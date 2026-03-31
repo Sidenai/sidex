@@ -1,509 +1,462 @@
-import { open } from '@tauri-apps/plugin-dialog';
-import { Disposable, DisposableStore } from '../../base/common/lifecycle';
-import { InstantiationService } from '../../platform/instantiation/common/instantiation';
-import { FileService } from '../../platform/files/browser/fileService';
-import { IFileService } from '../../platform/files/common/files';
-import { EditorPart } from './parts/editor/editorPart';
-import { SidebarPart } from './parts/sidebar/sidebarPart';
-import { StatusbarPart } from './parts/statusbar/statusbarPart';
-import { FileExplorer } from '../contrib/files/fileExplorer';
-import { SearchView } from '../contrib/search/searchView';
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
 
-interface ICommand {
-  id: string;
-  label: string;
-  keybinding?: string;
-  handler: () => void | Promise<void>;
+import './style.js';
+import { runWhenWindowIdle } from '../../base/browser/dom.js';
+import { Event, Emitter, setGlobalLeakWarningThreshold } from '../../base/common/event.js';
+import { RunOnceScheduler, timeout } from '../../base/common/async.js';
+import { isFirefox, isSafari, isChrome } from '../../base/browser/browser.js';
+import { mark } from '../../base/common/performance.js';
+import { onUnexpectedError, setUnexpectedErrorHandler } from '../../base/common/errors.js';
+import { Registry } from '../../platform/registry/common/platform.js';
+import { isWindows, isLinux, isWeb, isNative, isMacintosh } from '../../base/common/platform.js';
+import { IWorkbenchContributionsRegistry, Extensions as WorkbenchExtensions } from '../common/contributions.js';
+import { IEditorFactoryRegistry, EditorExtensions } from '../common/editor.js';
+import { getSingletonServiceDescriptors } from '../../platform/instantiation/common/extensions.js';
+import { Position, Parts, IWorkbenchLayoutService, positionToString } from '../services/layout/browser/layoutService.js';
+import { IStorageService, WillSaveStateReason, StorageScope, StorageTarget } from '../../platform/storage/common/storage.js';
+import { IConfigurationChangeEvent, IConfigurationService } from '../../platform/configuration/common/configuration.js';
+import { IInstantiationService } from '../../platform/instantiation/common/instantiation.js';
+import { ServiceCollection } from '../../platform/instantiation/common/serviceCollection.js';
+import { LifecyclePhase, ILifecycleService, WillShutdownEvent } from '../services/lifecycle/common/lifecycle.js';
+import { INotificationService } from '../../platform/notification/common/notification.js';
+import { NotificationService } from '../services/notification/common/notificationService.js';
+import { NotificationsCenter } from './parts/notifications/notificationsCenter.js';
+import { NotificationsAlerts } from './parts/notifications/notificationsAlerts.js';
+import { NotificationsStatus } from './parts/notifications/notificationsStatus.js';
+import { registerNotificationCommands } from './parts/notifications/notificationsCommands.js';
+import { NotificationsToasts } from './parts/notifications/notificationsToasts.js';
+import { setARIAContainer } from '../../base/browser/ui/aria/aria.js';
+import { FontMeasurements } from '../../editor/browser/config/fontMeasurements.js';
+import { createBareFontInfoFromRawSettings } from '../../editor/common/config/fontInfoFromSettings.js';
+import { ILogService } from '../../platform/log/common/log.js';
+import { toErrorMessage } from '../../base/common/errorMessage.js';
+import { WorkbenchContextKeysHandler } from './contextkeys.js';
+import { coalesce } from '../../base/common/arrays.js';
+import { InstantiationService } from '../../platform/instantiation/common/instantiationService.js';
+import { Layout } from './layout.js';
+import { IHostService } from '../services/host/browser/host.js';
+import { IDialogService } from '../../platform/dialogs/common/dialogs.js';
+import { mainWindow } from '../../base/browser/window.js';
+import { PixelRatio } from '../../base/browser/pixelRatio.js';
+import { IHoverService, WorkbenchHoverDelegate } from '../../platform/hover/browser/hover.js';
+import { setHoverDelegateFactory } from '../../base/browser/ui/hover/hoverDelegateFactory.js';
+import { setBaseLayerHoverDelegate } from '../../base/browser/ui/hover/hoverDelegate2.js';
+import { AccessibilityProgressSignalScheduler } from '../../platform/accessibilitySignal/browser/progressAccessibilitySignalScheduler.js';
+import { setProgressAccessibilitySignalScheduler } from '../../base/browser/ui/progressbar/progressAccessibilitySignal.js';
+import { AccessibleViewRegistry } from '../../platform/accessibility/browser/accessibleViewRegistry.js';
+import { NotificationAccessibleView } from './parts/notifications/notificationAccessibleView.js';
+import { IMarkdownRendererService } from '../../platform/markdown/browser/markdownRenderer.js';
+import { EditorMarkdownCodeBlockRenderer } from '../../editor/browser/widget/markdownRenderer/browser/editorMarkdownCodeBlockRenderer.js';
+
+export interface IWorkbenchOptions {
+
+	/**
+	 * Extra classes to be added to the workbench container.
+	 */
+	extraClasses?: string[];
+
+	/**
+	 * Whether to reset the workbench parts layout on startup.
+	 */
+	resetLayout?: boolean;
 }
 
-export class Workbench extends Disposable {
-  private readonly _store = new DisposableStore();
-  private readonly _instantiation: InstantiationService;
-  private _fileService!: FileService;
-  private _editorPart!: EditorPart;
-  private _sidebarPart!: SidebarPart;
-  private _statusbarPart!: StatusbarPart;
-  private _fileExplorer!: FileExplorer;
-  private _searchView!: SearchView;
+export class Workbench extends Layout {
 
-  private _commands: ICommand[] = [];
-  private _commandPalette!: HTMLElement;
-  private _commandInput!: HTMLInputElement;
-  private _commandResults!: HTMLElement;
-  private _focusedCommandIndex = -1;
-  private _currentView = 'explorer';
+	private readonly _onWillShutdown = this._register(new Emitter<WillShutdownEvent>());
+	readonly onWillShutdown = this._onWillShutdown.event;
 
-  constructor() {
-    super();
-    this._instantiation = new InstantiationService();
-  }
+	private readonly _onDidShutdown = this._register(new Emitter<void>());
+	readonly onDidShutdown = this._onDidShutdown.event;
 
-  async boot(): Promise<void> {
-    this._initServices();
-    this._initLayout();
-    this._renderWorkbench();
-    this._registerCommands();
-    this._bindGlobalKeys();
-    this._restore();
-  }
+	constructor(
+		parent: HTMLElement,
+		private readonly options: IWorkbenchOptions | undefined,
+		private readonly serviceCollection: ServiceCollection,
+		logService: ILogService
+	) {
+		super(parent, { resetLayout: Boolean(options?.resetLayout) });
 
-  private _initServices(): void {
-    this._fileService = new FileService();
-    this._instantiation.register(IFileService, this._fileService);
-    this._store.add(this._fileService);
-  }
+		// Perf: measure workbench startup time
+		mark('code/willStartWorkbench');
 
-  private _initLayout(): void {
-    this._editorPart = new EditorPart(this._fileService);
-    this._sidebarPart = new SidebarPart(this._fileService);
-    this._statusbarPart = new StatusbarPart(this._editorPart);
-    this._fileExplorer = new FileExplorer(this._fileService, this._sidebarPart, this._editorPart);
-    this._searchView = new SearchView(this._fileService, this._editorPart);
+		this.registerErrorHandler(logService);
+	}
 
-    this._store.add(this._editorPart);
-    this._store.add(this._sidebarPart);
-    this._store.add(this._statusbarPart);
-    this._store.add(this._fileExplorer);
-    this._store.add(this._searchView);
-  }
+	private registerErrorHandler(logService: ILogService): void {
 
-  private _renderWorkbench(): void {
-    this._editorPart.initialize();
-    this._statusbarPart.initialize();
+		// Increase stack trace limit for better errors stacks
+		if (!isFirefox) {
+			Error.stackTraceLimit = 100;
+		}
 
-    const sidebarContent = document.getElementById('sidebar-content')!;
-    this._searchView.initialize(sidebarContent);
+		// Listen on unhandled rejection events
+		// Note: intentionally not registered as disposable to handle
+		//       errors that can occur during shutdown phase.
+		mainWindow.addEventListener('unhandledrejection', (event) => {
 
-    this._commandPalette = document.getElementById('command-palette')!;
-    this._commandInput = document.getElementById('command-input') as HTMLInputElement;
-    this._commandResults = document.getElementById('command-results')!;
+			// See https://developer.mozilla.org/en-US/docs/Web/API/PromiseRejectionEvent
+			onUnexpectedError(event.reason);
 
-    this._setupCommandPalette();
-    this._setupActivityBar();
-    this._setupWelcomeButtons();
-    this._setupResizeHandle();
+			// Prevent the printing of this event to the console
+			event.preventDefault();
+		});
 
-    window.addEventListener('resize', () => this._editorPart.layout());
-  }
+		// Install handler for unexpected errors
+		setUnexpectedErrorHandler(error => this.handleUnexpectedError(error, logService));
+	}
 
-  private _setupCommandPalette(): void {
-    this._commandInput.addEventListener('input', () => {
-      this._filterCommands(this._commandInput.value);
-    });
+	private previousUnexpectedError: { message: string | undefined; time: number } = { message: undefined, time: 0 };
+	private handleUnexpectedError(error: unknown, logService: ILogService): void {
+		const message = toErrorMessage(error, true);
+		if (!message) {
+			return;
+		}
 
-    this._commandInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        this._hideCommandPalette();
-      } else if (e.key === 'Enter') {
-        this._executeSelectedCommand();
-      } else if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        this._moveFocus(1);
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        this._moveFocus(-1);
-      }
-    });
+		const now = Date.now();
+		if (message === this.previousUnexpectedError.message && now - this.previousUnexpectedError.time <= 1000) {
+			return; // Return if error message identical to previous and shorter than 1 second
+		}
 
-    const backdrop = this._commandPalette.querySelector('.command-palette-backdrop')!;
-    backdrop.addEventListener('click', () => this._hideCommandPalette());
-  }
+		this.previousUnexpectedError.time = now;
+		this.previousUnexpectedError.message = message;
 
-  private _setupActivityBar(): void {
-    const items = document.querySelectorAll('.activity-item');
-    items.forEach((item) => {
-      item.addEventListener('click', () => {
-        const view = (item as HTMLElement).dataset.view;
-        if (!view) return;
+		// Log it
+		logService.error(message);
+	}
 
-        items.forEach((i) => i.classList.remove('active'));
-        item.classList.add('active');
+	startup(): IInstantiationService {
+		try {
 
-        this._switchView(view);
-      });
-    });
-  }
+			// Configure emitter leak warning threshold
+			this._register(setGlobalLeakWarningThreshold(175));
 
-  private _switchView(view: string): void {
-    this._currentView = view;
+			// Services
+			const instantiationService = this.initServices(this.serviceCollection);
 
-    // Hide all panels
-    const treeView = document.querySelector('.tree-view') as HTMLElement;
-    if (treeView) treeView.style.display = 'none';
-    this._searchView.hide();
+			instantiationService.invokeFunction(accessor => {
+				const lifecycleService = accessor.get(ILifecycleService);
+				const storageService = accessor.get(IStorageService);
+				const configurationService = accessor.get(IConfigurationService);
+				const hostService = accessor.get(IHostService);
+				const hoverService = accessor.get(IHoverService);
+				const dialogService = accessor.get(IDialogService);
+				const notificationService = accessor.get(INotificationService) as NotificationService;
+				const markdownRendererService = accessor.get(IMarkdownRendererService);
 
-    const header = document.getElementById('sidebar-header')!.querySelector('h3')!;
+				// Set code block renderer for markdown rendering
+				markdownRendererService.setDefaultCodeBlockRenderer(instantiationService.createInstance(EditorMarkdownCodeBlockRenderer));
 
-    switch (view) {
-      case 'explorer':
-        if (treeView) treeView.style.display = 'block';
-        if (this._sidebarPart.rootPath) {
-          const name = this._sidebarPart.rootPath.split(/[/\\]/).filter(Boolean).pop() ?? '';
-          header.textContent = name.toUpperCase();
-        } else {
-          header.textContent = 'EXPLORER';
-        }
-        break;
-      case 'search':
-        header.textContent = 'SEARCH';
-        this._searchView.show(this._sidebarPart.rootPath);
-        break;
-      case 'git':
-        header.textContent = 'SOURCE CONTROL';
-        break;
-      case 'extensions':
-        header.textContent = 'EXTENSIONS';
-        break;
-    }
-  }
+				// Default Hover Delegate must be registered before creating any workbench/layout components
+				// as these possibly will use the default hover delegate
+				setHoverDelegateFactory((placement, enableInstantHover) => instantiationService.createInstance(WorkbenchHoverDelegate, placement, { instantHover: enableInstantHover }, {}));
+				setBaseLayerHoverDelegate(hoverService);
 
-  private _setupWelcomeButtons(): void {
-    const openFileBtn = document.getElementById('open-file-btn');
-    const openFolderBtn = document.getElementById('open-folder-btn');
+				// Layout
+				this.initLayout(accessor);
 
-    openFileBtn?.addEventListener('click', () => this._openFile());
-    openFolderBtn?.addEventListener('click', () => this._openFolder());
-  }
+				// Registries
+				Registry.as<IWorkbenchContributionsRegistry>(WorkbenchExtensions.Workbench).start(accessor);
+				Registry.as<IEditorFactoryRegistry>(EditorExtensions.EditorFactory).start(accessor);
 
-  private _setupResizeHandle(): void {
-    const sidebar = document.getElementById('sidebar')!;
-    let isResizing = false;
-    let startX = 0;
-    let startWidth = 0;
+				// Context Keys
+				this._register(instantiationService.createInstance(WorkbenchContextKeysHandler));
 
-    const handle = document.createElement('div');
-    handle.className = 'resize-handle';
-    sidebar.after(handle);
+				// Register Listeners
+				this.registerListeners(lifecycleService, storageService, configurationService, hostService, dialogService);
 
-    handle.addEventListener('mousedown', (e) => {
-      isResizing = true;
-      startX = e.clientX;
-      startWidth = sidebar.offsetWidth;
-      handle.classList.add('active');
-      document.body.style.cursor = 'col-resize';
-      document.body.style.userSelect = 'none';
-    });
+				// Render Workbench
+				this.renderWorkbench(instantiationService, notificationService, storageService, configurationService);
 
-    document.addEventListener('mousemove', (e) => {
-      if (!isResizing) return;
-      const delta = e.clientX - startX;
-      const newWidth = Math.max(170, Math.min(600, startWidth + delta));
-      sidebar.style.width = `${newWidth}px`;
-      this._editorPart.layout();
-    });
+				// Workbench Layout
+				this.createWorkbenchLayout();
 
-    document.addEventListener('mouseup', () => {
-      if (isResizing) {
-        isResizing = false;
-        handle.classList.remove('active');
-        document.body.style.cursor = '';
-        document.body.style.userSelect = '';
-      }
-    });
-  }
+				// Layout
+				this.layout();
 
-  private async _openFile(): Promise<void> {
-    try {
-      const selected = await open({
-        multiple: false,
-        directory: false,
-      });
-      if (selected && typeof selected === 'string') {
-        await this._editorPart.openFile(selected);
-      }
-    } catch (err) {
-      console.error('Open file failed:', err);
-    }
-  }
+				// Restore
+				this.restore(lifecycleService);
+			});
 
-  private async _openFolder(): Promise<void> {
-    try {
-      const selected = await open({
-        multiple: false,
-        directory: true,
-      });
-      if (selected && typeof selected === 'string') {
-        await this._sidebarPart.openFolder(selected);
-        this._statusbarPart.setFolderOpen(true);
-        this._switchView('explorer');
-        document.querySelector('.activity-item[data-view="explorer"]')?.classList.add('active');
-      }
-    } catch (err) {
-      console.error('Open folder failed:', err);
-    }
-  }
+			return instantiationService;
+		} catch (error) {
+			onUnexpectedError(error);
 
-  private _registerCommands(): void {
-    this._commands = [
-      {
-        id: 'workbench.action.openFile',
-        label: 'Open File',
-        keybinding: 'Ctrl+O',
-        handler: () => this._openFile(),
-      },
-      {
-        id: 'workbench.action.openFolder',
-        label: 'Open Folder',
-        keybinding: 'Ctrl+K Ctrl+O',
-        handler: () => this._openFolder(),
-      },
-      {
-        id: 'workbench.action.save',
-        label: 'Save File',
-        keybinding: 'Ctrl+S',
-        handler: () => this._editorPart.saveActiveFile(),
-      },
-      {
-        id: 'workbench.action.closeEditor',
-        label: 'Close Editor',
-        keybinding: 'Ctrl+W',
-        handler: () => {
-          const tab = this._editorPart.activeTab;
-          if (tab) this._editorPart.closeTab(tab.id);
-        },
-      },
-      {
-        id: 'workbench.action.toggleSidebar',
-        label: 'Toggle Sidebar',
-        keybinding: 'Ctrl+B',
-        handler: () => {
-          this._sidebarPart.toggle();
-          this._editorPart.layout();
-        },
-      },
-      {
-        id: 'workbench.action.showExplorer',
-        label: 'Show Explorer',
-        keybinding: 'Ctrl+Shift+E',
-        handler: () => {
-          this._sidebarPart.show();
-          this._switchView('explorer');
-        },
-      },
-      {
-        id: 'workbench.action.showSearch',
-        label: 'Show Search',
-        keybinding: 'Ctrl+Shift+F',
-        handler: () => {
-          this._sidebarPart.show();
-          this._switchView('search');
-        },
-      },
-      {
-        id: 'workbench.action.quickOpen',
-        label: 'Go to File',
-        keybinding: 'Ctrl+P',
-        handler: () => this._showCommandPalette('>'),
-      },
-      {
-        id: 'workbench.action.newFile',
-        label: 'New File',
-        handler: async () => {
-          if (this._sidebarPart.rootPath) {
-            const name = prompt('New file name:');
-            if (name) {
-              const path = this._sidebarPart.rootPath + '/' + name;
-              await this._fileService.write(path, '');
-              await this._sidebarPart.refresh();
-              await this._editorPart.openFile(path);
-            }
-          }
-        },
-      },
-      {
-        id: 'workbench.action.refreshExplorer',
-        label: 'Refresh Explorer',
-        handler: () => this._sidebarPart.refresh(),
-      },
-      {
-        id: 'editor.action.formatDocument',
-        label: 'Format Document',
-        keybinding: 'Shift+Alt+F',
-        handler: () => {
-          this._editorPart.editor?.getAction('editor.action.formatDocument')?.run();
-        },
-      },
-      {
-        id: 'workbench.action.zoomIn',
-        label: 'Zoom In',
-        handler: () => {
-          document.body.style.fontSize = `${parseFloat(getComputedStyle(document.body).fontSize) + 1}px`;
-        },
-      },
-      {
-        id: 'workbench.action.zoomOut',
-        label: 'Zoom Out',
-        handler: () => {
-          document.body.style.fontSize = `${Math.max(10, parseFloat(getComputedStyle(document.body).fontSize) - 1)}px`;
-        },
-      },
-      {
-        id: 'workbench.action.toggleWordWrap',
-        label: 'Toggle Word Wrap',
-        keybinding: 'Alt+Z',
-        handler: () => {
-          const editor = this._editorPart.editor;
-          if (editor) {
-            const current = editor.getRawOptions().wordWrap;
-            editor.updateOptions({ wordWrap: current === 'on' ? 'off' : 'on' });
-          }
-        },
-      },
-    ];
-  }
+			throw error; // rethrow because this is a critical issue we cannot handle properly here
+		}
+	}
 
-  private _bindGlobalKeys(): void {
-    document.addEventListener('keydown', (e) => {
-      // Ctrl+Shift+P - command palette
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'P') {
-        e.preventDefault();
-        this._showCommandPalette();
-        return;
-      }
+	private initServices(serviceCollection: ServiceCollection): IInstantiationService {
 
-      // Ctrl+P - quick open
-      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key === 'p') {
-        e.preventDefault();
-        this._showCommandPalette();
-        return;
-      }
+		// Layout Service
+		serviceCollection.set(IWorkbenchLayoutService, this);
 
-      // Ctrl+O - open file
-      if ((e.ctrlKey || e.metaKey) && e.key === 'o') {
-        e.preventDefault();
-        this._openFile();
-        return;
-      }
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		//
+		// NOTE: Please do NOT register services here. Use `registerSingleton()`
+		//       from `workbench.common.main.ts` if the service is shared between
+		//       desktop and web or `workbench.desktop.main.ts` if the service
+		//       is desktop only.
+		//
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-      // Ctrl+B - toggle sidebar
-      if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
-        e.preventDefault();
-        this._sidebarPart.toggle();
-        this._editorPart.layout();
-        return;
-      }
+		// All Contributed Services
+		const contributedServices = getSingletonServiceDescriptors();
+		for (const [id, descriptor] of contributedServices) {
+			serviceCollection.set(id, descriptor);
+		}
 
-      // Ctrl+Shift+E - explorer
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'E') {
-        e.preventDefault();
-        this._sidebarPart.show();
-        this._switchView('explorer');
-        return;
-      }
+		const instantiationService = new InstantiationService(serviceCollection, true);
 
-      // Ctrl+Shift+F - search
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'F') {
-        e.preventDefault();
-        this._sidebarPart.show();
-        this._switchView('search');
-        return;
-      }
-    });
-  }
+		// Wrap up
+		instantiationService.invokeFunction(accessor => {
+			const lifecycleService = accessor.get(ILifecycleService);
 
-  private _showCommandPalette(initialValue = ''): void {
-    this._commandPalette.classList.remove('hidden');
-    this._commandInput.value = initialValue;
-    this._commandInput.focus();
-    this._focusedCommandIndex = -1;
-    this._filterCommands(initialValue);
-  }
+			// TODO@Sandeep debt around cyclic dependencies
+			const configurationService = accessor.get(IConfigurationService);
+			if (configurationService && 'acquireInstantiationService' in configurationService) {
+				(configurationService as { acquireInstantiationService: (instantiationService: unknown) => void }).acquireInstantiationService(instantiationService);
+			}
 
-  private _hideCommandPalette(): void {
-    this._commandPalette.classList.add('hidden');
-    this._commandInput.value = '';
-    this._commandResults.innerHTML = '';
-    this._focusedCommandIndex = -1;
-    this._editorPart.editor?.focus();
-  }
+			// Signal to lifecycle that services are set
+			lifecycleService.phase = LifecyclePhase.Ready;
+		});
 
-  private _filterCommands(query: string): void {
-    this._commandResults.innerHTML = '';
-    this._focusedCommandIndex = -1;
+		return instantiationService;
+	}
 
-    const normalizedQuery = query.replace(/^>/, '').trim().toLowerCase();
+	private registerListeners(lifecycleService: ILifecycleService, storageService: IStorageService, configurationService: IConfigurationService, hostService: IHostService, dialogService: IDialogService): void {
 
-    const filtered = this._commands.filter((cmd) =>
-      cmd.label.toLowerCase().includes(normalizedQuery) ||
-      cmd.id.toLowerCase().includes(normalizedQuery),
-    );
+		// Configuration changes
+		this._register(configurationService.onDidChangeConfiguration(e => this.updateFontAliasing(e, configurationService)));
 
-    if (filtered.length === 0) {
-      const empty = document.createElement('div');
-      empty.className = 'command-item';
-      empty.style.color = 'var(--vscode-descriptionForeground)';
-      empty.textContent = 'No matching commands';
-      this._commandResults.appendChild(empty);
-      return;
-    }
+		// Font Info
+		if (isNative) {
+			this._register(storageService.onWillSaveState(e => {
+				if (e.reason === WillSaveStateReason.SHUTDOWN) {
+					this.storeFontInfo(storageService);
+				}
+			}));
+		} else {
+			this._register(lifecycleService.onWillShutdown(() => this.storeFontInfo(storageService)));
+		}
 
-    filtered.forEach((cmd, index) => {
-      const item = document.createElement('div');
-      item.className = 'command-item';
-      item.dataset.index = String(index);
+		// Lifecycle
+		this._register(lifecycleService.onWillShutdown(event => this._onWillShutdown.fire(event)));
+		this._register(lifecycleService.onDidShutdown(() => {
+			this._onDidShutdown.fire();
+			this.dispose();
+		}));
 
-      const label = document.createElement('span');
-      label.className = 'command-item-label';
-      label.textContent = cmd.label;
+		// In some environments we do not get enough time to persist state on shutdown.
+		// In other cases, VSCode might crash, so we periodically save state to reduce
+		// the chance of loosing any state.
+		// The window loosing focus is a good indication that the user has stopped working
+		// in that window so we pick that at a time to collect state.
+		this._register(hostService.onDidChangeFocus(focus => {
+			if (!focus) {
+				storageService.flush();
+			}
+		}));
 
-      item.appendChild(label);
+		// Dialogs showing/hiding
+		this._register(dialogService.onWillShowDialog(() => this.mainContainer.classList.add('modal-dialog-visible')));
+		this._register(dialogService.onDidShowDialog(() => this.mainContainer.classList.remove('modal-dialog-visible')));
+	}
 
-      if (cmd.keybinding) {
-        const kb = document.createElement('span');
-        kb.className = 'command-item-keybinding';
-        kb.textContent = cmd.keybinding;
-        item.appendChild(kb);
-      }
+	private fontAliasing: 'default' | 'antialiased' | 'none' | 'auto' | undefined;
+	private updateFontAliasing(e: IConfigurationChangeEvent | undefined, configurationService: IConfigurationService) {
+		if (!isMacintosh) {
+			return; // macOS only
+		}
 
-      item.addEventListener('click', () => {
-        this._hideCommandPalette();
-        cmd.handler();
-      });
+		if (e && !e.affectsConfiguration('workbench.fontAliasing')) {
+			return;
+		}
 
-      item.addEventListener('mouseenter', () => {
-        this._setFocusedCommand(index);
-      });
+		const aliasing = configurationService.getValue<'default' | 'antialiased' | 'none' | 'auto'>('workbench.fontAliasing');
+		if (this.fontAliasing === aliasing) {
+			return;
+		}
 
-      this._commandResults.appendChild(item);
-    });
-  }
+		this.fontAliasing = aliasing;
 
-  private _moveFocus(delta: number): void {
-    const items = this._commandResults.querySelectorAll('.command-item');
-    if (items.length === 0) return;
+		// Remove all
+		const fontAliasingValues: (typeof aliasing)[] = ['antialiased', 'none', 'auto'];
+		this.mainContainer.classList.remove(...fontAliasingValues.map(value => `monaco-font-aliasing-${value}`));
 
-    let newIndex = this._focusedCommandIndex + delta;
-    if (newIndex < 0) newIndex = items.length - 1;
-    if (newIndex >= items.length) newIndex = 0;
+		// Add specific
+		if (fontAliasingValues.some(option => option === aliasing)) {
+			this.mainContainer.classList.add(`monaco-font-aliasing-${aliasing}`);
+		}
+	}
 
-    this._setFocusedCommand(newIndex);
-  }
+	private restoreFontInfo(storageService: IStorageService, configurationService: IConfigurationService): void {
+		const storedFontInfoRaw = storageService.get('editorFontInfo', StorageScope.APPLICATION);
+		if (storedFontInfoRaw) {
+			try {
+				const storedFontInfo = JSON.parse(storedFontInfoRaw);
+				if (Array.isArray(storedFontInfo)) {
+					FontMeasurements.restoreFontInfo(mainWindow, storedFontInfo);
+				}
+			} catch (err) {
+				/* ignore */
+			}
+		}
 
-  private _setFocusedCommand(index: number): void {
-    const items = this._commandResults.querySelectorAll('.command-item');
-    items.forEach((i) => i.classList.remove('focused'));
-    this._focusedCommandIndex = index;
-    if (index >= 0 && index < items.length) {
-      items[index].classList.add('focused');
-      items[index].scrollIntoView({ block: 'nearest' });
-    }
-  }
+		FontMeasurements.readFontInfo(mainWindow, createBareFontInfoFromRawSettings(configurationService.getValue('editor'), PixelRatio.getInstance(mainWindow).value));
+	}
 
-  private _executeSelectedCommand(): void {
-    const items = this._commandResults.querySelectorAll('.command-item');
-    const index = this._focusedCommandIndex >= 0 ? this._focusedCommandIndex : 0;
-    if (index < items.length) {
-      (items[index] as HTMLElement).click();
-    }
-  }
+	private storeFontInfo(storageService: IStorageService): void {
+		const serializedFontInfo = FontMeasurements.serializeFontInfo(mainWindow);
+		if (serializedFontInfo) {
+			storageService.store('editorFontInfo', JSON.stringify(serializedFontInfo), StorageScope.APPLICATION, StorageTarget.MACHINE);
+		}
+	}
 
-  private _restore(): void {
-    // Future: restore previously open files and workspace
-    console.log('[SideX] Workbench ready');
-  }
+	private renderWorkbench(instantiationService: IInstantiationService, notificationService: NotificationService, storageService: IStorageService, configurationService: IConfigurationService): void {
 
-  override dispose(): void {
-    this._store.dispose();
-    super.dispose();
-  }
+		// ARIA & Signals
+		setARIAContainer(this.mainContainer);
+		setProgressAccessibilitySignalScheduler((msDelayTime: number, msLoopTime?: number) => instantiationService.createInstance(AccessibilityProgressSignalScheduler, msDelayTime, msLoopTime));
+
+		// State specific classes
+		const platformClass = isWindows ? 'windows' : isLinux ? 'linux' : 'mac';
+		const workbenchClasses = coalesce([
+			'monaco-workbench',
+			platformClass,
+			isWeb ? 'web' : undefined,
+			isChrome ? 'chromium' : isFirefox ? 'firefox' : isSafari ? 'safari' : undefined,
+			...this.getLayoutClasses(),
+			...(this.options?.extraClasses ? this.options.extraClasses : [])
+		]);
+
+		this.mainContainer.classList.add(...workbenchClasses);
+
+		// Apply font aliasing
+		this.updateFontAliasing(undefined, configurationService);
+
+		// Warm up font cache information before building up too many dom elements
+		this.restoreFontInfo(storageService, configurationService);
+
+		// Create Parts
+		for (const { id, role, classes, options } of [
+			{ id: Parts.TITLEBAR_PART, role: 'none', classes: ['titlebar'] },
+			{ id: Parts.BANNER_PART, role: 'banner', classes: ['banner'] },
+			{ id: Parts.ACTIVITYBAR_PART, role: 'none', classes: ['activitybar', this.getSideBarPosition() === Position.LEFT ? 'left' : 'right'] }, // Use role 'none' for some parts to make screen readers less chatty #114892
+			{ id: Parts.SIDEBAR_PART, role: 'none', classes: ['sidebar', this.getSideBarPosition() === Position.LEFT ? 'left' : 'right'] },
+			{ id: Parts.EDITOR_PART, role: 'main', classes: ['editor'], options: { restorePreviousState: this.willRestoreEditors() } },
+			{ id: Parts.PANEL_PART, role: 'none', classes: ['panel', 'basepanel', positionToString(this.getPanelPosition())] },
+			{ id: Parts.AUXILIARYBAR_PART, role: 'none', classes: ['auxiliarybar', 'basepanel', this.getSideBarPosition() === Position.LEFT ? 'right' : 'left'] },
+			{ id: Parts.STATUSBAR_PART, role: 'status', classes: ['statusbar'] }
+		]) {
+			const partContainer = this.createPart(id, role, classes);
+
+			mark(`code/willCreatePart/${id}`);
+			this.getPart(id).create(partContainer, options);
+			mark(`code/didCreatePart/${id}`);
+		}
+
+		// Notification Handlers
+		this.createNotificationsHandlers(instantiationService, notificationService);
+
+		// Add Workbench to DOM
+		this.parent.appendChild(this.mainContainer);
+	}
+
+	private createPart(id: string, role: string, classes: string[]): HTMLElement {
+		const part = document.createElement(role === 'status' ? 'footer' /* Use footer element for status bar #98376 */ : 'div');
+		part.classList.add('part', ...classes);
+		part.id = id;
+		part.setAttribute('role', role);
+		if (role === 'status') {
+			part.setAttribute('aria-live', 'off');
+		}
+
+		return part;
+	}
+
+	private createNotificationsHandlers(instantiationService: IInstantiationService, notificationService: NotificationService): void {
+
+		// Instantiate Notification components
+		const notificationsCenter = this._register(instantiationService.createInstance(NotificationsCenter, this.mainContainer, notificationService.model));
+		const notificationsToasts = this._register(instantiationService.createInstance(NotificationsToasts, this.mainContainer, notificationService.model));
+		this._register(instantiationService.createInstance(NotificationsAlerts, notificationService.model));
+		const notificationsStatus = instantiationService.createInstance(NotificationsStatus, notificationService.model);
+
+		// Visibility
+		this._register(notificationsCenter.onDidChangeVisibility(() => {
+			notificationsStatus.update(notificationsCenter.isVisible, notificationsToasts.isVisible);
+			notificationsToasts.update(notificationsCenter.isVisible);
+		}));
+
+		this._register(notificationsToasts.onDidChangeVisibility(() => {
+			notificationsStatus.update(notificationsCenter.isVisible, notificationsToasts.isVisible);
+		}));
+
+		// Register Commands
+		registerNotificationCommands(notificationsCenter, notificationsToasts, notificationService.model);
+
+		// Register notification accessible view
+		AccessibleViewRegistry.register(new NotificationAccessibleView());
+
+		// Register with Layout
+		this.registerNotifications({
+			onDidChangeNotificationsVisibility: Event.map(Event.any(notificationsToasts.onDidChangeVisibility, notificationsCenter.onDidChangeVisibility), () => notificationsToasts.isVisible || notificationsCenter.isVisible)
+		});
+	}
+
+	private restore(lifecycleService: ILifecycleService): void {
+
+		// Ask each part to restore
+		try {
+			this.restoreParts();
+		} catch (error) {
+			onUnexpectedError(error);
+		}
+
+		// Transition into restored phase after layout has restored
+		// but do not wait indefinitely on this to account for slow
+		// editors restoring. Since the workbench is fully functional
+		// even when the visible editors have not resolved, we still
+		// want contributions on the `Restored` phase to work before
+		// slow editors have resolved. But we also do not want fast
+		// editors to resolve slow when too many contributions get
+		// instantiated, so we find a middle ground solution via
+		// `Promise.race`
+		this.whenReady.finally(() =>
+			Promise.race([
+				this.whenRestored,
+				timeout(2000)
+			]).finally(() => {
+
+				// Update perf marks only when the layout is fully
+				// restored. We want the time it takes to restore
+				// editors to be included in these numbers
+
+				function markDidStartWorkbench() {
+					mark('code/didStartWorkbench');
+					performance.measure('perf: workbench create & restore', 'code/didLoadWorkbenchMain', 'code/didStartWorkbench');
+				}
+
+				if (this.isRestored()) {
+					markDidStartWorkbench();
+				} else {
+					this.whenRestored.finally(() => markDidStartWorkbench());
+				}
+
+				// Set lifecycle phase to `Restored`
+				lifecycleService.phase = LifecyclePhase.Restored;
+
+				// Set lifecycle phase to `Eventually` after a short delay and when idle (min 2.5sec, max 5sec)
+				const eventuallyPhaseScheduler = this._register(new RunOnceScheduler(() => {
+					this._register(runWhenWindowIdle(mainWindow, () => lifecycleService.phase = LifecyclePhase.Eventually, 2500));
+				}, 2500));
+				eventuallyPhaseScheduler.schedule();
+			})
+		);
+	}
 }
