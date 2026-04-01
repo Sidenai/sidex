@@ -73,8 +73,9 @@ async function boot() {
 		configurationDefaults: {
 			'workbench.startupEditor': 'none',
 			'workbench.enableExperiments': false,
-			'window.menuBarVisibility': 'classic',
+			'window.menuBarVisibility': 'hidden',
 			'window.titleBarStyle': 'custom',
+			'window.commandCenter': true,
 			'telemetry.telemetryLevel': 'off',
 			'update.mode': 'none',
 			'extensions.autoUpdate': false,
