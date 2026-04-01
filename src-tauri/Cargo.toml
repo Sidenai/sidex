@@ -35,3 +35,4 @@ rusqlite = { version = "0.31", features = ["bundled"] }
 tokio = { version = "1", features = ["full"] }
 hostname = "0.4"
 dirs = "5"
+reqwest = { version = "0.12", features = ["rustls-tls"] }

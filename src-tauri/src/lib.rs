@@ -242,6 +242,8 @@ pub fn run() {
             commands::start_extension_host,
             commands::stop_extension_host,
             commands::extension_host_port,
+            commands::fetch_url,
+            commands::fetch_url_text,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

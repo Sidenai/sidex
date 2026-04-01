@@ -43,6 +43,43 @@
         },
       };
     </script>
+    <script>
+      // Proxy Open VSX requests through Tauri backend to bypass CORS (Origin: null in webview)
+      (function() {
+        const originalFetch = window.fetch;
+        window.fetch = async function(input, init) {
+          const url = typeof input === 'string'
+            ? input
+            : input instanceof URL
+              ? input.href
+              : (input instanceof Request ? input.url : '');
+
+          if (url && (url.includes('open-vsx.org') || url.includes('openvsx.eclipsecontent.org'))) {
+            try {
+              const { invoke } = await import('@tauri-apps/api/core');
+              const isTextRequest = init?.headers?.['Accept']?.includes('application/json')
+                || url.endsWith('.json')
+                || url.includes('/gallery/')
+                || url.includes('/vscode/');
+              if (isTextRequest) {
+                const text = await invoke('fetch_url_text', { url });
+                return new Response(text, {
+                  status: 200,
+                  headers: { 'Content-Type': 'application/json' },
+                });
+              } else {
+                const bytes = await invoke('fetch_url', { url });
+                return new Response(new Uint8Array(bytes), { status: 200 });
+              }
+            } catch (e) {
+              console.warn('[SideX] Proxy fetch failed, falling back:', e);
+            }
+          }
+
+          return originalFetch.call(this, input, init);
+        };
+      })();
+    </script>
     <script src="/builtin-extensions.js"></script>
     <script type="module" src="/src/main.ts" defer></script>
     <style>
