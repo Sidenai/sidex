@@ -199,7 +199,7 @@ export class IncludePatternInputWidget extends PatternInputWidget {
 
 	override dispose(): void {
 		super.dispose();
-		this.useSearchInEditorsBox.dispose();
+		this.useSearchInEditorsBox?.dispose();
 	}
 
 	onlySearchInOpenEditors(): boolean {
@@ -213,7 +213,7 @@ export class IncludePatternInputWidget extends PatternInputWidget {
 	}
 
 	protected override getSubcontrolsWidth(): number {
-		return super.getSubcontrolsWidth() + this.useSearchInEditorsBox.width();
+		return super.getSubcontrolsWidth() + (this.useSearchInEditorsBox?.width() ?? 0);
 	}
 
 	protected override renderSubcontrols(controlsDiv: HTMLDivElement): void {
@@ -252,20 +252,21 @@ export class ExcludePatternInputWidget extends PatternInputWidget {
 
 	override dispose(): void {
 		super.dispose();
-		this.useExcludesAndIgnoreFilesBox.dispose();
+		this.useExcludesAndIgnoreFilesBox?.dispose();
 	}
 
 	useExcludesAndIgnoreFiles(): boolean {
-		return this.useExcludesAndIgnoreFilesBox.checked;
+		return this.useExcludesAndIgnoreFilesBox?.checked ?? true;
 	}
 
 	setUseExcludesAndIgnoreFiles(value: boolean) {
+		if (!this.useExcludesAndIgnoreFilesBox) { return; }
 		this.useExcludesAndIgnoreFilesBox.checked = value;
 		this._onChangeIgnoreBoxEmitter.fire();
 	}
 
 	protected override getSubcontrolsWidth(): number {
-		return super.getSubcontrolsWidth() + this.useExcludesAndIgnoreFilesBox.width();
+		return super.getSubcontrolsWidth() + (this.useExcludesAndIgnoreFilesBox?.width() ?? 0);
 	}
 
 	protected override renderSubcontrols(controlsDiv: HTMLDivElement): void {

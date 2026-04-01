@@ -507,9 +507,12 @@ export class BrowserMain extends Disposable {
 		}
 		fileService.registerProvider(Schemas.vscodeUserData, userDataProvider);
 
-		// Local file access via Tauri backend, falling back to browser File System Access API
-		if (typeof (globalThis as any).__TAURI_INTERNALS__ !== 'undefined') {
-			fileService.registerProvider(Schemas.file, new TauriFileSystemProvider());
+		// Local file access via Tauri backend
+		const isTauri = typeof (globalThis as any).__TAURI_INTERNALS__ !== 'undefined' || typeof (globalThis as any).__TAURI__ !== 'undefined' || (globalThis as any).__SIDEX_TAURI__ === true;
+		if (isTauri) {
+			const provider = new TauriFileSystemProvider();
+			fileService.registerProvider(Schemas.file, provider);
+			logService.info('[SideX] Registered TauriFileSystemProvider for file:// scheme');
 		} else if (WebFileSystemAccess.supported(mainWindow)) {
 			fileService.registerProvider(Schemas.file, new HTMLFileSystemProvider(indexedDB, handlesStore, logService));
 		}
