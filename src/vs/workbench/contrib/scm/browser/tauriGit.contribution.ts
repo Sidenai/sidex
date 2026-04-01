@@ -277,6 +277,10 @@ class TauriGitSCMProvider extends Disposable implements ISCMProvider {
 		this._stagedGroup.setResources(stagedResources);
 		this._changesGroup.setResources(changesResources);
 
+		// Fire provider-level change events so the SCM view updates
+		this._onDidChangeResources.fire();
+		this._onDidChangeResourceGroups.fire();
+
 		const total = stagedResources.length + changesResources.length;
 		this._count.set(total, undefined);
 
