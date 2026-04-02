@@ -299,7 +299,6 @@ import './contrib/externalUriOpener/common/externalUriOpener.contribution.js';
 // Extensions Management
 import './contrib/extensions/browser/extensions.contribution.js';
 import './contrib/extensions/browser/extensionsViewlet.js';
-import './contrib/extensions/browser/tauriExtensionHost.contribution.js';
 
 // Output View
 import './contrib/output/browser/output.contribution.js';
