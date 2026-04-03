@@ -356,3 +356,12 @@ viewsRegistry.registerViewWelcomeContent(EmptyView.ID, {
 	group: ViewContentGroups.Open,
 	order: 1
 });
+
+const cloneRepoButton = `[${localize('cloneRepository', "Clone Repository")}](command:git.clone)`;
+viewsRegistry.registerViewWelcomeContent(EmptyView.ID, {
+	content: localize({ key: 'sidexCloneRepository', comment: ['Please do not translate the word "command", it is part of our internal syntax which must not change'] },
+		"You can clone a repository locally.\n{0}", cloneRepoButton),
+	when: WorkbenchStateContext.notEqualsTo('workspace'),
+	group: '5_scm',
+	order: 1
+});
