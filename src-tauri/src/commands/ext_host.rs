@@ -31,10 +31,7 @@ struct PortMessage {
 
 fn find_node() -> Result<String, String> {
     let candidates = if cfg!(target_os = "windows") {
-        vec![
-            "node.exe",
-            "node",
-        ]
+        vec!["node.exe", "node"]
     } else {
         vec![
             "node",
@@ -62,7 +59,10 @@ fn find_node() -> Result<String, String> {
 fn resolve_server_script(app: &AppHandle) -> std::path::PathBuf {
     let resource_path = app
         .path()
-        .resolve("extension-host/server.cjs", tauri::path::BaseDirectory::Resource)
+        .resolve(
+            "extension-host/server.cjs",
+            tauri::path::BaseDirectory::Resource,
+        )
         .ok();
 
     if let Some(ref p) = resource_path {

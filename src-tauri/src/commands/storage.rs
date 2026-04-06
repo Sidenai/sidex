@@ -53,9 +53,7 @@ pub fn storage_get(
         .prepare("SELECT value FROM kv_store WHERE key = ?1")
         .map_err(|e| format!("Failed to prepare query: {}", e))?;
 
-    let result = stmt
-        .query_row([&key], |row| row.get::<_, String>(0))
-        .ok();
+    let result = stmt.query_row([&key], |row| row.get::<_, String>(0)).ok();
 
     Ok(result)
 }

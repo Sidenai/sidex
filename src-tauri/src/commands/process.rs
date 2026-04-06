@@ -1,5 +1,5 @@
 //! High-performance process and terminal management module for SideX
-//! 
+//!
 //! Features:
 //! - PTY (pseudo-terminal) support with full terminal emulation
 //! - Ring buffer for output to prevent memory exhaustion
@@ -7,14 +7,17 @@
 //! - Multiple shell support (bash, zsh, powershell, cmd, fish)
 //! - Process tree management for proper cleanup
 
+use crossbeam::channel::{bounded, Receiver, Sender};
 use portable_pty::{native_pty_system, CommandBuilder, MasterPty, PtySize};
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, VecDeque};
 use std::io::{Read, Write};
-use std::sync::{Arc, Mutex, atomic::{AtomicU32, AtomicBool, Ordering}};
-use std::time::{SystemTime, UNIX_EPOCH, Duration};
+use std::sync::{
+    atomic::{AtomicBool, AtomicU32, Ordering},
+    Arc, Mutex,
+};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use tauri::{AppHandle, Emitter, State};
-use crossbeam::channel::{bounded, Sender, Receiver};
 
 // ============================================================================
 // Constants
@@ -61,7 +64,11 @@ impl OutputLine {
             .duration_since(UNIX_EPOCH)
             .unwrap_or_default()
             .as_millis() as u64;
-        Self { text, is_stderr, timestamp }
+        Self {
+            text,
+            is_stderr,
+            timestamp,
+        }
     }
 }
 
@@ -223,10 +230,10 @@ impl Terminal {
     ) -> (Self, Receiver<OutputMessage>) {
         let output = Arc::new(Mutex::new(RingBuffer::new(DEFAULT_RING_BUFFER_CAPACITY)));
         let (sender, receiver) = bounded(OUTPUT_CHANNEL_SIZE);
-        
+
         // Spawn reader thread
         let reader_handle = spawn_output_reader(reader, sender.clone(), handle);
-        
+
         let terminal = Self {
             _handle: handle,
             shell,
@@ -241,7 +248,7 @@ impl Terminal {
             rows,
             is_alive: Arc::new(AtomicBool::new(true)),
         };
-        
+
         (terminal, receiver)
     }
 
@@ -278,7 +285,9 @@ impl Terminal {
 
     fn kill(&mut self) -> Result<(), String> {
         self.is_alive.store(false, Ordering::SeqCst);
-        self.child.kill().map_err(|e| format!("Failed to kill: {}", e))
+        self.child
+            .kill()
+            .map_err(|e| format!("Failed to kill: {}", e))
     }
 }
 
@@ -304,7 +313,10 @@ impl ProcessStore {
 
     fn insert(&self, handle: TermHandle, terminal: Terminal, receiver: Receiver<OutputMessage>) {
         self.terminals.lock().unwrap().insert(handle, terminal);
-        self.output_receivers.lock().unwrap().insert(handle, receiver);
+        self.output_receivers
+            .lock()
+            .unwrap()
+            .insert(handle, receiver);
     }
 
     fn remove(&self, handle: TermHandle) -> Option<Terminal> {
@@ -324,7 +336,7 @@ impl ProcessStore {
 /// Detect available shells on the system
 fn detect_shells() -> Vec<ShellInfo> {
     let default_shell = std::env::var("SHELL").unwrap_or_default();
-    
+
     let candidates: Vec<(&str, &str)> = if cfg!(target_os = "windows") {
         vec![
             ("PowerShell", "powershell.exe"),
@@ -356,15 +368,20 @@ fn detect_shells() -> Vec<ShellInfo> {
             path.to_string()
         } else {
             // Try to find in PATH
-            which::which(path).map(|p| p.to_string_lossy().to_string()).unwrap_or_default()
+            which::which(path)
+                .map(|p| p.to_string_lossy().to_string())
+                .unwrap_or_default()
         };
-        
-        if !full_path.is_empty() && std::path::Path::new(&full_path).exists() && seen_names.insert(name.to_string()) {
+
+        if !full_path.is_empty()
+            && std::path::Path::new(&full_path).exists()
+            && seen_names.insert(name.to_string())
+        {
             shells.push(ShellInfo {
                 name: name.to_string(),
                 path: full_path.clone(),
-                is_default: full_path == default_shell || 
-                    (default_shell.is_empty() && shells.is_empty()),
+                is_default: full_path == default_shell
+                    || (default_shell.is_empty() && shells.is_empty()),
             });
         }
     }
@@ -392,25 +409,27 @@ fn detect_shells() -> Vec<ShellInfo> {
 /// Get the best available shell
 fn get_best_shell(preferred: Option<&str>) -> (String, String) {
     let shells = detect_shells();
-    
+
     if let Some(pref) = preferred {
         // Try to find exact match first
         for shell in &shells {
-            if shell.name.to_lowercase() == pref.to_lowercase() ||
-               shell.path.to_lowercase().contains(&pref.to_lowercase()) {
+            if shell.name.to_lowercase() == pref.to_lowercase()
+                || shell.path.to_lowercase().contains(&pref.to_lowercase())
+            {
                 return (shell.name.clone(), shell.path.clone());
             }
         }
     }
-    
+
     // Return default or first available
     for shell in &shells {
         if shell.is_default {
             return (shell.name.clone(), shell.path.clone());
         }
     }
-    
-    shells.first()
+
+    shells
+        .first()
         .map(|s| (s.name.clone(), s.path.clone()))
         .unwrap_or_else(|| {
             if cfg!(target_os = "windows") {
@@ -429,12 +448,12 @@ fn get_best_shell(preferred: Option<&str>) -> (String, String) {
 #[cfg(unix)]
 fn kill_process_tree(pid: u32) -> Result<(), String> {
     use std::process::Command;
-    
+
     // Try to get child PIDs using pgrep (Linux/macOS)
     let output = Command::new("pgrep")
         .args(&["-P", &pid.to_string()])
         .output();
-    
+
     if let Ok(output) = output {
         let stdout = String::from_utf8_lossy(&output.stdout);
         for line in stdout.lines() {
@@ -444,7 +463,7 @@ fn kill_process_tree(pid: u32) -> Result<(), String> {
             }
         }
     }
-    
+
     // Kill the main process
     unsafe {
         let result = libc::kill(pid as i32, libc::SIGTERM);
@@ -453,7 +472,7 @@ fn kill_process_tree(pid: u32) -> Result<(), String> {
             libc::kill(pid as i32, libc::SIGKILL);
         }
     }
-    
+
     Ok(())
 }
 
@@ -461,13 +480,13 @@ fn kill_process_tree(pid: u32) -> Result<(), String> {
 fn kill_process_tree(pid: u32) -> Result<(), String> {
     use std::os::windows::process::CommandExt;
     use std::process::Command;
-    
+
     // Use taskkill /T to kill process tree on Windows
     let result = Command::new("taskkill")
         .args(&["/F", "/T", "/PID", &pid.to_string()])
         .creation_flags(0x08000000) // CREATE_NO_WINDOW
         .output();
-    
+
     match result {
         Ok(output) => {
             if !output.status.success() {
@@ -514,13 +533,13 @@ pub fn term_spawn(
 
     // Build command
     let mut cmd = CommandBuilder::new(&shell_path);
-    
+
     // Add login flag for Unix shells
     let shell_basename = std::path::Path::new(&shell_path)
         .file_name()
         .and_then(|n| n.to_str())
         .unwrap_or("");
-    
+
     match shell_basename {
         "zsh" | "bash" | "sh" | "fish" => {
             cmd.arg("-l");
@@ -539,8 +558,20 @@ pub fn term_spawn(
 
     // Copy essential environment (platform-aware)
     if cfg!(target_os = "windows") {
-        for key in ["PATH", "USERPROFILE", "USERNAME", "APPDATA", "LOCALAPPDATA",
-                     "HOMEDRIVE", "HOMEPATH", "COMSPEC", "SystemRoot", "HOME", "TEMP", "TMP"] {
+        for key in [
+            "PATH",
+            "USERPROFILE",
+            "USERNAME",
+            "APPDATA",
+            "LOCALAPPDATA",
+            "HOMEDRIVE",
+            "HOMEPATH",
+            "COMSPEC",
+            "SystemRoot",
+            "HOME",
+            "TEMP",
+            "TMP",
+        ] {
             if let Ok(val) = std::env::var(key) {
                 cmd.env(key, val);
             }
@@ -552,7 +583,7 @@ pub fn term_spawn(
             }
         }
     }
-    
+
     // Set LANG if not set
     if std::env::var("LANG").is_err() {
         cmd.env("LANG", "en_US.UTF-8");
@@ -617,12 +648,15 @@ pub fn term_spawn(
     state.insert(handle, terminal, receiver);
 
     // Emit term-started event
-    let _ = app.emit("term-started", TermStartedEvent {
-        handle,
-        shell: shell_name,
-        pid,
-        cwd: cwd_str,
-    });
+    let _ = app.emit(
+        "term-started",
+        TermStartedEvent {
+            handle,
+            shell: shell_name,
+            pid,
+            cwd: cwd_str,
+        },
+    );
 
     Ok(handle)
 }
@@ -721,10 +755,7 @@ pub struct TermReadResult {
 
 /// Kill terminal and all child processes
 #[tauri::command]
-pub fn term_kill(
-    state: State<'_, Arc<ProcessStore>>,
-    handle: TermHandle,
-) -> Result<(), String> {
+pub fn term_kill(state: State<'_, Arc<ProcessStore>>, handle: TermHandle) -> Result<(), String> {
     let pid = {
         let mut terminals = state.terminals.lock().map_err(|e| e.to_string())?;
         let terminal = terminals
@@ -775,9 +806,7 @@ pub fn term_info(
 
 /// List active terminals
 #[tauri::command]
-pub fn term_list(
-    state: State<'_, Arc<ProcessStore>>,
-) -> Result<Vec<TermHandle>, String> {
+pub fn term_list(state: State<'_, Arc<ProcessStore>>) -> Result<Vec<TermHandle>, String> {
     Ok(state.handles())
 }
 
@@ -834,12 +863,12 @@ pub async fn exec(
     cmd.args(&args);
     cmd.stdout(std::process::Stdio::piped());
     cmd.stderr(std::process::Stdio::piped());
-    
+
     // Set working directory
     if let Some(dir) = cwd {
         cmd.current_dir(dir);
     }
-    
+
     // Set environment
     if let Some(env_vars) = env {
         for (k, v) in env_vars {
@@ -848,7 +877,8 @@ pub async fn exec(
     }
 
     // Spawn the process
-    let mut child = cmd.spawn()
+    let mut child = cmd
+        .spawn()
         .map_err(|e| format!("Failed to spawn '{}': {}", command, e))?;
 
     // Wait with timeout
@@ -889,7 +919,7 @@ pub async fn exec(
         Err(_) => {
             // Timeout - kill the process
             let _ = child.kill().await;
-            
+
             // Try to get any output before killing
             let stdout = if let Some(mut stdout) = child.stdout.take() {
                 let mut buf = String::new();
@@ -934,9 +964,9 @@ pub fn term_clear_buffer(
         .get_mut(&handle)
         .ok_or_else(|| format!("Terminal {:?} not found", handle))?;
 
-    *terminal.output.lock().map_err(|e| e.to_string())? = 
+    *terminal.output.lock().map_err(|e| e.to_string())? =
         RingBuffer::new(DEFAULT_RING_BUFFER_CAPACITY);
-    
+
     Ok(())
 }
 
@@ -1010,6 +1040,6 @@ pub fn term_set_cwd(
     };
     terminal.write(&cd_cmd)?;
     terminal.cwd = cwd;
-    
+
     Ok(())
 }

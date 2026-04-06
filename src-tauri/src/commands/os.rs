@@ -31,9 +31,23 @@ pub fn get_env(key: String) -> Option<String> {
 }
 
 const SENSITIVE_ENV_PATTERNS: &[&str] = &[
-    "SECRET", "TOKEN", "PASSWORD", "PASSWD", "CREDENTIAL", "PRIVATE_KEY",
-    "API_KEY", "APIKEY", "AUTH", "AWS_", "AZURE_", "GCP_", "GITHUB_TOKEN",
-    "NPM_TOKEN", "DOCKER_PASSWORD", "SSH_", "GPG_",
+    "SECRET",
+    "TOKEN",
+    "PASSWORD",
+    "PASSWD",
+    "CREDENTIAL",
+    "PRIVATE_KEY",
+    "API_KEY",
+    "APIKEY",
+    "AUTH",
+    "AWS_",
+    "AZURE_",
+    "GCP_",
+    "GITHUB_TOKEN",
+    "NPM_TOKEN",
+    "DOCKER_PASSWORD",
+    "SSH_",
+    "GPG_",
 ];
 
 #[tauri::command]

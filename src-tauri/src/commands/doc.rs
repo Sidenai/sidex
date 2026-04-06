@@ -251,7 +251,11 @@ fn bom_len(encoding: &'static Encoding) -> usize {
 }
 
 /// Decode bytes to string using the specified encoding
-fn decode_to_string(encoding: &'static Encoding, data: &[u8], has_bom: bool) -> Result<String, String> {
+fn decode_to_string(
+    encoding: &'static Encoding,
+    data: &[u8],
+    has_bom: bool,
+) -> Result<String, String> {
     let start = if has_bom { bom_len(encoding) } else { 0 };
     let (cow, _had_errors) = encoding.decode_without_bom_handling(&data[start..]);
     if _had_errors {
@@ -266,7 +270,7 @@ fn decode_to_string(encoding: &'static Encoding, data: &[u8], has_bom: bool) -> 
 fn encode_to_bytes(encoding: &'static Encoding, text: &str, has_bom: bool) -> Vec<u8> {
     let (cow, _enc, _had_errors) = encoding.encode(text);
     let mut result = Vec::with_capacity(cow.len() + if has_bom { bom_len(encoding) } else { 0 });
-    
+
     if has_bom {
         // Add appropriate BOM
         if encoding == UTF_8 {
@@ -277,7 +281,7 @@ fn encode_to_bytes(encoding: &'static Encoding, text: &str, has_bom: bool) -> Ve
             result.extend_from_slice(&[0xFE, 0xFF]);
         }
     }
-    
+
     result.extend_from_slice(&cow);
     result
 }
@@ -328,10 +332,7 @@ fn range_to_byte_offsets(text: &str, range: &TextRange) -> (usize, usize) {
 
 impl Document {
     /// Create a new document from file path or as untitled
-    fn new(
-        handle: DocHandle,
-        path: Option<PathBuf>,
-    ) -> Result<Self, String> {
+    fn new(handle: DocHandle, path: Option<PathBuf>) -> Result<Self, String> {
         let (original, encoding, has_bom, line_endings) = if let Some(ref p) = path {
             // Load from file
             let file = File::open(p).map_err(|e| format!("Failed to open file: {}", e))?;
@@ -414,7 +415,9 @@ impl Document {
 
         for piece in &self.pieces {
             let bytes = match piece.source {
-                PieceSource::Original => &self.original.as_bytes()[piece.start..piece.start + piece.length],
+                PieceSource::Original => {
+                    &self.original.as_bytes()[piece.start..piece.start + piece.length]
+                }
                 PieceSource::AddBuffer => &self.add_buffer[piece.start..piece.start + piece.length],
             };
             result.extend_from_slice(bytes);
@@ -481,9 +484,10 @@ impl Document {
             let (start_offset, end_offset) = range_to_byte_offsets(&content, &edit.range);
 
             // Store old text for undo if not provided
-            let old_text = edit.old_text.clone().unwrap_or_else(|| {
-                content[start_offset..end_offset].to_string()
-            });
+            let old_text = edit
+                .old_text
+                .clone()
+                .unwrap_or_else(|| content[start_offset..end_offset].to_string());
 
             // Apply the edit to the piece table
             self.replace_range_bytes(start_offset, end_offset, &edit.new_text)?;
@@ -493,7 +497,8 @@ impl Document {
                 range: TextRange {
                     start_line: edit.range.start_line,
                     start_column: edit.range.start_column,
-                    end_line: edit.range.start_line + edit.new_text.lines().count().saturating_sub(1),
+                    end_line: edit.range.start_line
+                        + edit.new_text.lines().count().saturating_sub(1),
                     end_column: if edit.new_text.lines().count() == 1 {
                         edit.range.start_column + edit.new_text.len()
                     } else {
@@ -521,9 +526,14 @@ impl Document {
     }
 
     /// Replace a byte range in the piece table
-    fn replace_range_bytes(&mut self, start: usize, end: usize, new_text: &str) -> Result<(), String> {
+    fn replace_range_bytes(
+        &mut self,
+        start: usize,
+        end: usize,
+        new_text: &str,
+    ) -> Result<(), String> {
         let new_text_bytes = encode_to_bytes(self.encoding, new_text, false);
-        
+
         // Find the piece indices that contain start and end positions
         let mut current_offset = 0;
         let mut start_piece_idx = None;
@@ -650,10 +660,12 @@ impl Document {
 
     /// Save document to disk
     fn save(&mut self, path: Option<PathBuf>) -> Result<PathBuf, String> {
-        let save_path = path.or_else(|| self.path.clone()).ok_or("No path specified for save")?;
-        
+        let save_path = path
+            .or_else(|| self.path.clone())
+            .ok_or("No path specified for save")?;
+
         let content = self.get_content_bytes();
-        
+
         // Convert line endings if needed
         let final_content = if self.line_endings == LineEnding::Lf {
             content
@@ -677,7 +689,7 @@ impl Document {
         // Update state after successful save
         self.path = Some(save_path.clone());
         self.is_dirty = false;
-        
+
         // Reset original content to the saved state
         // Note: For large files, this could be optimized
         self.original = OriginalContent::Owned(self.get_content_bytes());
@@ -776,7 +788,7 @@ pub fn doc_open(
 ) -> Result<DocHandle, String> {
     let path_buf = path.as_ref().map(|p| PathBuf::from(p));
     let path_for_event = path.clone();
-    
+
     // Check if document is already open
     let docs = state.documents.read().map_err(|e| e.to_string())?;
     for (handle, doc) in docs.iter() {
@@ -794,10 +806,13 @@ pub fn doc_open(
     let mut docs = state.documents.write().map_err(|e| e.to_string())?;
     docs.insert(handle, Mutex::new(doc));
 
-    state.emit_event("doc-opened", serde_json::json!({
-        "handle": handle.0,
-        "path": path_for_event,
-    }));
+    state.emit_event(
+        "doc-opened",
+        serde_json::json!({
+            "handle": handle.0,
+            "path": path_for_event,
+        }),
+    );
 
     Ok(handle)
 }
@@ -810,9 +825,7 @@ pub fn doc_get(
     range: Option<LineRange>,
 ) -> Result<String, String> {
     let docs = state.documents.read().map_err(|e| e.to_string())?;
-    let doc = docs
-        .get(&handle)
-        .ok_or("Document not found")?;
+    let doc = docs.get(&handle).ok_or("Document not found")?;
     let doc = doc.lock().map_err(|e| e.to_string())?;
 
     match range {
@@ -829,9 +842,7 @@ pub fn doc_edit(
     edits: Vec<EditOp>,
 ) -> Result<(), String> {
     let docs = state.documents.read().map_err(|e| e.to_string())?;
-    let doc = docs
-        .get(&handle)
-        .ok_or("Document not found")?;
+    let doc = docs.get(&handle).ok_or("Document not found")?;
     let mut doc = doc.lock().map_err(|e| e.to_string())?;
 
     doc.apply_edits(edits, true)?;
@@ -840,23 +851,21 @@ pub fn doc_edit(
     drop(doc);
     drop(docs);
 
-    state.emit_event("doc-changed", serde_json::json!({
-        "handle": handle.0,
-    }));
+    state.emit_event(
+        "doc-changed",
+        serde_json::json!({
+            "handle": handle.0,
+        }),
+    );
 
     Ok(())
 }
 
 /// Get document stats
 #[tauri::command]
-pub fn doc_stats(
-    state: State<'_, Arc<DocStore>>,
-    handle: DocHandle,
-) -> Result<DocStats, String> {
+pub fn doc_stats(state: State<'_, Arc<DocStore>>, handle: DocHandle) -> Result<DocStats, String> {
     let docs = state.documents.read().map_err(|e| e.to_string())?;
-    let doc = docs
-        .get(&handle)
-        .ok_or("Document not found")?;
+    let doc = docs.get(&handle).ok_or("Document not found")?;
     let doc = doc.lock().map_err(|e| e.to_string())?;
 
     Ok(doc.stats())
@@ -870,38 +879,37 @@ pub fn doc_save(
     path: Option<String>,
 ) -> Result<(), String> {
     let path_buf = path.map(PathBuf::from);
-    
+
     let docs = state.documents.read().map_err(|e| e.to_string())?;
-    let doc = docs
-        .get(&handle)
-        .ok_or("Document not found")?;
+    let doc = docs.get(&handle).ok_or("Document not found")?;
     let mut doc = doc.lock().map_err(|e| e.to_string())?;
 
     // Save returns the path
     doc.save(path_buf.clone())?;
-    let path_str = path_buf.or_else(|| doc.path.clone())
+    let path_str = path_buf
+        .or_else(|| doc.path.clone())
         .map(|p| p.to_string_lossy().to_string())
         .unwrap_or_default();
-    
+
     drop(doc);
     drop(docs);
 
-    state.emit_event("doc-saved", serde_json::json!({
-        "handle": handle.0,
-        "path": path_str,
-    }));
+    state.emit_event(
+        "doc-saved",
+        serde_json::json!({
+            "handle": handle.0,
+            "path": path_str,
+        }),
+    );
 
     Ok(())
 }
 
 /// Close document (free memory)
 #[tauri::command]
-pub fn doc_close(
-    state: State<'_, Arc<DocStore>>,
-    handle: DocHandle,
-) -> Result<(), String> {
+pub fn doc_close(state: State<'_, Arc<DocStore>>, handle: DocHandle) -> Result<(), String> {
     let mut docs = state.documents.write().map_err(|e| e.to_string())?;
-    
+
     if let Some(doc) = docs.remove(&handle) {
         // Shutdown auto-save task
         if let Ok(doc) = doc.lock() {
@@ -911,9 +919,12 @@ pub fn doc_close(
         }
     }
 
-    state.emit_event("doc-closed", serde_json::json!({
-        "handle": handle.0,
-    }));
+    state.emit_event(
+        "doc-closed",
+        serde_json::json!({
+            "handle": handle.0,
+        }),
+    );
 
     Ok(())
 }
@@ -925,21 +936,22 @@ pub fn doc_undo(
     handle: DocHandle,
 ) -> Result<Option<Vec<EditOp>>, String> {
     let docs = state.documents.read().map_err(|e| e.to_string())?;
-    let doc = docs
-        .get(&handle)
-        .ok_or("Document not found")?;
+    let doc = docs.get(&handle).ok_or("Document not found")?;
     let mut doc = doc.lock().map_err(|e| e.to_string())?;
 
     let result = doc.undo();
-    
+
     if result.is_some() {
         drop(doc);
         drop(docs);
 
-        state.emit_event("doc-changed", serde_json::json!({
-            "handle": handle.0,
-            "action": "undo",
-        }));
+        state.emit_event(
+            "doc-changed",
+            serde_json::json!({
+                "handle": handle.0,
+                "action": "undo",
+            }),
+        );
     }
 
     Ok(result)
@@ -952,9 +964,7 @@ pub fn doc_redo(
     handle: DocHandle,
 ) -> Result<Option<Vec<EditOp>>, String> {
     let docs = state.documents.read().map_err(|e| e.to_string())?;
-    let doc = docs
-        .get(&handle)
-        .ok_or("Document not found")?;
+    let doc = docs.get(&handle).ok_or("Document not found")?;
     let mut doc = doc.lock().map_err(|e| e.to_string())?;
 
     let result = doc.redo();
@@ -963,10 +973,13 @@ pub fn doc_redo(
         drop(doc);
         drop(docs);
 
-        state.emit_event("doc-changed", serde_json::json!({
-            "handle": handle.0,
-            "action": "redo",
-        }));
+        state.emit_event(
+            "doc-changed",
+            serde_json::json!({
+                "handle": handle.0,
+                "action": "redo",
+            }),
+        );
     }
 
     Ok(result)
@@ -981,23 +994,24 @@ pub fn doc_autosave(
     delay_ms: Option<u64>,
 ) -> Result<(), String> {
     let docs = state.documents.read().map_err(|e| e.to_string())?;
-    let doc = docs
-        .get(&handle)
-        .ok_or("Document not found")?;
+    let doc = docs.get(&handle).ok_or("Document not found")?;
     let mut doc = doc.lock().map_err(|e| e.to_string())?;
 
     let delay = delay_ms.unwrap_or(DEFAULT_AUTOSAVE_DELAY_MS);
-    
+
     // Get app handle from DocStore
     let app_handle = state.app_handle.lock().ok().and_then(|h| h.clone());
-    
+
     doc.setup_autosave(app_handle, enabled, delay);
 
-    state.emit_event("doc-autosave-configured", serde_json::json!({
-        "handle": handle.0,
-        "enabled": enabled,
-        "delay_ms": delay,
-    }));
+    state.emit_event(
+        "doc-autosave-configured",
+        serde_json::json!({
+            "handle": handle.0,
+            "enabled": enabled,
+            "delay_ms": delay,
+        }),
+    );
 
     Ok(())
 }
@@ -1007,26 +1021,21 @@ pub fn doc_autosave(
 pub fn doc_list(state: State<'_, Arc<DocStore>>) -> Result<Vec<DocStats>, String> {
     let docs = state.documents.read().map_err(|e| e.to_string())?;
     let mut stats = Vec::new();
-    
+
     for (_, doc) in docs.iter() {
         if let Ok(doc) = doc.lock() {
             stats.push(doc.stats());
         }
     }
-    
+
     Ok(stats)
 }
 
 /// Check if document has unsaved changes
 #[tauri::command]
-pub fn doc_is_dirty(
-    state: State<'_, Arc<DocStore>>,
-    handle: DocHandle,
-) -> Result<bool, String> {
+pub fn doc_is_dirty(state: State<'_, Arc<DocStore>>, handle: DocHandle) -> Result<bool, String> {
     let docs = state.documents.read().map_err(|e| e.to_string())?;
-    let doc = docs
-        .get(&handle)
-        .ok_or("Document not found")?;
+    let doc = docs.get(&handle).ok_or("Document not found")?;
     let doc = doc.lock().map_err(|e| e.to_string())?;
 
     Ok(doc.is_dirty)
@@ -1039,9 +1048,7 @@ pub fn doc_path(
     handle: DocHandle,
 ) -> Result<Option<String>, String> {
     let docs = state.documents.read().map_err(|e| e.to_string())?;
-    let doc = docs
-        .get(&handle)
-        .ok_or("Document not found")?;
+    let doc = docs.get(&handle).ok_or("Document not found")?;
     let doc = doc.lock().map_err(|e| e.to_string())?;
 
     Ok(doc.path.as_ref().map(|p| p.to_string_lossy().to_string()))
@@ -1054,9 +1061,7 @@ pub fn doc_trigger_autosave(
     handle: DocHandle,
 ) -> Result<(), String> {
     let docs = state.documents.read().map_err(|e| e.to_string())?;
-    let doc = docs
-        .get(&handle)
-        .ok_or("Document not found")?;
+    let doc = docs.get(&handle).ok_or("Document not found")?;
     let doc = doc.lock().map_err(|e| e.to_string())?;
 
     doc.trigger_autosave();
@@ -1071,9 +1076,7 @@ pub fn doc_encoding_info(
     handle: DocHandle,
 ) -> Result<serde_json::Value, String> {
     let docs = state.documents.read().map_err(|e| e.to_string())?;
-    let doc = docs
-        .get(&handle)
-        .ok_or("Document not found")?;
+    let doc = docs.get(&handle).ok_or("Document not found")?;
     let doc = doc.lock().map_err(|e| e.to_string())?;
 
     Ok(serde_json::json!({
@@ -1091,9 +1094,7 @@ pub fn doc_set_line_endings(
     line_endings: String,
 ) -> Result<(), String> {
     let docs = state.documents.read().map_err(|e| e.to_string())?;
-    let doc = docs
-        .get(&handle)
-        .ok_or("Document not found")?;
+    let doc = docs.get(&handle).ok_or("Document not found")?;
     let mut doc = doc.lock().map_err(|e| e.to_string())?;
 
     doc.line_endings = match line_endings.as_str() {
@@ -1116,9 +1117,7 @@ pub fn doc_position_to_offset(
     column: usize,
 ) -> Result<usize, String> {
     let docs = state.documents.read().map_err(|e| e.to_string())?;
-    let doc = docs
-        .get(&handle)
-        .ok_or("Document not found")?;
+    let doc = docs.get(&handle).ok_or("Document not found")?;
     let doc = doc.lock().map_err(|e| e.to_string())?;
 
     let content = doc.get_content()?;
@@ -1133,9 +1132,7 @@ pub fn doc_offset_to_position(
     offset: usize,
 ) -> Result<serde_json::Value, String> {
     let docs = state.documents.read().map_err(|e| e.to_string())?;
-    let doc = docs
-        .get(&handle)
-        .ok_or("Document not found")?;
+    let doc = docs.get(&handle).ok_or("Document not found")?;
     let doc = doc.lock().map_err(|e| e.to_string())?;
 
     let content = doc.get_content()?;

@@ -191,7 +191,7 @@ impl InvertedIndex {
     /// Index a single file
     fn index_file(&self, file_path: &Path, max_file_size: u64) -> Result<(), String> {
         let path_str = file_path.to_string_lossy().to_string();
-        
+
         // Skip if file is too large
         let metadata = fs::metadata(file_path).map_err(|e| e.to_string())?;
         if metadata.len() > max_file_size {
@@ -286,11 +286,7 @@ impl InvertedIndex {
     }
 
     /// Search for exact word matches
-    fn search_exact(
-        &self,
-        query: &str,
-        options: &SearchOptions,
-    ) -> Vec<SearchResult> {
+    fn search_exact(&self, query: &str, options: &SearchOptions) -> Vec<SearchResult> {
         let max_results = options.max_results.unwrap_or(DEFAULT_MAX_RESULTS);
         let mut results = Vec::new();
 
@@ -301,9 +297,10 @@ impl InvertedIndex {
         };
 
         // Check file pattern if specified
-        let file_pattern = options.file_pattern.as_ref().and_then(|p| {
-            globset::Glob::new(p).ok().map(|g| g.compile_matcher())
-        });
+        let file_pattern = options
+            .file_pattern
+            .as_ref()
+            .and_then(|p| globset::Glob::new(p).ok().map(|g| g.compile_matcher()));
 
         if let Some(locations) = self.word_index.get(&search_word) {
             for loc in locations.iter() {
@@ -320,9 +317,7 @@ impl InvertedIndex {
                     }
 
                     // Get line content
-                    if let Ok(line_content) =
-                        get_line_at(&file_info.path, loc.line)
-                    {
+                    if let Ok(line_content) = get_line_at(&file_info.path, loc.line) {
                         results.push(SearchResult {
                             path: file_info.path.clone(),
                             line_number: loc.line,
@@ -339,11 +334,7 @@ impl InvertedIndex {
     }
 
     /// Search using trigram index for fuzzy matching
-    fn search_fuzzy(
-        &self,
-        query: &str,
-        options: &SearchOptions,
-    ) -> Vec<SearchResult> {
+    fn search_fuzzy(&self, query: &str, options: &SearchOptions) -> Vec<SearchResult> {
         let max_results = options.max_results.unwrap_or(DEFAULT_MAX_RESULTS);
 
         if query.len() < 3 {
@@ -357,24 +348,17 @@ impl InvertedIndex {
         if let Some(ref trigram_index) = self.trigram_index {
             for i in 0..=query_lower.len().saturating_sub(3) {
                 let trigram = &query_lower[i..i + 3];
-                
+
                 if let Some(words) = trigram_index.get(trigram) {
                     let word_set: HashSet<String> = words.iter().cloned().collect();
-                    
+
                     candidate_words = match candidate_words {
                         Some(existing) => {
-                            let intersection: HashSet<String> = existing
-                                .intersection(&word_set)
-                                .cloned()
-                                .collect();
+                            let intersection: HashSet<String> =
+                                existing.intersection(&word_set).cloned().collect();
                             if intersection.is_empty() {
                                 // No intersection, fall back to union
-                                Some(
-                                    existing
-                                        .union(&word_set)
-                                        .cloned()
-                                        .collect(),
-                                )
+                                Some(existing.union(&word_set).cloned().collect())
                             } else {
                                 Some(intersection)
                             }
@@ -392,11 +376,12 @@ impl InvertedIndex {
 
         // Score and filter candidates
         let mut scored_results: Vec<(SearchResult, f32)> = Vec::new();
-        
+
         // Check file pattern if specified
-        let file_pattern = options.file_pattern.as_ref().and_then(|p| {
-            globset::Glob::new(p).ok().map(|g| g.compile_matcher())
-        });
+        let file_pattern = options
+            .file_pattern
+            .as_ref()
+            .and_then(|p| globset::Glob::new(p).ok().map(|g| g.compile_matcher()));
 
         for word in candidates {
             if let Some(locations) = self.word_index.get(&word) {
@@ -417,16 +402,14 @@ impl InvertedIndex {
                         let score = calculate_score(query, &word);
 
                         if score > 0.3 {
-                            if let Ok(line_content) =
-                                get_line_at(&file_info.path, loc.line)
-                            {
+                            if let Ok(line_content) = get_line_at(&file_info.path, loc.line) {
                                 // Verify the query is actually in the line
                                 let line_check = if options.case_sensitive {
                                     line_content.clone()
                                 } else {
                                     line_content.to_lowercase()
                                 };
-                                
+
                                 if line_check.contains(&query_lower) {
                                     scored_results.push((
                                         SearchResult {
@@ -469,9 +452,10 @@ impl InvertedIndex {
         let mut results = Vec::new();
 
         // Check file pattern if specified
-        let file_pattern = options.file_pattern.as_ref().and_then(|p| {
-            globset::Glob::new(p).ok().map(|g| g.compile_matcher())
-        });
+        let file_pattern = options
+            .file_pattern
+            .as_ref()
+            .and_then(|p| globset::Glob::new(p).ok().map(|g| g.compile_matcher()));
 
         // Scan all indexed files (this is slower but necessary for regex)
         for entry in self.files.iter() {
@@ -561,7 +545,7 @@ fn calculate_score(query: &str, word: &str) -> f32 {
     // Calculate Levenshtein distance ratio
     let distance = levenshtein_distance(&query_lower, &word_lower);
     let max_len = query_lower.len().max(word_lower.len());
-    
+
     if max_len == 0 {
         return 0.0;
     }
@@ -627,20 +611,20 @@ fn levenshtein_distance(a: &str, b: &str) -> usize {
 fn is_binary_file(path: &Path) -> Result<bool, String> {
     let content = fs::read(path).map_err(|e| e.to_string())?;
     let check_len = content.len().min(BINARY_CHECK_BYTES);
-    
+
     for i in 0..check_len {
         if content[i] == 0 {
             return Ok(true);
         }
     }
-    
+
     Ok(false)
 }
 
 /// Get the content of a specific line from a file
 fn get_line_at(path: &str, line_number: usize) -> Result<String, String> {
     let content = fs::read_to_string(path).map_err(|e| e.to_string())?;
-    
+
     content
         .lines()
         .nth(line_number.saturating_sub(1))
@@ -649,10 +633,7 @@ fn get_line_at(path: &str, line_number: usize) -> Result<String, String> {
 }
 
 /// Collect all files to index in a directory
-fn collect_files(
-    root: &Path,
-    options: &IndexOptions,
-) -> Result<Vec<std::path::PathBuf>, String> {
+fn collect_files(root: &Path, options: &IndexOptions) -> Result<Vec<std::path::PathBuf>, String> {
     let max_file_size = options.max_file_size.unwrap_or(DEFAULT_MAX_FILE_SIZE);
     let exclude_dirs: HashSet<String> = options
         .exclude_dirs
@@ -693,7 +674,7 @@ fn collect_files(
                 .extension()
                 .and_then(|e| e.to_str())
                 .map(|e| e.to_lowercase());
-            
+
             if ext.map_or(true, |e| !extensions.contains(&e)) {
                 continue;
             }
@@ -748,7 +729,7 @@ pub fn index_build(
 
     // Index files in parallel using Rayon
     let max_file_size = options.max_file_size.unwrap_or(DEFAULT_MAX_FILE_SIZE);
-    
+
     files.par_iter().for_each(|file_path| {
         let _ = state.index.index_file(file_path, max_file_size);
     });

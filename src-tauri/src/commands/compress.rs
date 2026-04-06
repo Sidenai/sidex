@@ -7,11 +7,13 @@ use std::io::{Read, Write};
 pub fn gzip_compress(data: Vec<u8>) -> Result<Vec<u8>, String> {
     use flate2::write::GzEncoder;
     use flate2::Compression;
-    
+
     let mut encoder = GzEncoder::new(Vec::new(), Compression::default());
-    encoder.write_all(&data)
+    encoder
+        .write_all(&data)
         .map_err(|e| format!("Compression error: {}", e))?;
-    encoder.finish()
+    encoder
+        .finish()
         .map_err(|e| format!("Compression finish error: {}", e))
 }
 
@@ -37,8 +39,8 @@ pub fn gzip_decompress(data: Vec<u8>) -> Result<Vec<u8>, String> {
 /// Compress string to gzip base64
 #[tauri::command]
 pub fn gzip_compress_text(text: String) -> Result<String, String> {
-    use base64::{Engine as _, engine::general_purpose::STANDARD};
-    
+    use base64::{engine::general_purpose::STANDARD, Engine as _};
+
     let compressed = gzip_compress(text.into_bytes())?;
     Ok(STANDARD.encode(&compressed))
 }
@@ -46,13 +48,13 @@ pub fn gzip_compress_text(text: String) -> Result<String, String> {
 /// Decompress gzip base64 to string
 #[tauri::command]
 pub fn gzip_decompress_text(text: String) -> Result<String, String> {
-    use base64::{Engine as _, engine::general_purpose::STANDARD};
-    
-    let decoded = STANDARD.decode(&text)
+    use base64::{engine::general_purpose::STANDARD, Engine as _};
+
+    let decoded = STANDARD
+        .decode(&text)
         .map_err(|e| format!("Base64 decode error: {}", e))?;
     let decompressed = gzip_decompress(decoded)?;
-    String::from_utf8(decompressed)
-        .map_err(|e| format!("UTF-8 decode error: {}", e))
+    String::from_utf8(decompressed).map_err(|e| format!("UTF-8 decode error: {}", e))
 }
 
 #[derive(Debug, Serialize)]
@@ -66,17 +68,17 @@ pub struct ZipEntry {
 /// List contents of a zip file
 #[tauri::command]
 pub fn zip_list(path: String) -> Result<Vec<ZipEntry>, String> {
-    let file = File::open(&path)
-        .map_err(|e| format!("Failed to open zip: {}", e))?;
-    
-    let mut archive = zip::ZipArchive::new(file)
-        .map_err(|e| format!("Failed to read zip: {}", e))?;
-    
+    let file = File::open(&path).map_err(|e| format!("Failed to open zip: {}", e))?;
+
+    let mut archive =
+        zip::ZipArchive::new(file).map_err(|e| format!("Failed to read zip: {}", e))?;
+
     let mut entries = Vec::new();
     for i in 0..archive.len() {
-        let file = archive.by_index(i)
+        let file = archive
+            .by_index(i)
             .map_err(|e| format!("Failed to read zip entry: {}", e))?;
-        
+
         entries.push(ZipEntry {
             name: file.name().to_string(),
             size: file.size(),
@@ -84,7 +86,7 @@ pub fn zip_list(path: String) -> Result<Vec<ZipEntry>, String> {
             modified: None, // Simplified - zip datetime handling is complex
         });
     }
-    
+
     Ok(entries)
 }
 
@@ -95,11 +97,10 @@ pub fn zip_extract_file(zip_path: String, entry_name: String) -> Result<Vec<u8>,
         return Err("Invalid zip entry name: must not contain '..' or start with '/'".to_string());
     }
 
-    let file = File::open(&zip_path)
-        .map_err(|e| format!("Failed to open zip: {}", e))?;
+    let file = File::open(&zip_path).map_err(|e| format!("Failed to open zip: {}", e))?;
 
-    let mut archive = zip::ZipArchive::new(file)
-        .map_err(|e| format!("Failed to read zip: {}", e))?;
+    let mut archive =
+        zip::ZipArchive::new(file).map_err(|e| format!("Failed to read zip: {}", e))?;
 
     let entry = archive
         .by_name(&entry_name)
@@ -125,32 +126,31 @@ pub fn zip_extract_file(zip_path: String, entry_name: String) -> Result<Vec<u8>,
 /// Compress directory to zip
 #[tauri::command]
 pub fn zip_create(source_dir: String, zip_path: String) -> Result<(), String> {
-    let file = File::create(&zip_path)
-        .map_err(|e| format!("Failed to create zip: {}", e))?;
-    
+    let file = File::create(&zip_path).map_err(|e| format!("Failed to create zip: {}", e))?;
+
     let mut zip = zip::ZipWriter::new(file);
     let options = zip::write::SimpleFileOptions::default()
         .compression_method(zip::CompressionMethod::Deflated);
-    
+
     let walkdir = walkdir::WalkDir::new(&source_dir);
     let source_path = std::path::Path::new(&source_dir);
-    
+
     for entry in walkdir.into_iter().filter_map(|e| e.ok()) {
         let path = entry.path();
-        let name = path.strip_prefix(source_path)
+        let name = path
+            .strip_prefix(source_path)
             .map_err(|e| format!("Path error: {}", e))?
             .to_string_lossy();
-        
+
         if path.is_file() {
             zip.start_file(name, options)
                 .map_err(|e| format!("Failed to start file: {}", e))?;
-            
-            let mut f = File::open(path)
-                .map_err(|e| format!("Failed to open file: {}", e))?;
+
+            let mut f = File::open(path).map_err(|e| format!("Failed to open file: {}", e))?;
             let mut buffer = Vec::new();
             f.read_to_end(&mut buffer)
                 .map_err(|e| format!("Failed to read file: {}", e))?;
-            
+
             zip.write_all(&buffer)
                 .map_err(|e| format!("Failed to write to zip: {}", e))?;
         } else if !name.is_empty() {
@@ -158,9 +158,9 @@ pub fn zip_create(source_dir: String, zip_path: String) -> Result<(), String> {
                 .map_err(|e| format!("Failed to add directory: {}", e))?;
         }
     }
-    
+
     zip.finish()
         .map_err(|e| format!("Failed to finish zip: {}", e))?;
-    
+
     Ok(())
 }

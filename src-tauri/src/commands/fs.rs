@@ -2,7 +2,7 @@ use notify::{Event, RecommendedWatcher, RecursiveMode, Watcher};
 use serde::Serialize;
 use std::collections::HashMap;
 use std::fs;
-use std::path::Path;
+use std::path::{Component, Path};
 use std::sync::{Arc, Mutex};
 use std::time::UNIX_EPOCH;
 use tauri::{AppHandle, Emitter, State};
@@ -50,18 +50,37 @@ pub struct FileStat {
     pub readonly: bool,
 }
 
+fn validate_safe_path(path: &str) -> Result<(), String> {
+    if path.is_empty() {
+        return Err("Path must not be empty".to_string());
+    }
+    if path.contains('\0') {
+        return Err("Path must not contain NUL bytes".to_string());
+    }
+    if Path::new(path)
+        .components()
+        .any(|component| component == Component::ParentDir)
+    {
+        return Err(format!("Path must not contain '..': {}", path));
+    }
+    Ok(())
+}
+
 #[tauri::command]
 pub fn read_file(path: String) -> Result<String, String> {
+    validate_safe_path(&path)?;
     fs::read_to_string(&path).map_err(|e| format!("Failed to read file '{}': {}", path, e))
 }
 
 #[tauri::command]
 pub fn read_file_bytes(path: String) -> Result<Vec<u8>, String> {
+    validate_safe_path(&path)?;
     fs::read(&path).map_err(|e| format!("Failed to read file '{}': {}", path, e))
 }
 
 #[tauri::command]
 pub fn write_file(path: String, content: String) -> Result<(), String> {
+    validate_safe_path(&path)?;
     if let Some(parent) = Path::new(&path).parent() {
         fs::create_dir_all(parent)
             .map_err(|e| format!("Failed to create parent dirs for '{}': {}", path, e))?;
@@ -71,6 +90,7 @@ pub fn write_file(path: String, content: String) -> Result<(), String> {
 
 #[tauri::command]
 pub fn write_file_bytes(path: String, content: Vec<u8>) -> Result<(), String> {
+    validate_safe_path(&path)?;
     if let Some(parent) = Path::new(&path).parent() {
         fs::create_dir_all(parent)
             .map_err(|e| format!("Failed to create parent dirs for '{}': {}", path, e))?;
@@ -80,13 +100,19 @@ pub fn write_file_bytes(path: String, content: Vec<u8>) -> Result<(), String> {
 
 #[tauri::command]
 pub fn read_dir(path: String) -> Result<Vec<DirEntry>, String> {
-    let entries = fs::read_dir(&path).map_err(|e| format!("Failed to read dir '{}': {}", path, e))?;
+    validate_safe_path(&path)?;
+    let entries =
+        fs::read_dir(&path).map_err(|e| format!("Failed to read dir '{}': {}", path, e))?;
 
     let mut result = Vec::new();
     for entry in entries {
         let entry = entry.map_err(|e| format!("Failed to read entry: {}", e))?;
-        let metadata = entry.metadata().map_err(|e| format!("Failed to get metadata: {}", e))?;
-        let file_type = entry.file_type().map_err(|e| format!("Failed to get file type: {}", e))?;
+        let metadata = entry
+            .metadata()
+            .map_err(|e| format!("Failed to get metadata: {}", e))?;
+        let file_type = entry
+            .file_type()
+            .map_err(|e| format!("Failed to get file type: {}", e))?;
 
         let modified = metadata
             .modified()
@@ -107,7 +133,9 @@ pub fn read_dir(path: String) -> Result<Vec<DirEntry>, String> {
     }
 
     result.sort_by(|a, b| {
-        b.is_dir.cmp(&a.is_dir).then_with(|| a.name.to_lowercase().cmp(&b.name.to_lowercase()))
+        b.is_dir
+            .cmp(&a.is_dir)
+            .then_with(|| a.name.to_lowercase().cmp(&b.name.to_lowercase()))
     });
 
     Ok(result)
@@ -115,6 +143,7 @@ pub fn read_dir(path: String) -> Result<Vec<DirEntry>, String> {
 
 #[tauri::command]
 pub fn stat(path: String) -> Result<FileStat, String> {
+    validate_safe_path(&path)?;
     let metadata = fs::metadata(&path).map_err(|e| format!("Failed to stat '{}': {}", path, e))?;
 
     let modified = metadata
@@ -144,6 +173,7 @@ pub fn stat(path: String) -> Result<FileStat, String> {
 
 #[tauri::command]
 pub fn mkdir(path: String, recursive: bool) -> Result<(), String> {
+    validate_safe_path(&path)?;
     if recursive {
         fs::create_dir_all(&path)
     } else {
@@ -154,6 +184,7 @@ pub fn mkdir(path: String, recursive: bool) -> Result<(), String> {
 
 #[tauri::command]
 pub fn remove(path: String, recursive: bool) -> Result<(), String> {
+    validate_safe_path(&path)?;
     let meta = fs::metadata(&path).map_err(|e| format!("Failed to stat '{}': {}", path, e))?;
 
     if meta.is_dir() {
@@ -170,24 +201,26 @@ pub fn remove(path: String, recursive: bool) -> Result<(), String> {
 
 #[tauri::command]
 pub fn rename(old_path: String, new_path: String) -> Result<(), String> {
+    validate_safe_path(&old_path)?;
+    validate_safe_path(&new_path)?;
     fs::rename(&old_path, &new_path)
         .map_err(|e| format!("Failed to rename '{}' -> '{}': {}", old_path, new_path, e))
 }
 
 #[tauri::command]
 pub fn exists(path: String) -> bool {
-    Path::new(&path).exists()
+    validate_safe_path(&path).is_ok() && Path::new(&path).exists()
 }
 
 #[tauri::command]
 pub fn fs_stat(path: String) -> Result<FileStat, String> {
+    validate_safe_path(&path)?;
     let _p = Path::new(&path);
-    let symlink_meta = fs::symlink_metadata(&path)
-        .map_err(|e| format!("Failed to stat '{}': {}", path, e))?;
+    let symlink_meta =
+        fs::symlink_metadata(&path).map_err(|e| format!("Failed to stat '{}': {}", path, e))?;
     let is_symlink = symlink_meta.file_type().is_symlink();
 
-    let metadata = fs::metadata(&path)
-        .map_err(|e| format!("Failed to stat '{}': {}", path, e))?;
+    let metadata = fs::metadata(&path).map_err(|e| format!("Failed to stat '{}': {}", path, e))?;
 
     let modified = metadata
         .modified()
@@ -216,6 +249,8 @@ pub fn fs_stat(path: String) -> Result<FileStat, String> {
 
 #[tauri::command]
 pub fn fs_symlink(target: String, path: String) -> Result<(), String> {
+    validate_safe_path(&target)?;
+    validate_safe_path(&path)?;
     #[cfg(unix)]
     {
         std::os::unix::fs::symlink(&target, &path)
@@ -235,6 +270,7 @@ pub fn fs_symlink(target: String, path: String) -> Result<(), String> {
 
 #[tauri::command]
 pub fn fs_readlink(path: String) -> Result<String, String> {
+    validate_safe_path(&path)?;
     fs::read_link(&path)
         .map(|p| p.to_string_lossy().to_string())
         .map_err(|e| format!("Failed to readlink '{}': {}", path, e))
@@ -246,6 +282,7 @@ pub fn fs_watch(
     state: State<'_, Arc<FsWatchStore>>,
     path: String,
 ) -> Result<u32, String> {
+    validate_safe_path(&path)?;
     let id = {
         let mut next = state.next_id.lock().map_err(|e| e.to_string())?;
         let val = *next;
@@ -287,10 +324,7 @@ pub fn fs_watch(
 }
 
 #[tauri::command]
-pub fn fs_unwatch(
-    state: State<'_, Arc<FsWatchStore>>,
-    watch_id: u32,
-) -> Result<(), String> {
+pub fn fs_unwatch(state: State<'_, Arc<FsWatchStore>>, watch_id: u32) -> Result<(), String> {
     let mut watchers = state.watchers.lock().map_err(|e| e.to_string())?;
     watchers
         .remove(&watch_id)
@@ -300,6 +334,8 @@ pub fn fs_unwatch(
 
 #[tauri::command]
 pub fn fs_copy(src: String, dest: String) -> Result<(), String> {
+    validate_safe_path(&src)?;
+    validate_safe_path(&dest)?;
     let src_path = Path::new(&src);
     if src_path.is_dir() {
         copy_dir_recursive(src_path, Path::new(&dest))
@@ -317,8 +353,8 @@ pub fn fs_copy(src: String, dest: String) -> Result<(), String> {
 fn copy_dir_recursive(src: &Path, dest: &Path) -> Result<(), String> {
     fs::create_dir_all(dest)
         .map_err(|e| format!("Failed to create dir '{}': {}", dest.display(), e))?;
-    for entry in fs::read_dir(src)
-        .map_err(|e| format!("Failed to read dir '{}': {}", src.display(), e))?
+    for entry in
+        fs::read_dir(src).map_err(|e| format!("Failed to read dir '{}': {}", src.display(), e))?
     {
         let entry = entry.map_err(|e| format!("Failed to read entry: {}", e))?;
         let src_child = entry.path();
@@ -352,8 +388,7 @@ pub fn fs_temp_file(prefix: Option<String>) -> Result<String, String> {
             .as_nanos()
     );
     let path = dir.join(name);
-    fs::write(&path, "")
-        .map_err(|e| format!("Failed to create temp file: {}", e))?;
+    fs::write(&path, "").map_err(|e| format!("Failed to create temp file: {}", e))?;
     Ok(path.to_string_lossy().to_string())
 }
 
@@ -370,12 +405,12 @@ pub fn fs_temp_dir(prefix: Option<String>) -> Result<String, String> {
             .as_nanos()
     );
     let path = dir.join(name);
-    fs::create_dir_all(&path)
-        .map_err(|e| format!("Failed to create temp dir: {}", e))?;
+    fs::create_dir_all(&path).map_err(|e| format!("Failed to create temp dir: {}", e))?;
     Ok(path.to_string_lossy().to_string())
 }
 
 #[tauri::command]
 pub fn fs_read_binary(path: String) -> Result<Vec<u8>, String> {
+    validate_safe_path(&path)?;
     fs::read(&path).map_err(|e| format!("Failed to read file '{}': {}", path, e))
 }

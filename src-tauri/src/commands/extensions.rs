@@ -60,12 +60,18 @@ pub async fn install_extension(vsix_path: String) -> Result<InstalledExtension, 
                 fs::create_dir_all(parent).ok();
             }
             let mut buf = Vec::with_capacity(entry.size() as usize);
-            entry.read_to_end(&mut buf).map_err(|e| format!("read {rel}: {e}"))?;
+            entry
+                .read_to_end(&mut buf)
+                .map_err(|e| format!("read {rel}: {e}"))?;
             fs::write(&target, &buf).map_err(|e| format!("write {rel}: {e}"))?;
         }
     }
 
-    log::info!("installed extension {} to {}", manifest.id, ext_dir.display());
+    log::info!(
+        "installed extension {} to {}",
+        manifest.id,
+        ext_dir.display()
+    );
 
     Ok(InstalledExtension {
         id: manifest.id,
@@ -96,15 +102,31 @@ pub async fn list_installed_extensions() -> Result<Vec<InstalledExtension>, Stri
     let entries = fs::read_dir(&dir).map_err(|e| format!("readdir: {e}"))?;
     for entry in entries.flatten() {
         let pkg = entry.path().join("package.json");
-        if !pkg.exists() { continue; }
+        if !pkg.exists() {
+            continue;
+        }
         if let Ok(raw) = fs::read_to_string(&pkg) {
             if let Ok(val) = serde_json::from_str::<serde_json::Value>(&raw) {
-                let publisher = val.get("publisher").and_then(|v| v.as_str()).unwrap_or("unknown");
-                let name = val.get("name").and_then(|v| v.as_str()).unwrap_or("unknown");
+                let publisher = val
+                    .get("publisher")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("unknown");
+                let name = val
+                    .get("name")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("unknown");
                 out.push(InstalledExtension {
                     id: format!("{publisher}.{name}"),
-                    name: val.get("displayName").and_then(|v| v.as_str()).unwrap_or(name).to_string(),
-                    version: val.get("version").and_then(|v| v.as_str()).unwrap_or("0.0.0").to_string(),
+                    name: val
+                        .get("displayName")
+                        .and_then(|v| v.as_str())
+                        .unwrap_or(name)
+                        .to_string(),
+                    version: val
+                        .get("version")
+                        .and_then(|v| v.as_str())
+                        .unwrap_or("0.0.0")
+                        .to_string(),
                     path: entry.path().to_string_lossy().to_string(),
                 });
             }
@@ -121,16 +143,34 @@ struct VsixManifest {
 
 fn read_vsix_manifest(archive: &mut zip::ZipArchive<File>) -> Result<VsixManifest, String> {
     let pkg_path = "extension/package.json";
-    let mut entry = archive.by_name(pkg_path).map_err(|_| "VSIX missing extension/package.json".to_string())?;
+    let mut entry = archive
+        .by_name(pkg_path)
+        .map_err(|_| "VSIX missing extension/package.json".to_string())?;
     let mut buf = String::new();
-    entry.read_to_string(&mut buf).map_err(|e| format!("read manifest: {e}"))?;
-    let val: serde_json::Value = serde_json::from_str(&buf).map_err(|e| format!("parse manifest: {e}"))?;
-    let publisher = val.get("publisher").and_then(|v| v.as_str()).unwrap_or("unknown");
-    let name = val.get("name").and_then(|v| v.as_str()).ok_or("manifest missing 'name'")?;
-    let version = val.get("version").and_then(|v| v.as_str()).unwrap_or("0.0.0");
+    entry
+        .read_to_string(&mut buf)
+        .map_err(|e| format!("read manifest: {e}"))?;
+    let val: serde_json::Value =
+        serde_json::from_str(&buf).map_err(|e| format!("parse manifest: {e}"))?;
+    let publisher = val
+        .get("publisher")
+        .and_then(|v| v.as_str())
+        .unwrap_or("unknown");
+    let name = val
+        .get("name")
+        .and_then(|v| v.as_str())
+        .ok_or("manifest missing 'name'")?;
+    let version = val
+        .get("version")
+        .and_then(|v| v.as_str())
+        .unwrap_or("0.0.0");
     Ok(VsixManifest {
         id: format!("{publisher}.{name}"),
-        name: val.get("displayName").and_then(|v| v.as_str()).unwrap_or(name).to_string(),
+        name: val
+            .get("displayName")
+            .and_then(|v| v.as_str())
+            .unwrap_or(name)
+            .to_string(),
         version: version.to_string(),
     })
 }

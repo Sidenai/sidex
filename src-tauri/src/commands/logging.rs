@@ -24,7 +24,9 @@ impl LoggerStore {
 }
 
 impl Default for LoggerStore {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 #[tauri::command]
@@ -46,7 +48,13 @@ pub fn log_create_logger(
     let id = format!("log-{}-{}", name, counter);
 
     let mut loggers = state.loggers.lock().map_err(|e| e.to_string())?;
-    loggers.insert(id.clone(), LoggerState { filepath: path, level });
+    loggers.insert(
+        id.clone(),
+        LoggerState {
+            filepath: path,
+            level,
+        },
+    );
 
     Ok(id)
 }

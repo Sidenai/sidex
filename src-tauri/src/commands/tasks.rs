@@ -9,7 +9,9 @@ fn shell_escape(s: &str) -> String {
     if s.is_empty() {
         return "''".to_string();
     }
-    if s.chars().all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '.' || c == '/' || c == ':') {
+    if s.chars().all(|c| {
+        c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '.' || c == '/' || c == ':'
+    }) {
         return s.to_string();
     }
     format!("'{}'", s.replace('\'', "'\"'\"'"))
@@ -196,13 +198,7 @@ pub fn task_spawn(
                 }
             };
 
-            let _ = app_out.emit(
-                "task-exit",
-                TaskExitEvent {
-                    task_id,
-                    exit_code,
-                },
-            );
+            let _ = app_out.emit("task-exit", TaskExitEvent { task_id, exit_code });
         });
     }
 
@@ -236,10 +232,7 @@ pub fn task_spawn(
 
 /// Kill a running task process.
 #[tauri::command]
-pub fn task_kill(
-    state: State<'_, Arc<TaskProcessStore>>,
-    task_id: u32,
-) -> Result<(), String> {
+pub fn task_kill(state: State<'_, Arc<TaskProcessStore>>, task_id: u32) -> Result<(), String> {
     let mut tasks = state.tasks.lock().map_err(|e| e.to_string())?;
     let mut handle = tasks
         .remove(&task_id)
@@ -257,9 +250,7 @@ pub fn task_kill(
 
 /// List currently running task process IDs.
 #[tauri::command]
-pub fn task_list(
-    state: State<'_, Arc<TaskProcessStore>>,
-) -> Result<Vec<u32>, String> {
+pub fn task_list(state: State<'_, Arc<TaskProcessStore>>) -> Result<Vec<u32>, String> {
     let tasks = state.tasks.lock().map_err(|e| e.to_string())?;
     Ok(tasks.keys().cloned().collect())
 }

@@ -103,7 +103,13 @@ pub fn debug_spawn_adapter(
 
     {
         let mut adapters = state.adapters.lock().map_err(|e| e.to_string())?;
-        adapters.insert(id, DebugAdapterHandle { child, stdin: Some(stdin) });
+        adapters.insert(
+            id,
+            DebugAdapterHandle {
+                child,
+                stdin: Some(stdin),
+            },
+        );
     }
 
     let adapter_id = id;
@@ -221,10 +227,7 @@ pub fn debug_send(
 
 /// Kill a running debug adapter process.
 #[tauri::command]
-pub fn debug_kill(
-    state: State<'_, Arc<DebugAdapterStore>>,
-    adapter_id: u32,
-) -> Result<(), String> {
+pub fn debug_kill(state: State<'_, Arc<DebugAdapterStore>>, adapter_id: u32) -> Result<(), String> {
     let mut adapters = state.adapters.lock().map_err(|e| e.to_string())?;
     let mut handle = adapters
         .remove(&adapter_id)
@@ -244,9 +247,7 @@ pub fn debug_kill(
 
 /// List currently running debug adapter IDs.
 #[tauri::command]
-pub fn debug_list_adapters(
-    state: State<'_, Arc<DebugAdapterStore>>,
-) -> Result<Vec<u32>, String> {
+pub fn debug_list_adapters(state: State<'_, Arc<DebugAdapterStore>>) -> Result<Vec<u32>, String> {
     let adapters = state.adapters.lock().map_err(|e| e.to_string())?;
     Ok(adapters.keys().cloned().collect())
 }

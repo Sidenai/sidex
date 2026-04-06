@@ -131,14 +131,7 @@ pub async fn git_diff(path: String, file: Option<String>, staged: bool) -> Resul
 #[tauri::command]
 pub async fn git_log(path: String, limit: Option<u32>) -> Result<Vec<GitLogEntry>, String> {
     let limit_str = format!("-{}", limit.unwrap_or(50));
-    let output = run_git(
-        &path,
-        &[
-            "log",
-            "--format=%H%n%s%n%an%n%aI",
-            &limit_str,
-        ],
-    )?;
+    let output = run_git(&path, &["log", "--format=%H%n%s%n%an%n%aI", &limit_str])?;
 
     let lines: Vec<&str> = output.lines().collect();
     let entries = lines
@@ -192,14 +185,9 @@ pub async fn git_branches(path: String) -> Result<Vec<GitBranch>, String> {
         .filter(|l| !l.contains("->"))
         .map(|line| {
             let current = line.starts_with('*');
-            let name = line
-                .trim_start_matches('*')
-                .trim()
-                .to_string();
+            let name = line.trim_start_matches('*').trim().to_string();
             let remote = name.starts_with("remotes/");
-            let name = name
-                .trim_start_matches("remotes/")
-                .to_string();
+            let name = name.trim_start_matches("remotes/").to_string();
 
             GitBranch {
                 name,
@@ -230,7 +218,11 @@ pub async fn git_is_repo(path: String) -> Result<bool, String> {
 }
 
 #[tauri::command]
-pub async fn git_push(path: String, remote: Option<String>, branch: Option<String>) -> Result<String, String> {
+pub async fn git_push(
+    path: String,
+    remote: Option<String>,
+    branch: Option<String>,
+) -> Result<String, String> {
     let mut args = vec!["push"];
     if let Some(ref r) = remote {
         args.push(r.as_str());
@@ -242,7 +234,11 @@ pub async fn git_push(path: String, remote: Option<String>, branch: Option<Strin
 }
 
 #[tauri::command]
-pub async fn git_pull(path: String, remote: Option<String>, branch: Option<String>) -> Result<String, String> {
+pub async fn git_pull(
+    path: String,
+    remote: Option<String>,
+    branch: Option<String>,
+) -> Result<String, String> {
     let mut args = vec!["pull"];
     if let Some(ref r) = remote {
         args.push(r.as_str());
@@ -263,7 +259,11 @@ pub async fn git_fetch(path: String, remote: Option<String>) -> Result<String, S
 }
 
 #[tauri::command]
-pub async fn git_stash(path: String, action: String, message: Option<String>) -> Result<String, String> {
+pub async fn git_stash(
+    path: String,
+    action: String,
+    message: Option<String>,
+) -> Result<String, String> {
     let mut args = vec!["stash"];
     args.push(match action.as_str() {
         "push" => "push",
@@ -282,7 +282,11 @@ pub async fn git_stash(path: String, action: String, message: Option<String>) ->
 }
 
 #[tauri::command]
-pub async fn git_create_branch(path: String, name: String, start_point: Option<String>) -> Result<(), String> {
+pub async fn git_create_branch(
+    path: String,
+    name: String,
+    start_point: Option<String>,
+) -> Result<(), String> {
     let mut args = vec!["checkout", "-b", name.as_str()];
     if let Some(ref sp) = start_point {
         args.push(sp.as_str());
@@ -333,7 +337,10 @@ pub async fn git_clone(url: String, path: String) -> Result<(), String> {
     }
 
     let canon_path = std::path::Path::new(&path);
-    if canon_path.components().any(|c| c == std::path::Component::ParentDir) {
+    if canon_path
+        .components()
+        .any(|c| c == std::path::Component::ParentDir)
+    {
         return Err("git clone: path must not contain '..'".to_string());
     }
 
@@ -389,18 +396,60 @@ pub async fn git_show(path: String, file: String) -> Result<Vec<u8>, String> {
 }
 
 const BLOCKED_GIT_FLAGS: &[&str] = &[
-    "-c", "--exec", "--upload-pack", "--receive-pack",
-    "--config", "--exec-path",
+    "-c",
+    "--exec",
+    "--upload-pack",
+    "--receive-pack",
+    "--config",
+    "--exec-path",
 ];
 
 const ALLOWED_GIT_SUBCOMMANDS: &[&str] = &[
-    "add", "am", "apply", "archive", "bisect", "blame", "branch", "cat-file",
-    "cherry-pick", "checkout", "clone", "commit", "describe", "diff", "diff-tree",
-    "fetch", "for-each-ref", "format-patch", "gc", "grep", "hash-object",
-    "init", "log", "ls-files", "ls-remote", "ls-tree", "merge", "pack-refs",
-    "prune", "pull", "push", "rebase", "reflog", "remote", "reset", "revert",
-    "rev-parse", "shortlog", "show", "stash", "status", "submodule", "tag",
-    "worktree", "clean",
+    "add",
+    "am",
+    "apply",
+    "archive",
+    "bisect",
+    "blame",
+    "branch",
+    "cat-file",
+    "cherry-pick",
+    "checkout",
+    "clone",
+    "commit",
+    "describe",
+    "diff",
+    "diff-tree",
+    "fetch",
+    "for-each-ref",
+    "format-patch",
+    "gc",
+    "grep",
+    "hash-object",
+    "init",
+    "log",
+    "ls-files",
+    "ls-remote",
+    "ls-tree",
+    "merge",
+    "pack-refs",
+    "prune",
+    "pull",
+    "push",
+    "rebase",
+    "reflog",
+    "remote",
+    "reset",
+    "revert",
+    "rev-parse",
+    "shortlog",
+    "show",
+    "stash",
+    "status",
+    "submodule",
+    "tag",
+    "worktree",
+    "clean",
 ];
 
 fn validate_git_args(args: &[String]) -> Result<(), String> {

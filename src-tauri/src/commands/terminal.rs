@@ -138,7 +138,15 @@ pub fn terminal_spawn(
                 cmd.env("HOME", &profile);
             }
         }
-        for key in &["USERNAME", "APPDATA", "LOCALAPPDATA", "HOMEDRIVE", "HOMEPATH", "COMSPEC", "SystemRoot"] {
+        for key in &[
+            "USERNAME",
+            "APPDATA",
+            "LOCALAPPDATA",
+            "HOMEDRIVE",
+            "HOMEPATH",
+            "COMSPEC",
+            "SystemRoot",
+        ] {
             if let Ok(val) = std::env::var(key) {
                 cmd.env(key, &val);
             }
@@ -245,7 +253,11 @@ pub fn terminal_spawn(
             if let Some(handle) = terminals.get_mut(&terminal_id) {
                 match handle.child.try_wait() {
                     Ok(Some(status)) => {
-                        if status.success() { 0 } else { 1 }
+                        if status.success() {
+                            0
+                        } else {
+                            1
+                        }
                     }
                     _ => 0,
                 }
@@ -350,7 +362,8 @@ pub fn terminal_get_pid(
 
 fn home_dir_string() -> Option<String> {
     if cfg!(target_os = "windows") {
-        std::env::var("USERPROFILE").ok()
+        std::env::var("USERPROFILE")
+            .ok()
             .or_else(|| std::env::var("HOME").ok())
     } else {
         std::env::var("HOME").ok()
@@ -453,7 +466,8 @@ pub fn get_available_shells() -> Vec<ShellInfo> {
             }
             let path = std::path::Path::new(trimmed);
             if path.exists() && seen_paths.insert(trimmed.to_string()) {
-                let name = path.file_name()
+                let name = path
+                    .file_name()
                     .and_then(|n| n.to_str())
                     .unwrap_or("sh")
                     .to_string();
@@ -461,7 +475,10 @@ pub fn get_available_shells() -> Vec<ShellInfo> {
                     name: name.clone(),
                     path: trimmed.to_string(),
                     is_default: trimmed == default_shell
-                        || path.file_name().and_then(|n| n.to_str()) == std::path::Path::new(&default_shell).file_name().and_then(|n| n.to_str()),
+                        || path.file_name().and_then(|n| n.to_str())
+                            == std::path::Path::new(&default_shell)
+                                .file_name()
+                                .and_then(|n| n.to_str()),
                 });
             }
         }
@@ -516,8 +533,7 @@ pub fn setup_zsh_dotdir(app: tauri::AppHandle) -> Result<String, String> {
         .app_data_dir()
         .map_err(|e| format!("Failed to get app data dir: {}", e))?;
     let zdotdir = data_dir.join("zsh-integration");
-    std::fs::create_dir_all(&zdotdir)
-        .map_err(|e| format!("Failed to create zdotdir: {}", e))?;
+    std::fs::create_dir_all(&zdotdir).map_err(|e| format!("Failed to create zdotdir: {}", e))?;
 
     let resource_dir = app
         .path()

@@ -13,41 +13,39 @@ pub struct FileSummary {
 /// Fast line counting without loading entire file into memory
 #[tauri::command]
 pub fn count_lines(path: String) -> Result<usize, String> {
-    let file = std::fs::File::open(&path)
-        .map_err(|e| format!("Failed to open file: {}", e))?;
-    
+    let file = std::fs::File::open(&path).map_err(|e| format!("Failed to open file: {}", e))?;
+
     let mut count = 0usize;
     let buf = std::io::BufReader::new(file);
-    
+
     for line in std::io::BufRead::lines(buf) {
         if line.is_ok() {
             count += 1;
         }
     }
-    
+
     Ok(count)
 }
 
 /// Get file summary stats efficiently
 #[tauri::command]
 pub fn file_summary(path: String) -> Result<FileSummary, String> {
-    let content = std::fs::read(&path)
-        .map_err(|e| format!("Failed to read file: {}", e))?;
-    
+    let content = std::fs::read(&path).map_err(|e| format!("Failed to read file: {}", e))?;
+
     // Check for BOM
     let has_bom = content.starts_with(&[0xEF, 0xBB, 0xBF]); // UTF-8 BOM
-    
+
     // Convert to string, skipping BOM if present
     let text = if has_bom {
         String::from_utf8_lossy(&content[3..])
     } else {
         String::from_utf8_lossy(&content)
     };
-    
+
     let line_count = text.lines().count();
     let char_count = text.chars().count();
     let word_count = text.split_whitespace().count();
-    
+
     // Detect line endings
     let line_endings = if text.contains("\r\n") {
         "CRLF".to_string()
@@ -56,7 +54,7 @@ pub fn file_summary(path: String) -> Result<FileSummary, String> {
     } else {
         "LF".to_string()
     };
-    
+
     // Simple encoding detection
     let likely_encoding = if has_bom {
         "UTF-8 (with BOM)".to_string()
@@ -65,7 +63,7 @@ pub fn file_summary(path: String) -> Result<FileSummary, String> {
     } else {
         "UTF-8".to_string()
     };
-    
+
     Ok(FileSummary {
         line_count,
         word_count,
@@ -85,7 +83,9 @@ pub fn normalize_line_endings(text: String) -> String {
 /// Convert line endings to CRLF
 #[tauri::command]
 pub fn to_crlf(text: String) -> String {
-    text.replace("\r\n", "\n").replace('\r', "\n").replace('\n', "\r\n")
+    text.replace("\r\n", "\n")
+        .replace('\r', "\n")
+        .replace('\n', "\r\n")
 }
 
 /// Remove trailing whitespace from each line
@@ -120,27 +120,27 @@ pub fn get_word_boundaries(line: String, column: usize) -> Result<WordBoundary, 
     if chars.is_empty() || column >= chars.len() {
         return Ok(WordBoundary { start: 0, end: 0 });
     }
-    
+
     let is_word_char = |c: char| c.is_alphanumeric() || c == '_';
-    
+
     // Find start of word
     let mut start = column;
     while start > 0 && is_word_char(chars[start - 1]) {
         start -= 1;
     }
-    
+
     // Find end of word
     let mut end = column;
     while end < chars.len() && is_word_char(chars[end]) {
         end += 1;
     }
-    
+
     // If not on a word char, expand to surrounding whitespace/punctuation
     if start == column && end == column {
         start = column.saturating_sub(1);
         end = (column + 1).min(chars.len());
     }
-    
+
     Ok(WordBoundary { start, end })
 }
 
@@ -156,14 +156,14 @@ pub struct DiffLine {
 pub fn simple_diff(old_text: String, new_text: String) -> Vec<DiffLine> {
     let old_lines: Vec<&str> = old_text.lines().collect();
     let new_lines: Vec<&str> = new_text.lines().collect();
-    
+
     let mut result = Vec::new();
     let max_lines = old_lines.len().max(new_lines.len());
-    
+
     for i in 0..max_lines {
         let old_line = old_lines.get(i);
         let new_line = new_lines.get(i);
-        
+
         match (old_line, new_line) {
             (Some(old), Some(new)) if old != new => {
                 result.push(DiffLine {
@@ -189,7 +189,7 @@ pub fn simple_diff(old_text: String, new_text: String) -> Vec<DiffLine> {
             _ => {}
         }
     }
-    
+
     result
 }
 
@@ -198,10 +198,9 @@ pub fn simple_diff(old_text: String, new_text: String) -> Vec<DiffLine> {
 pub fn file_hash(path: String) -> Result<String, String> {
     use std::collections::hash_map::DefaultHasher;
     use std::hash::{Hash, Hasher};
-    
-    let content = std::fs::read(&path)
-        .map_err(|e| format!("Failed to read file: {}", e))?;
-    
+
+    let content = std::fs::read(&path).map_err(|e| format!("Failed to read file: {}", e))?;
+
     let mut hasher = DefaultHasher::new();
     content.hash(&mut hasher);
     Ok(format!("{:x}", hasher.finish()))
@@ -210,10 +209,8 @@ pub fn file_hash(path: String) -> Result<String, String> {
 /// Fast file content comparison
 #[tauri::command]
 pub fn files_equal(path1: String, path2: String) -> Result<bool, String> {
-    let content1 = std::fs::read(&path1)
-        .map_err(|e| format!("Failed to read file 1: {}", e))?;
-    let content2 = std::fs::read(&path2)
-        .map_err(|e| format!("Failed to read file 2: {}", e))?;
-    
+    let content1 = std::fs::read(&path1).map_err(|e| format!("Failed to read file 1: {}", e))?;
+    let content2 = std::fs::read(&path2).map_err(|e| format!("Failed to read file 2: {}", e))?;
+
     Ok(content1 == content2)
 }

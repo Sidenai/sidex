@@ -46,9 +46,9 @@ fn is_host_allowed(url: &reqwest::Url) -> bool {
         Some(h) => h,
         None => return false,
     };
-    ALLOWED_HOSTS.iter().any(|allowed| {
-        host == *allowed || host.ends_with(&format!(".{}", allowed))
-    })
+    ALLOWED_HOSTS
+        .iter()
+        .any(|allowed| host == *allowed || host.ends_with(&format!(".{}", allowed)))
 }
 
 fn build_client() -> Result<reqwest::Client, String> {
@@ -110,7 +110,10 @@ pub async fn proxy_request(
 ) -> Result<String, String> {
     let parsed = validate_url(&url)?;
     if !is_host_allowed(&parsed) {
-        return Err(format!("proxy requests to '{}' are not allowed", parsed.host_str().unwrap_or("unknown")));
+        return Err(format!(
+            "proxy requests to '{}' are not allowed",
+            parsed.host_str().unwrap_or("unknown")
+        ));
     }
 
     let client = build_client()?;

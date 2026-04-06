@@ -3,6 +3,7 @@ use rayon::prelude::*;
 use regex::RegexBuilder;
 use serde::{Deserialize, Serialize};
 use std::fs;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 use walkdir::WalkDir;
 
@@ -128,15 +129,35 @@ pub fn search_files(
     pattern: String,
     options: Option<SearchFileOptions>,
 ) -> Result<Vec<FileMatch>, String> {
-    let max_results = options.as_ref().and_then(|o| o.max_results).unwrap_or(DEFAULT_MAX_RESULTS);
-    let include_hidden = options.as_ref().and_then(|o| o.include_hidden).unwrap_or(false);
-    let include_set = options.as_ref()
+    let max_results = options
+        .as_ref()
+        .and_then(|o| o.max_results)
+        .unwrap_or(DEFAULT_MAX_RESULTS);
+    let include_hidden = options
+        .as_ref()
+        .and_then(|o| o.include_hidden)
+        .unwrap_or(false);
+    let include_set = options
+        .as_ref()
         .and_then(|o| o.include.as_deref())
-        .and_then(|v| if v.is_empty() { None } else { Some(build_globset(v)) })
+        .and_then(|v| {
+            if v.is_empty() {
+                None
+            } else {
+                Some(build_globset(v))
+            }
+        })
         .flatten();
-    let exclude_set = options.as_ref()
+    let exclude_set = options
+        .as_ref()
         .and_then(|o| o.exclude.as_deref())
-        .and_then(|v| if v.is_empty() { None } else { Some(build_globset(v)) })
+        .and_then(|v| {
+            if v.is_empty() {
+                None
+            } else {
+                Some(build_globset(v))
+            }
+        })
         .flatten();
 
     let mut scored: Vec<FileMatch> = Vec::new();
@@ -189,18 +210,44 @@ pub fn search_text(
     query: String,
     options: Option<SearchTextOptions>,
 ) -> Result<Vec<TextMatch>, String> {
-    let max_results = options.as_ref().and_then(|o| o.max_results).unwrap_or(DEFAULT_MAX_RESULTS);
-    let case_sensitive = options.as_ref().and_then(|o| o.case_sensitive).unwrap_or(false);
+    let max_results = options
+        .as_ref()
+        .and_then(|o| o.max_results)
+        .unwrap_or(DEFAULT_MAX_RESULTS);
+    let case_sensitive = options
+        .as_ref()
+        .and_then(|o| o.case_sensitive)
+        .unwrap_or(false);
     let is_regex = options.as_ref().and_then(|o| o.is_regex).unwrap_or(false);
-    let include_hidden = options.as_ref().and_then(|o| o.include_hidden).unwrap_or(false);
-    let max_file_size = options.as_ref().and_then(|o| o.max_file_size).unwrap_or(DEFAULT_MAX_FILE_SIZE);
-    let include_set = options.as_ref()
+    let include_hidden = options
+        .as_ref()
+        .and_then(|o| o.include_hidden)
+        .unwrap_or(false);
+    let max_file_size = options
+        .as_ref()
+        .and_then(|o| o.max_file_size)
+        .unwrap_or(DEFAULT_MAX_FILE_SIZE);
+    let include_set = options
+        .as_ref()
         .and_then(|o| o.include.as_deref())
-        .and_then(|v| if v.is_empty() { None } else { Some(build_globset(v)) })
+        .and_then(|v| {
+            if v.is_empty() {
+                None
+            } else {
+                Some(build_globset(v))
+            }
+        })
         .flatten();
-    let exclude_set = options.as_ref()
+    let exclude_set = options
+        .as_ref()
         .and_then(|o| o.exclude.as_deref())
-        .and_then(|v| if v.is_empty() { None } else { Some(build_globset(v)) })
+        .and_then(|v| {
+            if v.is_empty() {
+                None
+            } else {
+                Some(build_globset(v))
+            }
+        })
         .flatten();
 
     let pattern = if is_regex {
@@ -243,11 +290,20 @@ pub fn search_text(
         .collect();
 
     let results = Arc::new(Mutex::new(Vec::<TextMatch>::new()));
+    let stop = Arc::new(AtomicBool::new(false));
 
     files.par_iter().for_each(|entry| {
+        if stop.load(Ordering::Relaxed) {
+            return;
+        }
+
         {
-            let r = results.lock().unwrap();
+            let Ok(r) = results.lock() else {
+                stop.store(true, Ordering::Relaxed);
+                return;
+            };
             if r.len() >= max_results {
+                stop.store(true, Ordering::Relaxed);
                 return;
             }
         }
@@ -259,25 +315,48 @@ pub fn search_text(
 
         let path_str = entry.path().to_string_lossy().to_string();
 
+        let mut local_matches = Vec::new();
         for (line_idx, line) in content.lines().enumerate() {
-            let mut r = results.lock().unwrap();
-            if r.len() >= max_results {
+            if stop.load(Ordering::Relaxed) {
                 break;
             }
             for m in re.find_iter(line) {
-                r.push(TextMatch {
+                local_matches.push(TextMatch {
                     path: path_str.clone(),
                     line_number: line_idx + 1,
                     line_content: line.to_string(),
                     column: m.start(),
                     match_length: m.end() - m.start(),
                 });
-                if r.len() >= max_results {
+                if local_matches.len() >= max_results {
                     break;
                 }
             }
         }
+
+        if local_matches.is_empty() {
+            return;
+        }
+
+        let Ok(mut r) = results.lock() else {
+            stop.store(true, Ordering::Relaxed);
+            return;
+        };
+        let remaining = max_results.saturating_sub(r.len());
+        if remaining == 0 {
+            stop.store(true, Ordering::Relaxed);
+            return;
+        }
+        if local_matches.len() > remaining {
+            local_matches.truncate(remaining);
+            stop.store(true, Ordering::Relaxed);
+        }
+        r.extend(local_matches);
     });
 
-    Ok(Arc::try_unwrap(results).unwrap().into_inner().unwrap())
+    let mutex = Arc::try_unwrap(results)
+        .map_err(|_| "Internal error: search result collection still referenced".to_string())?;
+    mutex
+        .into_inner()
+        .map_err(|e| format!("Search results lock poisoned: {}", e))
 }

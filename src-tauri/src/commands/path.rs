@@ -15,25 +15,29 @@ pub struct PathInfo {
 #[tauri::command]
 pub fn parse_path(path: String) -> Result<PathInfo, String> {
     let p = Path::new(&path);
-    
-    let dir = p.parent()
+
+    let dir = p
+        .parent()
         .map(|d| d.to_string_lossy().to_string())
         .unwrap_or_default();
-    
-    let base = p.file_name()
+
+    let base = p
+        .file_name()
         .map(|n| n.to_string_lossy().to_string())
         .unwrap_or_default();
-    
-    let ext = p.extension()
+
+    let ext = p
+        .extension()
         .map(|e| e.to_string_lossy().to_string())
         .unwrap_or_default();
-    
-    let name = p.file_stem()
+
+    let name = p
+        .file_stem()
         .map(|n| n.to_string_lossy().to_string())
         .unwrap_or_default();
-    
+
     let normalized = normalize_path(&path);
-    
+
     Ok(PathInfo {
         dir,
         base,
@@ -48,7 +52,7 @@ pub fn parse_path(path: String) -> Result<PathInfo, String> {
 fn normalize_path(path: &str) -> String {
     let p = Path::new(path);
     let mut components = Vec::new();
-    
+
     for component in p.components() {
         match component {
             std::path::Component::Prefix(_) | std::path::Component::RootDir => {
@@ -72,13 +76,13 @@ fn normalize_path(path: &str) -> String {
             }
         }
     }
-    
+
     // Reconstruct path
     let mut result = PathBuf::new();
     for comp in components {
         result.push(comp);
     }
-    
+
     result.to_string_lossy().to_string()
 }
 
@@ -97,7 +101,7 @@ pub fn join_paths(base: String, segments: Vec<String>) -> String {
 pub fn relative_path(base: String, target: String) -> Result<String, String> {
     let base_path = Path::new(&base);
     let target_path = Path::new(&target);
-    
+
     pathdiff::diff_paths(target_path, base_path)
         .map(|p| p.to_string_lossy().to_string())
         .ok_or_else(|| "Failed to compute relative path".to_string())
@@ -119,7 +123,7 @@ pub fn ext_category(path: String) -> String {
         .and_then(|e| e.to_str())
         .unwrap_or("")
         .to_lowercase();
-    
+
     match ext.as_str() {
         "js" | "ts" | "jsx" | "tsx" | "mjs" | "cjs" => "javascript",
         "py" | "pyw" | "pyi" => "python",
@@ -142,15 +146,15 @@ pub fn ext_category(path: String) -> String {
         "vue" => "vue",
         "svelte" => "svelte",
         _ => "unknown",
-    }.to_string()
+    }
+    .to_string()
 }
 
 /// Check if file is binary (simple heuristic)
 #[tauri::command]
 pub fn is_binary_file(path: String) -> Result<bool, String> {
-    let content = std::fs::read(&path)
-        .map_err(|e| format!("Failed to read file: {}", e))?;
-    
+    let content = std::fs::read(&path).map_err(|e| format!("Failed to read file: {}", e))?;
+
     // Check for null bytes in first 8KB
     let sample = &content[..content.len().min(8192)];
     Ok(sample.contains(&0))
@@ -162,13 +166,13 @@ pub fn common_parent(paths: Vec<String>) -> Result<String, String> {
     if paths.is_empty() {
         return Err("No paths provided".to_string());
     }
-    
+
     let mut common = PathBuf::from(&paths[0]);
-    
+
     for path in &paths[1..] {
         let p = Path::new(path);
         let mut new_common = PathBuf::new();
-        
+
         for (a, b) in common.components().zip(p.components()) {
             if a == b {
                 new_common.push(a);
@@ -176,12 +180,12 @@ pub fn common_parent(paths: Vec<String>) -> Result<String, String> {
                 break;
             }
         }
-        
+
         common = new_common;
         if common.as_os_str().is_empty() {
             break;
         }
     }
-    
+
     Ok(common.to_string_lossy().to_string())
 }
