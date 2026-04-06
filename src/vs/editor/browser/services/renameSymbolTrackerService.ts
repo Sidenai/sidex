@@ -8,6 +8,7 @@ import { Position } from '../../common/core/position.js';
 import { Range } from '../../common/core/range.js';
 import { ITextModel } from '../../common/model.js';
 import { createDecorator } from '../../../platform/instantiation/common/instantiation.js';
+import { InstantiationType, registerSingleton } from '../../../platform/instantiation/common/extensions.js';
 
 export const IRenameSymbolTrackerService = createDecorator<IRenameSymbolTrackerService>('renameSymbolTrackerService');
 
@@ -59,3 +60,5 @@ export class NullRenameSymbolTrackerService implements IRenameSymbolTrackerServi
 		this._trackedWord.set(undefined, undefined);
 	}
 }
+
+registerSingleton(IRenameSymbolTrackerService, NullRenameSymbolTrackerService, InstantiationType.Delayed);

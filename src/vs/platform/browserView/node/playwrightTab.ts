@@ -20,7 +20,7 @@ declare module 'playwright-core' {
  * Wrapper around a Playwright page that tracks additional state like active dialogs and recent console messages,
  * and can produce a summary of the page's current state for use in tools.
  *
- * Loosely based on https://github.com/microsoft/playwright/blob/main/packages/playwright/src/mcp/browser/tab.ts.
+ * Loosely based on the Playwright browser tab implementation.
  */
 export class PlaywrightTab {
 	private _onDialogStateChanged = new Emitter<void>();

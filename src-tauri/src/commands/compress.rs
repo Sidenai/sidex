@@ -15,15 +15,22 @@ pub fn gzip_compress(data: Vec<u8>) -> Result<Vec<u8>, String> {
         .map_err(|e| format!("Compression finish error: {}", e))
 }
 
+const MAX_DECOMPRESSED_SIZE: u64 = 100 * 1024 * 1024; // 100 MB
+
 /// Decompress gzip data
 #[tauri::command]
 pub fn gzip_decompress(data: Vec<u8>) -> Result<Vec<u8>, String> {
     use flate2::read::GzDecoder;
-    
-    let mut decoder = GzDecoder::new(&data[..]);
+
+    let decoder = GzDecoder::new(&data[..]);
+    let mut limited = decoder.take(MAX_DECOMPRESSED_SIZE + 1);
     let mut result = Vec::new();
-    decoder.read_to_end(&mut result)
+    limited
+        .read_to_end(&mut result)
         .map_err(|e| format!("Decompression error: {}", e))?;
+    if result.len() as u64 > MAX_DECOMPRESSED_SIZE {
+        return Err("Decompressed data exceeds 100 MB limit".to_string());
+    }
     Ok(result)
 }
 
@@ -84,19 +91,34 @@ pub fn zip_list(path: String) -> Result<Vec<ZipEntry>, String> {
 /// Extract single file from zip
 #[tauri::command]
 pub fn zip_extract_file(zip_path: String, entry_name: String) -> Result<Vec<u8>, String> {
+    if entry_name.contains("..") || entry_name.starts_with('/') || entry_name.starts_with('\\') {
+        return Err("Invalid zip entry name: must not contain '..' or start with '/'".to_string());
+    }
+
     let file = File::open(&zip_path)
         .map_err(|e| format!("Failed to open zip: {}", e))?;
-    
+
     let mut archive = zip::ZipArchive::new(file)
         .map_err(|e| format!("Failed to read zip: {}", e))?;
-    
-    let mut entry = archive.by_name(&entry_name)
+
+    let entry = archive
+        .by_name(&entry_name)
         .map_err(|e| format!("Entry not found: {}", e))?;
-    
-    let mut result = Vec::new();
-    entry.read_to_end(&mut result)
+
+    let entry_size = entry.size();
+    if entry_size > MAX_DECOMPRESSED_SIZE {
+        return Err(format!(
+            "Zip entry too large: {} bytes (limit: {} bytes)",
+            entry_size, MAX_DECOMPRESSED_SIZE
+        ));
+    }
+
+    let mut limited = entry.take(MAX_DECOMPRESSED_SIZE + 1);
+    let mut result = Vec::with_capacity(entry_size.min(MAX_DECOMPRESSED_SIZE) as usize);
+    limited
+        .read_to_end(&mut result)
         .map_err(|e| format!("Failed to read entry: {}", e))?;
-    
+
     Ok(result)
 }
 

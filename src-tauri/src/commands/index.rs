@@ -20,7 +20,6 @@ use tauri::State;
 const DEFAULT_MAX_FILE_SIZE: u64 = 1024 * 1024; // 1MB
 const DEFAULT_MAX_RESULTS: usize = 1000;
 const BINARY_CHECK_BYTES: usize = 8192; // 8KB
-const MIN_WORD_LENGTH: usize = 3;
 
 /// Options for building the index
 #[derive(Debug, Clone, Deserialize)]
@@ -28,7 +27,6 @@ pub struct IndexOptions {
     pub file_extensions: Vec<String>,
     pub max_file_size: Option<u64>,
     pub exclude_dirs: Option<Vec<String>>,
-    pub trigram_index: Option<bool>,
 }
 
 impl Default for IndexOptions {
@@ -45,7 +43,6 @@ impl Default for IndexOptions {
                 "__pycache__".to_string(),
                 ".next".to_string(),
             ]),
-            trigram_index: Some(true),
         }
     }
 }

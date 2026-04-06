@@ -1,8 +1,8 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Full permissions for SideX IDE",
-  "windows": ["main", "*"],
+  "description": "SideX IDE permissions",
+  "windows": ["main"],
   "permissions": [
     "core:default",
  
@@ -13,54 +13,11 @@
     "dialog:allow-ask",
     "dialog:allow-confirm",
 
-    "fs:default",
-    "fs:allow-read-file",
-    "fs:allow-write-file",
-    "fs:allow-exists",
-    "fs:allow-mkdir",
-    "fs:allow-remove",
-    "fs:allow-rename",
-    "fs:allow-read-dir",
-    "fs:allow-stat",
-    "fs:allow-copy-file",
-    "fs:allow-watch",
-    "fs:allow-unwatch",
-    {
-      "identifier": "fs:scope",
-      "allow": [
-        { "path": "$HOME/**" },
-        { "path": "$HOME" },
-        { "path": "/**" },
-        { "path": "$APPDATA/**" },
-        { "path": "$LOCALAPPDATA/**" },
-        { "path": "$TEMP/**" },
-        { "path": "$DOWNLOAD/**" },
-        { "path": "$DOCUMENT/**" },
-        { "path": "$DESKTOP/**" }
-      ]
-    },
-
-    "clipboard-manager:default",
-    "clipboard-manager:allow-read-text",
-    "clipboard-manager:allow-write-text",
-    "clipboard-manager:allow-read-image",
-    "clipboard-manager:allow-write-image",
-
     "shell:default",
     "shell:allow-open",
-    "shell:allow-execute",
-    "shell:allow-spawn",
-    "shell:allow-stdin-write",
-    "shell:allow-kill",
 
-    "notification:default",
-    "notification:allow-is-permission-granted",
-    "notification:allow-request-permission",
-    "notification:allow-notify",
-
-    "opener:default",
-    "opener:allow-open-url",
-    "opener:allow-open-path",
-    "opener:allow-reveal-item-in-dir"
+    "updater:default",
+    "updater:allow-check",
+    "updater:allow-download-and-install"
   ]
 }

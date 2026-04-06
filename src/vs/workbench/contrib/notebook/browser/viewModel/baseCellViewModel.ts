@@ -25,7 +25,6 @@ import { CellViewModelStateChangeEvent } from '../notebookViewEvents.js';
 import { ViewContext } from './viewContext.js';
 import { NotebookCellTextModel } from '../../common/model/notebookCellTextModel.js';
 import { CellKind, INotebookCellStatusBarItem, INotebookFindOptions } from '../../common/notebookCommon.js';
-import { IInlineChatSessionService } from '../../../inlineChat/browser/inlineChatSessionService.js';
 
 export abstract class BaseCellViewModel extends Disposable {
 
@@ -189,9 +188,7 @@ export abstract class BaseCellViewModel extends Disposable {
 		private readonly _configurationService: IConfigurationService,
 		private readonly _modelService: ITextModelService,
 		private readonly _undoRedoService: IUndoRedoService,
-		private readonly _codeEditorService: ICodeEditorService,
-		private readonly _inlineChatSessionService: IInlineChatSessionService
-		// private readonly _keymapService: INotebookKeymapService
+		private readonly _codeEditorService: ICodeEditorService
 	) {
 		super();
 
@@ -316,11 +313,6 @@ export abstract class BaseCellViewModel extends Disposable {
 		});
 
 		this._editorListeners.push(editor.onDidChangeCursorSelection(() => { this._onDidChangeState.fire({ selectionChanged: true }); }));
-		this._editorListeners.push(this._inlineChatSessionService.onWillStartSession((e) => {
-			if (e === this._textEditor && this.textBuffer.getLength() === 0) {
-				this.enableAutoLanguageDetection();
-			}
-		}));
 
 		this._onDidChangeState.fire({ selectionChanged: true });
 		this._onDidChangeEditorAttachState.fire();

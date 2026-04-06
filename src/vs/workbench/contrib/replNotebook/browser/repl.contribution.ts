@@ -37,7 +37,6 @@ import { IWorkingCopyEditorHandler, IWorkingCopyEditorService } from '../../../s
 import { ResourceNotebookCellEdit } from '../../bulkEdit/browser/bulkCellEdits.js';
 import { getReplView } from '../../debug/browser/repl.js';
 import { REPL_VIEW_ID } from '../../debug/common/debug.js';
-import { InlineChatController } from '../../inlineChat/browser/inlineChatController.js';
 import { IInteractiveHistoryService } from '../../interactive/browser/interactiveHistoryService.js';
 import { NOTEBOOK_EDITOR_WIDGET_ACTION_WEIGHT } from '../../notebook/browser/controller/coreActions.js';
 import { INotebookEditorOptions } from '../../notebook/browser/notebookBrowser.js';
@@ -429,12 +428,6 @@ async function executeReplInput(
 
 			if (isFalsyOrWhitespace(value)) {
 				return;
-			}
-
-			// Just accept any existing inline chat hunk
-			const ctrl = InlineChatController.get(editorControl.activeCodeEditor);
-			if (ctrl) {
-				ctrl.acceptSession();
 			}
 
 			historyService.replaceLast(notebookDocument.uri, value);

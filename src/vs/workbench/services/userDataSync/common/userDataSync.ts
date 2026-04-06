@@ -4,7 +4,6 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { createDecorator } from '../../../../platform/instantiation/common/instantiation.js';
-import { IAuthenticationProvider, SyncStatus, SyncResource, IUserDataSyncResource, IResourcePreview } from '../../../../platform/userDataSync/common/userDataSync.js';
 import { Event } from '../../../../base/common/event.js';
 import { ContextKeyExpr, RawContextKey } from '../../../../platform/contextkey/common/contextkey.js';
 import { localize, localize2 } from '../../../../nls.js';
@@ -15,6 +14,46 @@ import { IView } from '../../../common/views.js';
 import { Categories } from '../../../../platform/action/common/actionCommonCategories.js';
 import { IAction2Options } from '../../../../platform/actions/common/actions.js';
 import { ILocalizedString } from '../../../../platform/action/common/action.js';
+
+// Inline types to avoid importing heavy userDataSync module
+export interface IAuthenticationProvider {
+	readonly id: string;
+	readonly scopes: string[];
+}
+
+export const enum SyncResource {
+	Settings = 'settings',
+	Keybindings = 'keybindings',
+	Snippets = 'snippets',
+	Tasks = 'tasks',
+	Extensions = 'extensions',
+	GlobalState = 'globalState',
+	Profiles = 'profiles',
+	WorkspaceState = 'workspaceState',
+	Prompts = 'prompts',
+}
+
+export const enum SyncStatus {
+	Uninitialized = 'uninitialized',
+	Idle = 'idle',
+	Syncing = 'syncing',
+	HasConflicts = 'hasConflicts',
+}
+
+export interface IUserDataSyncResource {
+	readonly syncResource: SyncResource;
+	readonly profile: unknown;
+}
+
+export interface IResourcePreview {
+	readonly remoteResource: URI;
+	readonly localResource: URI;
+	readonly previewResource: URI;
+	readonly acceptedResource: URI;
+	readonly localChange: number;
+	readonly remoteChange: number;
+	readonly mergeState: unknown;
+}
 
 export interface IUserDataSyncAccount {
 	readonly authenticationProviderId: string;
@@ -60,7 +99,6 @@ export function getSyncAreaLabel(source: SyncResource): string {
 		case SyncResource.Snippets: return localize('snippets', "Snippets");
 		case SyncResource.Prompts: return localize('prompts', "Prompts and Instructions");
 		case SyncResource.Tasks: return localize('tasks', "Tasks");
-		case SyncResource.Mcp: return localize('mcp', "MCP Servers");
 		case SyncResource.Extensions: return localize('extensions', "Extensions");
 		case SyncResource.GlobalState: return localize('ui state label', "UI State");
 		case SyncResource.Profiles: return localize('profiles', "Profiles");
@@ -105,3 +143,29 @@ export const DOWNLOAD_ACTIVITY_ACTION_DESCRIPTOR: Readonly<IAction2Options> = {
 	f1: true,
 	precondition: ContextKeyExpr.and(CONTEXT_ACCOUNT_STATE.isEqualTo(AccountStatus.Available), CONTEXT_SYNC_STATE.notEqualsTo(SyncStatus.Uninitialized))
 };
+
+// Null implementation — no online sync in this build
+import { InstantiationType, registerSingleton } from '../../../../platform/instantiation/common/extensions.js';
+
+export class NullUserDataSyncWorkbenchService implements IUserDataSyncWorkbenchService {
+	declare _serviceBrand: undefined;
+	readonly enabled = false;
+	readonly authenticationProviders = [];
+	readonly current = undefined;
+	readonly accountStatus = AccountStatus.Unavailable;
+	readonly onDidChangeAccountStatus = Event.None;
+	readonly onDidTurnOnSync = Event.None;
+	async turnOn(): Promise<void> { }
+	async turnoff(): Promise<void> { }
+	async signIn(): Promise<void> { }
+	async resetSyncedData(): Promise<void> { }
+	async showSyncActivity(): Promise<void> { }
+	async syncNow(): Promise<void> { }
+	async synchroniseUserDataSyncStoreType(): Promise<void> { }
+	async showConflicts(): Promise<void> { }
+	async accept(): Promise<void> { }
+	async getAllLogResources(): Promise<URI[]> { return []; }
+	async downloadSyncActivity(): Promise<URI | undefined> { return undefined; }
+}
+
+registerSingleton(IUserDataSyncWorkbenchService, NullUserDataSyncWorkbenchService, InstantiationType.Delayed);

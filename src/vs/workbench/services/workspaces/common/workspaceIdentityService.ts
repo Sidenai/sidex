@@ -9,7 +9,10 @@ import { isEqualOrParent, joinPath, relativePath } from '../../../../base/common
 import { URI } from '../../../../base/common/uri.js';
 import { InstantiationType, registerSingleton } from '../../../../platform/instantiation/common/extensions.js';
 import { createDecorator } from '../../../../platform/instantiation/common/instantiation.js';
-import { IWorkspaceStateFolder } from '../../../../platform/userDataSync/common/userDataSync.js';
+// Inline interface to avoid importing heavy userDataSync module
+export interface IWorkspaceStateFolder {
+	resourceUri: string;
+}
 import { EditSessionIdentityMatch, IEditSessionIdentityService } from '../../../../platform/workspace/common/editSessions.js';
 import { IWorkspaceContextService, IWorkspaceFolder } from '../../../../platform/workspace/common/workspace.js';
 

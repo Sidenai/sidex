@@ -33,7 +33,6 @@ import { ITestResultStorage, TestResultStorage } from '../common/testResultStora
 import { ITestService } from '../common/testService.js';
 import { TestService } from '../common/testServiceImpl.js';
 import { ITestItem, ITestRunProfileReference, TestRunProfileBitset } from '../common/testTypes.js';
-import { TestingChatAgentToolContribution } from '../common/testingChatAgentTool.js';
 import { TestingContentProvider } from '../common/testingContentProvider.js';
 import { TestingContextKeys } from '../common/testingContextKeys.js';
 import { ITestingContinuousRunService, TestingContinuousRunService } from '../common/testingContinuousRunService.js';
@@ -142,7 +141,6 @@ registerAction2(CollapsePeekStack);
 registerWorkbenchContribution2(TestingContentProvider.ID, TestingContentProvider, WorkbenchPhase.AfterRestored);
 registerWorkbenchContribution2(TestingPeekOpener.ID, TestingPeekOpener, WorkbenchPhase.Eventually);
 registerWorkbenchContribution2(TestingProgressTrigger.ID, TestingProgressTrigger, WorkbenchPhase.Eventually);
-registerWorkbenchContribution2(TestingChatAgentToolContribution.ID, TestingChatAgentToolContribution, WorkbenchPhase.Eventually);
 
 registerEditorContribution(Testing.OutputPeekContributionId, TestingOutputPeekController, EditorContributionInstantiation.AfterFirstRender);
 registerEditorContribution(Testing.DecorationsContributionId, TestingDecorations, EditorContributionInstantiation.AfterFirstRender);

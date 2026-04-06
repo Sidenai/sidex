@@ -14,7 +14,7 @@ import { Extensions as JSONExtensions, IJSONContributionRegistry } from '../../j
 import { Registry } from '../../registry/common/platform.js';
 import { IPolicy, PolicyName } from '../../../base/common/policy.js';
 import { Disposable } from '../../../base/common/lifecycle.js';
-import product from '../../product/common/product.js';
+
 
 export enum EditPresentationTypes {
 	Multiline = 'multilineText',
@@ -1023,4 +1023,4 @@ export function parseScope(scope: string): ConfigurationScope {
 }
 
 // Used for extension unification. Should be removed when complete.
-export const EXTENSION_UNIFICATION_EXTENSION_IDS: Set<string> = new Set(product.defaultChatAgent ? [product.defaultChatAgent.extensionId, product.defaultChatAgent.chatExtensionId].map(id => id.toLowerCase()) : []);
+export const EXTENSION_UNIFICATION_EXTENSION_IDS: Set<string> = new Set<string>();

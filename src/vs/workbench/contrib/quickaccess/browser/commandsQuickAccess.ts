@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { isFirefox } from '../../../../base/browser/browser.js';
-import { raceTimeout, timeout } from '../../../../base/common/async.js';
+import { raceTimeout } from '../../../../base/common/async.js';
 import { CancellationToken } from '../../../../base/common/cancellation.js';
 import { Codicon } from '../../../../base/common/codicons.js';
 import { stripIcons } from '../../../../base/common/iconLabels.js';
@@ -30,29 +30,15 @@ import { IQuickInputService, IQuickPickSeparator } from '../../../../platform/qu
 import { IStorageService } from '../../../../platform/storage/common/storage.js';
 import { ITelemetryService } from '../../../../platform/telemetry/common/telemetry.js';
 import { IWorkbenchQuickAccessConfiguration } from '../../../browser/quickaccess.js';
-import { CommandInformationResult, IAiRelatedInformationService, RelatedInformationType } from '../../../services/aiRelatedInformation/common/aiRelatedInformation.js';
 import { IEditorGroupsService } from '../../../services/editor/common/editorGroupsService.js';
 import { IEditorService } from '../../../services/editor/common/editorService.js';
 import { IExtensionService } from '../../../services/extensions/common/extensions.js';
 import { createKeybindingCommandQuery } from '../../../services/preferences/browser/keybindingsEditorModel.js';
 import { IPreferencesService } from '../../../services/preferences/common/preferences.js';
-import { CHAT_OPEN_ACTION_ID } from '../../chat/browser/actions/chatActions.js';
-import { ASK_QUICK_QUESTION_ACTION_ID } from '../../chat/browser/actions/chatQuickInputActions.js';
-import { IChatAgentService } from '../../chat/common/participants/chatAgents.js';
-import { ChatAgentLocation } from '../../chat/common/constants.js';
 
 export class CommandsQuickAccessProvider extends AbstractEditorCommandsQuickAccessProvider {
 
-	private static AI_RELATED_INFORMATION_MAX_PICKS = 5;
-	private static AI_RELATED_INFORMATION_DEBOUNCE = 200;
-
-	// If extensions are not yet registered, we wait for a little moment to give them
-	// a chance to register so that the complete set of commands shows up as result
-	// We do not want to delay functionality beyond that time though to keep the commands
-	// functional.
 	private readonly extensionRegistrationRace: Promise<boolean | undefined>;
-
-	private useAiRelatedInfo = false;
 
 	protected get activeTextEditorControl(): IEditor | undefined { return this.editorService.activeTextEditorControl; }
 
@@ -77,8 +63,6 @@ export class CommandsQuickAccessProvider extends AbstractEditorCommandsQuickAcce
 		@IEditorGroupsService private readonly editorGroupService: IEditorGroupsService,
 		@IPreferencesService private readonly preferencesService: IPreferencesService,
 		@IProductService private readonly productService: IProductService,
-		@IAiRelatedInformationService private readonly aiRelatedInformationService: IAiRelatedInformationService,
-		@IChatAgentService private readonly chatAgentService: IChatAgentService,
 	) {
 		super({
 			showAlias: !Language.isDefaultVariant(),
@@ -98,7 +82,6 @@ export class CommandsQuickAccessProvider extends AbstractEditorCommandsQuickAcce
 
 		return {
 			preserveInput: commandPaletteConfig.preserveInput,
-			showAskInChat: commandPaletteConfig.showAskInChat,
 			experimental: commandPaletteConfig.experimental
 		};
 	}
@@ -113,7 +96,6 @@ export class CommandsQuickAccessProvider extends AbstractEditorCommandsQuickAcce
 			? new Set(this.productService.commandPaletteSuggestedCommandIds)
 			: undefined;
 		this.options.suggestedCommandIds = suggestedCommandIds;
-		this.useAiRelatedInfo = config.experimental.enableNaturalLanguageSearch;
 	}
 
 	protected async getCommandPicks(token: CancellationToken): Promise<Array<ICommandQuickPick>> {
@@ -142,85 +124,11 @@ export class CommandsQuickAccessProvider extends AbstractEditorCommandsQuickAcce
 	}
 
 	protected hasAdditionalCommandPicks(filter: string, token: CancellationToken): boolean {
-		if (
-			!this.useAiRelatedInfo
-			|| token.isCancellationRequested
-			|| filter === ''
-			|| !this.aiRelatedInformationService.isEnabled()
-		) {
-			return false;
-		}
-
-		return true;
+		return false;
 	}
 
 	protected async getAdditionalCommandPicks(allPicks: ICommandQuickPick[], picksSoFar: ICommandQuickPick[], filter: string, token: CancellationToken): Promise<Array<ICommandQuickPick | IQuickPickSeparator>> {
-		if (!this.hasAdditionalCommandPicks(filter, token)) {
-			return [];
-		}
-
-		let additionalPicks: (ICommandQuickPick | IQuickPickSeparator)[] = [];
-		try {
-			// Wait a bit to see if the user is still typing
-			await timeout(CommandsQuickAccessProvider.AI_RELATED_INFORMATION_DEBOUNCE, token);
-			additionalPicks = await this.getRelatedInformationPicks(allPicks, picksSoFar, filter, token);
-		} catch (e) {
-			// Ignore and continue to add "Ask in Chat" option
-		}
-
-		// If enabled in settings, add "Ask in Chat" option after a separator (if needed).
-		if (this.configuration.showAskInChat) {
-			const defaultAgent = this.chatAgentService.getDefaultAgent(ChatAgentLocation.Chat);
-			if (defaultAgent) {
-				if (picksSoFar.length || additionalPicks.length) {
-					additionalPicks.push({
-						type: 'separator'
-					});
-				}
-
-				additionalPicks.push({
-					label: localize('commandsQuickAccess.askInChat', "Ask in Chat: {0}", filter),
-					commandId: this.configuration.experimental.askChatLocation === 'quickChat' ? ASK_QUICK_QUESTION_ACTION_ID : CHAT_OPEN_ACTION_ID,
-					args: [filter],
-					buttons: [{
-						iconClass: ThemeIcon.asClassName(Codicon.gear),
-						tooltip: localize('commandsQuickAccess.configureAskInChatSetting', "Configure visibility"),
-					}],
-					trigger: () => {
-						void this.preferencesService.openSettings({ jsonEditor: false, query: 'workbench.commandPalette.showAskInChat' });
-						return TriggerAction.CLOSE_PICKER;
-					},
-				});
-			}
-		}
-
-		return additionalPicks;
-	}
-
-	private async getRelatedInformationPicks(allPicks: ICommandQuickPick[], picksSoFar: ICommandQuickPick[], filter: string, token: CancellationToken) {
-		const relatedInformation = await this.aiRelatedInformationService.getRelatedInformation(
-			filter,
-			[RelatedInformationType.CommandInformation],
-			token
-		) as CommandInformationResult[];
-
-		// Sort by weight descending to get the most relevant results first
-		relatedInformation.sort((a, b) => b.weight - a.weight);
-
-		const setOfPicksSoFar = new Set(picksSoFar.map(p => p.commandId));
-		const additionalPicks = new Array<ICommandQuickPick | IQuickPickSeparator>();
-
-		for (const info of relatedInformation) {
-			if (additionalPicks.length === CommandsQuickAccessProvider.AI_RELATED_INFORMATION_MAX_PICKS) {
-				break;
-			}
-			const pick = allPicks.find(p => p.commandId === info.command && !setOfPicksSoFar.has(p.commandId));
-			if (pick) {
-				additionalPicks.push(pick);
-			}
-		}
-
-		return additionalPicks;
+		return [];
 	}
 
 	private getGlobalCommandPicks(): ICommandQuickPick[] {

@@ -8,9 +8,11 @@ import { RemoteAgentConnectionContext, IRemoteAgentEnvironment } from '../../../
 import { IChannel, IServerChannel } from '../../../../base/parts/ipc/common/ipc.js';
 import { IDiagnosticInfoOptions, IDiagnosticInfo } from '../../../../platform/diagnostics/common/diagnostics.js';
 import { Event } from '../../../../base/common/event.js';
-import { PersistentConnectionEvent } from '../../../../platform/remote/common/remoteAgentConnection.js';
 import { ITelemetryData, TelemetryLevel } from '../../../../platform/telemetry/common/telemetry.js';
 import { timeout } from '../../../../base/common/async.js';
+
+// Stub type to avoid importing heavy remoteAgentConnection module
+export type PersistentConnectionEvent = unknown;
 
 export const IRemoteAgentService = createDecorator<IRemoteAgentService>('remoteAgentService');
 

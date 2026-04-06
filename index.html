@@ -25,9 +25,9 @@
         commit: '',
         date: new Date().toISOString(),
         quality: 'stable',
-        reportIssueUrl: 'https://github.com/Razshy/sidexvs/issues/new',
+        reportIssueUrl: 'https://github.com/sidenai/sidex/issues/new',
         licenseName: 'MIT',
-        licenseUrl: 'https://github.com/Razshy/sidexvs/blob/main/LICENSE',
+        licenseUrl: 'https://github.com/sidenai/sidex/blob/main/LICENSE',
         extensionsGallery: {
           serviceUrl: 'https://open-vsx.org/vscode/gallery',
           itemUrl: 'https://open-vsx.org/vscode/item',
@@ -35,15 +35,6 @@
           controlUrl: '',
           nlsBaseUrl: '',
           publisherUrl: '',
-        },
-        defaultChatAgent: {
-          extensionId: '',
-          chatExtensionId: '',
-          provider: {
-            default: { id: '', name: '' },
-            enterprise: { id: '', name: '' },
-          },
-          providerScopes: [],
         },
       };
     </script>
@@ -112,6 +103,9 @@
         color: #c0c0c0;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
         font-size: 13px;
+      }
+      .titlebar-drag-region {
+        -webkit-app-region: no-drag !important;
       }
     </style>
   </head>

@@ -1102,7 +1102,7 @@ export interface IFetchResourceMetadataOptions {
 /**
  * Fetches and validates OAuth 2.0 protected resource metadata from the given URL.
  *
- * @param targetResource The target resource URL to compare origins with (e.g., the MCP server URL)
+ * @param targetResource The target resource URL to compare origins with (e.g., the protected resource URL)
  * @param resourceMetadataUrl Optional URL to fetch the resource metadata from. If not provided, will try well-known URIs.
  * @param options Configuration options for the fetch operation
  * @returns Promise that resolves to an object containing the validated resource metadata and any errors encountered during discovery

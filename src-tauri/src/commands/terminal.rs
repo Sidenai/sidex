@@ -37,6 +37,16 @@ struct TerminalExitEvent {
     exit_code: i32,
 }
 
+pub(crate) fn resolve_windows_shell() -> String {
+    for candidate in ["pwsh.exe", "powershell.exe"] {
+        if let Ok(path) = which::which(candidate) {
+            return path.to_string_lossy().to_string();
+        }
+    }
+
+    std::env::var("COMSPEC").unwrap_or_else(|_| "powershell.exe".to_string())
+}
+
 #[tauri::command]
 pub fn terminal_spawn(
     app: AppHandle,
@@ -64,7 +74,7 @@ pub fn terminal_spawn(
 
     let shell_path = shell.unwrap_or_else(|| {
         if cfg!(target_os = "windows") {
-            std::env::var("COMSPEC").unwrap_or_else(|_| "powershell.exe".to_string())
+            resolve_windows_shell()
         } else {
             std::env::var("SHELL").unwrap_or_else(|_| "/bin/bash".to_string())
         }
@@ -350,7 +360,7 @@ fn home_dir_string() -> Option<String> {
 #[tauri::command]
 pub fn get_default_shell() -> String {
     if cfg!(target_os = "windows") {
-        return std::env::var("COMSPEC").unwrap_or_else(|_| "powershell.exe".to_string());
+        return resolve_windows_shell();
     }
 
     // 1. Check $SHELL (same as VS Code: shell.ts getSystemShellUnixLike)
@@ -388,6 +398,10 @@ pub fn get_default_shell() -> String {
 
 #[tauri::command]
 pub fn check_shell_exists(path: String) -> bool {
+    if cfg!(target_os = "windows") {
+        return std::path::Path::new(&path).exists() || which::which(&path).is_ok();
+    }
+
     std::path::Path::new(&path).exists()
 }
 
@@ -401,15 +415,20 @@ pub fn get_available_shells() -> Vec<ShellInfo> {
             ("Git Bash", "bash.exe"),
             ("WSL", "wsl.exe"),
         ];
-        let default_shell = std::env::var("COMSPEC").unwrap_or_default();
+        let default_shell = get_default_shell();
         let mut seen = std::collections::HashSet::new();
         let mut shells = Vec::new();
         for (name, path) in candidates {
-            if std::path::Path::new(path).exists() && seen.insert(name.to_string()) {
+            if let Ok(resolved_path) = which::which(path) {
+                let resolved_path = resolved_path.to_string_lossy().to_string();
+                if !seen.insert(name.to_string()) {
+                    continue;
+                }
+
                 shells.push(ShellInfo {
                     name: name.to_string(),
-                    path: path.to_string(),
-                    is_default: path.to_lowercase() == default_shell.to_lowercase(),
+                    path: resolved_path.clone(),
+                    is_default: resolved_path.eq_ignore_ascii_case(&default_shell),
                 });
             }
         }

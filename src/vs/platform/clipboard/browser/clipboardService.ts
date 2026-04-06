@@ -50,7 +50,23 @@ export class BrowserClipboardService extends Disposable implements IClipboardSer
 		return undefined;
 	}
 
+	private get isTauriProtocol(): boolean {
+		const globalScope = globalThis as typeof globalThis & {
+			__SIDEX_TAURI__?: boolean;
+			__TAURI__?: unknown;
+			__TAURI_INTERNALS__?: unknown;
+		};
+		return globalScope.__SIDEX_TAURI__ === true
+			|| typeof globalScope.__TAURI__ !== 'undefined'
+			|| typeof globalScope.__TAURI_INTERNALS__ !== 'undefined'
+			|| getActiveWindow().location?.protocol === 'tauri:';
+	}
+
 	async readImage(): Promise<Uint8Array> {
+		if (this.isTauriProtocol) {
+			return new Uint8Array(0);
+		}
+
 		try {
 			const clipboardItems = await navigator.clipboard.read();
 			const clipboardItem = clipboardItems[0];
@@ -138,6 +154,11 @@ export class BrowserClipboardService extends Disposable implements IClipboardSer
 			return this.webKitPendingClipboardWritePromise.complete(text);
 		}
 
+		if (this.isTauriProtocol) {
+			this.fallbackWriteText(text);
+			return;
+		}
+
 		// Guard access to navigator.clipboard with try/catch
 		// as we have seen DOMExceptions in certain browsers
 		// due to security policies.
@@ -184,6 +205,9 @@ export class BrowserClipboardService extends Disposable implements IClipboardSer
 			return readText;
 		}
 
+		if (this.isTauriProtocol) {
+			return '';
+		}
 		// Guard access to navigator.clipboard with try/catch
 		// as we have seen DOMExceptions in certain browsers
 		// due to security policies.
@@ -214,24 +238,26 @@ export class BrowserClipboardService extends Disposable implements IClipboardSer
 	private static readonly MAX_RESOURCE_STATE_SOURCE_LENGTH = 1000;
 
 	async writeResources(resources: URI[]): Promise<void> {
-		// Guard access to navigator.clipboard with try/catch
-		// as we have seen DOMExceptions in certain browsers
-		// due to security policies.
-		try {
-			await getActiveWindow().navigator.clipboard.write([
-				new ClipboardItem({
-					[`web ${vscodeResourcesMime}`]: new Blob([
-						JSON.stringify(resources.map(x => x.toJSON()))
-					], {
-						type: vscodeResourcesMime
+		if (!this.isTauriProtocol) {
+			// Guard access to navigator.clipboard with try/catch
+			// as we have seen DOMExceptions in certain browsers
+			// due to security policies.
+			try {
+				await getActiveWindow().navigator.clipboard.write([
+					new ClipboardItem({
+						[`web ${vscodeResourcesMime}`]: new Blob([
+							JSON.stringify(resources.map(x => x.toJSON()))
+						], {
+							type: vscodeResourcesMime
+						})
 					})
-				})
-			]);
+				]);
 
-			// Continue to write to the in-memory clipboard as well.
-			// This is needed because some browsers allow the paste but then can't read the custom resources.
-		} catch (error) {
-			// Noop
+				// Continue to write to the in-memory clipboard as well.
+				// This is needed because some browsers allow the paste but then can't read the custom resources.
+			} catch (error) {
+				// Noop
+			}
 		}
 
 		if (resources.length === 0) {
@@ -243,20 +269,22 @@ export class BrowserClipboardService extends Disposable implements IClipboardSer
 	}
 
 	async readResources(): Promise<URI[]> {
-		// Guard access to navigator.clipboard with try/catch
-		// as we have seen DOMExceptions in certain browsers
-		// due to security policies.
-		try {
-			const items = await getActiveWindow().navigator.clipboard.read();
-			for (const item of items) {
-				if (item.types.includes(`web ${vscodeResourcesMime}`)) {
-					const blob = await item.getType(`web ${vscodeResourcesMime}`);
-					const resources = (JSON.parse(await blob.text()) as URI[]).map(x => URI.from(x));
-					return resources;
+		if (!this.isTauriProtocol) {
+			// Guard access to navigator.clipboard with try/catch
+			// as we have seen DOMExceptions in certain browsers
+			// due to security policies.
+			try {
+				const items = await getActiveWindow().navigator.clipboard.read();
+				for (const item of items) {
+					if (item.types.includes(`web ${vscodeResourcesMime}`)) {
+						const blob = await item.getType(`web ${vscodeResourcesMime}`);
+						const resources = (JSON.parse(await blob.text()) as URI[]).map(x => URI.from(x));
+						return resources;
+					}
 				}
+			} catch (error) {
+				// Noop
 			}
-		} catch (error) {
-			// Noop
 		}
 
 		const resourcesStateHash = await this.computeResourcesStateHash();
@@ -272,6 +300,10 @@ export class BrowserClipboardService extends Disposable implements IClipboardSer
 			return undefined; // no resources, no hash needed
 		}
 
+		if (this.isTauriProtocol) {
+			return undefined;
+		}
+
 		// Resources clipboard is managed in-memory only and thus
 		// fails to invalidate when clipboard data is changing.
 		// As such, we compute the hash of the current clipboard
@@ -282,18 +314,20 @@ export class BrowserClipboardService extends Disposable implements IClipboardSer
 	}
 
 	async hasResources(): Promise<boolean> {
-		// Guard access to navigator.clipboard with try/catch
-		// as we have seen DOMExceptions in certain browsers
-		// due to security policies.
-		try {
-			const items = await getActiveWindow().navigator.clipboard.read();
-			for (const item of items) {
-				if (item.types.includes(`web ${vscodeResourcesMime}`)) {
-					return true;
+		if (!this.isTauriProtocol) {
+			// Guard access to navigator.clipboard with try/catch
+			// as we have seen DOMExceptions in certain browsers
+			// due to security policies.
+			try {
+				const items = await getActiveWindow().navigator.clipboard.read();
+				for (const item of items) {
+					if (item.types.includes(`web ${vscodeResourcesMime}`)) {
+						return true;
+					}
 				}
+			} catch (error) {
+				// Noop
 			}
-		} catch (error) {
-			// Noop
 		}
 
 		return this.resources.length > 0;

@@ -55,6 +55,10 @@ async function ensureTauri(): Promise<boolean> {
 	}
 }
 
+function getShellBasename(shellPath: string): string {
+	return shellPath.split(/[\\/]/).pop()?.replace(/\.exe$/i, '') || 'zsh';
+}
+
 let nextPtyId = 1;
 
 class TauriPty extends Disposable implements ITerminalChildProcess {
@@ -113,42 +117,14 @@ class TauriPty extends Disposable implements ITerminalChildProcess {
 				envToPass['LANG'] = 'en_US.UTF-8';
 			}
 
-			// Shell integration injection
+			// Pass args from shell launch config; Rust will add -l if none provided
 			let shellArgs: string[] | undefined;
 			if (Array.isArray(args)) {
 				shellArgs = args as string[];
 			} else if (typeof args === 'string') {
 				shellArgs = [args];
 			}
-
 			const shellBasename = shell ? shell.split('/').pop() || '' : '';
-			const shellIntegrationEnabled = !this._shellLaunchConfig.ignoreShellIntegration;
-
-			if (shellIntegrationEnabled && shellBasename) {
-				envToPass['VSCODE_INJECTION'] = '1';
-
-				if (shellBasename === 'zsh') {
-					try {
-						const zdotdir = await _invoke('setup_zsh_dotdir', {}) as string;
-						if (zdotdir) {
-							envToPass['ZDOTDIR'] = zdotdir;
-							envToPass['USER_ZDOTDIR'] = envToPass['HOME'] || '';
-						}
-					} catch (e) {
-						console.warn('[SideX Terminal] Failed to set up zsh ZDOTDIR:', e);
-					}
-				} else if (shellBasename === 'bash') {
-					try {
-						const scriptsDir = await _invoke('get_shell_integration_dir', {}) as string;
-						if (scriptsDir) {
-							const rcFile = `${scriptsDir}/shellIntegration-bash.sh`;
-							shellArgs = ['--init-file', rcFile];
-						}
-					} catch (e) {
-						console.warn('[SideX Terminal] Failed to set up bash shell integration:', e);
-					}
-				}
-			}
 
 			const dataBuffer: string[] = [];
 			let attached = false;
@@ -193,7 +169,7 @@ class TauriPty extends Disposable implements ITerminalChildProcess {
 			} catch { }
 
 			this._onProcessReady.fire({ pid, cwd: this._cwd, windowsPty: undefined });
-			this._onDidChangeProperty.fire({ type: ProcessPropertyType.initialCwd, value: this._cwd });
+			this._onDidChangeProperty.fire({ type: ProcessPropertyType.InitialCwd, value: this._cwd });
 
 			const shellName = shellBasename || 'terminal';
 			this._onDidChangeProperty.fire({
@@ -245,6 +221,9 @@ class TauriPty extends Disposable implements ITerminalChildProcess {
 	async setUnicodeVersion(_version: '6' | '11'): Promise<void> { }
 
 	async refreshProperty<T extends ProcessPropertyType>(property: T): Promise<IProcessPropertyMap[T]> {
+		if (property === ProcessPropertyType.Cwd || property === ProcessPropertyType.InitialCwd) {
+			return this._cwd as IProcessPropertyMap[T];
+		}
 		throw new Error(`Unhandled property: ${property}`);
 	}
 
@@ -331,7 +310,7 @@ class TauriTerminalBackend extends Disposable implements ITerminalBackend {
 		_includeDetectedProfiles?: boolean
 	): Promise<ITerminalProfile[]> {
 		const defaultShell = await this.getDefaultSystemShell();
-		const defaultName = defaultShell.split('/').pop() || 'zsh';
+		const defaultName = getShellBasename(defaultShell);
 
 		await ensureTauri();
 
@@ -362,22 +341,26 @@ class TauriTerminalBackend extends Disposable implements ITerminalBackend {
 		if (detectedShells.length > 0) {
 			const profiles: ITerminalProfile[] = [];
 			const seen = new Set<string>();
+			let hasDefaultProfile = false;
 
 			for (const shell of detectedShells) {
 				if (seen.has(shell.name)) {
 					continue;
 				}
 				seen.add(shell.name);
+				const shellBaseName = getShellBasename(shell.path);
+				const isDefault = shell.is_default || shellBaseName === defaultName;
+				hasDefaultProfile = hasDefaultProfile || isDefault;
 				profiles.push({
 					profileName: shell.name,
 					path: shell.path,
-					isDefault: shell.is_default || shell.name === defaultName,
+					isDefault,
 					isAutoDetected: false,
-					icon: iconMap[shell.name] || Codicon.terminal,
+					icon: iconMap[shellBaseName] || iconMap[shell.name] || Codicon.terminal,
 				});
 			}
 
-			if (!seen.has(defaultName)) {
+			if (!hasDefaultProfile) {
 				profiles.unshift({
 					profileName: defaultName,
 					path: defaultShell,
@@ -452,21 +435,15 @@ class TauriTerminalBackend extends Disposable implements ITerminalBackend {
 		await ensureTauri();
 		if (_invoke) {
 			try {
-				const env = await _invoke('get_all_env') as Record<string, string>;
-				if (env) return env;
-			} catch { }
+				return await _invoke('get_all_env') as IProcessEnvironment;
+			} catch {
+				// Fall through to an empty environment if invoke is unavailable.
+			}
 		}
 		return {};
 	}
 	async getShellEnvironment(): Promise<IProcessEnvironment | undefined> {
-		await ensureTauri();
-		if (_invoke) {
-			try {
-				const env = await _invoke('get_all_env') as Record<string, string>;
-				if (env) return env;
-			} catch { }
-		}
-		return {};
+		return this.getEnvironment();
 	}
 	async setTerminalLayoutInfo(_layoutInfo?: ITerminalsLayoutInfoById): Promise<void> { }
 	async updateTitle(_id: number, _title: string, _titleSource: TitleEventSource): Promise<void> { }

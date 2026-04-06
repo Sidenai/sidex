@@ -5,7 +5,15 @@
 
 .file-icons-enabled .show-file-icons .vscode_getting_started_page-name-file-icon.file-icon::before {
 	content: ' ';
-	background-image: url('../../../../browser/media/code-icon.svg');
+	background-color: currentColor;
+	-webkit-mask-image: url('../../../../browser/media/code-icon.svg');
+	-webkit-mask-repeat: no-repeat;
+	-webkit-mask-size: contain;
+	-webkit-mask-position: center;
+	mask-image: url('../../../../browser/media/code-icon.svg');
+	mask-repeat: no-repeat;
+	mask-size: contain;
+	mask-position: center;
 }
 
 .monaco-workbench .part.editor > .content .gettingStartedContainer {

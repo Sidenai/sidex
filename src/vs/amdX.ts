@@ -6,7 +6,6 @@
 import { AppResourcePath, FileAccess, nodeModulesAsarPath, nodeModulesPath, Schemas, VSCODE_AUTHORITY } from './base/common/network.js';
 import * as platform from './base/common/platform.js';
 import { IProductConfiguration } from './base/common/product.js';
-import { URI } from './base/common/uri.js';
 import { generateUuid } from './base/common/uuid.js';
 
 export const canASAR = false; // TODO@esm: ASAR disabled in ESM
@@ -105,7 +104,7 @@ class AMDModuleImporter {
 			});
 		}
 
-		const defineCall = await (this._isWebWorker ? this._workerLoadScript(scriptSrc) : this._isRenderer ? this._rendererLoadScript(scriptSrc) : this._nodeJSLoadScript(scriptSrc));
+		const defineCall = await (this._isWebWorker ? this._workerLoadScript(scriptSrc) : this._rendererLoadScript(scriptSrc));
 		if (!defineCall) {
 			console.warn(`Did not receive a define call from script ${scriptSrc}`);
 			return <T>undefined;
@@ -173,24 +172,6 @@ class AMDModuleImporter {
 		}
 		await import(/* @vite-ignore */ scriptSrc);
 		return this._defineCalls.pop();
-	}
-
-	private async _nodeJSLoadScript(scriptSrc: string): Promise<DefineCall | undefined> {
-		try {
-			const fs = (await import(/* @vite-ignore */ `${'fs'}`)).default;
-			const vm = (await import(/* @vite-ignore */ `${'vm'}`)).default;
-			const module = (await import(/* @vite-ignore */ `${'module'}`)).default;
-
-			const filePath = URI.parse(scriptSrc).fsPath;
-			const content = fs.readFileSync(filePath).toString();
-			const scriptSource = module.wrap(content.replace(/^#!.*/, ''));
-			const script = new vm.Script(scriptSource);
-			const compileWrapper = script.runInThisContext();
-			compileWrapper.apply();
-			return this._defineCalls.pop();
-		} catch (error) {
-			throw error;
-		}
 	}
 }
 

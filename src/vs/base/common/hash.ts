@@ -4,6 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { encodeHex, VSBuffer } from './buffer.js';
+import { wasmSha1, wasmSha1Streaming } from './hashWasm.js';
 import * as strings from './strings.js';
 
 type NotSyncHashable = ArrayBufferLike | ArrayBufferView;
@@ -73,12 +74,11 @@ function objectHash(obj: object, initialHashVal: number): number {
 
 /** Hashes the input as SHA-1, returning a hex-encoded string. */
 export const hashAsync = (input: string | ArrayBufferView | VSBuffer) => {
-	// Note: I would very much like to expose a streaming interface for hashing
-	// generally, but this is not available in web crypto yet, see
-	// https://github.com/w3c/webcrypto/issues/73
-
-	// StringSHA1 is faster for small string input, use it since we have it:
 	if (typeof input === 'string' && input.length < 250) {
+		const wasmResult = wasmSha1(input);
+		if (wasmResult !== null) {
+			return Promise.resolve(wasmResult);
+		}
 		const sha = new StringSHA1();
 		sha.update(input);
 		return Promise.resolve(sha.digest());

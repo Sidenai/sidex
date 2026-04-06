@@ -4,19 +4,23 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { AsyncReferenceCollection, IReference, ReferenceCollection } from '../../../../../../base/common/lifecycle.js';
-import { IModifiedFileEntry } from '../../../../chat/common/editing/chatEditingService.js';
 import { INotebookService } from '../../../common/notebookService.js';
 import { bufferToStream, VSBuffer } from '../../../../../../base/common/buffer.js';
 import { NotebookTextModel } from '../../../common/model/notebookTextModel.js';
 import { createDecorator, IInstantiationService } from '../../../../../../platform/instantiation/common/instantiation.js';
 import { ITextModelService } from '../../../../../../editor/common/services/resolverService.js';
+import { URI } from '../../../../../../base/common/uri.js';
+
+interface IOriginalURIEntry {
+	readonly originalURI: URI;
+}
 
 
 export const INotebookOriginalModelReferenceFactory = createDecorator<INotebookOriginalModelReferenceFactory>('INotebookOriginalModelReferenceFactory');
 
 export interface INotebookOriginalModelReferenceFactory {
 	readonly _serviceBrand: undefined;
-	getOrCreate(fileEntry: IModifiedFileEntry, viewType: string): Promise<IReference<NotebookTextModel>>;
+	getOrCreate(fileEntry: IOriginalURIEntry, viewType: string): Promise<IReference<NotebookTextModel>>;
 }
 
 
@@ -28,7 +32,7 @@ export class OriginalNotebookModelReferenceCollection extends ReferenceCollectio
 		super();
 	}
 
-	protected override async createReferencedObject(key: string, fileEntry: IModifiedFileEntry, viewType: string): Promise<NotebookTextModel> {
+	protected override async createReferencedObject(key: string, fileEntry: IOriginalURIEntry, viewType: string): Promise<NotebookTextModel> {
 		this.modelsToDispose.delete(key);
 		const uri = fileEntry.originalURI;
 		const model = this.notebookService.getNotebookTextModel(uri);
@@ -88,7 +92,7 @@ export class NotebookOriginalModelReferenceFactory implements INotebookOriginalM
 	constructor(@IInstantiationService private readonly instantiationService: IInstantiationService) {
 	}
 
-	getOrCreate(fileEntry: IModifiedFileEntry, viewType: string): Promise<IReference<NotebookTextModel>> {
+	getOrCreate(fileEntry: IOriginalURIEntry, viewType: string): Promise<IReference<NotebookTextModel>> {
 		return this.asyncModelCollection.acquire(fileEntry.originalURI.toString(), fileEntry, viewType);
 	}
 }

@@ -43,6 +43,19 @@ export class WebWorkerService implements IWebWorkerService {
 	}
 
 	getWorkerUrl(descriptor: WebWorkerDescriptor): string {
+		const isTauriProduction = (globalThis as typeof globalThis & { __SIDEX_TAURI__?: boolean }).__SIDEX_TAURI__ === true && globalThis.location?.protocol === 'tauri:';
+		if (isTauriProduction) {
+			if (descriptor.label === 'editorWorkerService') {
+				return `${globalThis.location.origin}/assets/editorWorker.js`;
+			}
+			if (descriptor.label === 'TextMateWorker') {
+				return `${globalThis.location.origin}/assets/textMateWorker.js`;
+			}
+			if (descriptor.label === 'extensionHostWorkerMain') {
+				return `${globalThis.location.origin}/assets/extensionHostWorker.js`;
+			}
+		}
+
 		// Prefer bundler location for Vite/Webpack compatibility
 		if (descriptor.esmModuleLocationBundler) {
 			const url = typeof descriptor.esmModuleLocationBundler === 'function' ? descriptor.esmModuleLocationBundler() : descriptor.esmModuleLocationBundler;
@@ -111,9 +124,16 @@ function getWorkerBootstrapUrl(label: string, workerScriptUrl: string, workerLoa
 		`globalThis.__SIDEX_TAURI__ = ${JSON.stringify(!!(globalThis as any).__SIDEX_TAURI__)};`,
 		`const ttPolicy = globalThis.trustedTypes?.createPolicy('defaultWorkerFactory', { createScriptURL: value => value });`,
 		`globalThis.workerttPolicy = ttPolicy;`,
-
+		`const __sidexImportUrlRaw = (ttPolicy?.createScriptURL(${JSON.stringify(workerScriptUrl)}) ?? ${JSON.stringify(workerScriptUrl)});`,
+		`let __sidexImportUrl = String(__sidexImportUrlRaw);`,
+		`if (__sidexImportUrl.startsWith('tauri://')) {`,
+		`	const hashIndex = __sidexImportUrl.indexOf('#');`,
+		`	if (hashIndex >= 0) {`,
+		`		__sidexImportUrl = __sidexImportUrl.slice(0, hashIndex);`,
+		`	}`,
+		`}`,
 		workerLoadingFailedErrorMessage ? 'try {' : '',
-		`await import(ttPolicy?.createScriptURL(${JSON.stringify(workerScriptUrl)}) ?? ${JSON.stringify(workerScriptUrl)});`,
+		`await import(__sidexImportUrl);`,
 		workerLoadingFailedErrorMessage ? `} catch (err) { console.error(${JSON.stringify(workerLoadingFailedErrorMessage)}, err); throw err; }` : '',
 
 		`globalThis.postMessage({ type: 'vscode-worker-ready' });`,

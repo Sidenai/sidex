@@ -23,6 +23,24 @@ impl StorageDb {
             conn: Mutex::new(conn),
         })
     }
+
+    pub fn get(&self, key: &str) -> Result<Option<String>, String> {
+        let conn = self.conn.lock().map_err(|e| e.to_string())?;
+        let mut stmt = conn
+            .prepare("SELECT value FROM kv_store WHERE key = ?1")
+            .map_err(|e| e.to_string())?;
+        Ok(stmt.query_row([key], |row| row.get::<_, String>(0)).ok())
+    }
+
+    pub fn set(&self, key: &str, value: &str) -> Result<(), String> {
+        let conn = self.conn.lock().map_err(|e| e.to_string())?;
+        conn.execute(
+            "INSERT OR REPLACE INTO kv_store (key, value) VALUES (?1, ?2)",
+            [key, value],
+        )
+        .map_err(|e| e.to_string())?;
+        Ok(())
+    }
 }
 
 #[tauri::command]

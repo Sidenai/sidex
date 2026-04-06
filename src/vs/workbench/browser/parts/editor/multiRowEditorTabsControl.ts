@@ -21,6 +21,7 @@ export class MultiRowEditorControl extends Disposable implements IEditorTabsCont
 	private readonly unstickyEditorTabsControl: IEditorTabsControl;
 
 	private activeControl: IEditorTabsControl | undefined;
+	private initialized = false;
 
 	constructor(
 		private readonly parent: HTMLElement,
@@ -37,7 +38,16 @@ export class MultiRowEditorControl extends Disposable implements IEditorTabsCont
 
 		this.stickyEditorTabsControl = this._register(this.instantiationService.createInstance(MultiEditorTabsControl, this.parent, editorPartsView, this.groupsView, this.groupView, stickyModel));
 		this.unstickyEditorTabsControl = this._register(this.instantiationService.createInstance(MultiEditorTabsControl, this.parent, editorPartsView, this.groupsView, this.groupView, unstickyModel));
+}
 
+	init(): void {
+		if (this.initialized) {
+			return;
+		}
+		this.initialized = true;
+
+		this.stickyEditorTabsControl.init();
+		this.unstickyEditorTabsControl.init();
 		this.handleTabBarsStateChange();
 	}
 

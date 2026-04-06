@@ -29,8 +29,6 @@ import { Codicon } from '../../../../../base/common/codicons.js';
 import type { URI } from '../../../../../base/common/uri.js';
 import { TextEditorSelectionRevealType, type ITextEditorOptions } from '../../../../../platform/editor/common/editor.js';
 import product from '../../../../../platform/product/common/product.js';
-import { ctxHasEditorModification, ctxHasRequestInProgress } from '../../../chat/browser/chatEditing/chatEditingEditorContextKeys.js';
-
 // ActiveEditorContext.isEqualTo(SearchEditorConstants.SearchEditorID)
 
 registerAction2(class extends Action2 {
@@ -708,8 +706,7 @@ registerAction2(class extends Action2 {
 					group: '1_diff',
 					order: 10,
 					when: ContextKeyExpr.and(ActiveEditorContext.isEqualTo(NotebookTextDiffEditor.ID),
-						ContextKeyExpr.equals('config.notebook.diff.experimental.toggleInline', true),
-						ctxHasEditorModification.negate(), ctxHasRequestInProgress.negate())
+						ContextKeyExpr.equals('config.notebook.diff.experimental.toggleInline', true))
 				}
 			}
 		);

@@ -842,7 +842,10 @@ class ModalEditorPartImpl extends EditorPart implements IModalEditorPart {
 		this.enforceModalPartOptions();
 
 		this._register(this.configurationService.onDidChangeConfiguration(e => {
-			if (e.affectsConfiguration(USE_MODAL_EDITOR_SETTING)) {
+			if (
+				e.affectsConfiguration(USE_MODAL_EDITOR_SETTING) ||
+				e.affectsConfiguration('workbench.editor.showTabs')
+			) {
 				this.enforceModalPartOptions();
 			}
 		}));
@@ -856,12 +859,13 @@ class ModalEditorPartImpl extends EditorPart implements IModalEditorPart {
 
 	enforceModalPartOptions(): void {
 		const useModalForAll = this.configurationService.getValue<string>(USE_MODAL_EDITOR_SETTING) === 'all';
-		const editorCount = this.groups.reduce((count, group) => count + group.count, 0);
-		const showTabs = useModalForAll && editorCount > 1 ? 'multiple' : 'none';
+		const configuredShowTabs = this.configurationService.getValue<'multiple' | 'single' | 'none'>('workbench.editor.showTabs') ?? 'multiple';
+		const showTabs = useModalForAll ? configuredShowTabs : 'none';
+		const preserveOpenedEditorsAsTabs = useModalForAll && showTabs !== 'none';
 
 		this.optionsDisposable.value = this.enforcePartOptions({
 			showTabs,
-			enablePreview: true,
+			enablePreview: !preserveOpenedEditorsAsTabs,
 			closeEmptyGroups: true,
 			tabActionCloseVisibility: showTabs !== 'none',
 			editorActionsLocation: 'hidden',

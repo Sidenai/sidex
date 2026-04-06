@@ -73,6 +73,7 @@ export class EditorTitleControl extends Themable {
 		}
 
 		const control = this.instantiationService.createInstance(tabsControlType, this.parent, this.editorPartsView, this.groupsView, this.groupView, this.model);
+		control.init();
 		return this.editorTabsControlDisposable.add(control);
 	}
 

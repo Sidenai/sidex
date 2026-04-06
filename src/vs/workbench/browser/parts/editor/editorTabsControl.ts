@@ -75,6 +75,7 @@ export class EditorCommandsContextActionRunner extends ActionRunner {
 }
 
 export interface IEditorTabsControl extends IDisposable {
+	init(): void;
 	updateOptions(oldOptions: IEditorPartOptions, newOptions: IEditorPartOptions): void;
 	openEditor(editor: EditorInput, options?: IInternalEditorOpenOptions): boolean;
 	openEditors(editors: EditorInput[]): boolean;
@@ -109,21 +110,22 @@ export abstract class EditorTabsControl extends Themable implements IEditorTabsC
 	private readonly editorActionsToolbarDisposables = this._register(new DisposableStore());
 	private readonly editorActionsDisposables = this._register(new DisposableStore());
 
-	private readonly contextMenuContextKeyService: IContextKeyService;
-	private resourceContext: ResourceContextKey;
+	private contextMenuContextKeyService!: IContextKeyService;
+	private resourceContext!: ResourceContextKey;
 
-	private editorPinnedContext: IContextKey<boolean>;
-	private editorIsFirstContext: IContextKey<boolean>;
-	private editorIsLastContext: IContextKey<boolean>;
-	private editorStickyContext: IContextKey<boolean>;
-	private editorAvailableEditorIds: IContextKey<string>;
+	private editorPinnedContext!: IContextKey<boolean>;
+	private editorIsFirstContext!: IContextKey<boolean>;
+	private editorIsLastContext!: IContextKey<boolean>;
+	private editorStickyContext!: IContextKey<boolean>;
+	private editorAvailableEditorIds!: IContextKey<string>;
 
-	private editorCanSplitInGroupContext: IContextKey<boolean>;
-	private sideBySideEditorContext: IContextKey<boolean>;
+	private editorCanSplitInGroupContext!: IContextKey<boolean>;
+	private sideBySideEditorContext!: IContextKey<boolean>;
 
-	private groupLockedContext: IContextKey<boolean>;
+	private groupLockedContext!: IContextKey<boolean>;
 
 	private renderDropdownAsChildElement: boolean;
+	private initialized = false;
 
 	constructor(
 		protected readonly parent: HTMLElement,
@@ -144,8 +146,15 @@ export abstract class EditorTabsControl extends Themable implements IEditorTabsC
 		super(themeService);
 
 		this.renderDropdownAsChildElement = false;
+	}
 
-		const container = this.create(parent);
+	init(): void {
+		if (this.initialized) {
+			return;
+		}
+		this.initialized = true;
+
+		const container = this.create(this.parent);
 
 		// Context Keys
 		this.contextMenuContextKeyService = this._register(this.contextKeyService.createScoped(container));

@@ -444,32 +444,17 @@ function safeTokenize(languageIdCodec: ILanguageIdCodec, languageId: string, tok
 
 export class DefaultBackgroundTokenizer implements IBackgroundTokenizer {
 	private _isDisposed = false;
-	private readonly _defaultViewportLines = 200; // Default limit: tokenize first 200 lines before viewport is known
-	private readonly _viewportBufferLines = 200; // Tokenize 200 lines beyond viewport
-	private _viewportEndLine: number;
 
 	constructor(
 		private readonly _tokenizerWithStateStore: TokenizerWithStateStoreAndTextModel,
 		private readonly _backgroundTokenStore: IBackgroundTokenizationStore,
 	) {
-		// Initialize viewport limit to default (first N lines) until we get actual viewport info
-		this._viewportEndLine = this._defaultViewportLines;
 	}
 
 	/**
-	 * Set the viewport end line to limit background tokenization.
-	 * Background tokenization will stop at viewport + buffer lines.
+	 * No-op: we tokenize the entire file for smooth scrolling.
 	 */
-	public setViewportEndLine(lineNumber: number): void {
-		this._viewportEndLine = lineNumber + this._viewportBufferLines;
-		// If we're already past the viewport, check if we should stop
-		if (this._tokenizerWithStateStore) {
-			const firstInvalid = this._tokenizerWithStateStore.store.getFirstInvalidEndStateLineNumber();
-			if (firstInvalid && firstInvalid > this._viewportEndLine) {
-				// All invalid lines are beyond viewport, consider finished for now
-				this.checkFinished();
-			}
-		}
+	public setViewportEndLine(_lineNumber: number): void {
 	}
 
 	public dispose(): void {
@@ -482,9 +467,6 @@ export class DefaultBackgroundTokenizer implements IBackgroundTokenizer {
 
 	private _isScheduled = false;
 	private _beginBackgroundTokenization(): void {
-		// DISABLED: Background tokenization causes scroll lag and high memory usage
-		return;
-		/*
 		if (this._isScheduled || !this._tokenizerWithStateStore._textModel.isAttachedToEditor() || !this._hasLinesToTokenize()) {
 			return;
 		}
@@ -495,7 +477,6 @@ export class DefaultBackgroundTokenizer implements IBackgroundTokenizer {
 
 			this._backgroundTokenizeWithDeadline(deadline);
 		});
-		*/
 	}
 
 	/**
@@ -558,24 +539,12 @@ export class DefaultBackgroundTokenizer implements IBackgroundTokenizer {
 			return false;
 		}
 		// Check if all states are valid
-		if (this._tokenizerWithStateStore.store.allStatesValid()) {
-			return false;
-		}
-		// Check if the next invalid line is beyond our viewport limit
-		const firstInvalid = this._tokenizerWithStateStore.store.getFirstInvalidEndStateLineNumber();
-		if (firstInvalid && firstInvalid > this._viewportEndLine) {
-			return false; // Don't tokenize beyond viewport + buffer
-		}
-		return true;
+		return !this._tokenizerWithStateStore.store.allStatesValid();
 	}
 
 	private _tokenizeOneInvalidLine(builder: ContiguousMultilineTokensBuilder): number {
 		const firstInvalidLine = this._tokenizerWithStateStore?.getFirstInvalidLine();
 		if (!firstInvalidLine) {
-			return this._tokenizerWithStateStore._textModel.getLineCount() + 1;
-		}
-		// Don't tokenize beyond viewport + buffer
-		if (firstInvalidLine.lineNumber > this._viewportEndLine) {
 			return this._tokenizerWithStateStore._textModel.getLineCount() + 1;
 		}
 		this._tokenizerWithStateStore.updateTokensUntilLine(builder, firstInvalidLine.lineNumber);

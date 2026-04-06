@@ -1,14 +1,6 @@
 # SideX Architecture
 
-A detailed technical reference for how SideX maps to VSCode's architecture.
-
-## Approach
-
-SideX follows the [Open Claw](https://github.com/instructkr/claw-code) methodology:
-1. **Study** the VSCode architecture thoroughly
-2. **Map** every subsystem, service, and API surface  
-3. **Port** systematically — reuse pure TypeScript, rewrite native layers
-4. **Verify** parity at each checkpoint
+A technical reference for how SideX maps to VSCode's architecture.
 
 The VSCode source (MIT License) is the architectural reference. No proprietary code is used.
 
@@ -119,7 +111,7 @@ Extension Host               →       Sidecar process (in progress)
 | `common/` | Reuse directly | Done |
 | `browser/` | Reuse directly (DOM) | Done |
 | `contrib/` (57 contributions) | Reuse directly | Done |
-| `standalone/` | Reuse directly | Done |
+| `standalone/` | Removed (not needed in Tauri) | Deleted |
 
 ### workbench/ (IDE Shell)
 | Sublayer | Strategy | Status |
@@ -153,9 +145,3 @@ All Tauri commands are registered in `src-tauri/src/lib.rs`.
 | **network** | `fetch_url`, `fetch_url_text`, `proxy_request` |
 | **debug** | `debug_spawn_adapter`, `debug_send`, `debug_kill`, `debug_list_adapters` |
 | **tasks** | `task_spawn`, `task_kill`, `task_list` |
-
-## Credits
-
-- Architectural reference: [Microsoft VSCode](https://github.com/microsoft/vscode) (MIT License)
-- Methodology: [Open Claw](https://github.com/instructkr/claw-code)
-- Runtime: [Tauri](https://tauri.app/)

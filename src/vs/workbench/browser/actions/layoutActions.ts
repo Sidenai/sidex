@@ -771,7 +771,8 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 
 // --- Toggle Menu Bar
 
-if (isWindows || isLinux || isWeb) {
+const _sidexMacNative = (globalThis as any).__SIDEX_TAURI__ && isMacintosh;
+if ((isWindows || isLinux || isWeb) && !_sidexMacNative) {
 	registerAction2(class ToggleMenubarAction extends Action2 {
 
 		constructor() {
@@ -1400,7 +1401,7 @@ const CreateOptionLayoutItem = (id: string, active: ContextKeyExpression, label:
 
 const MenuBarToggledContext = ContextKeyExpr.and(IsMacNativeContext.toNegated(), ContextKeyExpr.notEquals(`config.${MenuSettings.MenuBarVisibility}`, 'hidden'), ContextKeyExpr.notEquals(`config.${MenuSettings.MenuBarVisibility}`, 'toggle'), ContextKeyExpr.notEquals(`config.${MenuSettings.MenuBarVisibility}`, 'compact')) as ContextKeyExpression;
 const ToggleVisibilityActions: CustomizeLayoutItem[] = [];
-if (!isMacintosh || !isNative) {
+if ((!isMacintosh || !isNative) && !_sidexMacNative) {
 	ToggleVisibilityActions.push(CreateToggleLayoutItem('workbench.action.toggleMenuBar', MenuBarToggledContext, localize('menuBar', "Menu Bar"), menubarIcon));
 }
 
@@ -1615,7 +1616,7 @@ registerAction2(class CustomizeLayoutAction extends Action2 {
 				resetSetting('workbench.statusBar.visible');
 				resetSetting('workbench.panel.defaultLocation');
 
-				if (!isMacintosh || !isNative) {
+				if ((!isMacintosh || !isNative) && !_sidexMacNative) {
 					resetSetting('window.menuBarVisibility');
 				}
 

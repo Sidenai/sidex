@@ -69,7 +69,6 @@ import { normalizeDriveLetter } from '../../../../base/common/labels.js';
 import { ActionBar } from '../../../../base/browser/ui/actionbar/actionbar.js';
 import { registerIcon } from '../../../../platform/theme/common/iconRegistry.js';
 import { DropdownMenuActionViewItem } from '../../../../base/browser/ui/dropdown/dropdownActionViewItem.js';
-import { IEnvironmentService } from '../../../../platform/environment/common/environment.js';
 
 const editIcon = registerIcon('profiles-editor-edit-folder', Codicon.edit, localize('editIcon', 'Icon for the edit folder icon in the profiles editor.'));
 const removeIcon = registerIcon('profiles-editor-remove-folder', Codicon.close, localize('removeIcon', 'Icon for the remove folder icon in the profiles editor.'));
@@ -886,8 +885,6 @@ class AbstractProfileResourceTreeRenderer extends Disposable {
 				return localize('snippets', "Snippets");
 			case ProfileResourceType.Tasks:
 				return localize('tasks', "Tasks");
-			case ProfileResourceType.Mcp:
-				return localize('mcp', "MCP Servers");
 			case ProfileResourceType.Extensions:
 				return localize('extensions', "Extensions");
 		}
@@ -2131,10 +2128,8 @@ class ChangeProfileAction implements IAction {
 	constructor(
 		private readonly item: WorkspaceTableElement,
 		@IUserDataProfilesService private readonly userDataProfilesService: IUserDataProfilesService,
-		@IUriIdentityService uriIdentityService: IUriIdentityService,
-		@IEnvironmentService environmentService: IEnvironmentService,
 	) {
-		this.enabled = !uriIdentityService.extUri.isEqual(item.workspace, environmentService.agentSessionsWorkspace);
+		this.enabled = true;
 	}
 
 	run(): void { }
@@ -2171,7 +2166,6 @@ class WorkspaceUriActionsColumnRenderer implements ITableRenderer<WorkspaceTable
 		@IUserDataProfileManagementService private readonly userDataProfileManagementService: IUserDataProfileManagementService,
 		@IContextMenuService private readonly contextMenuService: IContextMenuService,
 		@IUriIdentityService private readonly uriIdentityService: IUriIdentityService,
-		@IEnvironmentService private readonly environmentService: IEnvironmentService,
 	) {
 	}
 
@@ -2198,7 +2192,7 @@ class WorkspaceUriActionsColumnRenderer implements ITableRenderer<WorkspaceTable
 		templateData.actionBar.clear();
 		const actions: IAction[] = [];
 		actions.push(this.createOpenAction(item));
-		actions.push(new ChangeProfileAction(item, this.userDataProfilesService, this.uriIdentityService, this.environmentService));
+		actions.push(new ChangeProfileAction(item, this.userDataProfilesService));
 		actions.push(this.createDeleteAction(item));
 		templateData.actionBar.push(actions, { icon: true });
 	}
@@ -2215,11 +2209,10 @@ class WorkspaceUriActionsColumnRenderer implements ITableRenderer<WorkspaceTable
 	}
 
 	private createDeleteAction(item: WorkspaceTableElement): IAction {
-		const isAgentSessionsWorkspace = this.uriIdentityService.extUri.isEqual(item.workspace, this.environmentService.agentSessionsWorkspace);
 		return {
 			label: '',
 			class: ThemeIcon.asClassName(removeIcon),
-			enabled: this.userDataProfileManagementService.getDefaultProfileToUse().id !== item.profileElement.profile.id && !isAgentSessionsWorkspace,
+			enabled: this.userDataProfileManagementService.getDefaultProfileToUse().id !== item.profileElement.profile.id,
 			id: 'deleteTrustedUri',
 			tooltip: localize('deleteTrustedUri', "Delete Path"),
 			run: () => item.profileElement.updateWorkspaces([], [item.workspace])

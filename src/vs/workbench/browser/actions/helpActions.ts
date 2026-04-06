@@ -9,14 +9,13 @@ import { isMacintosh, isLinux, language, isWeb } from '../../../base/common/plat
 import { ITelemetryService } from '../../../platform/telemetry/common/telemetry.js';
 import { IOpenerService } from '../../../platform/opener/common/opener.js';
 import { URI } from '../../../base/common/uri.js';
-import { MenuId, Action2, registerAction2, MenuRegistry } from '../../../platform/actions/common/actions.js';
+import { MenuId, Action2, registerAction2 } from '../../../platform/actions/common/actions.js';
 import { KeyChord, KeyMod, KeyCode } from '../../../base/common/keyCodes.js';
 import { IProductService } from '../../../platform/product/common/productService.js';
 import { ServicesAccessor } from '../../../platform/instantiation/common/instantiation.js';
 import { KeybindingWeight } from '../../../platform/keybinding/common/keybindingsRegistry.js';
 import { Categories } from '../../../platform/action/common/actionCommonCategories.js';
 import { ICommandService } from '../../../platform/commands/common/commands.js';
-import { ContextKeyExpr } from '../../../platform/contextkey/common/contextkey.js';
 
 class KeybindingsReferenceAction extends Action2 {
 
@@ -332,36 +331,6 @@ class GetStartedWithAccessibilityFeatures extends Action2 {
 	}
 }
 
-class AskVSCodeCopilot extends Action2 {
-	static readonly ID = 'workbench.action.askVScode';
-
-	constructor() {
-		super({
-			id: AskVSCodeCopilot.ID,
-			title: localize2('askVScode', 'Ask @vscode'),
-			category: Categories.Help,
-			f1: true,
-			precondition: ContextKeyExpr.equals('chatSetupHidden', false)
-		});
-	}
-
-	async run(accessor: ServicesAccessor): Promise<void> {
-		const commandService = accessor.get(ICommandService);
-		commandService.executeCommand('workbench.action.chat.open', { mode: 'agent', query: '@vscode ', isPartialQuery: true });
-
-	}
-}
-
-MenuRegistry.appendMenuItem(MenuId.MenubarHelpMenu, {
-	command: {
-		id: AskVSCodeCopilot.ID,
-		title: localize2('askVScode', 'Ask @vscode'),
-	},
-	order: 7,
-	group: '1_welcome',
-	when: ContextKeyExpr.equals('chatSetupHidden', false)
-});
-
 // --- Actions Registration
 
 if (KeybindingsReferenceAction.AVAILABLE) {
@@ -401,5 +370,3 @@ if (OpenPrivacyStatementUrlAction.AVAILABLE) {
 }
 
 registerAction2(GetStartedWithAccessibilityFeatures);
-
-registerAction2(AskVSCodeCopilot);

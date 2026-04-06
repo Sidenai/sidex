@@ -6,12 +6,10 @@
 import type { IExperimentationFilterProvider } from 'tas-client';
 import { Emitter } from '../../../../base/common/event.js';
 import { Disposable } from '../../../../base/common/lifecycle.js';
-import { getInternalOrg } from '../../../../platform/assignment/common/assignment.js';
-import { IDefaultAccountService } from '../../../../platform/defaultAccount/common/defaultAccount.js';
+import { IDefaultAccountService } from '../../accounts/browser/nullDefaultAccount.js';
 import { ExtensionIdentifier } from '../../../../platform/extensions/common/extensions.js';
 import { ILogService } from '../../../../platform/log/common/log.js';
 import { IStorageService, StorageScope, StorageTarget } from '../../../../platform/storage/common/storage.js';
-import { IChatEntitlementService } from '../../chat/common/chatEntitlementService.js';
 import { IExtensionService } from '../../extensions/common/extensions.js';
 
 export enum ExtensionsFilter {
@@ -87,7 +85,6 @@ export class CopilotAssignmentFilterProvider extends Disposable implements IExpe
 		@IExtensionService private readonly _extensionService: IExtensionService,
 		@ILogService private readonly _logService: ILogService,
 		@IStorageService private readonly _storageService: IStorageService,
-		@IChatEntitlementService private readonly _chatEntitlementService: IChatEntitlementService,
 		@IDefaultAccountService private readonly _defaultAccountService: IDefaultAccountService,
 	) {
 		super();
@@ -107,16 +104,11 @@ export class CopilotAssignmentFilterProvider extends Disposable implements IExpe
 			}
 		}));
 
-		this._register(this._chatEntitlementService.onDidChangeEntitlement(() => {
-			this.updateCopilotEntitlementInfo();
-		}));
-
 		this._register(this._defaultAccountService.onDidChangeCopilotTokenInfo(() => {
 			this.updateCopilotTokenInfo();
 		}));
 
 		this.updateExtensionVersions();
-		this.updateCopilotEntitlementInfo();
 		this.updateCopilotTokenInfo();
 	}
 
@@ -151,27 +143,6 @@ export class CopilotAssignmentFilterProvider extends Disposable implements IExpe
 		this._storageService.store(StorageVersionKeys.CopilotExtensionVersion, this.copilotExtensionVersion, StorageScope.PROFILE, StorageTarget.MACHINE);
 		this._storageService.store(StorageVersionKeys.CopilotChatExtensionVersion, this.copilotChatExtensionVersion, StorageScope.PROFILE, StorageTarget.MACHINE);
 		this._storageService.store(StorageVersionKeys.CompletionsVersion, this.copilotCompletionsVersion, StorageScope.PROFILE, StorageTarget.MACHINE);
-
-		// Notify that the filters have changed.
-		this._onDidChangeFilters.fire();
-	}
-
-	private updateCopilotEntitlementInfo() {
-		const newSku = this._chatEntitlementService.sku;
-		const newTrackingId = this._chatEntitlementService.copilotTrackingId;
-		const newInternalOrg = getInternalOrg(this._chatEntitlementService.organisations);
-
-		if (this.copilotSku === newSku && this.copilotInternalOrg === newInternalOrg && this.copilotTrackingId === newTrackingId) {
-			return;
-		}
-
-		this.copilotSku = newSku;
-		this.copilotInternalOrg = newInternalOrg;
-		this.copilotTrackingId = newTrackingId;
-
-		this._storageService.store(StorageVersionKeys.CopilotSku, this.copilotSku, StorageScope.PROFILE, StorageTarget.MACHINE);
-		this._storageService.store(StorageVersionKeys.CopilotInternalOrg, this.copilotInternalOrg, StorageScope.PROFILE, StorageTarget.MACHINE);
-		this._storageService.store(StorageVersionKeys.CopilotTrackingId, this.copilotTrackingId, StorageScope.PROFILE, StorageTarget.MACHINE);
 
 		// Notify that the filters have changed.
 		this._onDidChangeFilters.fire();

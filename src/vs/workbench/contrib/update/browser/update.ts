@@ -24,12 +24,15 @@ import { MenuRegistry, MenuId, registerAction2, Action2 } from '../../../../plat
 import { CommandsRegistry } from '../../../../platform/commands/common/commands.js';
 import { IHostService } from '../../../services/host/browser/host.js';
 import { IProductService } from '../../../../platform/product/common/productService.js';
-import { IUserDataSyncEnablementService, IUserDataSyncService, IUserDataSyncStoreManagementService, SyncStatus, UserDataSyncStoreType } from '../../../../platform/userDataSync/common/userDataSync.js';
+import { IUserDataSyncEnablementService, IUserDataSyncService, IUserDataSyncStoreManagementService } from '../../../../platform/userDataSync/common/nullUserDataSync.js';
+import { SyncStatus } from '../../../services/userDataSync/common/userDataSync.js';
+const UserDataSyncStoreType = { Insiders: 'insiders', Stable: 'stable' } as const;
+type UserDataSyncStoreType = typeof UserDataSyncStoreType[keyof typeof UserDataSyncStoreType];
 import { IsWebContext } from '../../../../platform/contextkey/common/contextkeys.js';
 import { Promises, Throttler } from '../../../../base/common/async.js';
 import { IUserDataSyncWorkbenchService } from '../../../services/userDataSync/common/userDataSync.js';
 import { Event } from '../../../../base/common/event.js';
-import { IDefaultAccountService } from '../../../../platform/defaultAccount/common/defaultAccount.js';
+import { IDefaultAccountService } from '../../../services/accounts/browser/nullDefaultAccount.js';
 import { getInternalOrg } from '../../../../platform/assignment/common/assignment.js';
 import { IVersion, tryParseVersion } from '../common/updateUtils.js';
 

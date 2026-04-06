@@ -15,11 +15,9 @@ import './browser/terminalView.js';
 // primary workbench contribution)
 import '../terminalContrib/accessibility/browser/terminal.accessibility.contribution.js';
 import '../terminalContrib/autoReplies/browser/terminal.autoReplies.contribution.js';
-import '../terminalContrib/chatAgentTools/browser/terminal.chatAgentTools.contribution.js';
 import '../terminalContrib/developer/browser/terminal.developer.contribution.js';
 import '../terminalContrib/environmentChanges/browser/terminal.environmentChanges.contribution.js';
 import '../terminalContrib/find/browser/terminal.find.contribution.js';
-import '../terminalContrib/chat/browser/terminal.chat.contribution.js';
 import '../terminalContrib/commandGuide/browser/terminal.commandGuide.contribution.js';
 import '../terminalContrib/history/browser/terminal.history.contribution.js';
 import '../terminalContrib/inlineHint/browser/terminal.initialHint.contribution.js';

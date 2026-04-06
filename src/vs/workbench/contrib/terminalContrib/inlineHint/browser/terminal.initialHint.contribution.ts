@@ -8,7 +8,6 @@ import { IContentActionHandler, renderFormattedText } from '../../../../../base/
 import { StandardMouseEvent } from '../../../../../base/browser/mouseEvent.js';
 import { status } from '../../../../../base/browser/ui/aria/aria.js';
 import { KeybindingLabel } from '../../../../../base/browser/ui/keybindingLabel/keybindingLabel.js';
-import { WorkbenchActionExecutedClassification, WorkbenchActionExecutedEvent } from '../../../../../base/common/actions.js';
 import { Emitter, Event } from '../../../../../base/common/event.js';
 import { Disposable, DisposableStore, MutableDisposable } from '../../../../../base/common/lifecycle.js';
 import { OS } from '../../../../../base/common/platform.js';
@@ -19,20 +18,15 @@ import { IConfigurationService } from '../../../../../platform/configuration/com
 import { IContextMenuService } from '../../../../../platform/contextview/browser/contextView.js';
 import { IInstantiationService } from '../../../../../platform/instantiation/common/instantiation.js';
 import { IKeybindingService } from '../../../../../platform/keybinding/common/keybinding.js';
-import { ITelemetryService } from '../../../../../platform/telemetry/common/telemetry.js';
 import { ITerminalCapabilityStore, TerminalCapability } from '../../../../../platform/terminal/common/capabilities/capabilities.js';
 import { AccessibilityVerbositySettingId } from '../../../accessibility/browser/accessibilityConfiguration.js';
-import { IChatAgent, IChatAgentService } from '../../../chat/common/participants/chatAgents.js';
-import { ChatAgentLocation } from '../../../chat/common/constants.js';
 import { IDetachedTerminalInstance, ITerminalConfigurationService, ITerminalContribution, ITerminalInstance, IXtermTerminal } from '../../../terminal/browser/terminal.js';
 import { registerTerminalContribution, type IDetachedCompatibleTerminalContributionContext, type ITerminalContributionContext } from '../../../terminal/browser/terminalExtensions.js';
 import { TerminalInstance } from '../../../terminal/browser/terminalInstance.js';
-import { TerminalChatCommandId } from '../../chat/browser/terminalChat.js';
 import { TerminalInitialHintSettingId } from '../common/terminalInitialHintConfiguration.js';
 import './media/terminalInitialHint.css';
 import { TerminalSuggestCommandId } from '../../suggest/common/terminal.suggest.js';
 import { TerminalSuggestSettingId } from '../../suggest/common/terminalSuggestConfiguration.js';
-import { IChatEntitlementService } from '../../../../services/chat/common/chatEntitlementService.js';
 
 const $ = dom.$;
 
@@ -41,8 +35,7 @@ export class InitialHintAddon extends Disposable implements ITerminalAddon {
 	get onDidRequestCreateHint(): Event<void> { return this._onDidRequestCreateHint.event; }
 	private readonly _disposables = this._register(new MutableDisposable<DisposableStore>());
 
-	constructor(private readonly _capabilities: ITerminalCapabilityStore,
-		private readonly _onDidChangeAgents: Event<IChatAgent | undefined>) {
+	constructor(private readonly _capabilities: ITerminalCapabilityStore) {
 		super();
 	}
 	activate(terminal: RawXtermTerminal): void {
@@ -62,13 +55,6 @@ export class InitialHintAddon extends Disposable implements ITerminalAddon {
 				}
 			}));
 		}
-		const agentListener = this._onDidChangeAgents((e) => {
-			if (e?.locations.includes(ChatAgentLocation.Terminal)) {
-				this._onDidRequestCreateHint.fire();
-				agentListener.dispose();
-			}
-		});
-		this._disposables.value?.add(agentListener);
 	}
 }
 
@@ -88,7 +74,6 @@ export class TerminalInitialHintContribution extends Disposable implements ITerm
 
 	constructor(
 		private readonly _ctx: ITerminalContributionContext | IDetachedCompatibleTerminalContributionContext,
-		@IChatAgentService private readonly _chatAgentService: IChatAgentService,
 		@IConfigurationService private readonly _configurationService: IConfigurationService,
 		@IInstantiationService private readonly _instantiationService: IInstantiationService,
 		@ITerminalConfigurationService private readonly _terminalConfigurationService: ITerminalConfigurationService,
@@ -110,7 +95,7 @@ export class TerminalInitialHintContribution extends Disposable implements ITerm
 			return;
 		}
 		this._xterm = xterm;
-		this._addon = this._register(this._instantiationService.createInstance(InitialHintAddon, this._ctx.instance.capabilities, this._chatAgentService.onDidChangeAgents));
+		this._addon = this._register(this._instantiationService.createInstance(InitialHintAddon, this._ctx.instance.capabilities));
 		this._xterm.raw.loadAddon(this._addon);
 		this._register(this._addon.onDidRequestCreateHint(() => this._createHint()));
 	}
@@ -213,13 +198,10 @@ class TerminalInitialHintWidget extends Disposable {
 
 	constructor(
 		private readonly _instance: ITerminalInstance,
-		@IChatAgentService private readonly _chatAgentService: IChatAgentService,
-		@IChatEntitlementService private readonly _chatEntitlementService: IChatEntitlementService,
 		@ICommandService private readonly _commandService: ICommandService,
 		@IConfigurationService private readonly _configurationService: IConfigurationService,
 		@IContextMenuService private readonly _contextMenuService: IContextMenuService,
 		@IKeybindingService private readonly _keybindingService: IKeybindingService,
-		@ITelemetryService private readonly _telemetryService: ITelemetryService,
 	) {
 		super();
 		this._toDispose.add(_instance.onDidFocus(() => {
@@ -252,13 +234,6 @@ class TerminalInitialHintWidget extends Disposable {
 	private _getHintInlineChat() {
 		const ariaLabelParts: string[] = [];
 
-		const handleClick = () => {
-			this._telemetryService.publicLog2<WorkbenchActionExecutedEvent, WorkbenchActionExecutedClassification>('workbenchActionExecuted', {
-				id: 'terminalInlineChat.hintAction',
-				from: 'hint'
-			});
-			this._commandService.executeCommand(TerminalChatCommandId.Start, { from: 'hint' });
-		};
 		const handleDontShowClick = () => {
 			this._configurationService.updateValue(TerminalInitialHintSettingId.Enabled, false);
 		};
@@ -268,7 +243,6 @@ class TerminalInitialHintWidget extends Disposable {
 			callback: (index, _event) => {
 				switch (index) {
 					case '0':
-						handleClick();
 						break;
 				}
 			}
@@ -286,47 +260,6 @@ class TerminalInitialHintWidget extends Disposable {
 
 		const hintElement = $('div.terminal-initial-hint');
 		hintElement.style.display = 'block';
-
-		// Chat hint
-		if (!this._chatEntitlementService.sentiment.hidden) {
-			const keybindingHint = this._keybindingService.lookupKeybinding(TerminalChatCommandId.Start);
-			const keybindingHintLabel = keybindingHint?.getLabel();
-
-			if (keybindingHint && keybindingHintLabel) {
-				const terminalAgents = this._chatAgentService.getActivatedAgents().filter(candidate => candidate.locations.includes(ChatAgentLocation.Terminal));
-				if (terminalAgents?.length) {
-					const actionPart = localize('emptyHintText', 'Open chat {0}. ', keybindingHintLabel);
-
-					const { before, after } = this._createWrappedHintElements(actionPart, keybindingHintLabel, handleClick);
-
-					hintElement.appendChild(before);
-
-					const label = hintHandler.disposables.add(new KeybindingLabel(hintElement, OS));
-					label.set(keybindingHint);
-					label.element.style.width = 'min-content';
-					label.element.style.display = 'inline';
-
-					label.element.style.cursor = 'pointer';
-					this._toDispose.add(dom.addDisposableListener(label.element, dom.EventType.CLICK, handleClick));
-
-					hintElement.appendChild(after);
-					hintElement.appendChild($('span.terminal-initial-hint-separator'));
-
-					ariaLabelParts.push(actionPart);
-				}
-			} else {
-				const hintMsg = localize({
-					key: 'inlineChatHint',
-					comment: [
-						'Preserve double-square brackets and their order',
-					]
-				}, '[[Open chat]] or start typing to dismiss.');
-				const rendered = renderFormattedText(hintMsg, { actionHandler: hintHandler });
-				hintElement.appendChild(rendered);
-
-				ariaLabelParts.push(localize('openChatHint', 'Open chat or start typing to dismiss.'));
-			}
-		}
 
 		// Suggest hint
 		const suggestEnabled = this._configurationService.getValue<boolean>(TerminalSuggestSettingId.Enabled);

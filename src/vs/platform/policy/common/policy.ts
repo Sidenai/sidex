@@ -4,8 +4,13 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { IStringDictionary } from '../../../base/common/collections.js';
-import { IPolicyData } from '../../../base/common/defaultAccount.js';
 import { Emitter, Event } from '../../../base/common/event.js';
+
+// Inline interface to avoid importing from removed defaultAccount module
+export interface IPolicyData {
+	readonly chat_preview_features_enabled?: boolean;
+	readonly chat_agent_enabled?: boolean;
+}
 import { Iterable } from '../../../base/common/iterator.js';
 import { Disposable } from '../../../base/common/lifecycle.js';
 import { PolicyName } from '../../../base/common/policy.js';

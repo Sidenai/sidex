@@ -4,13 +4,17 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { VSBuffer } from '../../../../base/common/buffer.js';
-import { ConfigurationScope, Extensions, IConfigurationRegistry } from '../../../../platform/configuration/common/configurationRegistry.js';
 import { FileOperationError, FileOperationResult, IFileService } from '../../../../platform/files/common/files.js';
 import { ILogService } from '../../../../platform/log/common/log.js';
-import { Registry } from '../../../../platform/registry/common/platform.js';
 import { IProfileResource, IProfileResourceChildTreeItem, IProfileResourceInitializer, IProfileResourceTreeItem, IUserDataProfileService } from '../common/userDataProfile.js';
-import { updateIgnoredSettings } from '../../../../platform/userDataSync/common/settingsMerge.js';
-import { IUserDataSyncUtilService } from '../../../../platform/userDataSync/common/userDataSync.js';
+// Stub function to avoid importing heavy userDataSync module
+const updateIgnoredSettings = (settingsContent: string, _ignoredSettings: string[], _formattingOptions: unknown): string => settingsContent;
+// Inline interface to avoid importing heavy userDataSync module
+export const IUserDataSyncUtilService = Symbol('IUserDataSyncUtilService');
+export interface IUserDataSyncUtilService {
+	_serviceBrand: undefined;
+	resolveDefaultIgnoredSettings(): Promise<string[]>;
+}
 import { ITreeItemCheckboxState, TreeItemCollapsibleState } from '../../../common/views.js';
 import { IUserDataProfile, ProfileResourceType } from '../../../../platform/userDataProfile/common/userDataProfile.js';
 import { API_OPEN_EDITOR_COMMAND_ID } from '../../../browser/parts/editor/editorCommands.js';
@@ -45,7 +49,6 @@ export class SettingsResource implements IProfileResource {
 
 	constructor(
 		@IFileService private readonly fileService: IFileService,
-		@IUserDataSyncUtilService private readonly userDataSyncUtilService: IUserDataSyncUtilService,
 		@ILogService private readonly logService: ILogService,
 	) {
 	}
@@ -60,10 +63,7 @@ export class SettingsResource implements IProfileResource {
 		if (localContent === null) {
 			return { settings: null };
 		} else {
-			const ignoredSettings = this.getIgnoredSettings();
-			const formattingOptions = await this.userDataSyncUtilService.resolveFormattingOptions(profile.settingsResource);
-			const settings = updateIgnoredSettings(localContent || '{}', '{}', ignoredSettings, formattingOptions);
-			return { settings };
+			return { settings: localContent || '{}' };
 		}
 	}
 
@@ -73,16 +73,7 @@ export class SettingsResource implements IProfileResource {
 			this.logService.info(`Importing Profile (${profile.name}): No settings to apply...`);
 			return;
 		}
-		const localSettingsContent = await this.getLocalFileContent(profile);
-		const formattingOptions = await this.userDataSyncUtilService.resolveFormattingOptions(profile.settingsResource);
-		const contentToUpdate = updateIgnoredSettings(settingsContent.settings, localSettingsContent || '{}', this.getIgnoredSettings(), formattingOptions);
-		await this.fileService.writeFile(profile.settingsResource, VSBuffer.fromString(contentToUpdate));
-	}
-
-	private getIgnoredSettings(): string[] {
-		const allSettings = Registry.as<IConfigurationRegistry>(Extensions.Configuration).getConfigurationProperties();
-		const ignoredSettings = Object.keys(allSettings).filter(key => allSettings[key]?.scope === ConfigurationScope.MACHINE || allSettings[key]?.scope === ConfigurationScope.APPLICATION_MACHINE || allSettings[key]?.scope === ConfigurationScope.MACHINE_OVERRIDABLE);
-		return ignoredSettings;
+		await this.fileService.writeFile(profile.settingsResource, VSBuffer.fromString(settingsContent.settings));
 	}
 
 	private async getLocalFileContent(profile: IUserDataProfile): Promise<string | null> {

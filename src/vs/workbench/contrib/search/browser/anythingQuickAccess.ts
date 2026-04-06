@@ -54,8 +54,6 @@ import { Lazy } from '../../../../base/common/lazy.js';
 import { IKeybindingService } from '../../../../platform/keybinding/common/keybinding.js';
 import { IContextKeyService } from '../../../../platform/contextkey/common/contextkey.js';
 import { Registry } from '../../../../platform/registry/common/platform.js';
-import { ASK_QUICK_QUESTION_ACTION_ID } from '../../chat/browser/actions/chatQuickInputActions.js';
-import { IChatWidgetService, IQuickChatService } from '../../chat/browser/chat.js';
 import { ILogService } from '../../../../platform/log/common/log.js';
 import { ICustomEditorLabelService } from '../../../services/editor/common/customEditorLabelService.js';
 
@@ -138,10 +136,8 @@ export class AnythingQuickAccessProvider extends PickerQuickAccessProvider<IAnyt
 		@IQuickInputService private readonly quickInputService: IQuickInputService,
 		@IKeybindingService private readonly keybindingService: IKeybindingService,
 		@IContextKeyService private readonly contextKeyService: IContextKeyService,
-		@IQuickChatService private readonly quickChatService: IQuickChatService,
 		@ILogService private readonly logService: ILogService,
 		@ICustomEditorLabelService private readonly customEditorLabelService: ICustomEditorLabelService,
-		@IChatWidgetService private readonly chatWidgetService: IChatWidgetService
 	) {
 		super(AnythingQuickAccessProvider.PREFIX, {
 			canAcceptInBackground: true,
@@ -858,14 +854,6 @@ export class AnythingQuickAccessProvider extends PickerQuickAccessProvider<IAnyt
 
 		// TODO: There has to be a better place for this, but it's the first time we are adding a non-quick access provider
 		// to the command center, so for now, let's do this.
-		if (this.quickChatService.enabled) {
-			providers.push({
-				label: localize('chat', "Open Quick Chat"),
-				commandCenterOrder: 30,
-				keybinding: this.keybindingService.lookupKeybinding(ASK_QUICK_QUESTION_ACTION_ID),
-				accept: () => this.quickChatService.toggle()
-			});
-		}
 
 		return providers.sort((a, b) => a.commandCenterOrder - b.commandCenterOrder);
 	}
@@ -1086,19 +1074,6 @@ export class AnythingQuickAccessProvider extends PickerQuickAccessProvider<IAnyt
 				return TriggerAction.NO_ACTION;
 			},
 			accept: (keyMods, event) => this.openAnything(resourceOrEditor, { keyMods, range: this.pickState.lastRange, preserveFocus: event.inBackground, forcePinned: event.inBackground }),
-			attach: (keyMods, event) => {
-				// Only support adding context to chat when shift is pressed
-				if (keyMods.shift) {
-					const widget = this.chatWidgetService.lastFocusedWidget;
-					if (widget && resource) {
-						widget.attachmentModel.addContext(widget.attachmentModel.asFileVariableEntry(resource));
-					}
-					return;
-				}
-
-				// Fallback to accept behavior.
-				this.openAnything(resourceOrEditor, { keyMods, range: this.pickState.lastRange, preserveFocus: event.inBackground, forcePinned: event.inBackground });
-			}
 		};
 	}
 

@@ -119,9 +119,7 @@ export class FileDialogService extends AbstractFileDialogService implements IFil
 			console.log('[SideX] Folder selected:', selected);
 			if (selected && typeof selected === 'string') {
 				const folderUri = URI.file(selected);
-				const url = new URL(window.location.href);
-				url.searchParams.set('folder', folderUri.toString());
-				window.location.href = url.toString();
+				await this.hostService.openWindow([{ folderUri }], { forceNewWindow: _options.forceNewWindow, remoteAuthority: _options.remoteAuthority });
 			}
 		} catch (e) {
 			console.error('[SideX] Failed to open folder dialog:', e);
@@ -157,6 +155,10 @@ export class FileDialogService extends AbstractFileDialogService implements IFil
 	}
 
 	async pickFileToSave(defaultUri: URI, availableFileSystems?: string[]): Promise<URI | undefined> {
+		if (this.isTauri) {
+			return this._tauriPickFileToSave(defaultUri, availableFileSystems);
+		}
+
 		const schema = this.getFileSystemSchema({ defaultUri, availableFileSystems });
 
 		const options = this.getPickFileToSaveDialogOptions(defaultUri, availableFileSystems);
@@ -175,7 +177,7 @@ export class FileDialogService extends AbstractFileDialogService implements IFil
 		try {
 			fileHandle = await activeWindow.showSaveFilePicker({ types: this.getFilePickerTypes(options.filters), ...{ suggestedName: basename(defaultUri), startIn } });
 		} catch (error) {
-			return; // `showSaveFilePicker` will throw an error when the user cancels
+			return;
 		}
 
 		if (!WebFileSystemAccess.isFileSystemFileHandle(fileHandle)) {
@@ -183,6 +185,29 @@ export class FileDialogService extends AbstractFileDialogService implements IFil
 		}
 
 		return this.fileSystemProvider.registerFileHandle(fileHandle);
+	}
+
+	private async _tauriPickFileToSave(defaultUri: URI, availableFileSystems?: string[]): Promise<URI | undefined> {
+		try {
+			const { save } = await import('@tauri-apps/plugin-dialog');
+			const options = this.getPickFileToSaveDialogOptions(defaultUri, availableFileSystems);
+			const tauriFilters = (options.filters || []).map(f => ({
+				name: f.name,
+				extensions: f.extensions.filter(e => e !== '*' && e !== ''),
+			})).filter(f => f.extensions.length > 0);
+
+			const result = await save({
+				title: options.title,
+				defaultPath: defaultUri.fsPath || undefined,
+				filters: tauriFilters.length ? tauriFilters : undefined,
+			});
+			if (result) {
+				return URI.file(result);
+			}
+		} catch (e) {
+			console.error('[SideX] Save dialog failed:', e);
+		}
+		return undefined;
 	}
 
 	private getFilePickerTypes(filters?: FileFilter[]): FilePickerAcceptType[] | undefined {
@@ -200,6 +225,10 @@ export class FileDialogService extends AbstractFileDialogService implements IFil
 	}
 
 	async showSaveDialog(options: ISaveDialogOptions): Promise<URI | undefined> {
+		if (this.isTauri) {
+			return this._tauriShowSaveDialog(options);
+		}
+
 		const schema = this.getFileSystemSchema(options);
 
 		if (this.shouldUseSimplified(schema)) {
@@ -217,7 +246,7 @@ export class FileDialogService extends AbstractFileDialogService implements IFil
 		try {
 			fileHandle = await activeWindow.showSaveFilePicker({ types: this.getFilePickerTypes(options.filters), ...options.defaultUri ? { suggestedName: basename(options.defaultUri) } : undefined, ...{ startIn } });
 		} catch (error) {
-			return undefined; // `showSaveFilePicker` will throw an error when the user cancels
+			return undefined;
 		}
 
 		if (!WebFileSystemAccess.isFileSystemFileHandle(fileHandle)) {
@@ -227,7 +256,33 @@ export class FileDialogService extends AbstractFileDialogService implements IFil
 		return this.fileSystemProvider.registerFileHandle(fileHandle);
 	}
 
+	private async _tauriShowSaveDialog(options: ISaveDialogOptions): Promise<URI | undefined> {
+		try {
+			const { save } = await import('@tauri-apps/plugin-dialog');
+			const tauriFilters = (options.filters || []).map(f => ({
+				name: f.name,
+				extensions: f.extensions.filter(e => e !== '*' && e !== ''),
+			})).filter(f => f.extensions.length > 0);
+
+			const result = await save({
+				title: options.title,
+				defaultPath: options.defaultUri?.fsPath || undefined,
+				filters: tauriFilters.length ? tauriFilters : undefined,
+			});
+			if (result) {
+				return URI.file(result);
+			}
+		} catch (e) {
+			console.error('[SideX] Save dialog failed:', e);
+		}
+		return undefined;
+	}
+
 	async showOpenDialog(options: IOpenDialogOptions): Promise<URI[] | undefined> {
+		if (this.isTauri) {
+			return this._tauriShowOpenDialog(options);
+		}
+
 		const schema = this.getFileSystemSchema(options);
 
 		if (this.shouldUseSimplified(schema)) {
@@ -253,10 +308,38 @@ export class FileDialogService extends AbstractFileDialogService implements IFil
 				uri = await this.fileSystemProvider.registerDirectoryHandle(handle);
 			}
 		} catch (error) {
-			// ignore - `showOpenFilePicker` / `showDirectoryPicker` will throw an error when the user cancels
+			// user cancelled
 		}
 
 		return uri ? [uri] : undefined;
+	}
+
+	private async _tauriShowOpenDialog(options: IOpenDialogOptions): Promise<URI[] | undefined> {
+		try {
+			const { open } = await import('@tauri-apps/plugin-dialog');
+			const isDir = options.canSelectFolders && !options.canSelectFiles;
+			const tauriFilters = (options.filters || []).map(f => ({
+				name: f.name,
+				extensions: f.extensions.filter(e => e !== '*' && e !== ''),
+			})).filter(f => f.extensions.length > 0);
+
+			const result = await open({
+				directory: isDir,
+				multiple: options.canSelectMany ?? false,
+				title: options.title,
+				defaultPath: options.defaultUri?.fsPath || undefined,
+				filters: tauriFilters.length ? tauriFilters : undefined,
+			});
+
+			if (!result) {
+				return undefined;
+			}
+			const paths = Array.isArray(result) ? result : [result];
+			return paths.map(p => URI.file(p));
+		} catch (e) {
+			console.error('[SideX] Open dialog failed:', e);
+		}
+		return undefined;
 	}
 
 	private async showUnsupportedBrowserWarning(context: 'save' | 'open'): Promise<undefined> {

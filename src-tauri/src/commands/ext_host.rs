@@ -4,6 +4,9 @@ use std::process::{Child, Command, Stdio};
 use std::sync::Mutex;
 use tauri::{AppHandle, Manager, State};
 
+#[cfg(windows)]
+use std::os::windows::process::CommandExt;
+
 pub struct ExtHostProcess {
     inner: Mutex<Option<ExtHostState>>,
 }
@@ -101,14 +104,22 @@ pub async fn start_extension_host(
     let extensions_dir = ensure_extensions_dir();
     log::info!("extensions directory: {}", extensions_dir.display());
 
-    let mut child = Command::new(&node)
+    let mut child_cmd = Command::new(&node);
+    child_cmd
         .arg("--max-old-space-size=3072")
         .arg(&server_js)
         .env("SIDEX_EXTENSIONS_DIR", &extensions_dir)
         .env("NODE_ENV", "production")
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
+        .stderr(Stdio::piped());
+
+    #[cfg(windows)]
+    {
+        child_cmd.creation_flags(0x08000000); // CREATE_NO_WINDOW
+    }
+
+    let mut child = child_cmd
         .spawn()
         .map_err(|e| format!("failed to spawn extension host: {e}"))?;
 

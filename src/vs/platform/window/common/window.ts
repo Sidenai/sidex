@@ -162,6 +162,10 @@ export function hasNativeContextMenu(configurationService: IConfigurationService
 }
 
 export function hasNativeMenu(configurationService: IConfigurationService, titleBarStyle?: TitlebarStyle): boolean {
+	if ((globalThis as any).__SIDEX_TAURI__ && isMacintosh) {
+		return true;
+	}
+
 	if (isWeb) {
 		return false;
 	}

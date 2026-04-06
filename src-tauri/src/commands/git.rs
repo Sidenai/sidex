@@ -1,6 +1,17 @@
 use serde::{Deserialize, Serialize};
 use std::process::Command;
 
+#[cfg(target_os = "windows")]
+use std::os::windows::process::CommandExt;
+
+/// Create a `Command` for git with CREATE_NO_WINDOW on Windows.
+fn git_command() -> Command {
+    let mut cmd = Command::new("git");
+    #[cfg(target_os = "windows")]
+    cmd.creation_flags(0x08000000); // CREATE_NO_WINDOW
+    cmd
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GitChange {
     pub path: String,
@@ -40,7 +51,7 @@ pub struct GitBranch {
 }
 
 fn run_git(path: &str, args: &[&str]) -> Result<String, String> {
-    let output = Command::new("git")
+    let output = git_command()
         .current_dir(path)
         .args(args)
         .output()
@@ -209,7 +220,7 @@ pub async fn git_init(path: String) -> Result<(), String> {
 
 #[tauri::command]
 pub async fn git_is_repo(path: String) -> Result<bool, String> {
-    let output = Command::new("git")
+    let output = git_command()
         .current_dir(&path)
         .args(["rev-parse", "--is-inside-work-tree"])
         .output()
@@ -314,16 +325,40 @@ pub async fn git_remote_list(path: String) -> Result<Vec<GitRemote>, String> {
 
 #[tauri::command]
 pub async fn git_clone(url: String, path: String) -> Result<(), String> {
-    let output = Command::new("git")
-        .args(["clone", &url, &path])
+    if let Ok(parsed) = reqwest::Url::parse(&url) {
+        match parsed.scheme() {
+            "https" | "http" | "ssh" | "git" => {}
+            scheme => return Err(format!("git clone: blocked URL scheme '{}'", scheme)),
+        }
+    }
+
+    let canon_path = std::path::Path::new(&path);
+    if canon_path.components().any(|c| c == std::path::Component::ParentDir) {
+        return Err("git clone: path must not contain '..'".to_string());
+    }
+
+    let output = git_command()
+        .args(["clone", "--no-checkout", &url, &path])
         .output()
         .map_err(|e| format!("Failed to execute git clone: {}", e))?;
 
-    if output.status.success() {
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        return Err(format!("git clone error: {}", stderr.trim()));
+    }
+
+    // Complete checkout with hooks disabled
+    let checkout = git_command()
+        .current_dir(&path)
+        .args(["-c", "core.hooksPath=/dev/null", "checkout"])
+        .output()
+        .map_err(|e| format!("Failed to execute git checkout: {}", e))?;
+
+    if checkout.status.success() {
         Ok(())
     } else {
-        let stderr = String::from_utf8_lossy(&output.stderr);
-        Err(format!("git clone error: {}", stderr.trim()))
+        let stderr = String::from_utf8_lossy(&checkout.stderr);
+        Err(format!("git checkout error: {}", stderr.trim()))
     }
 }
 
@@ -339,7 +374,7 @@ pub async fn git_reset(path: String, files: Vec<String>) -> Result<(), String> {
 #[tauri::command]
 pub async fn git_show(path: String, file: String) -> Result<Vec<u8>, String> {
     let rev_file = format!("HEAD:{}", file);
-    let output = Command::new("git")
+    let output = git_command()
         .current_dir(&path)
         .args(["show", &rev_file])
         .output()
@@ -353,8 +388,40 @@ pub async fn git_show(path: String, file: String) -> Result<Vec<u8>, String> {
     }
 }
 
+const BLOCKED_GIT_FLAGS: &[&str] = &[
+    "-c", "--exec", "--upload-pack", "--receive-pack",
+    "--config", "--exec-path",
+];
+
+const ALLOWED_GIT_SUBCOMMANDS: &[&str] = &[
+    "add", "am", "apply", "archive", "bisect", "blame", "branch", "cat-file",
+    "cherry-pick", "checkout", "clone", "commit", "describe", "diff", "diff-tree",
+    "fetch", "for-each-ref", "format-patch", "gc", "grep", "hash-object",
+    "init", "log", "ls-files", "ls-remote", "ls-tree", "merge", "pack-refs",
+    "prune", "pull", "push", "rebase", "reflog", "remote", "reset", "revert",
+    "rev-parse", "shortlog", "show", "stash", "status", "submodule", "tag",
+    "worktree", "clean",
+];
+
+fn validate_git_args(args: &[String]) -> Result<(), String> {
+    let subcommand = args.first().map(|s| s.as_str()).unwrap_or("");
+    if !ALLOWED_GIT_SUBCOMMANDS.contains(&subcommand) {
+        return Err(format!("git subcommand '{}' is not allowed", subcommand));
+    }
+    for arg in args.iter().skip(1) {
+        let lower = arg.to_lowercase();
+        for blocked in BLOCKED_GIT_FLAGS {
+            if lower == *blocked || lower.starts_with(&format!("{}=", blocked)) {
+                return Err(format!("git flag '{}' is not allowed", arg));
+            }
+        }
+    }
+    Ok(())
+}
+
 #[tauri::command]
 pub async fn git_run(path: String, args: Vec<String>) -> Result<String, String> {
+    validate_git_args(&args)?;
     let arg_refs: Vec<&str> = args.iter().map(|s| s.as_str()).collect();
     run_git(&path, &arg_refs)
 }

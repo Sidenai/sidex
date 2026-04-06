@@ -1,5 +1,5 @@
 [package]
-name = "app"
+name = "sidex"
 version = "0.1.0"
 description = "SideX - A Tauri-based code editor"
 authors = ["you"]
@@ -8,22 +8,23 @@ repository = ""
 edition = "2021"
 rust-version = "1.77.2"
 
+[[bin]]
+name = "SideX"
+path = "src/main.rs"
+
 [lib]
-name = "app_lib"
+name = "sidex_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
 tauri-build = { version = "2.5.6", features = [] }
 
 [dependencies]
-tauri = { version = "2.10.3", features = ["tray-icon", "devtools"] }
+tauri = { version = "2.10.3", features = ["tray-icon"] }
 tauri-plugin-log = "2"
 tauri-plugin-dialog = "2"
-tauri-plugin-fs = "2"
-tauri-plugin-clipboard-manager = "2"
 tauri-plugin-shell = "2"
-tauri-plugin-notification = "2"
-tauri-plugin-opener = "2"
+tauri-plugin-updater = "2"
 
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
@@ -68,3 +69,10 @@ which = "6"
 
 [target.'cfg(unix)'.dependencies]
 libc = "0.2"
+
+[profile.release]
+opt-level = "z"
+lto = "thin"
+codegen-units = 1
+strip = true
+panic = "abort"

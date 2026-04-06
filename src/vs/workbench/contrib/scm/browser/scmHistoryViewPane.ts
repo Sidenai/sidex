@@ -486,7 +486,7 @@ class HistoryItemRenderer implements ICompressibleTreeRenderer<SCMHistoryItemVie
 		hoverActions.push({
 			label: `${historyItem.displayId ?? historyItem.id.substring(0, 7)}  `,
 			iconClass: 'codicon codicon-git-commit',
-			commandId: 'tauri-git.copyToClipboard',
+			commandId: 'git.copyToClipboard',
 			run: () => {
 				navigator.clipboard.writeText(historyItem.id).catch(() => {});
 			}
@@ -495,7 +495,7 @@ class HistoryItemRenderer implements ICompressibleTreeRenderer<SCMHistoryItemVie
 		hoverActions.push({
 			label: '',
 			iconClass: 'codicon codicon-copy',
-			commandId: 'tauri-git.copyToClipboard',
+			commandId: 'git.copyToClipboard',
 			run: () => {
 				navigator.clipboard.writeText(historyItem.id).catch(() => {});
 			}
@@ -506,7 +506,7 @@ class HistoryItemRenderer implements ICompressibleTreeRenderer<SCMHistoryItemVie
 			hoverActions.push({
 				label: 'Open on GitHub',
 				iconClass: 'codicon codicon-github',
-				commandId: 'tauri-git.openOnGitHub',
+				commandId: 'git.openOnGitHub',
 				run: () => {
 					const match = ghUrl.match(/github\.com[:/]([^/]+\/[^/.]+)/);
 					if (match) {

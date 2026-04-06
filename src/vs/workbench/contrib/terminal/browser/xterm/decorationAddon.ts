@@ -27,13 +27,7 @@ import { TERMINAL_COMMAND_DECORATION_DEFAULT_BACKGROUND_COLOR, TERMINAL_COMMAND_
 import { ILifecycleService } from '../../../../services/lifecycle/common/lifecycle.js';
 import { IHoverService } from '../../../../../platform/hover/browser/hover.js';
 import { MarkdownString } from '../../../../../base/common/htmlContent.js';
-import { IChatContextPickService } from '../../../chat/browser/attachments/chatContextPickService.js';
-import { IChatWidgetService } from '../../../chat/browser/chat.js';
-import { IInstantiationService } from '../../../../../platform/instantiation/common/instantiation.js';
-import { TerminalContext } from '../../../chat/browser/actions/chatContext.js';
-import { getTerminalUri, parseTerminalUri } from '../terminalUri.js';
 import { URI } from '../../../../../base/common/uri.js';
-import { ChatAgentLocation } from '../../../chat/common/constants.js';
 import { isString } from '../../../../../base/common/types.js';
 
 interface IDisposableDecoration { decoration: IDecoration; disposables: IDisposable[]; command?: ITerminalCommand; markProperties?: IMarkProperties }
@@ -66,9 +60,6 @@ export class DecorationAddon extends Disposable implements ITerminalAddon, IDeco
 		@IAccessibilitySignalService private readonly _accessibilitySignalService: IAccessibilitySignalService,
 		@INotificationService private readonly _notificationService: INotificationService,
 		@IHoverService private readonly _hoverService: IHoverService,
-		@IChatContextPickService private readonly _contextPickService: IChatContextPickService,
-		@IChatWidgetService private readonly _chatWidgetService: IChatWidgetService,
-		@IInstantiationService private readonly _instantiationService: IInstantiationService
 	) {
 		super();
 		this._register(toDisposable(() => this._dispose()));
@@ -432,11 +423,6 @@ export class DecorationAddon extends Disposable implements ITerminalAddon, IDeco
 			actions.push(...registeredMenuItems, new Separator());
 		}
 
-		const attachToChatAction = this._createAttachToChatAction(command);
-		if (attachToChatAction) {
-			actions.push(attachToChatAction, new Separator());
-		}
-
 		if (command.command !== '') {
 			const labelRun = localize("terminal.rerunCommand", 'Rerun Command');
 			actions.push({
@@ -519,48 +505,6 @@ export class DecorationAddon extends Disposable implements ITerminalAddon, IDeco
 			run: () => this._openerService.open('https://code.visualstudio.com/docs/terminal/shell-integration')
 		});
 		return actions;
-	}
-
-	private _createAttachToChatAction(command: ITerminalCommand): IAction | undefined {
-		const chatIsEnabled = this._chatWidgetService.getWidgetsByLocations(ChatAgentLocation.Chat).some(w => w.attachmentCapabilities.supportsTerminalAttachments);
-		if (!chatIsEnabled) {
-			return undefined;
-		}
-		const labelAttachToChat = localize("terminal.attachToChat", 'Attach To Chat');
-		return {
-			class: undefined, tooltip: labelAttachToChat, id: 'terminal.attachToChat', label: labelAttachToChat, enabled: true,
-			run: async () => {
-				let widget = this._chatWidgetService.lastFocusedWidget ?? this._chatWidgetService.getWidgetsByLocations(ChatAgentLocation.Chat)?.find(w => w.attachmentCapabilities.supportsTerminalAttachments);
-
-				// If no widget found (e.g., after window reload when chat hasn't been focused), open chat view
-				if (!widget) {
-					widget = await this._chatWidgetService.revealWidget();
-				}
-
-				if (!widget) {
-					return;
-				}
-
-				let terminalContext: TerminalContext | undefined;
-				if (this._resource) {
-					const parsedUri = parseTerminalUri(this._resource);
-					terminalContext = this._instantiationService.createInstance(TerminalContext, getTerminalUri(parsedUri.workspaceId, parsedUri.instanceId!, undefined, command.id));
-				}
-
-				if (terminalContext && widget.attachmentCapabilities.supportsTerminalAttachments) {
-					try {
-						const attachment = await terminalContext.asAttachment(widget);
-						if (attachment) {
-							widget.attachmentModel.addContext(attachment);
-							widget.focusInput();
-							return;
-						}
-					} catch (err) {
-					}
-					this._store.add(this._contextPickService.registerChatContextItem(terminalContext));
-				}
-			}
-		};
 	}
 
 	private _showToggleVisibilityQuickPick() {

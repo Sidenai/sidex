@@ -1,12 +1,6 @@
 use serde::Serialize;
 
 #[derive(Debug, Serialize)]
-pub struct LineInfo {
-    pub count: usize,
-    pub endings: String,
-}
-
-#[derive(Debug, Serialize)]
 pub struct FileSummary {
     pub line_count: usize,
     pub word_count: usize,

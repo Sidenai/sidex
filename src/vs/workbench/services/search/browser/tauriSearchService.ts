@@ -1,6 +1,6 @@
 /*---------------------------------------------------------------------------------------------
  *  SideX — Tauri-backed search provider.
- *  Delegates file search and text search to Rust via `invoke()`.
+ *  Delegates file search and text search to Rust via invoke().
  *--------------------------------------------------------------------------------------------*/
 
 import { invoke } from '@tauri-apps/api/core';
@@ -29,28 +29,22 @@ import {
 } from '../common/search.js';
 import { SearchService } from '../common/searchService.js';
 
-// ── Rust ↔ TypeScript DTOs ──────────────────────────────────────────────────
-
-interface TauriFileMatch {
+interface RustFileMatch {
 	path: string;
 	name: string;
-	is_dir: boolean;
 }
 
-interface TauriTextMatch {
+interface RustTextMatch {
 	path: string;
 	line_number: number;
 	line_content: string;
 	column: number;
+	match_length: number;
 }
-
-// ── Provider ────────────────────────────────────────────────────────────────
 
 class TauriSearchProvider extends Disposable implements ISearchResultProvider {
 
-	constructor(
-		private readonly logService: ILogService,
-	) {
+	constructor(private readonly logService: ILogService) {
 		super();
 	}
 
@@ -69,51 +63,42 @@ class TauriSearchProvider extends Disposable implements ISearchResultProvider {
 		for (const fq of query.folderQueries) {
 			if (token?.isCancellationRequested) { break; }
 
-			const root = fq.folder.fsPath;
-			const pattern = query.contentPattern.pattern;
-
 			try {
-				const matches = await invoke<TauriTextMatch[]>('search_text', {
-					root,
-					query: pattern,
+				const matches = await invoke<RustTextMatch[]>('search_text', {
+					root: fq.folder.fsPath,
+					query: query.contentPattern.pattern,
 					options: {
 						max_results: query.maxResults ?? 500,
 						case_sensitive: query.contentPattern.isCaseSensitive ?? false,
+						is_regex: query.contentPattern.isRegExp ?? false,
+						include: query.includePattern ? Object.keys(query.includePattern) : [],
+						exclude: query.excludePattern ? Object.keys(query.excludePattern) : [],
 					},
 				});
 
-				const byFile = new Map<string, TauriTextMatch[]>();
+				const byFile = new Map<string, RustTextMatch[]>();
 				for (const m of matches) {
-					const existing = byFile.get(m.path);
-					if (existing) {
-						existing.push(m);
-					} else {
-						byFile.set(m.path, [m]);
-					}
+					const arr = byFile.get(m.path);
+					if (arr) { arr.push(m); } else { byFile.set(m.path, [m]); }
 				}
 
 				for (const [filePath, fileMatches] of byFile) {
 					const resource = URI.file(filePath);
 					const textResults = fileMatches.map(m => {
-						const lineNumber = m.line_number - 1; // 0-based
-						const startColumn = m.column;
-						const endColumn = m.column + pattern.length;
-						const sourceRange = new SearchRange(lineNumber, startColumn, lineNumber, endColumn);
-						const previewRange = new SearchRange(0, startColumn, 0, endColumn);
+						const line = m.line_number - 1;
+						const start = m.column;
+						const end = m.column + m.match_length;
 						return {
 							previewText: m.line_content,
 							rangeLocations: [{
-								source: sourceRange,
-								preview: previewRange,
+								source: new SearchRange(line, start, line, end),
+								preview: new SearchRange(0, start, 0, end),
 							}],
 						};
 					});
 
 					const fileMatch: IFileMatch = { resource, results: textResults };
-
-					if (onProgress) {
-						onProgress(fileMatch);
-					}
+					onProgress?.(fileMatch);
 					results.push(fileMatch);
 				}
 
@@ -138,22 +123,19 @@ class TauriSearchProvider extends Disposable implements ISearchResultProvider {
 		for (const fq of query.folderQueries) {
 			if (token?.isCancellationRequested) { break; }
 
-			const root = fq.folder.fsPath;
-			const pattern = query.filePattern ?? '';
-
 			try {
-				const matches = await invoke<TauriFileMatch[]>('search_files', {
-					root,
-					pattern,
+				const matches = await invoke<RustFileMatch[]>('search_files', {
+					root: fq.folder.fsPath,
+					pattern: query.filePattern ?? '',
 					options: {
 						max_results: query.maxResults ?? 500,
+						include: query.includePattern ? Object.keys(query.includePattern) : [],
+						exclude: query.excludePattern ? Object.keys(query.excludePattern) : [],
 					},
 				});
 
 				for (const m of matches) {
-					if (!m.is_dir) {
-						results.push({ resource: URI.file(m.path) });
-					}
+					results.push({ resource: URI.file(m.path) });
 				}
 
 				if (matches.length >= (query.maxResults ?? 500)) {
@@ -168,11 +150,9 @@ class TauriSearchProvider extends Disposable implements ISearchResultProvider {
 	}
 
 	async clearCache(_cacheKey: string): Promise<void> {
-		// no-op — Tauri search is stateless
+		// Rust search is stateless, nothing to clear
 	}
 }
-
-// ── Service ─────────────────────────────────────────────────────────────────
 
 export class TauriSearchService extends SearchService {
 	constructor(
@@ -186,10 +166,9 @@ export class TauriSearchService extends SearchService {
 	) {
 		super(modelService, editorService, telemetryService, logService, extensionService, fileService, uriIdentityService);
 
-		const provider = new TauriSearchProvider(logService);
-		this.registerSearchResultProvider(Schemas.file, SearchProviderType.file, provider);
-		this.registerSearchResultProvider(Schemas.file, SearchProviderType.text, provider);
-		logService.info('[SideX] Registered TauriSearchProvider for file:// scheme');
+		const provider = this._register(new TauriSearchProvider(logService));
+		this._register(this.registerSearchResultProvider(Schemas.file, SearchProviderType.file, provider));
+		this._register(this.registerSearchResultProvider(Schemas.file, SearchProviderType.text, provider));
 	}
 }
 

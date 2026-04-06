@@ -1155,32 +1155,6 @@ export class ExtHostSCM implements ExtHostSCMShape {
 		}
 	}
 
-	async $resolveHistoryItemChatContext(sourceControlHandle: number, historyItemId: string, token: CancellationToken): Promise<string | undefined> {
-		try {
-			const historyProvider = this._sourceControls.get(sourceControlHandle)?.historyProvider;
-			const chatContext = await historyProvider?.resolveHistoryItemChatContext(historyItemId, token);
-
-			return chatContext ?? undefined;
-		}
-		catch (err) {
-			this.logService.error('ExtHostSCM#$resolveHistoryItemChatContext', err);
-			return undefined;
-		}
-	}
-
-	async $resolveHistoryItemChangeRangeChatContext(sourceControlHandle: number, historyItemId: string, historyItemParentId: string, path: string, token: CancellationToken): Promise<string | undefined> {
-		try {
-			const historyProvider = this._sourceControls.get(sourceControlHandle)?.historyProvider;
-			const chatContext = await historyProvider?.resolveHistoryItemChangeRangeChatContext?.(historyItemId, historyItemParentId, path, token);
-
-			return chatContext ?? undefined;
-		}
-		catch (err) {
-			this.logService.error('ExtHostSCM#$resolveHistoryItemChangeRangeChatContext', err);
-			return undefined;
-		}
-	}
-
 	async $resolveHistoryItemRefsCommonAncestor(sourceControlHandle: number, historyItemRefs: string[], token: CancellationToken): Promise<string | undefined> {
 		try {
 			const historyProvider = this._sourceControls.get(sourceControlHandle)?.historyProvider;

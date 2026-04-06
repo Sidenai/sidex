@@ -34,8 +34,6 @@ import { ILanguageFeaturesService } from '../../../../../editor/common/services/
 import { ContextKeyExpr } from '../../../../../platform/contextkey/common/contextkey.js';
 import { accessibilityHelpIsShown, accessibleViewIsShown } from '../../../accessibility/browser/accessibilityConfiguration.js';
 import { matchesFuzzyIconAware, parseLabelWithIcons } from '../../../../../base/common/iconLabels.js';
-import { IChatWidgetService } from '../../../chat/browser/chat.js';
-import { ISymbolVariableEntry } from '../../../chat/common/attachments/chatVariableEntries.js';
 
 export class GotoSymbolQuickAccessProvider extends AbstractGotoSymbolQuickAccessProvider {
 
@@ -47,7 +45,6 @@ export class GotoSymbolQuickAccessProvider extends AbstractGotoSymbolQuickAccess
 		@ILanguageFeaturesService languageFeaturesService: ILanguageFeaturesService,
 		@IOutlineService private readonly outlineService: IOutlineService,
 		@IOutlineModelService outlineModelService: IOutlineModelService,
-		@IChatWidgetService private readonly chatWidgetService: IChatWidgetService,
 	) {
 		super(languageFeaturesService, outlineModelService, {
 			openSideBySideDirection: () => this.configuration.openSideBySideDirection
@@ -126,26 +123,6 @@ export class GotoSymbolQuickAccessProvider extends AbstractGotoSymbolQuickAccess
 
 	protected override async doGetSymbolPicks(symbolsPromise: Promise<DocumentSymbol[]>, query: IPreparedQuery, options: { extraContainerLabel?: string } | undefined, token: CancellationToken, model: ITextModel): Promise<Array<IGotoSymbolQuickPickItem | IQuickPickSeparator>> {
 		const picks = await super.doGetSymbolPicks(symbolsPromise, query, options, token, model);
-		const modelUri = model.uri;
-		for (const pick of picks) {
-			const symbolPick = pick as IGotoSymbolQuickPickItem;
-			if (symbolPick.range && !symbolPick.attach) {
-				symbolPick.attach = () => {
-					const widget = this.chatWidgetService.lastFocusedWidget;
-					if (!widget) {
-						return;
-					}
-					const entry: ISymbolVariableEntry = {
-						kind: 'symbol',
-						id: JSON.stringify({ uri: modelUri.toString(), range: symbolPick.range!.decoration }),
-						name: symbolPick.symbolName ?? symbolPick.label,
-						value: { uri: modelUri, range: symbolPick.range!.decoration },
-						symbolKind: symbolPick.kind,
-					};
-					widget.attachmentModel.addContext(entry);
-				};
-			}
-		}
 		return picks;
 	}
 

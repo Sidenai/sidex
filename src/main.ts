@@ -3,6 +3,26 @@
  *  Entry point. Globals set by inline script in index.html.
  *--------------------------------------------------------------------------------------------*/
 
+async function sidexOpenFolder() {
+	try {
+		const { open } = await import('@tauri-apps/plugin-dialog');
+		const { URI } = await import('./vs/base/common/uri.js');
+		const selected = await open({ directory: true, multiple: false });
+		if (selected && typeof selected === 'string') {
+			navigateToFolder(URI.file(selected).toString());
+		}
+	} catch (e) {
+		console.error('[SideX] Failed to open folder picker:', e);
+	}
+}
+(window as any).__sidex_openFolder = sidexOpenFolder;
+
+function navigateToFolder(folderUri: string) {
+	const url = new URL(window.location.href);
+	url.searchParams.set('folder', folderUri);
+	window.location.href = url.toString();
+}
+
 async function boot() {
 	const stages = [
 		['common',       () => import('./vs/workbench/workbench.common.main.js')],
@@ -15,7 +35,8 @@ async function boot() {
 		try {
 			await loader();
 		} catch (e) {
-			console.warn(`[SideX] Barrel stage "${label}" failed (non-fatal):`, e);
+			console.error(`[SideX] Barrel stage "${label}" failed:`, e);
+			throw e;
 		}
 	}
 
@@ -29,10 +50,12 @@ async function boot() {
 	const urlParams = new URLSearchParams(window.location.search);
 	const folderParam = urlParams.get('folder');
 
-	// Build the workspace provider — this is how VSCode web knows what folder to open
 	let workspace: any = undefined;
 	if (folderParam) {
-		workspace = { folderUri: URI.parse(folderParam) };
+		const parsed = URI.parse(folderParam);
+		if (parsed.scheme === 'file' || parsed.scheme === 'vscode-remote' || parsed.scheme === 'vscode-vfs') {
+			workspace = { folderUri: parsed };
+		}
 	}
 
 	const options: any = {
@@ -50,9 +73,7 @@ async function boot() {
 			open: async (_workspace: any, _options: any) => {
 				// When VSCode asks to open a new workspace, reload with the folder param
 				if (_workspace && 'folderUri' in _workspace) {
-					const url = new URL(window.location.href);
-					url.searchParams.set('folder', _workspace.folderUri.toString());
-					window.location.href = url.toString();
+					navigateToFolder(_workspace.folderUri.toString());
 				}
 				return true;
 			},
@@ -78,19 +99,15 @@ async function boot() {
 			enabled: false,
 		},
 		additionalBuiltinExtensions: [],
-		defaultLayout: {
-			editors: [],
-			layout: { editors: {} },
-		},
 		configurationDefaults: {
 			'workbench.startupEditor': 'welcomePage',
 			'workbench.enableExperiments': false,
 			'workbench.iconTheme': 'vs-seti',
-			'workbench.colorTheme': 'SideX Monochrome Dark',
+			'workbench.colorTheme': 'Default Dark Modern',
 			'editor.experimentalGpuAcceleration': 'auto',
 			'workbench.productIconTheme': 'Default',
 			'workbench.editor.showTabs': 'multiple',
-			'workbench.editor.enablePreview': true,
+			'workbench.editor.enablePreview': false,
 			'workbench.editor.tabCloseButton': 'right',
 			'window.menuBarVisibility': 'hidden',
 			'window.titleBarStyle': 'custom',
@@ -158,11 +175,9 @@ async function boot() {
 
 	create(document.body, options);
 
-	// Override external URL opener to use Tauri's shell plugin
 	setupTauriExternalOpener();
-
-	// Wire up native menu actions to VSCode commands
 	setupMenuActions();
+	setupWindowStateRestore();
 
 	console.log('[SideX] Workbench created' + (folderParam ? ` (folder: ${folderParam})` : ' (no folder)'), 'workspace:', workspace);
 }
@@ -185,6 +200,25 @@ function setupTauriExternalOpener() {
 			}
 		};
 		document.addEventListener('click', handler, true);
+	}).catch(() => {});
+}
+
+function setupWindowStateRestore() {
+	import('@tauri-apps/api/core').then(({ invoke }) => {
+		invoke('restore_window_state', { label: 'main' }).catch(() => {});
+
+		let saveTimer: ReturnType<typeof setTimeout> | null = null;
+		const debouncedSave = () => {
+			if (saveTimer) { clearTimeout(saveTimer); }
+			saveTimer = setTimeout(() => {
+				invoke('save_window_state', { label: 'main' }).catch(() => {});
+			}, 500);
+		};
+
+		window.addEventListener('resize', debouncedSave);
+		window.addEventListener('beforeunload', () => {
+			invoke('save_window_state', { label: 'main' }).catch(() => {});
+		});
 	}).catch(() => {});
 }
 
@@ -259,14 +293,17 @@ function setupMenuActions() {
 			return;
 		}
 
+		if (menuId === 'open_folder') {
+			sidexOpenFolder();
+			return;
+		}
+
 		const commandId = menuToCommand[menuId];
 		if (!commandId) {
 			console.warn(`[SideX] Unknown menu action: ${menuId}`);
 			return;
 		}
 		try {
-			const { CommandsRegistry } = await import('./vs/platform/commands/common/commands.js');
-			// Access the global command service through the workbench
 			const event = new CustomEvent('sidex-command', { detail: { commandId } });
 			window.dispatchEvent(event);
 		} catch (e) {
@@ -274,13 +311,23 @@ function setupMenuActions() {
 		}
 	};
 
+	// Native menu events arrive as CustomEvents from the Rust backend
+	window.addEventListener('sidex-native-menu', ((e: CustomEvent) => {
+		const menuId = e.detail;
+		if (typeof menuId === 'string' && (window as any).__sidex_menu_action) {
+			(window as any).__sidex_menu_action(menuId);
+		}
+	}) as EventListener);
+
 	// Listen for command execution via keyboard shortcuts forwarded from native menu
 	window.addEventListener('sidex-command', async (e: any) => {
 		const commandId = e.detail?.commandId;
 		if (!commandId) return;
+		if (commandId === 'workbench.action.files.openFolder' || commandId === 'workbench.action.files.openFolderViaWorkspace') {
+			sidexOpenFolder();
+			return;
+		}
 		try {
-			// Use the keybinding dispatch trick — simulate the keyboard shortcut
-			// or directly invoke the command if the service is available
 			const commandService = (window as any).__sidex_commandService;
 			if (commandService) {
 				await commandService.executeCommand(commandId);
@@ -295,8 +342,13 @@ function setupMenuActions() {
 
 boot().catch((err) => {
 	console.error('[SideX] Fatal:', err);
-	document.body.innerHTML = `<div style="padding:40px;color:#ccc;font-family:system-ui">
-		<h2>SideX failed to start</h2>
-		<pre style="color:#f88;white-space:pre-wrap">${(err as Error)?.stack || err}</pre>
-	</div>`;
+	const container = document.createElement('div');
+	container.style.cssText = 'padding:40px;color:#ccc;font-family:system-ui';
+	const h2 = document.createElement('h2');
+	h2.textContent = 'SideX failed to start';
+	const pre = document.createElement('pre');
+	pre.style.cssText = 'color:#f88;white-space:pre-wrap';
+	pre.textContent = (err as Error)?.stack || String(err);
+	container.append(h2, pre);
+	document.body.replaceChildren(container);
 });

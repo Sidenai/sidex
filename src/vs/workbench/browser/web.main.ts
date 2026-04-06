@@ -12,11 +12,10 @@ import { ConsoleLogInAutomationLogger } from '../../platform/log/browser/log.js'
 import { Disposable, DisposableStore, toDisposable } from '../../base/common/lifecycle.js';
 import { BrowserWorkbenchEnvironmentService, IBrowserWorkbenchEnvironmentService } from '../services/environment/browser/environmentService.js';
 import { Workbench } from './workbench.js';
-import { RemoteFileSystemProviderClient } from '../services/remote/common/remoteFileSystemProviderClient.js';
 import { IWorkbenchEnvironmentService } from '../services/environment/common/environmentService.js';
 import { IProductService } from '../../platform/product/common/productService.js';
 import product from '../../platform/product/common/product.js';
-import { RemoteAgentService } from '../services/remote/browser/remoteAgentService.js';
+import { NullRemoteAgentService } from '../services/remote/browser/nullRemoteAgentService.js';
 import { RemoteAuthorityResolverService } from '../../platform/remote/browser/remoteAuthorityResolverService.js';
 import { IRemoteAuthorityResolverService, RemoteConnectionType } from '../../platform/remote/common/remoteAuthorityResolver.js';
 import { IRemoteAgentService } from '../services/remote/common/remoteAgentService.js';
@@ -44,8 +43,7 @@ import { IndexedDBFileSystemProvider } from '../../platform/files/browser/indexe
 import { BrowserRequestService } from '../services/request/browser/requestService.js';
 import { IRequestService } from '../../platform/request/common/request.js';
 import { IUserDataInitializationService, IUserDataInitializer, UserDataInitializationService } from '../services/userData/browser/userDataInit.js';
-import { UserDataSyncStoreManagementService } from '../../platform/userDataSync/common/userDataSyncStoreService.js';
-import { IUserDataSyncStoreManagementService } from '../../platform/userDataSync/common/userDataSync.js';
+import { IUserDataSyncStoreManagementService, NullUserDataSyncStoreManagementService } from '../../platform/userDataSync/common/nullUserDataSync.js';
 import { ILifecycleService, WillShutdownEvent } from '../services/lifecycle/common/lifecycle.js';
 import { Event } from '../../base/common/event.js';
 import { Action2, MenuId, registerAction2 } from '../../platform/actions/common/actions.js';
@@ -70,7 +68,7 @@ import { IProgressService } from '../../platform/progress/common/progress.js';
 import { DelayedLogChannel } from '../services/output/common/delayedLogChannel.js';
 import { dirname, joinPath } from '../../base/common/resources.js';
 import { IUserDataProfile, IUserDataProfilesService } from '../../platform/userDataProfile/common/userDataProfile.js';
-import { IPolicyService } from '../../platform/policy/common/policy.js';
+import { IPolicyService, NullPolicyService } from '../../platform/policy/common/policy.js';
 import { IRemoteExplorerService } from '../services/remote/common/remoteExplorerService.js';
 import { DisposableTunnel, TunnelProtocol } from '../../platform/tunnel/common/tunnel.js';
 import { ILabelService } from '../../platform/label/common/label.js';
@@ -85,7 +83,6 @@ import { BrowserSocketFactory } from '../../platform/remote/browser/browserSocke
 import { VSBuffer } from '../../base/common/buffer.js';
 import { IStoredWorkspace } from '../../platform/workspaces/common/workspaces.js';
 import { UserDataProfileInitializer } from '../services/userDataProfile/browser/userDataProfileInit.js';
-import { UserDataSyncInitializer } from '../services/userDataSync/browser/userDataSyncInit.js';
 import { BrowserRemoteResourceLoader } from '../services/remote/browser/browserRemoteResourceHandler.js';
 import { BufferLogger } from '../../platform/log/common/bufferLog.js';
 import { FileLoggerService } from '../../platform/log/common/fileLog.js';
@@ -97,9 +94,7 @@ import { ISecretStorageService } from '../../platform/secrets/common/secrets.js'
 import { TunnelSource } from '../services/remote/common/tunnelModel.js';
 import { mainWindow } from '../../base/browser/window.js';
 import { INotificationService, Severity } from '../../platform/notification/common/notification.js';
-import { IDefaultAccountService } from '../../platform/defaultAccount/common/defaultAccount.js';
-import { DefaultAccountService } from '../services/accounts/browser/defaultAccount.js';
-import { AccountPolicyService } from '../services/policies/common/accountPolicyService.js';
+import { IDefaultAccountService, NullDefaultAccountService } from '../services/accounts/browser/nullDefaultAccount.js';
 
 export interface IBrowserMainWorkbench {
 	startup(): IInstantiationService;
@@ -360,16 +355,15 @@ export class BrowserMain extends Disposable {
 		const remoteSocketFactoryService = new RemoteSocketFactoryService();
 		remoteSocketFactoryService.register(RemoteConnectionType.WebSocket, new BrowserSocketFactory(this.configuration.webSocketFactory));
 		serviceCollection.set(IRemoteSocketFactoryService, remoteSocketFactoryService);
-		const remoteAgentService = this._register(new RemoteAgentService(remoteSocketFactoryService, userDataProfileService, environmentService, productService, remoteAuthorityResolverService, signService, logService));
+		const remoteAgentService = new NullRemoteAgentService();
 		serviceCollection.set(IRemoteAgentService, remoteAgentService);
-		this._register(RemoteFileSystemProviderClient.register(remoteAgentService, fileService, logService));
 
-		// Default Account
-		const defaultAccountService = this._register(new DefaultAccountService(productService));
+		// Default Account (null - no MS account)
+		const defaultAccountService = new NullDefaultAccountService();
 		serviceCollection.set(IDefaultAccountService, defaultAccountService);
 
-		// Policies
-		const policyService = new AccountPolicyService(logService, defaultAccountService);
+		// Policies (null - no account policies)
+		const policyService = new NullPolicyService();
 		serviceCollection.set(IPolicyService, policyService);
 
 		// Long running services (workspace, config, storage)
@@ -418,8 +412,8 @@ export class BrowserMain extends Disposable {
 		const requestService = new BrowserRequestService(remoteAgentService, configurationService, loggerService);
 		serviceCollection.set(IRequestService, requestService);
 
-		// Userdata Sync Store Management Service
-		const userDataSyncStoreManagementService = new UserDataSyncStoreManagementService(productService, configurationService, storageService);
+		// Userdata Sync Store Management Service (null stub)
+		const userDataSyncStoreManagementService = new NullUserDataSyncStoreManagementService();
 		serviceCollection.set(IUserDataSyncStoreManagementService, userDataSyncStoreManagementService);
 
 
@@ -439,7 +433,6 @@ export class BrowserMain extends Disposable {
 
 		// Userdata Initialize Service
 		const userDataInitializers: IUserDataInitializer[] = [];
-		userDataInitializers.push(new UserDataSyncInitializer(environmentService, secretStorageService, userDataSyncStoreManagementService, fileService, userDataProfilesService, storageService, productService, requestService, logService, uriIdentityService));
 		if (environmentService.options.profile) {
 			userDataInitializers.push(new UserDataProfileInitializer(environmentService, fileService, userDataProfileService, storageService, logService, uriIdentityService, requestService));
 		}

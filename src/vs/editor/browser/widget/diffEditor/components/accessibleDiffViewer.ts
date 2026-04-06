@@ -62,6 +62,7 @@ export interface IAccessibleDiffViewerModel {
 
 export class AccessibleDiffViewer extends Disposable {
 	public static _ttPolicy = createTrustedTypesPolicy('diffReview', { createHTML: value => value });
+	declare private readonly _state: IObservable<{ model: ViewModel; view: View } | null>;
 
 	constructor(
 		private readonly _parentNode: HTMLElement,
@@ -75,18 +76,18 @@ export class AccessibleDiffViewer extends Disposable {
 		@IInstantiationService private readonly _instantiationService: IInstantiationService,
 	) {
 		super();
-	}
 
-	private readonly _state = derived(this, (reader) => {
-		const visible = this._visible.read(reader);
-		this._parentNode.style.visibility = visible ? 'visible' : 'hidden';
-		if (!visible) {
-			return null;
-		}
-		const model = reader.store.add(this._instantiationService.createInstance(ViewModel, this._diffs, this._models, this._setVisible, this._canClose));
-		const view = reader.store.add(this._instantiationService.createInstance(View, this._parentNode, model, this._width, this._height, this._models));
-		return { model, view, };
-	}).recomputeInitiallyAndOnChange(this._store);
+		this._state = derived(this, (reader) => {
+			const visible = this._visible.read(reader);
+			this._parentNode.style.visibility = visible ? 'visible' : 'hidden';
+			if (!visible) {
+				return null;
+			}
+			const model = reader.store.add(this._instantiationService.createInstance(ViewModel, this._diffs, this._models, this._setVisible, this._canClose));
+			const view = reader.store.add(this._instantiationService.createInstance(View, this._parentNode, model, this._width, this._height, this._models));
+			return { model, view, };
+		}).recomputeInitiallyAndOnChange(this._store);
+	}
 
 	next(): void {
 		transaction(tx => {

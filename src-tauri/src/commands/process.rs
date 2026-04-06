@@ -14,7 +14,7 @@ use std::io::{Read, Write};
 use std::sync::{Arc, Mutex, atomic::{AtomicU32, AtomicBool, Ordering}};
 use std::time::{SystemTime, UNIX_EPOCH, Duration};
 use tauri::{AppHandle, Emitter, State};
-use crossbeam::channel::{bounded, Sender, Receiver, TryRecvError};
+use crossbeam::channel::{bounded, Sender, Receiver};
 
 // ============================================================================
 // Constants
@@ -140,10 +140,6 @@ impl RingBuffer {
         count
     }
 
-    fn len(&self) -> usize {
-        self.buffer.len()
-    }
-
     fn total_count(&self) -> usize {
         self.total_count
     }
@@ -199,13 +195,13 @@ fn spawn_output_reader(
 
 /// Internal terminal state
 pub struct Terminal {
-    handle: TermHandle,
+    _handle: TermHandle,
     shell: String,
     cwd: String,
-    _pty: Box<dyn MasterPty + Send>,  // Keep alive for the lifetime
+    _pty: Box<dyn MasterPty + Send>,
     writer: Box<dyn Write + Send>,
     output: Arc<Mutex<RingBuffer>>,
-    sender: Sender<OutputMessage>,
+    _sender: Sender<OutputMessage>,
     child: Box<dyn portable_pty::Child + Send>,
     _reader_handle: Option<std::thread::JoinHandle<()>>,
     cols: u16,
@@ -232,13 +228,13 @@ impl Terminal {
         let reader_handle = spawn_output_reader(reader, sender.clone(), handle);
         
         let terminal = Self {
-            handle,
+            _handle: handle,
             shell,
             cwd,
             _pty: pty,
             writer,
             output: output.clone(),
-            sender,
+            _sender: sender,
             child,
             _reader_handle: Some(reader_handle),
             cols,
@@ -294,7 +290,6 @@ impl Terminal {
 pub struct ProcessStore {
     terminals: Mutex<HashMap<TermHandle, Terminal>>,
     output_receivers: Mutex<HashMap<TermHandle, Receiver<OutputMessage>>>,
-    app_handle: Mutex<Option<AppHandle>>,
 }
 
 impl ProcessStore {
@@ -302,13 +297,10 @@ impl ProcessStore {
         Self {
             terminals: Mutex::new(HashMap::new()),
             output_receivers: Mutex::new(HashMap::new()),
-            app_handle: Mutex::new(None),
         }
     }
 
-    pub fn set_app_handle(&self, handle: AppHandle) {
-        *self.app_handle.lock().unwrap() = Some(handle);
-    }
+    pub fn set_app_handle(&self, _handle: AppHandle) {}
 
     fn insert(&self, handle: TermHandle, terminal: Terminal, receiver: Receiver<OutputMessage>) {
         self.terminals.lock().unwrap().insert(handle, terminal);
@@ -320,119 +312,9 @@ impl ProcessStore {
         self.terminals.lock().unwrap().remove(&handle)
     }
 
-    fn get_terminal(&self, handle: TermHandle) -> Option<(TermHandle, std::sync::MutexGuard<'_, HashMap<TermHandle, Terminal>>)> {
-        let terminals = self.terminals.lock().ok()?;
-        if terminals.contains_key(&handle) {
-            Some((handle, terminals))
-        } else {
-            None
-        }
-    }
-
-    fn contains(&self, handle: TermHandle) -> bool {
-        self.terminals.lock().unwrap().contains_key(&handle)
-    }
-
     fn handles(&self) -> Vec<TermHandle> {
         self.terminals.lock().unwrap().keys().cloned().collect()
     }
-
-    /// Poll all terminals and emit events
-    pub fn poll_and_emit(&self) {
-        let handles: Vec<TermHandle> = self.handles();
-        
-        for handle in handles {
-            // Process output from receiver
-            if let Ok(receivers) = self.output_receivers.try_lock() {
-                if let Some(receiver) = receivers.get(&handle) {
-                    let mut lines_to_emit = Vec::new();
-                    let mut is_shutdown = false;
-                    
-                    // Collect available messages (non-blocking)
-                    loop {
-                        match receiver.try_recv() {
-                            Ok(OutputMessage::Data(line)) => {
-                                lines_to_emit.push(line);
-                            }
-                            Ok(OutputMessage::Shutdown) => {
-                                is_shutdown = true;
-                                break;
-                            }
-                            Err(TryRecvError::Empty) => break,
-                            Err(TryRecvError::Disconnected) => {
-                                is_shutdown = true;
-                                break;
-                            }
-                        }
-                    }
-                    
-                    // Store in ring buffer and emit if we have lines
-                    if !lines_to_emit.is_empty() || is_shutdown {
-                        if let Ok(mut terminals) = self.terminals.try_lock() {
-                            if let Some(terminal) = terminals.get_mut(&handle) {
-                                let mut dropped = 0;
-                                
-                                for line in &lines_to_emit {
-                                    terminal.output.lock().unwrap().push(line.clone());
-                                }
-                                
-                                if !lines_to_emit.is_empty() {
-                                    dropped = terminal.output.lock().unwrap().take_dropped_count();
-                                }
-                                
-                                // Emit term-output event
-                                if let Ok(app_handle) = self.app_handle.lock() {
-                                    if let Some(app) = app_handle.as_ref() {
-                                        let _ = app.emit("term-output", TermOutputEvent {
-                                            handle,
-                                            lines: lines_to_emit,
-                                            dropped,
-                                        });
-                                    }
-                                }
-                                
-                                // Handle shutdown
-                                if is_shutdown {
-                                    terminal.is_alive.store(false, Ordering::SeqCst);
-                                    
-                                    let exit_code = match terminal.try_wait() {
-                                        Ok(Some(status)) => {
-                                            if status.success() { Some(0) } else { Some(1) }
-                                        }
-                                        _ => Some(0),
-                                    };
-                                    
-                                    if let Ok(app_handle) = self.app_handle.lock() {
-                                        if let Some(app) = app_handle.as_ref() {
-                                            let _ = app.emit("term-exit", TermExitEvent {
-                                                handle,
-                                                exit_code,
-                                            });
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-/// Event emitted when terminal has output
-#[derive(Debug, Clone, Serialize)]
-struct TermOutputEvent {
-    handle: TermHandle,
-    lines: Vec<OutputLine>,
-    dropped: usize,
-}
-
-/// Event emitted when terminal exits
-#[derive(Debug, Clone, Serialize)]
-struct TermExitEvent {
-    handle: TermHandle,
-    exit_code: Option<i32>,
 }
 
 // ============================================================================
@@ -1058,6 +940,14 @@ pub fn term_clear_buffer(
     Ok(())
 }
 
+const ALLOWED_SIGNALS: &[i32] = &[
+    2,  // SIGINT
+    9,  // SIGKILL
+    15, // SIGTERM
+    18, // SIGCONT
+    19, // SIGSTOP
+];
+
 /// Send signal to terminal process (Unix only)
 #[cfg(unix)]
 #[tauri::command]
@@ -1066,20 +956,27 @@ pub fn term_signal(
     handle: TermHandle,
     signal: i32,
 ) -> Result<(), String> {
+    if !ALLOWED_SIGNALS.contains(&signal) {
+        return Err(format!("Signal {} is not in the allowed list", signal));
+    }
+
     let terminals = state.terminals.lock().map_err(|e| e.to_string())?;
     let terminal = terminals
         .get(&handle)
         .ok_or_else(|| format!("Terminal {:?} not found", handle))?;
 
     if let Some(pid) = terminal.pid() {
+        let pid_i32: i32 = pid
+            .try_into()
+            .map_err(|_| format!("PID {} overflows i32", pid))?;
         unsafe {
-            let result = libc::kill(pid as i32, signal);
+            let result = libc::kill(pid_i32, signal);
             if result != 0 {
                 return Err(format!("Failed to send signal {} to {}", signal, pid));
             }
         }
     }
-    
+
     Ok(())
 }
 
@@ -1091,21 +988,6 @@ pub fn term_signal(
     _signal: i32,
 ) -> Result<(), String> {
     Err("Signals are only supported on Unix systems".to_string())
-}
-
-/// Set environment variable for a specific terminal
-#[tauri::command]
-pub fn term_set_env(
-    state: State<'_, Arc<ProcessStore>>,
-    handle: TermHandle,
-    key: String,
-    value: String,
-) -> Result<(), String> {
-    // Note: PTY environment can't be changed after spawn
-    // This is a placeholder for potential future implementation
-    // (e.g., using shell-specific escape sequences)
-    let _ = (state, handle, key, value);
-    Ok(())
 }
 
 /// Change terminal working directory (via shell command)

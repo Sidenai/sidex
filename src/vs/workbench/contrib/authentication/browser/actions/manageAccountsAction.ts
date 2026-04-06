@@ -33,7 +33,6 @@ export class ManageAccountsAction extends Action2 {
 
 interface AccountQuickPickItem extends IQuickPickItem {
 	providerId: string;
-	canUseMcp: boolean;
 	canSignOut: () => Promise<boolean>;
 }
 
@@ -77,7 +76,6 @@ class ManageAccountsActionImpl {
 					label,
 					description: provider.label,
 					providerId,
-					canUseMcp: !!provider.authorizationServers?.length,
 					canSignOut: async () => this.canSignOut(provider, id, await activeSession.value)
 				});
 			}
@@ -94,7 +92,7 @@ class ManageAccountsActionImpl {
 	}
 
 	private async showAccountActions(account: AccountQuickPickItem): Promise<void> {
-		const { providerId, label: accountLabel, canUseMcp, canSignOut } = account;
+		const { providerId, label: accountLabel, canSignOut } = account;
 
 		const store = new DisposableStore();
 		const quickPick = store.add(this.quickInputService.createQuickPick<AccountActionQuickPickItem>());
@@ -107,13 +105,6 @@ class ManageAccountsActionImpl {
 			label: localize('manageTrustedExtensions', "Manage Trusted Extensions"),
 			action: () => this.commandService.executeCommand('_manageTrustedExtensionsForAccount', { providerId, accountLabel })
 		}];
-
-		if (canUseMcp) {
-			items.push({
-				label: localize('manageTrustedMCPServers', "Manage Trusted MCP Servers"),
-				action: () => this.commandService.executeCommand('_manageTrustedMCPServersForAccount', { providerId, accountLabel })
-			});
-		}
 
 		if (await canSignOut()) {
 			items.push({

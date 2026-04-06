@@ -60,7 +60,6 @@ import { IExtensionService } from '../../../services/extensions/common/extension
 import { IWorkingCopyIdentifier } from '../../../services/workingCopy/common/workingCopy.js';
 import { IWorkingCopyEditorHandler, IWorkingCopyEditorService } from '../../../services/workingCopy/common/workingCopyEditorService.js';
 import { isReplEditorControl, ReplEditorControl } from '../../replNotebook/browser/replEditor.js';
-import { InlineChatController } from '../../inlineChat/browser/inlineChatController.js';
 import { IsLinuxContext, IsWindowsContext } from '../../../../platform/contextkey/common/contextkeys.js';
 
 const interactiveWindowCategory: ILocalizedString = localize2('interactiveWindow', "Interactive Window");
@@ -533,11 +532,6 @@ registerAction2(class extends Action2 {
 
 				if (isFalsyOrWhitespace(value)) {
 					return;
-				}
-
-				const ctrl = InlineChatController.get(editorControl.activeCodeEditor);
-				if (ctrl) {
-					ctrl.acceptSession();
 				}
 
 				historyService.replaceLast(notebookDocument.uri, value);

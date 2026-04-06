@@ -17,6 +17,17 @@ import { ILayoutService } from '../../../../platform/layout/browser/layoutServic
 import { getActiveWindow } from '../../../../base/browser/dom.js';
 
 export class BrowserClipboardService extends BaseBrowserClipboardService {
+	private get isTauriDesktop(): boolean {
+		const globalScope = globalThis as typeof globalThis & {
+			__SIDEX_TAURI__?: boolean;
+			__TAURI__?: unknown;
+			__TAURI_INTERNALS__?: unknown;
+		};
+		return globalScope.__SIDEX_TAURI__ === true
+			|| typeof globalScope.__TAURI__ !== 'undefined'
+			|| typeof globalScope.__TAURI_INTERNALS__ !== 'undefined'
+			|| globalThis.location?.protocol === 'tauri:';
+	}
 
 	constructor(
 		@INotificationService private readonly notificationService: INotificationService,
@@ -53,6 +64,11 @@ export class BrowserClipboardService extends BaseBrowserClipboardService {
 			this.logService.trace('BrowserClipboardService#readText with readText.length:', readText.length);
 			return readText;
 		} catch (error) {
+			if (this.isTauriDesktop) {
+				this.logService.debug('BrowserClipboardService#readText falling back for tauri protocol');
+				return super.readText(type);
+			}
+
 			return new Promise<string>(resolve => {
 
 				// Inform user about permissions problem (https://github.com/microsoft/vscode/issues/112089)

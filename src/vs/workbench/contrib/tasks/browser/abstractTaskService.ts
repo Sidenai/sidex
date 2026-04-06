@@ -48,7 +48,6 @@ import { ITerminalGroupService, ITerminalService } from '../../terminal/browser/
 import { ITerminalProfileResolverService } from '../../terminal/common/terminal.js';
 
 import { CommandString, ConfiguringTask, ContributedTask, CustomTask, ExecutionEngine, InMemoryTask, InstancePolicy, ITaskConfig, ITaskEvent, ITaskIdentifier, ITaskInactiveEvent, ITaskProcessEndedEvent, ITaskSet, JsonSchemaVersion, KeyedTaskIdentifier, RerunAllRunningTasksCommandId, RuntimeType, Task, TASK_RUNNING_STATE, TaskDefinition, TaskEventKind, TaskGroup, TaskRunSource, TaskSettingId, TaskSorter, TaskSourceKind, TasksSchemaProperties, USER_TASKS_GROUP_KEY } from '../common/tasks.js';
-import { ChatAgentLocation, ChatModeKind } from '../../chat/common/constants.js';
 import { CustomExecutionSupportedContext, ICustomizationProperties, IProblemMatcherRunOptions, ITaskFilter, ITaskProvider, ITaskService, IWorkspaceFolderTaskResult, ProcessExecutionSupportedContext, ServerlessWebContext, ShellExecutionSupportedContext, TaskCommandsRegistered, TaskExecutionSupportedContext, TasksAvailableContext } from '../common/taskService.js';
 import { ITaskExecuteResult, ITaskResolver, ITaskSummary, ITaskSystem, ITaskSystemInfo, ITaskTerminateResponse, TaskError, TaskErrors, TaskExecuteKind, Triggers, VerifiedTask } from '../common/taskSystem.js';
 import { getTemplates as getTaskTemplates } from '../common/taskTemplates.js';
@@ -85,9 +84,6 @@ import { IPathService } from '../../../services/path/common/pathService.js';
 import { IPreferencesService } from '../../../services/preferences/common/preferences.js';
 import { IRemoteAgentService } from '../../../services/remote/common/remoteAgentService.js';
 import { IViewsService } from '../../../services/views/common/viewsService.js';
-import { CHAT_OPEN_ACTION_ID } from '../../chat/browser/actions/chatActions.js';
-import { IChatAgentService } from '../../chat/common/participants/chatAgents.js';
-import { IChatService } from '../../chat/common/chatService/chatService.js';
 import { configureTaskIcon, isWorkspaceFolder, ITaskQuickPickEntry, QUICKOPEN_DETAIL_CONFIG, QUICKOPEN_SKIP_CONFIG, TaskQuickPick } from './taskQuickPick.js';
 import { IHostService } from '../../../services/host/browser/host.js';
 import * as dom from '../../../../base/browser/dom.js';
@@ -296,8 +292,6 @@ export abstract class AbstractTaskService extends Disposable implements ITaskSer
 		@ILifecycleService private readonly _lifecycleService: ILifecycleService,
 		@IRemoteAgentService remoteAgentService: IRemoteAgentService,
 		@IInstantiationService private readonly _instantiationService: IInstantiationService,
-		@IChatService private readonly _chatService: IChatService,
-		@IChatAgentService private readonly _chatAgentService: IChatAgentService,
 		@IHostService private readonly _hostService: IHostService
 	) {
 		super();
@@ -511,9 +505,6 @@ export abstract class AbstractTaskService extends Disposable implements ITaskSer
 		}
 
 		const taskRunSource = this._taskRunSources.get(event.taskId);
-		if (taskRunSource === TaskRunSource.ChatAgent) {
-			return;
-		}
 
 		const terminalForTask = this._terminalService.instances.find(i => i.instanceId === event.terminalId);
 		if (!terminalForTask) {
@@ -797,43 +788,14 @@ export abstract class AbstractTaskService extends Disposable implements ITaskSer
 			if (userRequested) {
 				this._outputService.showChannel(this._outputChannel.id, true);
 			} else {
-				const chatEnabled = this._chatService.isEnabled(ChatAgentLocation.Chat);
 				const actions = [];
-				if (chatEnabled && errorMessage) {
-					const beforeJSONregex = /^(.*?)\s*\{[\s\S]*$/;
-					const matches = errorMessage.match(beforeJSONregex);
-					if (matches && matches.length > 1) {
-						const message = matches[1];
-						const customMessage = message === errorMessage
-							? `\`${message}\``
-							: `\`${message}\`\n\`\`\`json${errorMessage}\`\`\``;
-
-
-						const defaultAgent = this._chatAgentService.getDefaultAgent(ChatAgentLocation.Chat);
-						if (defaultAgent) {
-							actions.push({
-								label: nls.localize('troubleshootWithChat', "Fix with AI"),
-								run: async () => {
-									this._commandService.executeCommand(CHAT_OPEN_ACTION_ID, {
-										mode: ChatModeKind.Agent,
-										query: `Fix this task configuration error: ${customMessage}`
-									});
-								}
-							});
-						}
-					}
-				}
 				actions.push({
 					label: nls.localize('showOutput', "Show Output"),
 					run: () => {
 						this._outputService.showChannel(this._outputChannel.id, true);
 					}
 				});
-				if (chatEnabled && actions.length > 1) {
-					this._notificationService.prompt(Severity.Warning, nls.localize('taskServiceOutputPromptChat', 'There are task errors. Use chat to fix them or view the output for details.'), actions);
-				} else {
-					this._notificationService.prompt(Severity.Warning, nls.localize('taskServiceOutputPrompt', 'There are task errors. See the output for details.'), actions);
-				}
+				this._notificationService.prompt(Severity.Warning, nls.localize('taskServiceOutputPrompt', 'There are task errors. See the output for details.'), actions);
 			}
 		}
 	}

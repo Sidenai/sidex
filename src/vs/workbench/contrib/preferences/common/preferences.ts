@@ -12,7 +12,6 @@ import { RawContextKey } from '../../../../platform/contextkey/common/contextkey
 import { IExtensionGalleryService, IGalleryExtension } from '../../../../platform/extensionManagement/common/extensionManagement.js';
 import { createDecorator } from '../../../../platform/instantiation/common/instantiation.js';
 import { IProductService } from '../../../../platform/product/common/productService.js';
-import { IChatEntitlementService } from '../../../services/chat/common/chatEntitlementService.js';
 import { ISearchResult, ISettingsEditorModel } from '../../../services/preferences/common/preferences.js';
 
 export interface IWorkbenchSettingsConfiguration {
@@ -134,7 +133,6 @@ export type ExtensionToggleData = {
 let cachedExtensionToggleData: ExtensionToggleData | undefined;
 
 export async function getExperimentalExtensionToggleData(
-	chatEntitlementService: IChatEntitlementService,
 	extensionGalleryService: IExtensionGalleryService,
 	productService: IProductService,
 ): Promise<ExtensionToggleData | undefined> {
@@ -143,10 +141,6 @@ export async function getExperimentalExtensionToggleData(
 	}
 
 	if (!extensionGalleryService.isEnabled()) {
-		return undefined;
-	}
-
-	if (chatEntitlementService.sentiment.hidden || chatEntitlementService.sentiment.disabled) {
 		return undefined;
 	}
 

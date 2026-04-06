@@ -4,6 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { CancellationToken } from './cancellation.js';
+import { createWasmTfIdfEngine, type WasmTfIdfEngine } from './tfIdfWasm.js';
 
 type SparseEmbedding = Record</* word */ string, /* weight */number>;
 type TermFrequencies = Map</* word */ string, /*occurrences*/ number>;
@@ -50,7 +51,17 @@ export interface NormalizedTfIdfScore {
  * by taking the max score over all the chunks in the document.
  */
 export class TfIdfCalculator {
+	private wasmEngine: WasmTfIdfEngine | null = null;
+
+	constructor() {
+		this.wasmEngine = createWasmTfIdfEngine();
+	}
+
 	calculateScores(query: string, token: CancellationToken): TfIdfScore[] {
+		if (this.wasmEngine && !token.isCancellationRequested) {
+			return this.wasmEngine.calculateScores(query);
+		}
+
 		const embedding = this.computeEmbedding(query);
 		const idfCache = new Map<string, number>();
 		const scores: TfIdfScore[] = [];
@@ -117,6 +128,10 @@ export class TfIdfCalculator {
 		}
 
 		for (const doc of documents) {
+			if (this.wasmEngine) {
+				this.wasmEngine.updateDocument(doc.key, doc.textChunks.slice());
+			}
+
 			const chunks: Array<{ text: string; tf: TermFrequencies }> = [];
 			for (const text of doc.textChunks) {
 				// TODO: See if we can compute the tf lazily
@@ -143,6 +158,10 @@ export class TfIdfCalculator {
 		const doc = this.documents.get(key);
 		if (!doc) {
 			return;
+		}
+
+		if (this.wasmEngine) {
+			this.wasmEngine.deleteDocument(key);
 		}
 
 		this.documents.delete(key);

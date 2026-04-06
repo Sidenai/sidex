@@ -217,15 +217,22 @@ class CommandCenterCenterViewItem extends BaseActionViewItem {
 
 						private _getLabel(): string {
 							const { prefix, suffix } = that._windowTitle.getTitleDecorations();
-							let label = that._windowTitle.workspaceName;
+							const fileName = that._windowTitle.fileName;
+							const workspaceName = that._windowTitle.workspaceName;
+
+							let label: string;
 							if (that._windowTitle.isCustomTitleFormat()) {
 								label = that._windowTitle.getWindowTitle();
-							} else if (that._editorGroupService.partOptions.showTabs === 'none') {
-								label = that._windowTitle.fileName ?? label;
-							}
-							if (!label) {
+							} else if (fileName && workspaceName) {
+								label = `${fileName} \u2014 ${workspaceName}`;
+							} else if (fileName) {
+								label = fileName;
+							} else if (workspaceName) {
+								label = workspaceName;
+							} else {
 								label = localize('label.dfl', "Search");
 							}
+
 							if (prefix) {
 								label = localize('label1', "{0} {1}", prefix, label);
 							}

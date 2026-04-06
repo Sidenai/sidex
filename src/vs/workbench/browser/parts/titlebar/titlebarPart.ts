@@ -476,7 +476,8 @@ export class BrowserTitlebarPart extends Part implements ITitlebarPart {
 			!this.isAuxiliary &&
 			!hasNativeMenu(this.configurationService, this.titleBarStyle) &&
 			(!isMacintosh || isWeb) &&
-			this.currentMenubarVisibility !== 'compact'
+			this.currentMenubarVisibility !== 'compact' &&
+			this.currentMenubarVisibility !== 'hidden'
 		) {
 			this.installMenubar();
 		}

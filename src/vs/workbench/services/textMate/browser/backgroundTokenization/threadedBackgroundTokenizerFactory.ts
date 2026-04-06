@@ -131,7 +131,8 @@ export class ThreadedBackgroundTokenizerFactory implements IDisposable {
 
 	private async _createWorkerProxy(): Promise<Proxied<TextMateTokenizationWorker> | null> {
 		// In SideX / web builds, use the public directory copy of onig.wasm
-		const onigurumaWASMUri = isWeb
+		const isTauri = typeof (globalThis as any).__TAURI_INTERNALS__ !== 'undefined';
+		const onigurumaWASMUri = (isWeb || isTauri)
 			? new URL('/onig.wasm', globalThis.location?.origin ?? '').href
 			: (() => {
 				const onigurumaModuleLocation: AppResourcePath = `${nodeModulesPath}/vscode-oniguruma`;

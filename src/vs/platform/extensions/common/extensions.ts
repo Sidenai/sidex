@@ -169,43 +169,6 @@ export interface ILocalizationContribution {
 	minimalTranslations?: { [key: string]: string };
 }
 
-export interface IChatParticipantContribution {
-	id: string;
-	name: string;
-	fullName: string;
-	description?: string;
-	isDefault?: boolean;
-	commands?: { name: string }[];
-}
-
-export interface IToolContribution {
-	name: string;
-	displayName: string;
-	modelDescription: string;
-	userDescription?: string;
-}
-
-export interface IToolSetContribution {
-	name: string;
-	referenceName: string;
-	description: string;
-	icon?: string;
-	tools: string[];
-}
-
-export interface IMcpCollectionContribution {
-	readonly id: string;
-	readonly label: string;
-	readonly when?: string;
-}
-
-export interface IChatFileContribution {
-	readonly path: string;
-	readonly name?: string;
-	readonly description?: string;
-	readonly when?: string;
-}
-
 export interface IExtensionContributions {
 	commands?: ICommand[];
 	configuration?: any;
@@ -232,15 +195,6 @@ export interface IExtensionContributions {
 	readonly notebooks?: INotebookEntry[];
 	readonly notebookRenderer?: INotebookRendererContribution[];
 	readonly debugVisualizers?: IDebugVisualizationContribution[];
-	readonly chatParticipants?: ReadonlyArray<IChatParticipantContribution>;
-	readonly chatPromptFiles?: ReadonlyArray<IChatFileContribution>;
-	readonly chatInstructions?: ReadonlyArray<IChatFileContribution>;
-	readonly chatAgents?: ReadonlyArray<IChatFileContribution>;
-	readonly chatSkills?: ReadonlyArray<IChatFileContribution>;
-	readonly chatPlugins?: ReadonlyArray<IChatFileContribution>;
-	readonly languageModelTools?: ReadonlyArray<IToolContribution>;
-	readonly languageModelToolSets?: ReadonlyArray<IToolSetContribution>;
-	readonly mcpServerDefinitionProviders?: ReadonlyArray<IMcpCollectionContribution>;
 }
 
 export interface IExtensionCapabilities {
@@ -274,9 +228,7 @@ export interface IExtensionIdentifier {
 }
 
 export const EXTENSION_CATEGORIES = [
-	'AI',
 	'Azure',
-	'Chat',
 	'Data Science',
 	'Debuggers',
 	'Extension Packs',

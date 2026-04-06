@@ -89,11 +89,10 @@ export class BrowserWorkspacesService extends Disposable implements IWorkspacesS
 			const recentlyOpened = restoreRecentlyOpened(JSON.parse(recentlyOpenedRaw), this.logService);
 			recentlyOpened.workspaces = recentlyOpened.workspaces.filter(recent => {
 
-				// In web, unless we are in a temporary workspace, we cannot support
-				// to switch to local folders because this would require a window
-				// reload and local file access only works with explicit user gesture
-				// from the current session.
-				if (isRecentFolder(recent) && recent.folderUri.scheme === Schemas.file && !isTemporaryWorkspace(this.contextService.getWorkspace())) {
+				// In web (non-Tauri), we cannot switch to local folders because
+				// this would require a window reload and local file access only
+				// works with explicit user gesture from the current session.
+				if (!(globalThis as any).__SIDEX_TAURI__ && isRecentFolder(recent) && recent.folderUri.scheme === Schemas.file && !isTemporaryWorkspace(this.contextService.getWorkspace())) {
 					return false;
 				}
 

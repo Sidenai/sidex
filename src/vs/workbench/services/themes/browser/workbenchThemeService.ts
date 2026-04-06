@@ -509,7 +509,11 @@ export class WorkbenchThemeService extends Disposable implements IWorkbenchTheme
 			themeData.setCustomizations(this.settings);
 			return this.applyTheme(themeData, settingsTarget);
 		} catch (error) {
-			throw new Error(nls.localize('error.cannotloadtheme', "Unable to load {0}: {1}", themeData.location?.toString(), error.message));
+			const msg: string = error?.message ?? '';
+			if (msg.includes('Load failed') || msg.includes('NetworkError') || msg.includes('aborted') || error?.name === 'AbortError') {
+				return null;
+			}
+			throw new Error(nls.localize('error.cannotloadtheme', "Unable to load {0}: {1}", themeData.location?.toString(), msg));
 		}
 
 	}

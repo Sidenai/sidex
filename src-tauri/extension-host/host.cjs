@@ -769,7 +769,12 @@ function createVscodeShim() {
       return Promise.resolve(host._makeDocumentProxy('file:///untitled'));
     },
     findFiles: () => Promise.resolve([]),
-    applyEdit: () => Promise.resolve(true),
+    applyEdit: (edit) => {
+      if (edit && edit._edits) {
+        host.emit('event', { type: 'applyEdit', edits: edit._edits.map(e => ({ uri: e.uri?.toString(), range: e.range, newText: e.newText })) });
+      }
+      return Promise.resolve(true);
+    },
     saveAll: () => Promise.resolve(true),
     updateWorkspaceFolders: () => false,
     registerTextDocumentContentProvider: () => noopDisposable,
@@ -780,9 +785,30 @@ function createVscodeShim() {
   };
 
   const window = {
-    showInformationMessage(msg, ...rest) { log(`[info] ${msg}`); host.emit('event', { type: 'showMessage', severity: 'info', message: msg }); return Promise.resolve(rest.length && typeof rest[rest.length - 1] === 'object' ? rest[rest.length - 1] : undefined); },
-    showWarningMessage(msg, ...rest) { log(`[warn] ${msg}`); host.emit('event', { type: 'showMessage', severity: 'warning', message: msg }); return Promise.resolve(undefined); },
-    showErrorMessage(msg, ...rest) { log(`[error] ${msg}`); host.emit('event', { type: 'showMessage', severity: 'error', message: msg }); return Promise.resolve(undefined); },
+    showInformationMessage(msg, ...rest) {
+      log(`[info] ${msg}`);
+      host.emit('event', { type: 'showMessage', severity: 'info', message: msg });
+      const items = rest.filter(r => typeof r === 'string' || (typeof r === 'object' && r !== null));
+      if (items.length) {
+        return new Promise((resolve) => {
+          const reqId = ++host._reqId;
+          host._pendingRequests.set(reqId, resolve);
+          host.emit('event', { type: 'showMessageRequest', id: reqId, severity: 'info', message: msg, items: items.map(i => typeof i === 'string' ? i : i.title) });
+          setTimeout(() => { if (host._pendingRequests.has(reqId)) { host._pendingRequests.delete(reqId); resolve(undefined); } }, 30000);
+        });
+      }
+      return Promise.resolve(undefined);
+    },
+    showWarningMessage(msg, ...rest) {
+      log(`[warn] ${msg}`);
+      host.emit('event', { type: 'showMessage', severity: 'warning', message: msg });
+      return Promise.resolve(undefined);
+    },
+    showErrorMessage(msg, ...rest) {
+      log(`[error] ${msg}`);
+      host.emit('event', { type: 'showMessage', severity: 'error', message: msg });
+      return Promise.resolve(undefined);
+    },
     createOutputChannel(name, opts) {
       const ch = { name, _lines: [], append(s) { this._lines.push(s); }, appendLine(line) { log(`[${name}] ${line}`); this._lines.push(line + '\n'); }, clear() { this._lines = []; }, show() {}, hide() {}, replace(s) { this._lines = [s]; }, dispose() { host._outputChannels.delete(name); } };
       if (typeof opts === 'object' && opts.log) { ch.trace = ch.debug = ch.info = ch.warn = ch.error = (msg) => ch.appendLine(msg); }
@@ -790,8 +816,23 @@ function createVscodeShim() {
       return ch;
     },
     createStatusBarItem(alignmentOrId, priorityOrAlignment, priorityArg) { return { id: '', text: '', tooltip: '', command: '', alignment: 1, priority: 0, name: '', backgroundColor: undefined, color: undefined, accessibilityInformation: undefined, show() {}, hide() {}, dispose() {} }; },
-    showQuickPick: () => Promise.resolve(undefined),
-    showInputBox: () => Promise.resolve(undefined),
+    showQuickPick(items, options) {
+      return new Promise((resolve) => {
+        const reqId = ++host._reqId;
+        host._pendingRequests.set(reqId, resolve);
+        const labels = Array.isArray(items) ? items.map(i => typeof i === 'string' ? i : i.label) : [];
+        host.emit('event', { type: 'showQuickPick', id: reqId, items: labels, options: options || {} });
+        setTimeout(() => { if (host._pendingRequests.has(reqId)) { host._pendingRequests.delete(reqId); resolve(undefined); } }, 60000);
+      });
+    },
+    showInputBox(options) {
+      return new Promise((resolve) => {
+        const reqId = ++host._reqId;
+        host._pendingRequests.set(reqId, resolve);
+        host.emit('event', { type: 'showInputBox', id: reqId, options: options || {} });
+        setTimeout(() => { if (host._pendingRequests.has(reqId)) { host._pendingRequests.delete(reqId); resolve(undefined); } }, 60000);
+      });
+    },
     showOpenDialog: () => Promise.resolve(undefined),
     showSaveDialog: () => Promise.resolve(undefined),
     get activeTextEditor() { return undefined; },

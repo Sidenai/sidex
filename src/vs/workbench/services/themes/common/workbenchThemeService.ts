@@ -39,8 +39,8 @@ export enum ThemeSettings {
 }
 
 export namespace ThemeSettingDefaults {
-	export const COLOR_THEME_DARK = 'SideX Monochrome Dark';
-	export const COLOR_THEME_LIGHT = 'Light 2026';
+	export const COLOR_THEME_DARK = 'Dark Modern';
+	export const COLOR_THEME_LIGHT = 'Light Modern';
 	export const COLOR_THEME_HC_DARK = 'Default High Contrast';
 	export const COLOR_THEME_HC_LIGHT = 'Default High Contrast Light';
 
@@ -55,6 +55,8 @@ export namespace ThemeSettingDefaults {
  */
 export function migrateThemeSettingsId(settingsId: string): string {
 	switch (settingsId) {
+		case 'SideX Monochrome Dark': return 'Dark Modern';
+		case 'Light 2026': return 'Light Modern';
 		case 'Default Dark Modern': return 'Dark Modern';
 		case 'Default Light Modern': return 'Light Modern';
 		case 'Default Dark+': return 'Dark+';
