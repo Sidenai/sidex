@@ -240,6 +240,8 @@ jobs:
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
         run: |
           VERSION="${{ github.event.inputs.version || github.ref_name }}"
+          aws s3 sync all-artifacts/ \
+            "s3://siden-assets/releases/sidex/${VERSION}/" \
             --endpoint-url "https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com" \
             --delete
 
