@@ -208,6 +208,330 @@ interface common-types {
         ctime: u64,
         mtime: u64,
     }
+
+    // -- Window / UI types --
+    record input-box-options {
+        title: option<string>,
+        prompt: option<string>,
+        placeholder: option<string>,
+        value: option<string>,
+        password: bool,
+        ignore-focus-out: bool,
+    }
+
+    record quick-pick-item {
+        label: string,
+        description: option<string>,
+        detail: option<string>,
+        picked: bool,
+        always-show: bool,
+    }
+
+    record quick-pick-options {
+        title: option<string>,
+        placeholder: option<string>,
+        can-pick-many: bool,
+        ignore-focus-out: bool,
+        match-on-description: bool,
+        match-on-detail: bool,
+    }
+
+    record open-dialog-options {
+        title: option<string>,
+        default-uri: option<string>,
+        open-label: option<string>,
+        can-select-files: bool,
+        can-select-folders: bool,
+        can-select-many: bool,
+        filters: list<file-filter>,
+    }
+
+    record save-dialog-options {
+        title: option<string>,
+        default-uri: option<string>,
+        save-label: option<string>,
+        filters: list<file-filter>,
+    }
+
+    record file-filter {
+        name: string,
+        extensions: list<string>,
+    }
+
+    record progress-options {
+        location: progress-location,
+        title: option<string>,
+        cancellable: bool,
+    }
+
+    enum progress-location {
+        source-control,
+        window,
+        notification,
+    }
+
+    record notification-action {
+        title: string,
+        is-close-affordance: bool,
+    }
+
+    // -- Editor / decoration types --
+    record decoration-render-options {
+        background-color: option<string>,
+        outline-color: option<string>,
+        outline-style: option<string>,
+        outline-width: option<string>,
+        border-color: option<string>,
+        border-radius: option<string>,
+        border-spacing: option<string>,
+        border-style: option<string>,
+        border-width: option<string>,
+        font-style: option<string>,
+        font-weight: option<string>,
+        text-decoration: option<string>,
+        cursor: option<string>,
+        color: option<string>,
+        letter-spacing: option<string>,
+        gutter-icon-path: option<string>,
+        gutter-icon-size: option<string>,
+        overview-ruler-color: option<string>,
+        before: option<decoration-attachment>,
+        after: option<decoration-attachment>,
+    }
+
+    record decoration-attachment {
+        content-text: option<string>,
+        color: option<string>,
+        background-color: option<string>,
+        margin: option<string>,
+        width: option<string>,
+        height: option<string>,
+    }
+
+    record decoration-instance {
+        range: range,
+        hover-message: option<string>,
+        render-options: option<decoration-render-options>,
+    }
+
+    // -- SCM types --
+    record scm-resource {
+        uri: string,
+        state: scm-resource-state,
+        decorations: option<scm-decorations>,
+    }
+
+    enum scm-resource-state {
+        index-added,
+        index-modified,
+        index-deleted,
+        index-renamed,
+        index-copied,
+        working-tree-modified,
+        working-tree-deleted,
+        working-tree-new,
+        working-tree-renamed,
+        untracked,
+        ignored,
+        conflicting,
+    }
+
+    record scm-decorations {
+        strikethrough: bool,
+        faded: bool,
+        tooltip: option<string>,
+        color: option<string>,
+        badge: option<string>,
+    }
+
+    // -- Task types --
+    record task-definition {
+        task-type: string,
+        required: list<string>,
+        properties: list<task-property>,
+    }
+
+    record task-property {
+        name: string,
+        description: option<string>,
+        default-value: option<string>,
+    }
+
+    record task-execution {
+        id: string,
+        name: string,
+        source: string,
+        detail: option<string>,
+        is-background: bool,
+        kind: task-kind,
+        command: option<string>,
+        args: list<string>,
+    }
+
+    enum task-kind {
+        shell,
+        process,
+        custom,
+    }
+
+    // -- Debug types --
+    record debug-session-options {
+        name: string,
+        request-type: string,
+        debug-type: string,
+        args: list<string>,
+        env: list<tuple<string, string>>,
+        program: option<string>,
+        stop-at-entry: bool,
+    }
+
+    record breakpoint {
+        id: string,
+        enabled: bool,
+        condition: option<string>,
+        hit-condition: option<string>,
+        log-message: option<string>,
+    }
+
+    record source-breakpoint {
+        bp: breakpoint,
+        uri: string,
+        line: u32,
+        character: option<u32>,
+    }
+
+    // -- Notebook types --
+    record notebook-cell {
+        index: u32,
+        kind: notebook-cell-kind,
+        language-id: string,
+        value: string,
+        metadata: list<tuple<string, string>>,
+    }
+
+    enum notebook-cell-kind {
+        markup,
+        code,
+    }
+
+    record notebook-cell-output {
+        items: list<notebook-cell-output-item>,
+    }
+
+    record notebook-cell-output-item {
+        mime: string,
+        data: list<u8>,
+    }
+
+    // -- Test types --
+    record test-item {
+        id: string,
+        label: string,
+        uri: option<string>,
+        can-resolve-children: bool,
+        description: option<string>,
+        sort-text: option<string>,
+        tags: list<string>,
+        range: option<range>,
+    }
+
+    enum test-result-state {
+        queued,
+        running,
+        passed,
+        failed,
+        errored,
+        skipped,
+    }
+
+    record test-result {
+        id: string,
+        state: test-result-state,
+        message: option<string>,
+        duration: option<u64>,
+    }
+
+    // -- Env / window state --
+    record window-state {
+        focused: bool,
+    }
+
+    record text-document-save-reason {
+        kind: save-reason-kind,
+    }
+
+    enum save-reason-kind {
+        manual,
+        after-delay,
+        focus-out,
+    }
+
+    // -- Workspace edit (extended) --
+    record create-file-options {
+        overwrite: bool,
+        ignore-if-exists: bool,
+    }
+
+    record delete-file-options {
+        recursive: bool,
+        ignore-if-not-exists: bool,
+    }
+
+    record rename-file-options {
+        overwrite: bool,
+        ignore-if-exists: bool,
+    }
+
+    record workspace-edit-entry {
+        kind: workspace-edit-kind,
+        uri: string,
+        new-uri: option<string>,
+        edits: list<text-edit>,
+        create-options: option<create-file-options>,
+        delete-options: option<delete-file-options>,
+        rename-options: option<rename-file-options>,
+    }
+
+    enum workspace-edit-kind {
+        text-edit,
+        create-file,
+        delete-file,
+        rename-file,
+    }
+
+    // -- Language config --
+    record language-configuration {
+        language-id: string,
+        comments: option<comment-rule>,
+        brackets: list<bracket-pair>,
+        word-pattern: option<string>,
+        indent-rules: option<indent-rules-definition>,
+        on-enter-rules: list<on-enter-rule>,
+    }
+
+    record comment-rule {
+        line: option<string>,
+        block-start: option<string>,
+        block-end: option<string>,
+    }
+
+    record bracket-pair {
+        open: string,
+        close: string,
+    }
+
+    record indent-rules-definition {
+        increase-indent-pattern: string,
+        decrease-indent-pattern: string,
+    }
+
+    record on-enter-rule {
+        before-text: string,
+        after-text: option<string>,
+        action-indent-action: u32,
+        action-append-text: option<string>,
+        action-remove-text: option<string>,
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -219,6 +543,16 @@ interface host-api {
         position, range, location, text-edit, diagnostic, diagnostic-severity,
         document-context, command-definition, tree-item, status-bar-item,
         file-event, file-stat, workspace-edit, resource-text-edit,
+        input-box-options, quick-pick-item, quick-pick-options,
+        open-dialog-options, save-dialog-options,
+        progress-options, notification-action,
+        decoration-render-options, decoration-instance,
+        scm-resource, task-execution, task-definition,
+        debug-session-options, breakpoint, source-breakpoint,
+        notebook-cell, notebook-cell-output,
+        test-item, test-result,
+        window-state, language-configuration,
+        workspace-edit-entry,
     };
 
     // -- Logging & output --
@@ -228,43 +562,201 @@ interface host-api {
     show-info-message: func(message: string);
     show-warn-message: func(message: string);
     show-error-message: func(message: string);
+    show-info-message-with-actions: func(message: string, actions: list<notification-action>) -> option<string>;
+    show-warn-message-with-actions: func(message: string, actions: list<notification-action>) -> option<string>;
+    show-error-message-with-actions: func(message: string, actions: list<notification-action>) -> option<string>;
     output-channel-append: func(channel: string, text: string);
+    output-channel-append-line: func(channel: string, text: string);
+    output-channel-clear: func(channel: string);
+    output-channel-show: func(channel: string, preserve-focus: bool);
 
     // -- Diagnostics --
     publish-diagnostics: func(uri: string, diagnostics: list<diagnostic>);
     clear-diagnostics: func(uri: string);
+    clear-all-diagnostics: func();
 
     // -- Workspace --
     get-workspace-folders: func() -> list<string>;
+    get-workspace-name: func() -> option<string>;
     get-configuration: func(section: string, key: string) -> option<string>;
+    get-configuration-section: func(section: string) -> list<tuple<string, string>>;
+    update-configuration: func(section: string, key: string, value: string, global: bool) -> result<_, string>;
     find-files: func(pattern: string, max-results: u32) -> list<string>;
+    find-files-with-exclude: func(include-pattern: string, exclude-pattern: string, max-results: u32) -> list<string>;
+    open-text-document: func(uri: string) -> result<string, string>;
+    open-text-document-with-content: func(content: string, language-id: string) -> result<string, string>;
+    save-text-document: func(uri: string) -> result<bool, string>;
+    save-all-text-documents: func() -> result<bool, string>;
+    apply-workspace-edit-entries: func(entries: list<workspace-edit-entry>) -> result<bool, string>;
+    create-file-system-watcher: func(glob-pattern: string) -> result<u64, string>;
+    on-did-create-files: func(uris: list<string>);
+    on-did-rename-files: func(old-uris: list<string>, new-uris: list<string>);
+    on-did-delete-files: func(uris: list<string>);
+    get-workspace-state: func(key: string) -> option<string>;
+    set-workspace-state: func(key: string, value: string) -> result<_, string>;
+    get-global-state: func(key: string) -> option<string>;
+    set-global-state: func(key: string, value: string) -> result<_, string>;
 
     // -- File system (sandboxed to workspace) --
     read-file: func(uri: string) -> result<string, string>;
     read-file-bytes: func(uri: string) -> result<list<u8>, string>;
     write-file: func(uri: string, content: string) -> result<_, string>;
+    write-file-bytes: func(uri: string, content: list<u8>) -> result<_, string>;
+    delete-file: func(uri: string, recursive: bool) -> result<_, string>;
+    rename-file: func(old-uri: string, new-uri: string, overwrite: bool) -> result<_, string>;
+    copy-file: func(source: string, dest: string, overwrite: bool) -> result<_, string>;
+    create-directory: func(uri: string) -> result<_, string>;
     stat-file: func(uri: string) -> result<file-stat, string>;
     list-dir: func(uri: string) -> result<list<string>, string>;
+    list-dir-with-types: func(uri: string) -> result<list<tuple<string, u32>>, string>;
 
     // -- Document access --
     get-document-text: func(uri: string) -> option<string>;
     get-document-language: func(uri: string) -> option<string>;
+    get-document-version: func(uri: string) -> option<u32>;
+    get-document-line-count: func(uri: string) -> option<u32>;
+    get-document-is-dirty: func(uri: string) -> bool;
+    get-document-is-untitled: func(uri: string) -> bool;
+    get-all-open-document-uris: func() -> list<string>;
 
-    // -- Commands --
-    register-command: func(id: string);
-    execute-command: func(id: string, args: string) -> result<string, string>;
+    // -- Window / editor --
+    get-active-text-editor-uri: func() -> option<string>;
+    get-active-text-editor-selection: func() -> option<range>;
+    get-active-text-editor-selections: func() -> list<range>;
+    get-active-text-editor-visible-ranges: func() -> list<range>;
+    get-active-text-editor-language-id: func() -> option<string>;
+    get-active-text-editor-view-column: func() -> option<u32>;
+    get-visible-text-editors: func() -> list<string>;
+    set-text-editor-selection: func(uri: string, selection: range) -> result<_, string>;
+    set-text-editor-selections: func(uri: string, selections: list<range>) -> result<_, string>;
+    reveal-range: func(uri: string, r: range, reveal-type: u32) -> result<_, string>;
+    insert-snippet: func(uri: string, snippet: string, range: option<range>) -> result<_, string>;
 
-    // -- Editor actions --
-    apply-workspace-edit: func(edit: workspace-edit) -> result<_, string>;
-    show-text-document: func(uri: string);
+    // -- Window UI --
+    show-input-box: func(options: input-box-options) -> option<string>;
+    show-quick-pick: func(items: list<quick-pick-item>, options: quick-pick-options) -> list<quick-pick-item>;
+    show-open-dialog: func(options: open-dialog-options) -> list<string>;
+    show-save-dialog: func(options: save-dialog-options) -> option<string>;
+    set-status-bar-message: func(text: string, timeout-ms: option<u32>) -> u64;
+    clear-status-bar-message: func(handle: u64);
+    with-progress: func(options: progress-options, task-id: string);
+    report-progress: func(task-id: string, increment: option<f64>, message: option<string>);
+    complete-progress: func(task-id: string);
+    get-window-state: func() -> window-state;
+    open-external-uri: func(uri: string) -> result<bool, string>;
 
     // -- Status bar --
     set-status-bar-item: func(item: status-bar-item);
     remove-status-bar-item: func(id: string);
 
+    // -- Commands --
+    register-command: func(id: string);
+    register-text-editor-command: func(id: string);
+    unregister-command: func(id: string);
+    execute-command: func(id: string, args: string) -> result<string, string>;
+    execute-built-in-command: func(id: string, args: string) -> result<string, string>;
+    get-all-commands: func(filter-internal: bool) -> list<string>;
+
+    // -- Editor actions --
+    apply-workspace-edit: func(edit: workspace-edit) -> result<_, string>;
+    show-text-document: func(uri: string);
+    show-text-document-at: func(uri: string, range: range, preview: bool) -> result<_, string>;
+    diff-editor-open: func(original-uri: string, modified-uri: string, title: string) -> result<_, string>;
+    close-active-editor: func() -> result<_, string>;
+
+    // -- Decorations --
+    create-decoration-type: func(options: decoration-render-options) -> u64;
+    set-decorations: func(editor-uri: string, type-id: u64, decorations: list<decoration-instance>) -> result<_, string>;
+    delete-decoration-type: func(type-id: u64);
+
+    // -- Languages --
+    register-language-configuration: func(config: language-configuration) -> result<u64, string>;
+    unregister-language-configuration: func(handle: u64);
+    get-languages: func() -> list<string>;
+    change-document-language: func(uri: string, language-id: string) -> result<_, string>;
+
+    // -- SCM (source control) --
+    scm-create-source-control: func(id: string, label: string, root-uri: option<string>) -> result<u64, string>;
+    scm-dispose: func(handle: u64);
+    scm-set-count: func(handle: u64, count: u32);
+    scm-set-commit-template: func(handle: u64, template: string);
+    scm-get-input-box-value: func(handle: u64) -> string;
+    scm-set-input-box-value: func(handle: u64, value: string);
+    scm-set-resource-groups: func(handle: u64, groups: list<tuple<string, list<scm-resource>>>) -> result<_, string>;
+    scm-create-resource-group: func(handle: u64, id: string, label: string) -> result<u64, string>;
+    scm-dispose-resource-group: func(group-handle: u64);
+
+    // -- Tasks --
+    register-task-provider: func(task-type: string) -> result<u64, string>;
+    unregister-task-provider: func(handle: u64);
+    execute-task: func(task: task-execution) -> result<u64, string>;
+    terminate-task-execution: func(execution-id: u64) -> result<_, string>;
+    fetch-tasks: func(filter-type: option<string>) -> list<task-execution>;
+
+    // -- Debug --
+    register-debug-adapter-descriptor: func(debug-type: string, executable: string, args: list<string>) -> result<u64, string>;
+    unregister-debug-adapter-descriptor: func(handle: u64);
+    start-debug-session: func(options: debug-session-options) -> result<u64, string>;
+    stop-debug-session: func(session-id: u64) -> result<_, string>;
+    add-breakpoints: func(breakpoints: list<source-breakpoint>) -> result<_, string>;
+    remove-breakpoints: func(ids: list<string>) -> result<_, string>;
+    get-breakpoints: func() -> list<source-breakpoint>;
+
+    // -- Environment --
+    env-app-name: func() -> string;
+    env-app-root: func() -> string;
+    env-language: func() -> string;
+    env-machine-id: func() -> string;
+    env-session-id: func() -> string;
+    env-clipboard-read-text: func() -> result<string, string>;
+    env-clipboard-write-text: func(text: string) -> result<_, string>;
+    env-shell: func() -> option<string>;
+    env-remote-name: func() -> option<string>;
+    env-is-new-app-install: func() -> bool;
+
+    // -- Extensions --
+    get-extension-id: func() -> string;
+    get-extension-path: func() -> string;
+    get-extension-version: func() -> string;
+    get-extension-global-storage-path: func() -> string;
+    get-extension-workspace-storage-path: func() -> string;
+    get-extension-log-path: func() -> string;
+    is-extension-active: func(extension-id: string) -> bool;
+    get-extension-exports: func(extension-id: string) -> option<string>;
+    extension-storage-get: func(key: string) -> option<string>;
+    extension-storage-set: func(key: string, value: string) -> result<_, string>;
+    extension-storage-delete: func(key: string) -> result<_, string>;
+    extension-secrets-get: func(key: string) -> result<option<string>, string>;
+    extension-secrets-store: func(key: string, value: string) -> result<_, string>;
+    extension-secrets-delete: func(key: string) -> result<_, string>;
+
+    // -- Notebooks --
+    notebook-open-document: func(uri: string) -> result<u64, string>;
+    notebook-close-document: func(handle: u64) -> result<_, string>;
+    notebook-get-cells: func(handle: u64) -> list<notebook-cell>;
+    notebook-execute-cell: func(handle: u64, cell-index: u32) -> result<notebook-cell-output, string>;
+    notebook-apply-edit: func(handle: u64, cell-index: u32, new-value: string) -> result<_, string>;
+    notebook-insert-cell: func(handle: u64, index: u32, kind: u32, language-id: string, value: string) -> result<_, string>;
+    notebook-delete-cell: func(handle: u64, index: u32) -> result<_, string>;
+
+    // -- Testing --
+    test-controller-create: func(id: string, label: string) -> result<u64, string>;
+    test-controller-dispose: func(handle: u64);
+    test-controller-add-items: func(handle: u64, items: list<test-item>) -> result<_, string>;
+    test-run-create: func(controller-handle: u64, name: option<string>) -> result<u64, string>;
+    test-run-started: func(run-handle: u64, item-id: string);
+    test-run-passed: func(run-handle: u64, item-id: string, duration: option<u64>);
+    test-run-failed: func(run-handle: u64, item-id: string, message: string, duration: option<u64>);
+    test-run-errored: func(run-handle: u64, item-id: string, message: string, duration: option<u64>);
+    test-run-skipped: func(run-handle: u64, item-id: string);
+    test-run-end: func(run-handle: u64);
+
     // -- File watching --
     watch-files: func(pattern: string) -> result<u64, string>;
     unwatch-files: func(watch-id: u64);
+
+    // -- Telemetry --
+    telemetry-send-event: func(event-name: string, data: list<tuple<string, string>>);
 }
 
 // ---------------------------------------------------------------------------
@@ -279,6 +771,10 @@ interface extension-api {
         inlay-hint, color-info, selection-range, document-link,
         rename-result, rename-location, semantic-tokens, semantic-tokens-legend,
         command-definition, tree-item, file-event, diagnostic,
+        task-definition, task-execution, debug-session-options,
+        notebook-cell, notebook-cell-output, test-item, test-result,
+        decoration-render-options, language-configuration,
+        text-document-save-reason, quick-pick-item,
     };
 
     // -- Lifecycle --
@@ -287,12 +783,22 @@ interface extension-api {
 
     // -- Metadata --
     get-name: func() -> string;
+    get-display-name: func() -> string;
+    get-version: func() -> string;
+    get-publisher: func() -> string;
     get-activation-events: func() -> list<string>;
     get-commands: func() -> list<command-definition>;
     get-semantic-tokens-legend: func() -> option<semantic-tokens-legend>;
+    get-languages: func() -> list<string>;
+    get-task-types: func() -> list<task-definition>;
+    get-debug-types: func() -> list<string>;
+    get-view-ids: func() -> list<string>;
+    get-notebook-types: func() -> list<string>;
+    get-custom-editor-types: func() -> list<string>;
 
     // -- Language providers --
     provide-completion: func(ctx: document-context, pos: position) -> option<completion-list>;
+    provide-completion-item-resolve: func(label: string, kind: option<u32>, data: option<string>) -> option<completion-list>;
     provide-hover: func(ctx: document-context, pos: position) -> option<hover-result>;
     provide-definition: func(ctx: document-context, pos: position) -> list<location>;
     provide-type-definition: func(ctx: document-context, pos: position) -> list<location>;
@@ -300,31 +806,110 @@ interface extension-api {
     provide-declaration: func(ctx: document-context, pos: position) -> list<location>;
     provide-references: func(ctx: document-context, pos: position) -> list<location>;
     provide-document-symbols: func(ctx: document-context) -> list<document-symbol>;
+    provide-workspace-symbols: func(query: string) -> list<document-symbol>;
+    provide-workspace-symbol-resolve: func(symbol-name: string, container-name: option<string>) -> option<document-symbol>;
     provide-code-actions: func(ctx: document-context, range: range, diagnostics: list<diagnostic>) -> list<code-action>;
+    provide-code-action-resolve: func(title: string, kind: option<string>, data: option<string>) -> option<code-action>;
     provide-code-lenses: func(ctx: document-context) -> list<code-lens>;
+    provide-code-lens-resolve: func(range: range, command-id: option<string>, data: option<string>) -> option<code-lens>;
     provide-formatting: func(ctx: document-context, tab-size: u32, insert-spaces: bool) -> list<text-edit>;
     provide-range-formatting: func(ctx: document-context, range: range, tab-size: u32, insert-spaces: bool) -> list<text-edit>;
+    provide-on-type-formatting: func(ctx: document-context, pos: position, ch: string, tab-size: u32, insert-spaces: bool) -> list<text-edit>;
     provide-signature-help: func(ctx: document-context, pos: position) -> option<signature-help-result>;
     provide-document-highlights: func(ctx: document-context, pos: position) -> list<document-highlight>;
     provide-rename: func(ctx: document-context, pos: position, new-name: string) -> option<rename-result>;
     prepare-rename: func(ctx: document-context, pos: position) -> option<rename-location>;
     provide-folding-ranges: func(ctx: document-context) -> list<folding-range>;
     provide-inlay-hints: func(ctx: document-context, range: range) -> list<inlay-hint>;
+    provide-inlay-hint-resolve: func(position: position, label: string, kind: option<u32>) -> option<inlay-hint>;
     provide-document-links: func(ctx: document-context) -> list<document-link>;
+    provide-document-link-resolve: func(range: range, target: option<string>) -> option<document-link>;
     provide-selection-ranges: func(ctx: document-context, positions: list<position>) -> list<selection-range>;
     provide-semantic-tokens: func(ctx: document-context) -> option<semantic-tokens>;
+    provide-semantic-tokens-range: func(ctx: document-context, range: range) -> option<semantic-tokens>;
+    provide-semantic-tokens-delta: func(ctx: document-context, previous-result-id: string) -> option<semantic-tokens>;
     provide-document-colors: func(ctx: document-context) -> list<color-info>;
-    provide-workspace-symbols: func(query: string) -> list<document-symbol>;
+    provide-color-presentation: func(ctx: document-context, color: color-info, range: range) -> list<text-edit>;
+    provide-call-hierarchy-incoming: func(ctx: document-context, pos: position) -> list<document-symbol>;
+    provide-call-hierarchy-outgoing: func(ctx: document-context, pos: position) -> list<document-symbol>;
+    provide-type-hierarchy-subtypes: func(ctx: document-context, pos: position) -> list<document-symbol>;
+    provide-type-hierarchy-supertypes: func(ctx: document-context, pos: position) -> list<document-symbol>;
+    provide-linked-editing-ranges: func(ctx: document-context, pos: position) -> list<range>;
 
     // -- Commands --
     execute-command: func(command-id: string, args: string) -> result<string, string>;
 
-    // -- Events --
+    // -- Document events --
     on-file-event: func(events: list<file-event>);
-    on-configuration-changed: func(section: string);
+    on-document-opened: func(ctx: document-context);
+    on-document-closed: func(ctx: document-context);
+    on-document-changed: func(ctx: document-context, changes: list<text-edit>);
+    on-document-saved: func(ctx: document-context, reason: u32);
+    on-document-will-save: func(ctx: document-context, reason: u32) -> list<text-edit>;
+    on-document-language-changed: func(uri: string, old-language-id: string, new-language-id: string);
 
-    // -- Tree view (optional) --
+    // -- Workspace events --
+    on-configuration-changed: func(section: string);
+    on-workspace-folders-changed: func(added: list<string>, removed: list<string>);
+    on-files-created: func(uris: list<string>);
+    on-files-renamed: func(old-uris: list<string>, new-uris: list<string>);
+    on-files-deleted: func(uris: list<string>);
+    on-files-will-create: func(uris: list<string>) -> option<list<tuple<string, list<text-edit>>>>;
+    on-files-will-rename: func(old-uris: list<string>, new-uris: list<string>) -> option<list<tuple<string, list<text-edit>>>>;
+    on-files-will-delete: func(uris: list<string>) -> option<list<tuple<string, list<text-edit>>>>;
+
+    // -- Editor events --
+    on-active-editor-changed: func(uri: option<string>);
+    on-visible-editors-changed: func(uris: list<string>);
+    on-editor-selections-changed: func(uri: string, selections: list<range>);
+    on-editor-scroll-changed: func(uri: string, visible-ranges: list<range>);
+    on-editor-view-column-changed: func(uri: string, view-column: u32);
+
+    // -- Tree view --
     get-tree-children: func(view-id: string, element-id: option<string>) -> list<tree-item>;
+    get-tree-item: func(view-id: string, element-id: string) -> option<tree-item>;
+    on-tree-item-activated: func(view-id: string, element-id: string);
+    on-tree-visibility-changed: func(view-id: string, visible: bool);
+
+    // -- Tasks --
+    provide-tasks: func(filter-type: option<string>) -> list<task-execution>;
+    resolve-task: func(task-id: string, task-type: string) -> option<task-execution>;
+    on-task-started: func(execution: task-execution);
+    on-task-ended: func(execution: task-execution, exit-code: option<s32>);
+    on-task-process-started: func(execution: task-execution, pid: u32);
+    on-task-process-ended: func(execution: task-execution, exit-code: option<s32>);
+
+    // -- Debug --
+    create-debug-adapter-descriptor: func(debug-type: string, executable: string, args: list<string>) -> result<string, string>;
+    on-debug-session-started: func(session-id: string, session-name: string, debug-type: string);
+    on-debug-session-stopped: func(session-id: string);
+    on-debug-breakpoints-changed: func(added: list<string>, removed: list<string>, changed: list<string>);
+
+    // -- Notebooks --
+    provide-notebook-serializer-deserialize: func(notebook-type: string, data: list<u8>) -> result<list<notebook-cell>, string>;
+    provide-notebook-serializer-serialize: func(notebook-type: string, cells: list<notebook-cell>) -> result<list<u8>, string>;
+    provide-notebook-kernel-execute-all: func(notebook-uri: string, cells: list<notebook-cell>) -> list<notebook-cell-output>;
+    provide-notebook-kernel-execute-cell: func(notebook-uri: string, cell-index: u32, cell: notebook-cell) -> notebook-cell-output;
+    provide-notebook-kernel-interrupt: func(notebook-uri: string);
+
+    // -- Testing --
+    provide-tests-resolve-children: func(controller-id: string, item-id: option<string>) -> list<test-item>;
+    provide-tests-run: func(controller-id: string, run-id: string, items-to-run: list<string>, items-to-exclude: list<string>);
+    provide-tests-debug: func(controller-id: string, run-id: string, items-to-run: list<string>, items-to-exclude: list<string>);
+    provide-tests-cancel-run: func(controller-id: string, run-id: string);
+
+    // -- Custom editors --
+    custom-editor-open: func(editor-type: string, uri: string, view-column: u32) -> result<string, string>;
+    custom-editor-update: func(editor-id: string, changes: list<text-edit>) -> result<_, string>;
+    custom-editor-save: func(editor-id: string) -> result<_, string>;
+    custom-editor-save-as: func(editor-id: string, destination-uri: string) -> result<_, string>;
+    custom-editor-revert: func(editor-id: string) -> result<_, string>;
+    custom-editor-dispose: func(editor-id: string);
+
+    // -- Webview --
+    webview-receive-message: func(panel-id: string, message: string);
+    on-webview-disposed: func(panel-id: string);
+    on-webview-visibility-changed: func(panel-id: string, visible: bool);
 }
 
 // ---------------------------------------------------------------------------

@@ -393,7 +393,7 @@ pub fn run() {
         .manage(Arc::new(LoggerStore::new()))
         .manage(ExtensionPlatformSupervisor::new())
         .manage(ExtensionDiagnosticsStore::new())
-        .manage(std::sync::Arc::new(
+        .manage(Arc::new(
             WasmExtensionRuntime::new().expect("failed to initialize WASM runtime"),
         ))
         .setup(|app| {
@@ -406,12 +406,10 @@ pub fn run() {
             let db = StorageDb::new(db_path.to_str().unwrap())
                 .expect("failed to initialize storage database");
 
-            // Restore window position/size before showing — zero flicker
             restore_and_show(app, &db);
 
             app.manage(Arc::new(db));
 
-            // Set app handle for stores to enable event emission
             let process_store = app.state::<Arc<ProcessStore>>();
             process_store.set_app_handle(app.handle().clone());
 
@@ -591,6 +589,30 @@ pub fn run() {
             commands::wasm_provide_definition_all,
             commands::wasm_provide_document_symbols_all,
             commands::wasm_provide_formatting_all,
+            commands::wasm_provide_type_definition_all,
+            commands::wasm_provide_implementation_all,
+            commands::wasm_provide_declaration_all,
+            commands::wasm_provide_code_actions_all,
+            commands::wasm_provide_code_lenses_all,
+            commands::wasm_provide_signature_help_all,
+            commands::wasm_provide_document_highlights_all,
+            commands::wasm_provide_rename_all,
+            commands::wasm_provide_folding_ranges_all,
+            commands::wasm_provide_inlay_hints_all,
+            commands::wasm_provide_document_links_all,
+            commands::wasm_provide_selection_ranges_all,
+            commands::wasm_provide_semantic_tokens_all,
+            commands::wasm_provide_document_colors_all,
+            commands::wasm_provide_workspace_symbols_all,
+            commands::wasm_provide_range_formatting_all,
+            commands::wasm_execute_command_all,
+            commands::wasm_get_extension_metadata,
+            commands::wasm_on_document_opened,
+            commands::wasm_on_document_closed,
+            commands::wasm_on_document_saved,
+            commands::wasm_on_document_changed,
+            commands::wasm_on_configuration_changed,
+            commands::wasm_on_active_editor_changed,
             // Extension diagnostics
             commands::extension_report_activated,
             commands::extension_report_provider_call,
