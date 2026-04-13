@@ -1,5 +1,6 @@
 mod commands;
 
+use commands::cache::FileMetadataCache;
 use commands::debug::DebugAdapterStore;
 use commands::ext_host::ExtensionPlatformSupervisor;
 use commands::extension_diagnostics::ExtensionDiagnosticsStore;
@@ -376,6 +377,7 @@ pub fn run() {
         .manage(Arc::new(WatchStore::new()))
         .manage(Arc::new(IndexStore::new(true)))
         .manage(Arc::new(LoggerStore::new()))
+        .manage(Arc::new(FileMetadataCache::new(10_000))) // NEW: LRU cache for file metadata
         .manage(ExtensionPlatformSupervisor::new())
         .manage(ExtensionDiagnosticsStore::new())
         .manage(Arc::new(

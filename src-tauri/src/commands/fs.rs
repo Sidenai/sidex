@@ -1,9 +1,13 @@
 use serde::Serialize;
 use std::fs;
 use std::path::Path;
+use std::sync::Arc;
 use std::time::UNIX_EPOCH;
+use tauri::State;
+use tokio::sync::Mutex;
 
 // SECURITY: Use centralized validation to prevent path traversal (CWE-22)
+use super::cache::{metadata_to_cache_entry, FileMetadataCache};
 use super::validation::validate_path;
 
 #[derive(Debug, Serialize)]
@@ -111,10 +115,33 @@ pub fn read_dir(path: String) -> Result<Vec<DirEntry>, String> {
 
 #[allow(clippy::needless_pass_by_value)]
 #[tauri::command]
-pub fn stat(path: String) -> Result<FileStat, String> {
+pub async fn stat(
+    path: String,
+    cache: State<'_, Arc<FileMetadataCache>>,
+) -> Result<FileStat, String> {
     validate_path(&path)?;
+
+    // Try to get from cache first
+    if let Some(entry) = cache.get(&path).await {
+        return Ok(FileStat {
+            size: entry.size,
+            is_dir: entry.is_dir,
+            is_file: entry.is_file,
+            is_symlink: entry.is_symlink,
+            modified: entry.modified,
+            created: entry.created,
+            readonly: entry.readonly,
+        });
+    }
+
+    // Cache miss - get from filesystem
     let metadata =
-        fs::symlink_metadata(&path).map_err(|e| format!("Failed to stat '{path}': {e}"))?;
+        fs::symlink_metadata(&path).map_err(|e| format!("Failed to stat '{}': {}", path, e))?;
+
+    // Cache the result
+    if let Some(entry) = metadata_to_cache_entry(&metadata) {
+        cache.insert(path.clone(), entry).await;
+    }
 
     let modified = metadata
         .modified()
