@@ -1,3 +1,4 @@
+pub mod cache; // NEW: LRU cache for file metadata
 pub mod compress;
 pub mod crypto;
 pub mod debug;

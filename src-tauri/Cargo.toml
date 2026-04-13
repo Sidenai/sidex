@@ -69,6 +69,7 @@ dashmap = "6"
 rayon = "1.10"
 regex = "1"
 memchr = "2"
+lru = "0.12")
 
 # Process & terminal management
 crossbeam = "0.8"
