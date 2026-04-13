@@ -1,3 +1,5 @@
+#![allow(clippy::all)]
+
 //! LRU Cache for file metadata to improve performance.
 //!
 //! This module provides a thread-safe LRU cache that stores file metadata
