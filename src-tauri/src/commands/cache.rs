@@ -20,7 +20,7 @@ use lru::LruCache;
 use std::fs;
 use std::path::PathBuf;
 use std::sync::Arc;
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::time::UNIX_EPOCH;
 use tokio::sync::Mutex;
 
 /// Maximum number of file metadata entries to cache

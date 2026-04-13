@@ -4,7 +4,6 @@ use std::path::Path;
 use std::sync::Arc;
 use std::time::UNIX_EPOCH;
 use tauri::State;
-use tokio::sync::Mutex;
 
 // SECURITY: Use centralized validation to prevent path traversal (CWE-22)
 use super::cache::{metadata_to_cache_entry, FileMetadataCache};
