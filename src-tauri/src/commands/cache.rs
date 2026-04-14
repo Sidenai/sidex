@@ -1,5 +1,3 @@
-#![allow(clippy::all)]
-
 //! LRU Cache for file metadata to improve performance.
 //!
 //! This module provides a thread-safe LRU cache that stores file metadata
@@ -86,6 +84,12 @@ impl FileMetadataCache {
         let cache = self.cache.lock().await;
         cache.len()
     }
+
+    /// Checks if the cache is empty
+    pub async fn is_empty(&self) -> bool {
+        let cache = self.cache.lock().await;
+        cache.is_empty()
+    }
 }
 
 impl Default for FileMetadataCache {
@@ -133,6 +137,7 @@ mod tests {
 
         // Initially empty
         assert_eq!(cache.len().await, 0);
+        assert!(cache.is_empty().await);
 
         // Insert an entry
         cache
@@ -152,6 +157,7 @@ mod tests {
 
         // Should have 1 entry
         assert_eq!(cache.len().await, 1);
+        assert!(!cache.is_empty().await);
 
         // Get the entry
         let entry = cache.get("/test/path").await;
@@ -161,6 +167,7 @@ mod tests {
         // Remove the entry
         cache.remove("/test/path").await;
         assert_eq!(cache.len().await, 0);
+        assert!(cache.is_empty().await);
     }
 
     #[tokio::test]

@@ -1,0 +1,62 @@
+name: OpenCode AI Review
+
+# Run this workflow on PRs to automatically review code changes
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  pull_request_review_comment:
+    types: [created, edited]
+
+# Permissions required for OpenCode to work
+permissions:
+  contents: read
+  pull-requests: read
+  issues: read
+  id-token: write
+
+jobs:
+  opencode-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Run OpenCode AI Review
+        uses: anomalyco/opencode/github@latest
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          model: anthropic/claude-sonnet-4-20250514
+          use_github_token: true
+          prompt: |
+            You are an expert code reviewer for the SideX project (VS Code fork using Tauri).
+            
+            Review this pull request thoroughly:
+            
+            1. **CI Status Check**: Check if typecheck, clippy, and build-check jobs pass. If they fail, identify the root cause.
+            
+            2. **Code Quality**: Review the code changes for:
+               - Rust code quality (clippy warnings, best practices)
+               - TypeScript code quality
+               - Security vulnerabilities
+            
+            3. **Performance Impact**: Look for any performance implications of the changes.
+            
+            4. **Testing**: Check if tests are included and if the code is testable.
+            
+            5. **Breaking Changes**: Identify any breaking changes that might affect users.
+            
+            6. **Documentation**: Check if documentation needs to be updated.
+            
+            7. **Follows Project Conventions**: Verify the code follows SideX project conventions.
+            
+            Provide a detailed review with:
+            - Summary of changes
+            - Issues found (if any)
+            - Suggestions for improvement
+            - Whether it's ready to merge
+            
+            If CI is failing, analyze the errors and suggest fixes.
