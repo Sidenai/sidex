@@ -117,7 +117,7 @@ async function boot() {
 			'workbench.editor.showTabs': 'multiple',
 			'workbench.editor.enablePreview': false,
 			'workbench.editor.tabCloseButton': 'right',
-			'window.menuBarVisibility': 'hidden',
+			'window.menuBarVisibility': navigator.userAgent.includes('Mac') ? 'hidden' : 'classic',
 			'window.titleBarStyle': 'custom',
 			'window.commandCenter': true,
 			'scm.defaultViewMode': 'list',

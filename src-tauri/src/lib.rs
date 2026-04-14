@@ -13,9 +13,11 @@ use commands::terminal::TerminalStore;
 use commands::watch::WatchStore;
 use commands::window::restore_and_show;
 use std::sync::Arc;
+#[cfg(target_os = "macos")]
 use tauri::menu::{Menu, MenuItemBuilder, PredefinedMenuItem, SubmenuBuilder};
 use tauri::Manager;
 
+#[cfg(target_os = "macos")]
 fn build_menu(app: &tauri::AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
     let file_menu = SubmenuBuilder::new(app, "File")
         .item(
@@ -328,41 +330,22 @@ fn build_menu(app: &tauri::AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
         .separator()
         .build()?;
 
-    #[cfg(target_os = "macos")]
-    let menu = {
-        let sidex_menu = SubmenuBuilder::new(app, "SideX")
-            .item(&PredefinedMenuItem::about(app, Some("About SideX"), None)?)
-            .separator()
-            .item(&PredefinedMenuItem::services(app, None)?)
-            .separator()
-            .item(&PredefinedMenuItem::hide(app, None)?)
-            .item(&PredefinedMenuItem::hide_others(app, None)?)
-            .item(&PredefinedMenuItem::show_all(app, None)?)
-            .separator()
-            .item(&PredefinedMenuItem::quit(app, None)?)
-            .build()?;
+    let sidex_menu = SubmenuBuilder::new(app, "SideX")
+        .item(&PredefinedMenuItem::about(app, Some("About SideX"), None)?)
+        .separator()
+        .item(&PredefinedMenuItem::services(app, None)?)
+        .separator()
+        .item(&PredefinedMenuItem::hide(app, None)?)
+        .item(&PredefinedMenuItem::hide_others(app, None)?)
+        .item(&PredefinedMenuItem::show_all(app, None)?)
+        .separator()
+        .item(&PredefinedMenuItem::quit(app, None)?)
+        .build()?;
 
-        Menu::with_items(
-            app,
-            &[
-                &sidex_menu,
-                &file_menu,
-                &edit_menu,
-                &selection_menu,
-                &view_menu,
-                &go_menu,
-                &run_menu,
-                &terminal_menu,
-                &window_menu,
-                &help_menu,
-            ],
-        )?
-    };
-
-    #[cfg(not(target_os = "macos"))]
     let menu = Menu::with_items(
         app,
         &[
+            &sidex_menu,
             &file_menu,
             &edit_menu,
             &selection_menu,
@@ -413,8 +396,11 @@ pub fn run() {
             let process_store = app.state::<Arc<ProcessStore>>();
             process_store.set_app_handle(app.handle().clone());
 
-            let menu = build_menu(app.handle())?;
-            app.set_menu(menu)?;
+            #[cfg(target_os = "macos")]
+            {
+                let menu = build_menu(app.handle())?;
+                app.set_menu(menu)?;
+            }
 
             if cfg!(debug_assertions) {
                 app.handle().plugin(

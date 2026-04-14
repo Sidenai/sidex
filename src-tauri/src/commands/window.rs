@@ -26,9 +26,19 @@ pub fn create_window(
         None => WebviewUrl::default(),
     };
 
-    WebviewWindowBuilder::new(&app, &label, webview_url)
+    let builder = WebviewWindowBuilder::new(&app, &label, webview_url)
         .title(&title)
-        .inner_size(1200.0, 800.0)
+        .inner_size(1200.0, 800.0);
+
+    #[cfg(target_os = "macos")]
+    let builder = builder
+        .title_bar_style(tauri::TitleBarStyle::Overlay)
+        .hidden_title(true);
+
+    #[cfg(not(target_os = "macos"))]
+    let builder = builder.decorations(false).shadow(true);
+
+    builder
         .build()
         .map_err(|e| format!("Failed to create window '{}': {}", label, e))?;
 

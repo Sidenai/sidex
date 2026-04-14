@@ -36,6 +36,7 @@ pnpm-debug.log*
 
 # ── OS files ─────────────────────────────────────────────────────────────────
 .DS_Store
+._*
 Thumbs.db
 Desktop.ini
 ehthumbs.db

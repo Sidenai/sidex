@@ -92,6 +92,16 @@ pub struct UriComponents {
     pub authority: String,
 }
 
+pub fn path_to_uri_path(path: &str) -> String {
+    let stripped = path.strip_prefix(r"\\?\").unwrap_or(path);
+    let p = stripped.replace('\\', "/");
+    if p.starts_with('/') {
+        p
+    } else {
+        format!("/{p}")
+    }
+}
+
 /// Parsed from a VSIX archive (extension/package.json).
 #[derive(Debug)]
 pub struct VsixManifest {
@@ -694,7 +704,7 @@ pub fn build_extension_descriptions(manifests: &[ExtensionManifest]) -> Vec<Exte
                 },
                 extension_location: UriComponents {
                     scheme: "file".to_string(),
-                    path: m.path.clone(),
+                    path: path_to_uri_path(&m.path),
                     authority: String::new(),
                 },
                 package_json,
@@ -736,15 +746,14 @@ pub fn build_init_data(
             is_extension_telemetry_logging_only: false,
             global_storage_home: UriComponents {
                 scheme: "file".to_string(),
-                path: global_storage.to_string_lossy().to_string(),
+                path: path_to_uri_path(&global_storage.to_string_lossy()),
                 authority: String::new(),
             },
             workspace_storage_home: UriComponents {
                 scheme: "file".to_string(),
-                path: data_dir
+                path: path_to_uri_path(&data_dir
                     .join("workspaceStorage")
-                    .to_string_lossy()
-                    .to_string(),
+                    .to_string_lossy()),
                 authority: String::new(),
             },
             extension_development_location_uri: None,
@@ -755,7 +764,7 @@ pub fn build_init_data(
         } else {
             Some(serde_json::json!({
                 "folders": workspace_folders.iter().map(|f| {
-                    serde_json::json!({ "uri": { "scheme": "file", "path": f } })
+                    serde_json::json!({ "uri": { "scheme": "file", "path": path_to_uri_path(f) } })
                 }).collect::<Vec<_>>()
             }))
         },
@@ -772,7 +781,7 @@ pub fn build_init_data(
         loggers: vec![],
         logs_location: UriComponents {
             scheme: "file".to_string(),
-            path: data_dir.join("logs").to_string_lossy().to_string(),
+            path: path_to_uri_path(&data_dir.join("logs").to_string_lossy()),
             authority: String::new(),
         },
         auto_start: true,

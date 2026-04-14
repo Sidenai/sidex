@@ -3,12 +3,13 @@
   "version": "0.1.2",
   "type": "module",
   "scripts": {
-    "setup": "bash scripts/setup-extensions.sh && node scripts/generate-extension-meta.js",
+    "setup": "node scripts/generate-extension-meta.js",
+    "setup:full": "bash scripts/setup-extensions.sh && node scripts/generate-extension-meta.js",
     "dev": "npm run setup && node --max-old-space-size=8192 node_modules/vite/bin/vite.js",
     "build": "npm run setup && node --max-old-space-size=12288 node_modules/vite/bin/vite.js build",
     "postbuild": "node scripts/postbuild.js",
     "preview": "vite preview",
-    "tauri": "PATH=/usr/bin:$PATH tauri",
+    "tauri": "cross-env tauri",
     "lint": "eslint 'src/**/*.ts' 'src/**/*.tsx'",
     "lint:fix": "eslint --fix 'src/**/*.ts' 'src/**/*.tsx'",
     "format": "prettier --write 'src/**/*.{ts,tsx,js,json}'",
@@ -47,6 +48,7 @@
   "devDependencies": {
     "@tauri-apps/cli": "^2.10.1",
     "@tauri-apps/plugin-dialog": "^2.6.0",
+    "cross-env": "^10.1.0",
     "typescript": "~5.6.2",
     "vite": "^6.0.3",
     "vite-plugin-static-copy": "^2.2.0"

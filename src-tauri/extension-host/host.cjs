@@ -12,11 +12,21 @@ process.on('uncaughtException', (err) => {
   } catch {}
 });
 
+const _isWin = process.platform === 'win32';
+
+function uriPathToFsPath(uriPath) {
+  if (!uriPath) return uriPath;
+  if (_isWin && /^\/[A-Za-z]:/.test(uriPath)) {
+    return uriPath.slice(1).replace(/\//g, '\\');
+  }
+  return uriPath;
+}
+
 const VSCODE_RESOURCE_RE = /https:\/\/file\+[^.]*\.vscode-resource\.vscode-cdn\.net(\/[^"')\s]*)/g;
 
 function extractResourcePath(url) {
   const m = /https:\/\/file\+[^.]*\.vscode-resource\.vscode-cdn\.net(\/[^"')\s]*)/.exec(url);
-  return m ? decodeURIComponent(m[1]) : null;
+  return m ? uriPathToFsPath(decodeURIComponent(m[1])) : null;
 }
 
 function inlineWebviewResources(html) {
@@ -1024,23 +1034,24 @@ class ExtensionHost extends EventEmitter {
           const u = typeof localUri === 'string' ? localUri : (localUri.toString ? localUri.toString() : String(localUri));
           const scheme = localUri.scheme || 'file';
           const authority = localUri.authority || '';
-          const p = localUri.path || localUri.fsPath || '';
+          const uriPath = localUri.path || '';
+          const nativePath = localUri.fsPath || uriPathToFsPath(uriPath) || '';
           if (scheme === 'http' || scheme === 'https') return localUri;
           const imgMimes = { '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif', '.webp': 'image/webp', '.ico': 'image/x-icon' };
-          const ext = path.extname(p).toLowerCase();
+          const ext = path.extname(nativePath).toLowerCase();
           if (imgMimes[ext]) {
             try {
-              const dataUri = `data:${imgMimes[ext]};base64,${fs.readFileSync(p).toString('base64')}`;
-              return { scheme: 'data', authority: '', path: dataUri.slice(5), query: '', fragment: '', fsPath: p, toString() { return dataUri; }, with(change) { return { ...this, ...change }; }, toJSON() { return { $mid: 1, scheme: 'data', path: this.path }; } };
+              const dataUri = `data:${imgMimes[ext]};base64,${fs.readFileSync(nativePath).toString('base64')}`;
+              return { scheme: 'data', authority: '', path: dataUri.slice(5), query: '', fragment: '', fsPath: nativePath, toString() { return dataUri; }, with(change) { return { ...this, ...change }; }, toJSON() { return { $mid: 1, scheme: 'data', path: this.path }; } };
             } catch {}
           }
           return {
             scheme: 'https',
             authority: `${scheme}+${authority}.${RESOURCE_AUTHORITY}`,
-            path: p,
+            path: uriPath,
             query: localUri.query || '',
             fragment: localUri.fragment || '',
-            fsPath: p,
+            fsPath: nativePath,
             toString() { return `https://${this.authority}${this.path}`; },
             with(change) { return { ...this, ...change }; },
             toJSON() { return { scheme: this.scheme, authority: this.authority, path: this.path }; },
@@ -1795,17 +1806,30 @@ class VscUri {
     this.path = p || '';
     this.query = query || '';
     this.fragment = fragment || '';
-    this.fsPath = this.scheme === 'file' ? this.path : '';
+    if (this.scheme === 'file') {
+      this.fsPath = _isWin && /^\/[A-Za-z]:/.test(this.path)
+        ? this.path.slice(1).replace(/\//g, '\\')
+        : this.path;
+    } else {
+      this.fsPath = '';
+    }
   }
   static file(p) {
-    return new VscUri('file', '', p);
+    let uriPath = p;
+    if (_isWin && p) {
+      uriPath = p.replace(/\\/g, '/');
+      if (/^[A-Za-z]:/.test(uriPath)) {
+        uriPath = '/' + uriPath;
+      }
+    }
+    return new VscUri('file', '', uriPath);
   }
   static parse(s) {
     try {
       const u = new URL(s);
       return new VscUri(u.protocol.replace(':', ''), u.host, u.pathname, u.search.slice(1), u.hash.slice(1));
     } catch {
-      return new VscUri('file', '', s);
+      return VscUri.file(s);
     }
   }
   static from(components) {
@@ -3657,24 +3681,25 @@ function createVscodeShim() {
           asWebviewUri(localUri) {
             if (!localUri) return localUri;
             const scheme = localUri.scheme || 'file';
-            const p = localUri.path || localUri.fsPath || '';
+            const uriPath = localUri.path || '';
+            const nativePath = localUri.fsPath || uriPathToFsPath(uriPath) || '';
             if (scheme === 'http' || scheme === 'https') return localUri;
             const imgMimes = { '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif', '.webp': 'image/webp', '.ico': 'image/x-icon' };
-            const ext = path.extname(p).toLowerCase();
+            const ext = path.extname(nativePath).toLowerCase();
             if (imgMimes[ext]) {
               try {
-                const dataUri = `data:${imgMimes[ext]};base64,${fs.readFileSync(p).toString('base64')}`;
-                return { scheme: 'data', authority: '', path: dataUri.slice(5), query: '', fragment: '', fsPath: p, toString() { return dataUri; }, with(change) { return { ...this, ...change }; }, toJSON() { return { $mid: 1, scheme: 'data', path: this.path }; } };
+                const dataUri = `data:${imgMimes[ext]};base64,${fs.readFileSync(nativePath).toString('base64')}`;
+                return { scheme: 'data', authority: '', path: dataUri.slice(5), query: '', fragment: '', fsPath: nativePath, toString() { return dataUri; }, with(change) { return { ...this, ...change }; }, toJSON() { return { $mid: 1, scheme: 'data', path: this.path }; } };
               } catch {}
             }
             const RESOURCE_AUTHORITY = 'vscode-resource.vscode-cdn.net';
             return {
               scheme: 'https',
               authority: `${scheme}+${localUri.authority || ''}.${RESOURCE_AUTHORITY}`,
-              path: p,
+              path: uriPath,
               query: localUri.query || '',
               fragment: localUri.fragment || '',
-              fsPath: p,
+              fsPath: nativePath,
               toString() { return `https://${this.authority}${this.path}`; },
               with(change) { return { ...this, ...change }; },
               toJSON() { return { scheme: this.scheme, authority: this.authority, path: this.path }; },
@@ -5002,7 +5027,7 @@ if (process.env.SIDEX_EXTENSION_HOST === 'true' && process.send) {
       'vscode.microsoft-authentication',
     ];
     for (const ext of initData.extensions) {
-      const extPath = ext.extensionLocation?.path || ext.location?.path;
+      const extPath = uriPathToFsPath(ext.extensionLocation?.path || ext.location?.path);
       if (!extPath) continue;
       try {
         const manifest = host._readManifest(extPath);

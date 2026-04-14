@@ -171,7 +171,9 @@ export class MenuBar extends Disposable {
 
 			// We are losing focus and there is no related target, e.g. webview case
 			if (!event.relatedTarget) {
-				this.setUnfocusedState();
+				if (!this.isOpen) {
+					this.setUnfocusedState();
+				}
 			}
 			// We are losing focus and there is a target, reset focusToReturn value as not to redirect
 			else if (event.relatedTarget && !this.container.contains(event.relatedTarget as HTMLElement)) {

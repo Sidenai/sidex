@@ -1058,14 +1058,12 @@ class TauriExtensionHostContribution extends Disposable implements IWorkbenchCon
 				const webviewHandle = `wvv-${viewId}-${++this._msgId}`;
 				const listeners: IDisposable[] = [];
 
-				const homeDir = (globalThis as any).__SIDEX_HOME_DIR__ || '/Users/';
-				webviewView.webview.localResourcesRoot = [
-					URI.file('/'),
-				];
+				const rootUri = URI.from({ scheme: 'file', path: '/' });
+				webviewView.webview.localResourcesRoot = [rootUri];
 				webviewView.webview.contentOptions = {
 					...webviewView.webview.contentOptions,
 					allowScripts: true,
-					localResourceRoots: [URI.file('/')],
+					localResourceRoots: [rootUri],
 				};
 
 				listeners.push(webviewView.webview.onMessage(e => {
@@ -2715,7 +2713,7 @@ class TauriExtensionHostContribution extends Disposable implements IWorkbenchCon
 					},
 					contentOptions: {
 						allowScripts: msg.options?.enableScripts ?? true,
-						localResourceRoots: [URI.file('/')],
+						localResourceRoots: [URI.from({ scheme: 'file', path: '/' })],
 					},
 					extension: undefined,
 				},

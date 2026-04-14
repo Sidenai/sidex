@@ -293,10 +293,9 @@
 }
 
 .monaco-workbench .part.titlebar > .titlebar-container > .titlebar-left > .window-appicon:not(.codicon) {
-	background-image: url('../../../media/code-icon.svg');
-	background-repeat: no-repeat;
-	background-position: center center;
-	background-size: 16px;
+	-webkit-mask: url('../../../media/code-icon.svg') no-repeat center center / 20px;
+	mask: url('../../../media/code-icon.svg') no-repeat center center / 20px;
+	background-color: var(--vscode-titleBar-activeForeground);
 }
 
 .monaco-workbench .part.titlebar > .titlebar-container > .titlebar-left > .window-appicon.codicon {
@@ -348,7 +347,19 @@
 	width: calc(138px / var(--zoom-factor, 1));
 }
 
+/* Tauri on Windows/Linux runs as web context but still needs custom controls width */
+.monaco-workbench.web.windows .part.titlebar .titlebar-right .window-controls-container,
+.monaco-workbench.web.linux .part.titlebar .titlebar-right .window-controls-container {
+	width: calc(138px / var(--zoom-factor, 1));
+	height: 100%;
+}
+
 .monaco-workbench:not(.web):not(.mac) .part.titlebar .titlebar-container.counter-zoom .window-controls-container {
+	width: 138px;
+}
+
+.monaco-workbench.web.windows .part.titlebar .titlebar-container.counter-zoom .window-controls-container,
+.monaco-workbench.web.linux .part.titlebar .titlebar-container.counter-zoom .window-controls-container {
 	width: 138px;
 }
 
@@ -357,6 +368,11 @@
 }
 
 .monaco-workbench:not(.web):not(.mac) .part.titlebar .titlebar-container:not(.counter-zoom) .window-controls-container * {
+	zoom: calc(1 / var(--zoom-factor, 1));
+}
+
+.monaco-workbench.web.windows .part.titlebar .titlebar-container:not(.counter-zoom) .window-controls-container *,
+.monaco-workbench.web.linux .part.titlebar .titlebar-container:not(.counter-zoom) .window-controls-container * {
 	zoom: calc(1 / var(--zoom-factor, 1));
 }
 
@@ -373,6 +389,7 @@
 	width: 46px;
 	font-size: 16px;
 	color: var(--vscode-titleBar-activeForeground);
+	-webkit-app-region: no-drag;
 }
 
 .monaco-workbench .part.titlebar.inactive .window-controls-container > .window-icon {

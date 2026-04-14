@@ -470,7 +470,20 @@ export class BrowserTitlebarPart extends Part implements ITitlebarPart {
 
 		// Draggable region that we can manipulate for #52522
 		this.dragRegion = prepend(this.rootContainer, $('div.titlebar-drag-region'));
-		this.dragRegion.setAttribute('data-tauri-drag-region', '');
+		if ((globalThis as any).__SIDEX_TAURI__) {
+			this.dragRegion.style.setProperty('-webkit-app-region', 'no-drag');
+			this.dragRegion.style.pointerEvents = 'none';
+
+			this._register(addDisposableListener(this.rootContainer, EventType.MOUSE_DOWN, (e) => {
+				const target = e.target as HTMLElement;
+				if (target === this.dragRegion || target === this.rootContainer) {
+					e.preventDefault();
+					import('@tauri-apps/api/window').then(({ getCurrentWindow }) => {
+						getCurrentWindow().startDragging();
+					});
+				}
+			}));
+		}
 
 		// Menubar: install a custom menu bar depending on configuration
 		if (
@@ -538,13 +551,51 @@ export class BrowserTitlebarPart extends Part implements ITitlebarPart {
 					append(primaryWindowControlsLocation === 'left' ? this.rightContent : this.leftContent, $('div.window-controls-container'));
 				}
 
-				if (isWCOEnabled()) {
-					this.windowControlsContainer.classList.add('wco-enabled');
-				}
+			if (isWCOEnabled()) {
+				this.windowControlsContainer.classList.add('wco-enabled');
+			}
+
+			if (!isMacintosh && (globalThis as any).__SIDEX_TAURI__) {
+				const minBtn = append(this.windowControlsContainer, $('div.window-icon.window-min'));
+				const minIcon = append(minBtn, $('span.codicon.codicon-chrome-minimize'));
+				minIcon.setAttribute('aria-hidden', 'true');
+
+				const maxBtn = append(this.windowControlsContainer, $('div.window-icon.window-max'));
+				const maxIcon = append(maxBtn, $('span.codicon.codicon-chrome-maximize'));
+				maxIcon.setAttribute('aria-hidden', 'true');
+
+				const closeBtn = append(this.windowControlsContainer, $('div.window-icon.window-close'));
+				const closeIcon = append(closeBtn, $('span.codicon.codicon-chrome-close'));
+				closeIcon.setAttribute('aria-hidden', 'true');
+
+				import('@tauri-apps/api/window').then(({ getCurrentWindow }) => {
+					const win = getCurrentWindow();
+
+					this._register(addDisposableListener(minBtn, EventType.CLICK, () => win.minimize()));
+					this._register(addDisposableListener(maxBtn, EventType.CLICK, () => win.toggleMaximize()));
+					this._register(addDisposableListener(closeBtn, EventType.CLICK, () => win.close()));
+
+					const updateMaxIcon = async () => {
+						const maximized = await win.isMaximized();
+						if (maximized) {
+							maxIcon.classList.remove('codicon-chrome-maximize');
+							maxIcon.classList.add('codicon-chrome-restore');
+						} else {
+							maxIcon.classList.remove('codicon-chrome-restore');
+							maxIcon.classList.add('codicon-chrome-maximize');
+						}
+					};
+
+					updateMaxIcon();
+					win.onResized(() => updateMaxIcon()).then(unlisten => {
+						this._register({ dispose: () => unlisten() });
+					});
+				}).catch(() => {/* not in Tauri context */});
 			}
 		}
+	}
 
-		// Context menu over title bar: depending on the OS and the location of the click this will either be
+	// Context menu over title bar: depending on the OS and the location of the click this will either be
 		// the overall context menu for the entire title bar or a specific title context menu.
 		// Windows / Linux: we only support the overall context menu on the title bar
 		// macOS: we support both the overall context menu and the title context menu.

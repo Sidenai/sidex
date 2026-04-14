@@ -105,6 +105,10 @@ function containsResource(root: URI, resource: URI, uriIdentityService: IUriIden
 		return false;
 	}
 
+	if (root.scheme === resource.scheme && root.path === '/') {
+		return true;
+	}
+	
 	// Compare unc paths case-insensitively
 	if (root.scheme === Schemas.file && isUNC(root.fsPath)) {
 		if (resource.scheme === Schemas.file && isUNC(resource.fsPath)) {
