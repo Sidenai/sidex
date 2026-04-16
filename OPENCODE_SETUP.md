@@ -23,6 +23,7 @@ The OpenCode agent requires an Anthropic API key to function:
 ### 3. Verify Setup
 
 The workflow will automatically run on:
+
 - **PRs**: When opened, updated, or marked ready for review
 - **Issues**: When opened or edited
 
@@ -31,6 +32,7 @@ The workflow will automatically run on:
 ### OpenCode Review (`.github/workflows/opencode-review.yml`)
 
 Automatically reviews pull requests with:
+
 - CI status analysis
 - Code quality checks
 - Security vulnerability detection
@@ -42,6 +44,7 @@ Automatically reviews pull requests with:
 ### OpenCode Triage (`.github/workflows/opencode-triage.yml`)
 
 Automatically triages new issues with:
+
 - Issue type classification
 - Priority assessment
 - Component affected analysis
@@ -53,19 +56,25 @@ Automatically triages new issues with:
 ## 💬 Using OpenCode Manually
 
 ### On a PR
+
 Comment on the PR:
+
 ```
 /opencode review this PR
 ```
 
 ### On an Issue
+
 Comment on the issue:
+
 ```
 /opencode explain this issue
 ```
 
 ### To Fix an Issue
+
 Comment on the issue:
+
 ```
 /opencode fix this
 ```
@@ -81,6 +90,7 @@ OpenCode will create a branch, implement the fix, and open a PR.
 ## 📝 Configuration
 
 You can customize the OpenCode behavior by modifying the `prompt` in each workflow file. The current prompts are optimized for:
+
 - SideX project specifics
 - Tauri + Rust backend
 - VS Code fork frontend (TypeScript)

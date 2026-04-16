@@ -70,8 +70,8 @@ import { TerminalService } from 'vs/workbench/contrib/terminal/';
 
 // Use dynamic import when terminal tab is opened
 async function openTerminal() {
-    const { TerminalService } = await import('vs/workbench/contrib/terminal/');
-    return new TerminalService();
+	const { TerminalService } = await import('vs/workbench/contrib/terminal/');
+	return new TerminalService();
 }
 ```
 
@@ -91,9 +91,9 @@ async fn watch_with_debounce(path: String, debounce_ms: u64) {
 
 ```typescript
 // src/workers/search.worker.ts
-self.onmessage = async (e) => {
-    const results = await searchIndex.search(e.data.query);
-    postMessage(results);
+self.onmessage = async e => {
+	const results = await searchIndex.search(e.data.query);
+	postMessage(results);
 };
 ```
 
@@ -110,19 +110,19 @@ self.onmessage = async (e) => {
 
 ## 📊 Expected Improvements
 
-| Metric | Before | After |
-|--------|--------|-------|
-| Idle Memory | ~200MB | ~150MB |
-| File Open (1MB) | ~500ms | ~200ms |
-| Search (10K files) | ~2s | ~500ms |
-| UI Frame Rate | 30fps | 60fps |
+| Metric             | Before | After  |
+| ------------------ | ------ | ------ |
+| Idle Memory        | ~200MB | ~150MB |
+| File Open (1MB)    | ~500ms | ~200ms |
+| Search (10K files) | ~2s    | ~500ms |
+| UI Frame Rate      | 30fps  | 60fps  |
 
 ---
 
 ## 📅 Timeline
 
 - **Phase 1**: 1-2 weeks
-- **Phase 2**: 2-3 weeks  
+- **Phase 2**: 2-3 weeks
 - **Phase 3**: 3-4 weeks
 - **Phase 4**: 4-6 weeks
 
@@ -131,6 +131,7 @@ self.onmessage = async (e) => {
 ## 🤝 Contributing
 
 This is a major feature branch. Please:
+
 1. Create sub-branches for each feature
 2. Write tests for new functionality
 3. Document changes in this file
@@ -138,5 +139,5 @@ This is a major feature branch. Please:
 
 ---
 
-*Last Updated: 2026-04-13*
-*Created by: Akarsh Bandi*
+_Last Updated: 2026-04-13_
+_Created by: Akarsh Bandi_

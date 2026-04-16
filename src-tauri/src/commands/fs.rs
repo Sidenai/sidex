@@ -138,9 +138,8 @@ pub async fn stat(
         fs::symlink_metadata(&path).map_err(|e| format!("Failed to stat '{}': {}", path, e))?;
 
     // Cache the result
-    if let Some(entry) = metadata_to_cache_entry(&metadata) {
-        cache.insert(path.clone(), entry).await;
-    }
+    let entry = metadata_to_cache_entry(&metadata);
+    cache.insert(path.clone(), entry).await;
 
     let modified = metadata
         .modified()

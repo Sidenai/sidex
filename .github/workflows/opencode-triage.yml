@@ -27,29 +27,29 @@ jobs:
           model: anthropic/claude-sonnet-4-20250514
           prompt: |
             You are an expert issue triager for the SideX project (VS Code fork using Tauri).
-            
+
             Analyze this issue:
-            
+
             1. **Issue Type**: Is it a bug, feature request, enhancement, or question?
-            
+
             2. **Priority**: Assess the priority (critical, high, medium, low)
                - Critical: Security issues, crashes, data loss
                - High: Major features broken, significant performance issues
                - Medium: Features partially working, minor bugs
                - Low: Minor issues, nice-to-haves
-            
+
             3. **Components Affected**: Which parts of the codebase are affected?
                - Frontend (TypeScript/Vite)
                - Backend (Rust/Tauri)
                - Build system
                - Documentation
-            
+
             4. **Complexity**: Estimate the effort to fix (small, medium, large)
-            
+
             5. **Duplicates**: Check if there's a similar issue already open
-            
+
             6. **Suggested Labels**: Recommend labels (bug, enhancement, security, good-first-issue, etc.)
-            
+
             7. **Initial Assessment**: Can you identify the root cause or suggest where to start looking?
-            
+
             Provide your triage analysis as a comment on this issue.

@@ -1,7 +1,7 @@
 //! LRU Cache for file metadata to improve performance.
 //!
 //! This module provides a thread-safe LRU cache that stores file metadata
-//! to avoid repeated stat() system calls for the same files.
+//! to avoid repeated `stat()` system calls for the same files.
 //!
 //! # Performance Benefits
 //!
@@ -12,7 +12,11 @@
 //! # Usage
 //!
 //! The cache is integrated into the file system commands and automatically
-//! caches stat() results. Cache is cleared on file modifications.
+//! caches `stat()` results. Cache is cleared on file modifications.
+
+#![allow(dead_code)]
+#![allow(clippy::struct_excessive_bools)]
+#![allow(clippy::map_unwrap_or)]
 
 use lru::LruCache;
 use std::fs;
@@ -98,25 +102,24 @@ impl Default for FileMetadataCache {
     }
 }
 
-/// Converts std::fs::Metadata to cache entry
-pub fn metadata_to_cache_entry(metadata: &fs::Metadata) -> Option<FileMetadataCacheEntry> {
+/// Converts `std::fs::Metadata` to cache entry
+#[allow(clippy::map_unwrap_or)]
+pub fn metadata_to_cache_entry(metadata: &fs::Metadata) -> FileMetadataCacheEntry {
     let modified = metadata
         .modified()
         .ok()
         .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
-        .map(|d| d.as_secs())
-        .unwrap_or(0);
+        .map_or(0, |d| d.as_secs());
 
     let created = metadata
         .created()
         .ok()
         .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
-        .map(|d| d.as_secs())
-        .unwrap_or(0);
+        .map_or(0, |d| d.as_secs());
 
     let readonly = metadata.permissions().readonly();
 
-    Some(FileMetadataCacheEntry {
+    FileMetadataCacheEntry {
         size: metadata.len(),
         is_dir: metadata.is_dir(),
         is_file: metadata.is_file(),
@@ -124,7 +127,7 @@ pub fn metadata_to_cache_entry(metadata: &fs::Metadata) -> Option<FileMetadataCa
         modified,
         created,
         readonly,
-    })
+    }
 }
 
 #[cfg(test)]
