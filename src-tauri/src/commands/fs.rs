@@ -135,7 +135,7 @@ pub async fn stat(
 
     // Cache miss - get from filesystem
     let metadata =
-        fs::symlink_metadata(&path).map_err(|e| format!("Failed to stat '{}': {}", path, e))?;
+        fs::symlink_metadata(&path).map_err(|e| format!("Failed to stat '{path}': {e}"))?;
 
     // Cache the result
     let entry = metadata_to_cache_entry(&metadata);
