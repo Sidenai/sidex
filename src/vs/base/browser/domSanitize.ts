@@ -5,7 +5,7 @@
 
 import { Schemas } from '../common/network.js';
 import { reset } from './dom.js';
- 
+
 import dompurify, * as DomPurifyTypes from './dompurify/dompurify.js';
 
 /**

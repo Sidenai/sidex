@@ -7,7 +7,6 @@ import { sumBy } from '../../../../base/common/arrays.js';
 import { BugIndicatingError } from '../../../../base/common/errors.js';
 import { OffsetRange } from '../ranges/offsetRange.js';
 
- 
 export abstract class BaseEdit<
 	T extends BaseReplacement<T> = BaseReplacement<any>,
 	TEdit extends BaseEdit<T, TEdit> = BaseEdit<T, any>

@@ -270,7 +270,7 @@ export function renderMarkdown(
 				return;
 			}
 			const renderedElements = new Map(tuples);
-			 
+
 			const placeholderElements = outElement.querySelectorAll<HTMLDivElement>(`div[data-code]`);
 			for (const placeholderElement of placeholderElements) {
 				const renderedElement = renderedElements.get(placeholderElement.dataset['code'] ?? '');
@@ -282,7 +282,7 @@ export function renderMarkdown(
 		});
 	} else if (syncCodeBlocks.length > 0) {
 		const renderedElements = new Map(syncCodeBlocks);
-		 
+
 		const placeholderElements = outElement.querySelectorAll<HTMLDivElement>(`div[data-code]`);
 		for (const placeholderElement of placeholderElements) {
 			const renderedElement = renderedElements.get(placeholderElement.dataset['code'] ?? '');
@@ -294,7 +294,6 @@ export function renderMarkdown(
 
 	// Signal size changes for image tags
 	if (options.asyncRenderCallback) {
-		 
 		for (const img of outElement.getElementsByTagName('img')) {
 			const listener = disposables.add(
 				DOM.addDisposableListener(img, 'load', () => {
@@ -329,7 +328,7 @@ export function renderMarkdown(
 	}
 
 	// Remove/disable inputs
-	 
+
 	for (const input of [...outElement.getElementsByTagName('input')]) {
 		if (input.attributes.getNamedItem('type')?.value === 'checkbox') {
 			input.setAttribute('disabled', '');
@@ -357,7 +356,6 @@ export function renderMarkdown(
 }
 
 function rewriteRenderedLinks(markdown: IMarkdownString, options: MarkdownRenderOptions, root: HTMLElement) {
-	 
 	for (const el of root.querySelectorAll('img, audio, video, source')) {
 		const src = el.getAttribute('src'); // Get the raw 'src' attribute value as text, not the resolved 'src'
 		if (src) {
@@ -384,7 +382,6 @@ function rewriteRenderedLinks(markdown: IMarkdownString, options: MarkdownRender
 		}
 	}
 
-	 
 	for (const el of root.querySelectorAll('a')) {
 		const href = el.getAttribute('href'); // Get the raw 'href' attribute value as text, not the resolved 'href'
 		el.setAttribute('href', ''); // Clear out href. We use the `data-href` for handling clicks instead

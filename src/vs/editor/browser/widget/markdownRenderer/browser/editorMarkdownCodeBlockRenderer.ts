@@ -61,7 +61,7 @@ export class EditorMarkdownCodeBlockRenderer implements IMarkdownCodeBlockRender
 
 		const root = document.createElement('span');
 		root.innerHTML = content as string;
-		 
+
 		const codeElement = root.querySelector('.monaco-tokenized-source');
 		if (!isHTMLElement(codeElement)) {
 			return document.createElement('span');

@@ -265,7 +265,7 @@ class EmptyTextEditorHintContentWidget extends Disposable implements IContentWid
 			'Execute {0} to select a language and get started. Start typing to dismiss.',
 			keybindingLabel
 		);
-		 
+
 		for (const anchor of hintElement.querySelectorAll('a')) {
 			anchor.style.cursor = 'pointer';
 		}

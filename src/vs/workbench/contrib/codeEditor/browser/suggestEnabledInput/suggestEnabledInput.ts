@@ -369,7 +369,6 @@ export class SuggestEnabledInput extends Widget {
 			'transparent'
 		);
 
-		 
 		const cursor = this.stylingContainer.getElementsByClassName('cursor')[0] as HTMLDivElement;
 		if (cursor) {
 			cursor.style.backgroundColor = asCssVariable(styleOverrides.inputForeground ?? inputForeground);

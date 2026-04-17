@@ -791,14 +791,12 @@ export class SearchWidget extends Widget {
 			}
 			keyboardEvent.preventDefault();
 		} else if (keyboardEvent.equals(KeyCode.UpArrow)) {
-			 
 			stopPropagationForMultiLineUpwards(
 				keyboardEvent,
 				this.searchInput?.getValue() ?? '',
 				this.searchInput?.domNode.querySelector('textarea') ?? null
 			);
 		} else if (keyboardEvent.equals(KeyCode.DownArrow)) {
-			 
 			stopPropagationForMultiLineDownwards(
 				keyboardEvent,
 				this.searchInput?.getValue() ?? '',
@@ -870,14 +868,12 @@ export class SearchWidget extends Widget {
 			this.searchInput?.focus();
 			keyboardEvent.preventDefault();
 		} else if (keyboardEvent.equals(KeyCode.UpArrow)) {
-			 
 			stopPropagationForMultiLineUpwards(
 				keyboardEvent,
 				this.replaceInput?.getValue() ?? '',
 				this.replaceInput?.domNode.querySelector('textarea') ?? null
 			);
 		} else if (keyboardEvent.equals(KeyCode.DownArrow)) {
-			 
 			stopPropagationForMultiLineDownwards(
 				keyboardEvent,
 				this.replaceInput?.getValue() ?? '',

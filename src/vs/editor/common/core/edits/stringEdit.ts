@@ -8,7 +8,6 @@ import { OffsetRange } from '../ranges/offsetRange.js';
 import { StringText } from '../text/abstractText.js';
 import { BaseEdit, BaseReplacement } from './edit.js';
 
- 
 export abstract class BaseStringEdit<
 	T extends BaseStringReplacement<T> = BaseStringReplacement<any>,
 	TEdit extends BaseStringEdit<T, TEdit> = BaseStringEdit<any, any>
@@ -194,7 +193,6 @@ export abstract class BaseStringEdit<
 	}
 }
 
- 
 export abstract class BaseStringReplacement<
 	T extends BaseStringReplacement<T> = BaseStringReplacement<any>
 > extends BaseReplacement<T> {

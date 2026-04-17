@@ -503,7 +503,6 @@ class TerminalTabsRenderer implements IListRenderer<ITerminalInstance, ITerminal
 		const editableData = this._terminalEditingService.getEditableData(instance);
 		template.label.element.classList.toggle('editable-tab', !!editableData);
 		if (editableData) {
-			 
 			template.elementDisposables.add(
 				this._renderInputBox(
 					template.label.element.querySelector('.monaco-icon-label-container')!,

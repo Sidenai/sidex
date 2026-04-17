@@ -442,7 +442,7 @@ function propertyIsDynamicEvent(name: string): boolean {
 
 export interface IWebWorkerServerRequestHandler {
 	_requestHandlerBrand: void;
-	 
+
 	[prop: string]: any;
 }
 

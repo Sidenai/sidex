@@ -1062,7 +1062,6 @@ class ThemeFileWatcher {
 }
 
 function _applyRules(styleSheetContent: string, rulesClassName: string) {
-	 
 	const themeStyles = mainWindow.document.head.getElementsByClassName(rulesClassName);
 	if (themeStyles.length === 0) {
 		const elStyle = createStyleSheet();

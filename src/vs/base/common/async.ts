@@ -1901,7 +1901,6 @@ export namespace Promises {
 	export function withAsyncBody<T, E = Error>(
 		bodyFn: (resolve: (value: T) => unknown, reject: (error: E) => unknown) => Promise<unknown>
 	): Promise<T> {
-		 
 		return new Promise<T>(async (resolve, reject) => {
 			try {
 				await bodyFn(resolve, reject);

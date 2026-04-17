@@ -18,7 +18,6 @@ export function ensureCodeWindow(targetWindow: Window, fallbackWindowId: number)
 	}
 }
 
- 
 export const mainWindow = window as CodeWindow;
 
 export function isAuxiliaryWindow(obj: Window): obj is CodeWindow {

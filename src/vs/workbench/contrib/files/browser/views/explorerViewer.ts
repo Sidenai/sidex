@@ -910,7 +910,6 @@ export class CompressedNavigationController implements ICompressedNavigationCont
 	}
 
 	private updateLabels(templateData: IFileTemplateData): void {
-		 
 		this._labels = Array.from(templateData.container.querySelectorAll('.label-name'));
 		let parents = '';
 		for (let i = 0; i < this.labels.length; i++) {
@@ -1208,7 +1207,7 @@ export class FilesRenderer
 		const theme = this.themeService.getFileIconTheme();
 
 		// Hack to always render chevrons for file nests, or else may not be able to identify them.
-		 
+
 		const twistieContainer = templateData.container.parentElement?.parentElement?.querySelector('.monaco-tl-twistie');
 		twistieContainer?.classList.toggle('force-twistie', stat.hasNests && theme.hidesExplorerArrows);
 

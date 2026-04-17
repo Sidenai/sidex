@@ -304,7 +304,7 @@ class TerminalSuggestContribution extends DisposableStore implements ITerminalCo
 
 		const container = this._resolveAddonContainer(xtermElement);
 		addon.setContainerWithOverflow(container);
-		 
+
 		const screenElement = xtermElement?.querySelector('.xterm-screen');
 		if (dom.isHTMLElement(screenElement)) {
 			addon.setScreen(screenElement);

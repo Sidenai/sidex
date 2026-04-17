@@ -543,7 +543,6 @@ export class Sash extends Disposable {
 			return;
 		}
 
-		 
 		const iframes = this.el.ownerDocument.getElementsByTagName('iframe');
 		for (const iframe of iframes) {
 			iframe.classList.add(PointerEventsDisabledCssClass); // disable mouse events on iframes as long as we drag the sash

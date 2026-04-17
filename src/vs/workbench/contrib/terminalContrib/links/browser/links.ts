@@ -172,5 +172,5 @@ export interface IResolvedValidLink {
 }
 
 // Suppress as the any type is being removed anyway
- 
+
 export type OmitFirstArg<F> = F extends (x: any, ...args: infer P) => infer R ? (...args: P) => R : never;

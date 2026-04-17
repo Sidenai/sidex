@@ -210,7 +210,7 @@ async function extractFileTransferData(
 	items: DataTransferItemList
 ): Promise<IFileTransferData[]> {
 	const fileSystemProvider = accessor.get(IFileService).getProvider(Schemas.file);
-	 
+
 	if (!(fileSystemProvider instanceof HTMLFileSystemProvider)) {
 		return []; // only supported when running in web
 	}

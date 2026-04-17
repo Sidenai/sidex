@@ -224,7 +224,7 @@ export class TerminalStickyScrollOverlay extends Disposable {
 					// scrolling horizontally in a pager
 					this._xterm.raw.onCursorMove
 				)(() => this._refresh()),
-				 
+
 				addStandardDisposableListener(this._xterm.raw.element!.querySelector('.xterm-viewport')!, 'scroll', () =>
 					this._refresh()
 				)
