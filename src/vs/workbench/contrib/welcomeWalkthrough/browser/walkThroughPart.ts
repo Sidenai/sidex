@@ -194,10 +194,8 @@ export class WalkThroughPart extends EditorPane {
 			this.addEventListener(this.content, 'click', event => {
 				for (let node = event.target as HTMLElement; node; node = node.parentNode as HTMLElement) {
 					if (isHTMLAnchorElement(node) && node.href) {
-						 
 						const baseElement = node.ownerDocument.getElementsByTagName('base')[0] || this.window.location;
 						if (baseElement && node.href.indexOf(baseElement.href) >= 0 && node.hash) {
-							 
 							const scrollTarget = this.content.querySelector(node.hash);
 							const innerContent = this.content.firstElementChild;
 							if (scrollTarget && innerContent) {
@@ -359,7 +357,7 @@ export class WalkThroughPart extends EditorPane {
 						return;
 					}
 					const id = `snippet-${model.uri.fragment}`;
-					 
+
 					const div = innerContent.querySelector(`#${id.replace(/[\\.]/g, '\\$&')}`) as HTMLElement;
 
 					const options = this.getEditorOptions(model.getLanguageId());
@@ -478,7 +476,6 @@ export class WalkThroughPart extends EditorPane {
 	}
 
 	private decorateContent() {
-		 
 		const keys = this.content.querySelectorAll('.shortcut[data-command]');
 		Array.prototype.forEach.call(keys, (key: Element) => {
 			const command = key.getAttribute('data-command');
@@ -489,7 +486,7 @@ export class WalkThroughPart extends EditorPane {
 			}
 			key.appendChild(document.createTextNode(label));
 		});
-		 
+
 		const ifkeys = this.content.querySelectorAll('.if_shortcut[data-command]');
 		Array.prototype.forEach.call(ifkeys, (key: HTMLElement) => {
 			const command = key.getAttribute('data-command');
@@ -503,7 +500,7 @@ export class WalkThroughPart extends EditorPane {
 		const value = this.configurationService.getValue('editor.multiCursorModifier');
 		const modifier =
 			labels[value === 'ctrlCmd' ? (OS === OperatingSystem.Macintosh ? 'metaKey' : 'ctrlKey') : 'altKey'];
-		 
+
 		const keys = this.content.querySelectorAll('.multi-cursor-modifier');
 		Array.prototype.forEach.call(keys, (key: Element) => {
 			while (key.firstChild) {

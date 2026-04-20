@@ -125,7 +125,6 @@ export class CodeCellDragImageRenderer {
 		dragImageContainer.classList.forEach(c => dragImageContainer.classList.remove(c));
 		dragImageContainer.classList.add('cell-drag-image', 'monaco-list-row', 'focused', `${type}-cell-row`);
 
-		 
 		const editorContainer: HTMLElement | null = dragImageContainer.querySelector('.cell-editor-container');
 		if (!editorContainer) {
 			return null;

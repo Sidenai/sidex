@@ -8254,7 +8254,7 @@ type EditorOptionsType = typeof EditorOptions;
 type FindEditorOptionsKeyById<T extends EditorOption> = {
 	[K in keyof EditorOptionsType]: EditorOptionsType[K]['id'] extends T ? K : never;
 }[keyof EditorOptionsType];
- 
+
 type ComputedEditorOptionValue<T extends IEditorOption<any, any>> = T extends IEditorOption<any, infer R> ? R : never;
 export type FindComputedEditorOptionValueById<T extends EditorOption> = NonNullable<
 	ComputedEditorOptionValue<EditorOptionsType[FindEditorOptionsKeyById<T>]>

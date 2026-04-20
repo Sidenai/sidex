@@ -234,7 +234,6 @@ export function deepMerge<T extends {}>(source1: T, source2: Partial<T>): T {
 	for (const key in source2) {
 		const source2Value = source2[key];
 		if (typeof result[key] === 'object' && source2Value && typeof source2Value === 'object') {
-			 
 			result[key] = deepMerge<any>(result[key], source2Value);
 		} else {
 			// eslint-disable-next-line local/code-no-any-casts

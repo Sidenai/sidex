@@ -690,7 +690,7 @@ export class OpenEditorsView extends ViewPane {
 		}
 
 		const parentNode = this.list.getHTMLElement();
-		 
+
 		const childNodes: HTMLElement[] = [].slice.call(parentNode.querySelectorAll('.open-editor > a'));
 
 		return dom.getLargestChildWidth(parentNode, childNodes);

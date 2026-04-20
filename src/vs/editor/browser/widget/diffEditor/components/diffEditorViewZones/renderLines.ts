@@ -228,7 +228,7 @@ export class RenderLinesResult {
 		}
 
 		// Find the view line index based on the element
-		 
+
 		const viewLines = container.querySelectorAll('.view-line');
 		let viewLineIndex = -1;
 		for (let i = 0; i < viewLines.length; i++) {

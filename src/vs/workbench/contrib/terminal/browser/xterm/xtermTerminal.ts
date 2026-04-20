@@ -626,7 +626,7 @@ export class XtermTerminal
 
 		this._attached = { container, options };
 		// Screen must be created at this point as xterm.open is called
-		 
+
 		return this._attached?.container.querySelector('.xterm-screen')!;
 	}
 
@@ -1196,7 +1196,6 @@ export class XtermTerminal
 		}
 	}
 
-	 
 	_writeText(data: string): void {
 		this.raw.write(data);
 	}

@@ -177,7 +177,6 @@ export class DecorationAddon extends Disposable implements ITerminalAddon, IDeco
 	}
 
 	private _updateGutterDecorationVisibility(): void {
-		 
 		const commandDecorationElements = this._terminal?.element?.querySelectorAll(DecorationSelector.CommandDecoration);
 		if (commandDecorationElements) {
 			for (const commandDecorationElement of commandDecorationElements) {

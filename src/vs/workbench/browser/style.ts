@@ -47,7 +47,7 @@ registerThemingParticipant((theme, collector) => {
 		const titleBackground = theme.getColor(TITLE_BAR_ACTIVE_BACKGROUND);
 		if (titleBackground) {
 			const metaElementId = 'monaco-workbench-meta-theme-color';
-			 
+
 			let metaElement = mainWindow.document.getElementById(metaElementId) as HTMLMetaElement | null;
 			if (!metaElement) {
 				metaElement = createMetaElement();

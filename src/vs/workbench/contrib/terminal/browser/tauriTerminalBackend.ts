@@ -42,7 +42,9 @@ let _invoke: ((cmd: string, args?: Record<string, unknown>) => Promise<unknown>)
 let _listen: ((event: string, handler: (event: { payload: unknown }) => void) => Promise<() => void>) | undefined;
 
 async function ensureTauri(): Promise<boolean> {
-	if (_invoke && _listen) {return true;}
+	if (_invoke && _listen) {
+		return true;
+	}
 	try {
 		const core = await import('@tauri-apps/api/core');
 		const events = await import('@tauri-apps/api/event');
@@ -323,7 +325,9 @@ class TauriTerminalBackend extends Disposable implements ITerminalBackend {
 		if (_invoke) {
 			try {
 				const shell = (await _invoke('get_default_shell')) as string;
-				if (shell) {return shell;}
+				if (shell) {
+					return shell;
+				}
 			} catch {}
 		}
 		return '/bin/zsh';

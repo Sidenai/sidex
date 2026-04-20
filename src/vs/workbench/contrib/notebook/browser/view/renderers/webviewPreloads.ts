@@ -89,8 +89,6 @@ declare function cancelIdleCallback(handle: number): void;
 declare function __import(path: string): Promise<any>;
 
 async function webviewPreloads(ctx: PreloadContext) {
-	 
-
 	// The use of global `window` should be fine in this context, even
 	// with aux windows. This code is running from within an `iframe`
 	// where there is only one `window` object anyway.

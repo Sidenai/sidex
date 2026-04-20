@@ -355,7 +355,9 @@ function setupMenuActions() {
 	// Listen for command execution via keyboard shortcuts forwarded from native menu
 	window.addEventListener('sidex-command', async (e: any) => {
 		const commandId = e.detail?.commandId;
-		if (!commandId) {return;}
+		if (!commandId) {
+			return;
+		}
 		if (
 			commandId === 'workbench.action.files.openFolder' ||
 			commandId === 'workbench.action.files.openFolderViaWorkspace'

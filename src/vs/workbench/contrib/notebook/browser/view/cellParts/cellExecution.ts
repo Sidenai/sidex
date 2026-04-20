@@ -188,7 +188,7 @@ export class CellExecutionPart extends CellContentPart {
 				this._executionOrderLabel.classList.remove('sticky');
 				top = this.currentCell.layoutInfo.editorHeight - lineHeight; // Place at the bottom of the editor
 				// Only update content if we were previously sticky or content is not correct
-				 
+
 				const iconIsPresent = this._executionOrderContent.querySelector('.codicon') !== null;
 				if (wasStickyHere || iconIsPresent) {
 					const executionOrder = this.currentCell.internalMetadata.executionOrder;

@@ -67,7 +67,7 @@ export class BuiltinExtensionsScannerService implements IBuiltinExtensionsScanne
 					delete (globalThis as any)._VSCODE_BUILTIN_EXTENSIONS;
 				} else {
 					// Fallback: check for DOM meta element
-					 
+
 					const builtinExtensionsElement = mainWindow.document.getElementById('vscode-workbench-builtin-extensions');
 					const builtinExtensionsElementAttribute = builtinExtensionsElement
 						? builtinExtensionsElement.getAttribute('data-settings')

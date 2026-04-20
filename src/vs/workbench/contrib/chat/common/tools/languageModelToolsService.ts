@@ -13,7 +13,7 @@ export type ToolProgress = (message: string) => void;
 
 export const enum ToolDataSource {
 	Internal = 'internal',
-	Extension = 'extension',
+	Extension = 'extension'
 }
 
 export interface IToolData {
@@ -54,6 +54,14 @@ export interface IPreparedToolInvocation {
 }
 
 export interface IToolImpl {
-	prepareToolInvocation?(context: IToolInvocationPreparationContext, token: CancellationToken): Promise<IPreparedToolInvocation | undefined>;
-	invoke(invocation: IToolInvocation, countTokens: CountTokensCallback, progress: ToolProgress, token: CancellationToken): Promise<IToolResult>;
+	prepareToolInvocation?(
+		context: IToolInvocationPreparationContext,
+		token: CancellationToken
+	): Promise<IPreparedToolInvocation | undefined>;
+	invoke(
+		invocation: IToolInvocation,
+		countTokens: CountTokensCallback,
+		progress: ToolProgress,
+		token: CancellationToken
+	): Promise<IToolResult>;
 }

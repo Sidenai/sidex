@@ -751,11 +751,11 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 		// As the tree does not know anything about the rendered DOM elements
 		// we have to traverse the dom to find the HTMLElements
 		const treeDOM = lastFocusedList.getHTMLElement();
-		 
+
 		const scrollableElement = treeDOM.querySelector('.monaco-scrollable-element');
-		 
+
 		const listRows = scrollableElement?.querySelector('.monaco-list-rows');
-		 
+
 		const focusedElement = listRows?.querySelector('.focused');
 		if (!focusedElement) {
 			return;
@@ -776,7 +776,7 @@ function getCustomHoverForElement(element: HTMLElement): HTMLElement | undefined
 
 	// Only consider children that are not action items or have a tabindex
 	// as these element are focusable and the user is able to trigger them already
-	 
+
 	const noneFocusableElementWithHover = element.querySelector(
 		'[custom-hover="true"]:not([tabindex]):not(.action-item)'
 	);

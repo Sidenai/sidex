@@ -373,7 +373,6 @@ export class MarkersTable extends Disposable implements IProblemsWidget {
 			options
 		) as WorkbenchTable<MarkerTableItem>;
 
-		 
 		const list = this.table.domNode.querySelector('.monaco-list-rows')! as HTMLElement;
 
 		// mouseover/mouseleave event handlers
