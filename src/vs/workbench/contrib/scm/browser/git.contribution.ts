@@ -1307,7 +1307,7 @@ class TauriGitContribution extends Disposable implements IWorkbenchContribution 
 					const resource = args[0];
 					const uri = resource?.sourceUri ?? resource;
 					if (uri?.fsPath) {
-						await invokeGit('git_restore', { path: rootPath, file_path: uri.fsPath });
+						await invokeGit('git_restore', { path: rootPath, filePath: uri.fsPath });
 						await provider.refresh();
 					}
 				} catch (err) {
