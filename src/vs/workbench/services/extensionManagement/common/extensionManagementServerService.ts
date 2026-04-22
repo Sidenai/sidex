@@ -22,9 +22,7 @@ export class ExtensionManagementServerService implements IExtensionManagementSer
 	readonly remoteExtensionManagementServer: IExtensionManagementServer | null = null;
 	readonly webExtensionManagementServer: IExtensionManagementServer | null = null;
 
-	constructor(
-		@IInstantiationService instantiationService: IInstantiationService
-	) {
+	constructor(@IInstantiationService instantiationService: IInstantiationService) {
 		if (isWeb) {
 			const extensionManagementService = instantiationService.createInstance(WebExtensionManagementService);
 			this.webExtensionManagementServer = {

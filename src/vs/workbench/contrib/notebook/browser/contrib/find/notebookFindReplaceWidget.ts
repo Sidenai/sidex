@@ -15,7 +15,7 @@ export class NotebookFindInputFilterButton extends Disposable {
 		_contextMenuService: any,
 		_instantiationService: any,
 		_options: any,
-		_label?: string,
+		_label?: string
 	) {
 		super();
 	}
@@ -24,5 +24,5 @@ export class NotebookFindInputFilterButton extends Disposable {
 		return 0;
 	}
 
-	applyStyles(_checked: boolean): void { }
+	applyStyles(_checked: boolean): void {}
 }

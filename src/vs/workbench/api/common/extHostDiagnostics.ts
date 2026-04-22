@@ -58,11 +58,17 @@ export class DiagnosticCollection implements vscode.DiagnosticCollection {
 		first: vscode.Uri | ReadonlyArray<[vscode.Uri, ReadonlyArray<vscode.Diagnostic>]>,
 		diagnostics?: ReadonlyArray<vscode.Diagnostic>
 	) {
-		if (!first) { this.clear(); return; }
+		if (!first) {
+			this.clear();
+			return;
+		}
 		this._checkDisposed();
 
 		if (URI.isUri(first)) {
-			if (!diagnostics) { this.delete(first); return; }
+			if (!diagnostics) {
+				this.delete(first);
+				return;
+			}
 			this.#data.set(first, [...diagnostics]);
 			this.#onDidChangeDiagnostics.fire([first]);
 			if (this.#proxy) {
@@ -82,10 +88,13 @@ export class DiagnosticCollection implements vscode.DiagnosticCollection {
 			if (this.#proxy) {
 				const entries: [URI, IMarkerData[]][] = uris.map(uri => {
 					const diags = this.#data.get(uri) || [];
-					return [uri, diags.map(d => ({
-						...converter.Diagnostic.from(d),
-						modelVersionId: this._modelVersionIdProvider(uri)
-					}))];
+					return [
+						uri,
+						diags.map(d => ({
+							...converter.Diagnostic.from(d),
+							modelVersionId: this._modelVersionIdProvider(uri)
+						}))
+					];
 				});
 				this.#proxy.$changeMany(this._owner, entries);
 			}
@@ -155,7 +164,9 @@ export class ExtHostDiagnostics implements ExtHostDiagnosticsShape {
 
 	static _mapper(last: readonly vscode.Uri[]): { uris: readonly vscode.Uri[] } {
 		const map = new ResourceMap<vscode.Uri>();
-		for (const uri of last) { map.set(uri, uri); }
+		for (const uri of last) {
+			map.set(uri, uri);
+		}
 		return { uris: Object.freeze(Array.from(map.values())) };
 	}
 
@@ -183,7 +194,9 @@ export class ExtHostDiagnostics implements ExtHostDiagnosticsShape {
 		} else if (!_collections.has(name)) {
 			owner = name;
 		} else {
-			do { owner = name + ExtHostDiagnostics._idPool++; } while (_collections.has(owner));
+			do {
+				owner = name + ExtHostDiagnostics._idPool++;
+			} while (_collections.has(owner));
 		}
 
 		const result = new (class extends DiagnosticCollection {
@@ -245,8 +258,10 @@ export class ExtHostDiagnostics implements ExtHostDiagnosticsShape {
 		if (!this._mirrorCollection) {
 			const name = '_generated_mirror';
 			const collection = new DiagnosticCollection(
-				name, name,
-				Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER,
+				name,
+				name,
+				Number.MAX_SAFE_INTEGER,
+				Number.MAX_SAFE_INTEGER,
 				_uri => undefined,
 				this._fileSystemInfoService.extUri,
 				undefined,

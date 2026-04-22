@@ -18,17 +18,22 @@ export class ExtHostTelemetry extends Disposable implements ExtHostTelemetryShap
 	readonly onDidChangeTelemetryEnabled: Event<boolean> = this._onDidChangeTelemetryEnabled.event;
 
 	private readonly _onDidChangeTelemetryConfiguration = this._register(new Emitter<vscode.TelemetryConfiguration>());
-	readonly onDidChangeTelemetryConfiguration: Event<vscode.TelemetryConfiguration> = this._onDidChangeTelemetryConfiguration.event;
+	readonly onDidChangeTelemetryConfiguration: Event<vscode.TelemetryConfiguration> =
+		this._onDidChangeTelemetryConfiguration.event;
 
 	constructor(_isWorker?: boolean) {
 		super();
 	}
 
-	getTelemetryConfiguration(): boolean { return false; }
+	getTelemetryConfiguration(): boolean {
+		return false;
+	}
 	getTelemetryDetails(): vscode.TelemetryConfiguration {
 		return { isCrashEnabled: false, isErrorsEnabled: false, isUsageEnabled: false };
 	}
-	onExtensionError(_extension: ExtensionIdentifier, _error: Error): boolean { return false; }
+	onExtensionError(_extension: ExtensionIdentifier, _error: Error): boolean {
+		return false;
+	}
 	instantiateLogger(
 		_extension: IExtensionDescription,
 		sender: vscode.TelemetrySender,
@@ -39,14 +44,20 @@ export class ExtHostTelemetry extends Disposable implements ExtHostTelemetryShap
 			onDidChangeEnableStates: emitter.event,
 			isUsageEnabled: false,
 			isErrorsEnabled: false,
-			logUsage: () => { sender; },
-			logError: () => { },
+			logUsage: () => {
+				sender;
+			},
+			logError: () => {},
 			dispose: () => emitter.dispose()
 		} as unknown as vscode.TelemetryLogger;
 	}
 
-	$initializeTelemetryLevel(_level: TelemetryLevel, _supportsTelemetry: boolean, _productConfig?: { usage: boolean; error: boolean }): void { }
-	$onDidChangeTelemetryLevel(_level: TelemetryLevel): void { }
+	$initializeTelemetryLevel(
+		_level: TelemetryLevel,
+		_supportsTelemetry: boolean,
+		_productConfig?: { usage: boolean; error: boolean }
+	): void {}
+	$onDidChangeTelemetryLevel(_level: TelemetryLevel): void {}
 }
 
 export class ExtHostTelemetryLogger {
@@ -62,4 +73,4 @@ export function isNewAppInstall(_firstSessionDate: string): boolean {
 }
 
 export const IExtHostTelemetry = createDecorator<IExtHostTelemetry>('IExtHostTelemetry');
-export interface IExtHostTelemetry extends ExtHostTelemetry, ExtHostTelemetryShape { }
+export interface IExtHostTelemetry extends ExtHostTelemetry, ExtHostTelemetryShape {}

@@ -52,7 +52,7 @@ export class SideXSearchProvider {
 				regex: options.regex ?? false,
 				include: options.include ?? '',
 				exclude: options.exclude ?? '',
-				maxResults: options.maxResults ?? 2000,
+				maxResults: options.maxResults ?? 2000
 			});
 			return (results as FileSearchResult[]) || [];
 		} catch (e) {

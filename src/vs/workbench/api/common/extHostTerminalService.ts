@@ -58,15 +58,30 @@ export interface IExtHostTerminalService extends ExtHostTerminalServiceShape, ID
 	readonly onDidChangeShell: Event<string>;
 
 	createTerminal(name?: string, shellPath?: string, shellArgs?: readonly string[] | string): vscode.Terminal;
-	createTerminalFromOptions(options: vscode.TerminalOptions, internalOptions?: ITerminalInternalOptions): vscode.Terminal;
+	createTerminalFromOptions(
+		options: vscode.TerminalOptions,
+		internalOptions?: ITerminalInternalOptions
+	): vscode.Terminal;
 	createExtensionTerminal(options: vscode.ExtensionTerminalOptions): vscode.Terminal;
 	attachPtyToTerminal(id: number, pty: vscode.Pseudoterminal): void;
 	getDefaultShell(useAutomationShell: boolean): string;
 	getDefaultShellArgs(useAutomationShell: boolean): string[] | string;
 	registerLinkProvider(provider: vscode.TerminalLinkProvider): vscode.Disposable;
-	registerProfileProvider(extension: IExtensionDescription, id: string, provider: vscode.TerminalProfileProvider): vscode.Disposable;
-	registerTerminalQuickFixProvider(id: string, extensionId: string, provider: vscode.TerminalQuickFixProvider): vscode.Disposable;
-	getEnvironmentVariableCollection(extension: IExtensionDescription): vscode.EnvironmentVariableCollection & { getScoped(scope: vscode.EnvironmentVariableScope): vscode.EnvironmentVariableCollection };
+	registerProfileProvider(
+		extension: IExtensionDescription,
+		id: string,
+		provider: vscode.TerminalProfileProvider
+	): vscode.Disposable;
+	registerTerminalQuickFixProvider(
+		id: string,
+		extensionId: string,
+		provider: vscode.TerminalQuickFixProvider
+	): vscode.Disposable;
+	getEnvironmentVariableCollection(
+		extension: IExtensionDescription
+	): vscode.EnvironmentVariableCollection & {
+		getScoped(scope: vscode.EnvironmentVariableScope): vscode.EnvironmentVariableCollection;
+	};
 	getTerminalById(id: number): ExtHostTerminal | null;
 	getTerminalIdByApiObject(apiTerminal: vscode.Terminal): number | null;
 	registerTerminalCompletionProvider(
@@ -86,7 +101,10 @@ export class ExtHostTerminal extends Disposable {
 	private readonly _onWillDispose = this._register(new Emitter<void>());
 	readonly onWillDispose = this._onWillDispose.event;
 
-	constructor(public _id: ExtHostTerminalIdentifier, name?: string) {
+	constructor(
+		public _id: ExtHostTerminalIdentifier,
+		name?: string
+	) {
 		super();
 		const noop = () => undefined;
 		this.value = {
@@ -107,15 +125,19 @@ export class ExtHostTerminal extends Disposable {
 class StubEnvVarCollection implements vscode.EnvironmentVariableCollection {
 	persistent = true;
 	description: string | vscode.MarkdownString | undefined = undefined;
-	replace() { }
-	append() { }
-	prepend() { }
-	get() { return undefined; }
-	forEach() { }
-	delete() { }
-	clear() { }
-	*[Symbol.iterator](): IterableIterator<[variable: string, mutator: vscode.EnvironmentVariableMutator]> { }
-	getScoped(_scope: vscode.EnvironmentVariableScope): vscode.EnvironmentVariableCollection { return this; }
+	replace() {}
+	append() {}
+	prepend() {}
+	get() {
+		return undefined;
+	}
+	forEach() {}
+	delete() {}
+	clear() {}
+	*[Symbol.iterator](): IterableIterator<[variable: string, mutator: vscode.EnvironmentVariableMutator]> {}
+	getScoped(_scope: vscode.EnvironmentVariableScope): vscode.EnvironmentVariableCollection {
+		return this;
+	}
 }
 
 export abstract class BaseExtHostTerminalService extends Disposable implements IExtHostTerminalService {
@@ -130,7 +152,9 @@ export abstract class BaseExtHostTerminalService extends Disposable implements I
 	readonly onDidOpenTerminal = this._onDidOpenTerminal.event;
 	protected readonly _onDidChangeActiveTerminal = this._register(new Emitter<vscode.Terminal | undefined>());
 	readonly onDidChangeActiveTerminal = this._onDidChangeActiveTerminal.event;
-	protected readonly _onDidChangeTerminalDimensions = this._register(new Emitter<vscode.TerminalDimensionsChangeEvent>());
+	protected readonly _onDidChangeTerminalDimensions = this._register(
+		new Emitter<vscode.TerminalDimensionsChangeEvent>()
+	);
 	readonly onDidChangeTerminalDimensions = this._onDidChangeTerminalDimensions.event;
 	protected readonly _onDidChangeTerminalState = this._register(new Emitter<vscode.Terminal>());
 	readonly onDidChangeTerminalState = this._onDidChangeTerminalState.event;
@@ -152,43 +176,73 @@ export abstract class BaseExtHostTerminalService extends Disposable implements I
 	createExtensionTerminal(options: vscode.ExtensionTerminalOptions): vscode.Terminal {
 		return new ExtHostTerminal(0, options.name).value;
 	}
-	attachPtyToTerminal(): void { }
-	getDefaultShell(): string { return ''; }
-	getDefaultShellArgs(): string[] { return []; }
-	registerLinkProvider(): vscode.Disposable { return toDisposable(() => { }); }
-	registerProfileProvider(): vscode.Disposable { return toDisposable(() => { }); }
-	registerTerminalQuickFixProvider(): vscode.Disposable { return toDisposable(() => { }); }
-	getEnvironmentVariableCollection() { return this._envVarCollection; }
-	getTerminalById(): ExtHostTerminal | null { return null; }
-	getTerminalIdByApiObject(): number | null { return null; }
-	registerTerminalCompletionProvider(): vscode.Disposable { return toDisposable(() => { }); }
+	attachPtyToTerminal(): void {}
+	getDefaultShell(): string {
+		return '';
+	}
+	getDefaultShellArgs(): string[] {
+		return [];
+	}
+	registerLinkProvider(): vscode.Disposable {
+		return toDisposable(() => {});
+	}
+	registerProfileProvider(): vscode.Disposable {
+		return toDisposable(() => {});
+	}
+	registerTerminalQuickFixProvider(): vscode.Disposable {
+		return toDisposable(() => {});
+	}
+	getEnvironmentVariableCollection() {
+		return this._envVarCollection;
+	}
+	getTerminalById(): ExtHostTerminal | null {
+		return null;
+	}
+	getTerminalIdByApiObject(): number | null {
+		return null;
+	}
+	registerTerminalCompletionProvider(): vscode.Disposable {
+		return toDisposable(() => {});
+	}
 
 	// Shape methods — all no-ops.
-	$acceptTerminalClosed(): void { }
-	$acceptTerminalOpened(): void { }
-	$acceptActiveTerminalChanged(): void { }
-	$acceptTerminalProcessId(): void { }
-	$acceptTerminalProcessData(): void { }
-	$acceptDidExecuteCommand(_id: number, _command: ITerminalCommandDto): void { }
-	$acceptTerminalTitleChange(): void { }
-	$acceptTerminalDimensions(): void { }
-	$acceptTerminalMaximumDimensions(): void { }
-	$acceptTerminalInteraction(): void { }
-	$acceptTerminalSelection(): void { }
-	$acceptTerminalShellType(_id: number, _shellType: TerminalShellType | undefined): void { }
-	async $startExtensionTerminal(_id: number, _initialDimensions: ITerminalDimensionsDto | undefined): Promise<ITerminalLaunchError | undefined> { return undefined; }
-	$acceptProcessAckDataEvent(): void { }
-	$acceptProcessInput(): void { }
-	$acceptProcessResize(): void { }
-	$acceptProcessShutdown(): void { }
-	$acceptProcessRequestInitialCwd(): void { }
-	$acceptProcessRequestCwd(): void { }
-	async $acceptProcessRequestLatency(): Promise<number> { return 0; }
-	async $provideLinks(_id: number, _line: string): Promise<ITerminalLinkDto[]> { return []; }
-	$activateLink(): void { }
-	$initEnvironmentVariableCollections(_collections: [string, ISerializableEnvironmentVariableCollection][]): void { }
-	$acceptDefaultProfile(_profile: ITerminalProfile, _automationProfile: ITerminalProfile): void { }
-	async $createContributedProfileTerminal(_id: string, _options: ICreateContributedTerminalProfileOptions): Promise<void> { }
+	$acceptTerminalClosed(): void {}
+	$acceptTerminalOpened(): void {}
+	$acceptActiveTerminalChanged(): void {}
+	$acceptTerminalProcessId(): void {}
+	$acceptTerminalProcessData(): void {}
+	$acceptDidExecuteCommand(_id: number, _command: ITerminalCommandDto): void {}
+	$acceptTerminalTitleChange(): void {}
+	$acceptTerminalDimensions(): void {}
+	$acceptTerminalMaximumDimensions(): void {}
+	$acceptTerminalInteraction(): void {}
+	$acceptTerminalSelection(): void {}
+	$acceptTerminalShellType(_id: number, _shellType: TerminalShellType | undefined): void {}
+	async $startExtensionTerminal(
+		_id: number,
+		_initialDimensions: ITerminalDimensionsDto | undefined
+	): Promise<ITerminalLaunchError | undefined> {
+		return undefined;
+	}
+	$acceptProcessAckDataEvent(): void {}
+	$acceptProcessInput(): void {}
+	$acceptProcessResize(): void {}
+	$acceptProcessShutdown(): void {}
+	$acceptProcessRequestInitialCwd(): void {}
+	$acceptProcessRequestCwd(): void {}
+	async $acceptProcessRequestLatency(): Promise<number> {
+		return 0;
+	}
+	async $provideLinks(_id: number, _line: string): Promise<ITerminalLinkDto[]> {
+		return [];
+	}
+	$activateLink(): void {}
+	$initEnvironmentVariableCollections(_collections: [string, ISerializableEnvironmentVariableCollection][]): void {}
+	$acceptDefaultProfile(_profile: ITerminalProfile, _automationProfile: ITerminalProfile): void {}
+	async $createContributedProfileTerminal(
+		_id: string,
+		_options: ICreateContributedTerminalProfileOptions
+	): Promise<void> {}
 	async $provideTerminalQuickFixes(
 		_id: string,
 		_matchResult: TerminalCommandMatchResultDto,
@@ -205,4 +259,4 @@ export abstract class BaseExtHostTerminalService extends Disposable implements I
 	}
 }
 
-export class WorkerExtHostTerminalService extends BaseExtHostTerminalService { }
+export class WorkerExtHostTerminalService extends BaseExtHostTerminalService {}

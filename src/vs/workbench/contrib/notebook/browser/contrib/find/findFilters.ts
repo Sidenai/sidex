@@ -16,28 +16,47 @@ export class NotebookFindFilters extends Disposable {
 	private readonly _onDidChange = this._register(new Emitter<void>());
 	readonly onDidChange: Event<void> = this._onDidChange.event;
 
-	get markupInput(): boolean { return this._markupInput; }
-	set markupInput(value: boolean) { this._markupInput = value; this._onDidChange.fire(); }
+	get markupInput(): boolean {
+		return this._markupInput;
+	}
+	set markupInput(value: boolean) {
+		this._markupInput = value;
+		this._onDidChange.fire();
+	}
 
-	get markupPreview(): boolean { return this._markupPreview; }
-	set markupPreview(value: boolean) { this._markupPreview = value; this._onDidChange.fire(); }
+	get markupPreview(): boolean {
+		return this._markupPreview;
+	}
+	set markupPreview(value: boolean) {
+		this._markupPreview = value;
+		this._onDidChange.fire();
+	}
 
-	get codeInput(): boolean { return this._codeInput; }
-	set codeInput(value: boolean) { this._codeInput = value; this._onDidChange.fire(); }
+	get codeInput(): boolean {
+		return this._codeInput;
+	}
+	set codeInput(value: boolean) {
+		this._codeInput = value;
+		this._onDidChange.fire();
+	}
 
-	get codeOutput(): boolean { return this._codeOutput; }
-	set codeOutput(value: boolean) { this._codeOutput = value; this._onDidChange.fire(); }
+	get codeOutput(): boolean {
+		return this._codeOutput;
+	}
+	set codeOutput(value: boolean) {
+		this._codeOutput = value;
+		this._onDidChange.fire();
+	}
 
-	get findScope(): any { return this._findScope; }
-	set findScope(value: any) { this._findScope = value; this._onDidChange.fire(); }
+	get findScope(): any {
+		return this._findScope;
+	}
+	set findScope(value: any) {
+		this._findScope = value;
+		this._onDidChange.fire();
+	}
 
-	constructor(
-		markupInput: boolean,
-		markupPreview: boolean,
-		codeInput: boolean,
-		codeOutput: boolean,
-		findScope?: any,
-	) {
+	constructor(markupInput: boolean, markupPreview: boolean, codeInput: boolean, codeOutput: boolean, findScope?: any) {
 		super();
 		this._markupInput = markupInput;
 		this._markupPreview = markupPreview;
@@ -50,12 +69,7 @@ export class NotebookFindFilters extends Disposable {
 		return false;
 	}
 
-	update(
-		markupInput: boolean,
-		markupPreview: boolean,
-		codeInput: boolean,
-		codeOutput: boolean,
-	): void {
+	update(markupInput: boolean, markupPreview: boolean, codeInput: boolean, codeOutput: boolean): void {
 		this._markupInput = markupInput;
 		this._markupPreview = markupPreview;
 		this._codeInput = codeInput;

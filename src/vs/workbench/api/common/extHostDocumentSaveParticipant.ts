@@ -130,7 +130,7 @@ export class ExtHostDocumentSaveParticipant implements ExtHostDocumentSavePartic
 		const event = Object.freeze<vscode.TextDocumentWillSaveEvent>({
 			document,
 			reason,
-			 
+
 			waitUntil(p: Promise<any | vscode.TextEdit[]>) {
 				if (Object.isFrozen(promises)) {
 					throw illegalState('waitUntil can not be called async');

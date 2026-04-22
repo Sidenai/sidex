@@ -10,7 +10,9 @@ export class UserDataProfileInitializer implements IUserDataInitializer {
 	_serviceBrand: undefined;
 
 	async whenInitializationFinished(): Promise<void> {}
-	async requiresInitialization(): Promise<boolean> { return false; }
+	async requiresInitialization(): Promise<boolean> {
+		return false;
+	}
 	async initializeRequiredResources(): Promise<void> {}
 	async initializeOtherResources(_instantiationService: IInstantiationService): Promise<void> {}
 	async initializeInstalledExtensions(_instantiationService: IInstantiationService): Promise<void> {}

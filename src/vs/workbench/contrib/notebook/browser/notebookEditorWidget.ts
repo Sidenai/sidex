@@ -35,7 +35,7 @@ export class NotebookEditorWidget extends Disposable {
 		return null;
 	}
 
-	focus(): void { }
+	focus(): void {}
 
 	getControl(): any {
 		return undefined;
@@ -49,7 +49,7 @@ export class NotebookEditorWidget extends Disposable {
 		return -1;
 	}
 
-	revealCellRangeInView(_range: any): void { }
+	revealCellRangeInView(_range: any): void {}
 	revealRangeInCenterIfOutsideViewportAsync(_cell: any, _range: any): Promise<void> {
 		return Promise.resolve();
 	}

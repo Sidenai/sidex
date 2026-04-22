@@ -298,7 +298,7 @@ export class ContentHoverWidget extends ResizableContentWidget {
 		const contentsDomNode = this._hover.contentsDomNode;
 		contentsDomNode.style.fontSize = `${fontSize}px`;
 		contentsDomNode.style.lineHeight = `${lineHeight / fontSize}`;
-		 
+
 		const codeClasses: HTMLElement[] = Array.prototype.slice.call(
 			this._hover.contentsDomNode.getElementsByClassName('code')
 		);

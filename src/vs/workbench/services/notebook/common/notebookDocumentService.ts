@@ -117,7 +117,9 @@ export interface INotebookDocumentService {
 class NullNotebookDocumentService implements INotebookDocumentService {
 	declare readonly _serviceBrand: undefined;
 
-	getNotebook(_uri: URI): INotebookDocument | undefined { return undefined; }
+	getNotebook(_uri: URI): INotebookDocument | undefined {
+		return undefined;
+	}
 	addNotebookDocument(_document: INotebookDocument): void {}
 	removeNotebookDocument(_document: INotebookDocument): void {}
 }

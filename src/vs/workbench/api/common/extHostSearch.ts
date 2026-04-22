@@ -85,15 +85,26 @@ export class ExtHostSearch implements IExtHostSearch {
 			throw new Error(`a ${kind} search provider for the scheme '${scheme}' is already registered`);
 		}
 		set.add(scheme);
-		this._logService.trace(`[SideX] extHostSearch: ignoring ${kind} provider for scheme '${scheme}' (search routed through Rust)`);
+		this._logService.trace(
+			`[SideX] extHostSearch: ignoring ${kind} provider for scheme '${scheme}' (search routed through Rust)`
+		);
 		return toDisposable(() => set.delete(scheme));
 	}
 
-	async $provideFileSearchResults(_handle: number, _session: number, _rawQuery: IRawFileQuery, _token: vscode.CancellationToken): Promise<ISearchCompleteStats> {
+	async $provideFileSearchResults(
+		_handle: number,
+		_session: number,
+		_rawQuery: IRawFileQuery,
+		_token: vscode.CancellationToken
+	): Promise<ISearchCompleteStats> {
 		return { messages: [] };
 	}
 
-	async doInternalFileSearchWithCustomCallback(_query: IFileQuery, _token: CancellationToken, _handleFileMatch: (data: URI[]) => void): Promise<ISearchCompleteStats> {
+	async doInternalFileSearchWithCustomCallback(
+		_query: IFileQuery,
+		_token: CancellationToken,
+		_handleFileMatch: (data: URI[]) => void
+	): Promise<ISearchCompleteStats> {
 		return { messages: [] };
 	}
 
@@ -101,15 +112,25 @@ export class ExtHostSearch implements IExtHostSearch {
 		return undefined;
 	}
 
-	async $provideTextSearchResults(_handle: number, _session: number, _rawQuery: IRawTextQuery, _token: vscode.CancellationToken): Promise<ISearchCompleteStats> {
+	async $provideTextSearchResults(
+		_handle: number,
+		_session: number,
+		_rawQuery: IRawTextQuery,
+		_token: vscode.CancellationToken
+	): Promise<ISearchCompleteStats> {
 		return { messages: [] };
 	}
 
-	async $provideAITextSearchResults(_handle: number, _session: number, _rawQuery: IRawAITextQuery, _token: vscode.CancellationToken): Promise<ISearchCompleteStats> {
+	async $provideAITextSearchResults(
+		_handle: number,
+		_session: number,
+		_rawQuery: IRawAITextQuery,
+		_token: vscode.CancellationToken
+	): Promise<ISearchCompleteStats> {
 		return { messages: [] };
 	}
 
-	$enableExtensionHostSearch(): void { }
+	$enableExtensionHostSearch(): void {}
 
 	async $getAIName(_handle: number): Promise<string | undefined> {
 		return undefined;
@@ -124,7 +145,8 @@ export function reviveQuery<U extends IRawQuery>(
 		...(<any>rawQuery),
 		...{
 			folderQueries: rawQuery.folderQueries && rawQuery.folderQueries.map(reviveFolderQuery),
-			extraFileResources: rawQuery.extraFileResources && rawQuery.extraFileResources.map(components => URI.revive(components))
+			extraFileResources:
+				rawQuery.extraFileResources && rawQuery.extraFileResources.map(components => URI.revive(components))
 		}
 	};
 }

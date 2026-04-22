@@ -19,7 +19,7 @@ export async function connectManagedSocket<T extends ManagedSocket>(
 	_path: string,
 	_query: string,
 	_debugLabel: string,
-	_half: RemoteSocketHalf,
+	_half: RemoteSocketHalf
 ): Promise<T> {
 	return socket;
 }
@@ -35,7 +35,9 @@ export abstract class ManagedSocket extends Disposable implements ISocket {
 	}
 
 	public pauseData(): void {}
-	public drain(): Promise<void> { return Promise.resolve(); }
+	public drain(): Promise<void> {
+		return Promise.resolve();
+	}
 	public end(): void {}
 	public abstract write(buffer: VSBuffer): void;
 	protected abstract closeRemote(): void;

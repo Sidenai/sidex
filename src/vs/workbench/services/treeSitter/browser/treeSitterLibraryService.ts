@@ -25,11 +25,7 @@ export class TreeSitterLibraryService extends Disposable implements ITreeSitterL
 		throw new Error('[sidex] tree-sitter WASM parser disabled; use the Rust backend');
 	}
 
-	getLanguage(
-		_languageId: string,
-		_ignoreSupportsCheck: boolean,
-		_reader: IReader | undefined
-	): Language | undefined {
+	getLanguage(_languageId: string, _ignoreSupportsCheck: boolean, _reader: IReader | undefined): Language | undefined {
 		return undefined;
 	}
 

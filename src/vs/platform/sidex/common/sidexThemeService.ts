@@ -36,7 +36,7 @@ export class SideXThemeService {
 	declare readonly _serviceBrand: undefined;
 	async listThemes(): Promise<ThemeInfo[]> {
 		try {
-			return await invoke('theme_list') || [];
+			return (await invoke('theme_list')) || [];
 		} catch {
 			return [];
 		}

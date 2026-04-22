@@ -29,10 +29,7 @@ interface TauriEvent {
 
 async function loadTauri(): Promise<{ core: TauriCore; event: TauriEvent } | undefined> {
 	try {
-		const [core, event] = await Promise.all([
-			import('@tauri-apps/api/core'),
-			import('@tauri-apps/api/event')
-		]);
+		const [core, event] = await Promise.all([import('@tauri-apps/api/core'), import('@tauri-apps/api/event')]);
 		return { core, event };
 	} catch {
 		return undefined;

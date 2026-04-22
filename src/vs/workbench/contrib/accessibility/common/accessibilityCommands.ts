@@ -16,5 +16,5 @@ export const enum AccessibilityCommandId {
 	AccessibleViewAcceptInlineCompletion = 'editor.action.accessibleViewAcceptInlineCompletion',
 	AccessibleViewNextCodeBlock = 'editor.action.accessibleViewNextCodeBlock',
 	AccessibleViewPreviousCodeBlock = 'editor.action.accessibleViewPreviousCodeBlock',
-	AccessibleViewDisableHint = 'editor.action.accessibleViewDisableHint',
+	AccessibleViewDisableHint = 'editor.action.accessibleViewDisableHint'
 }

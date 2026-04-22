@@ -57,7 +57,7 @@ export class ExtHostFileSystemEventService implements ExtHostFileSystemEventServ
 		_mainContext: IMainContext,
 		_logService: ILogService,
 		_extHostDocumentsAndEditors: ExtHostDocumentsAndEditors
-	) { }
+	) {}
 
 	createFileSystemWatcher(
 		_workspace: IExtHostWorkspace,
@@ -70,12 +70,14 @@ export class ExtHostFileSystemEventService implements ExtHostFileSystemEventServ
 		return new StubFileSystemWatcher();
 	}
 
-	$onFileEvent(_events: FileSystemEvents): void { }
+	$onFileEvent(_events: FileSystemEvents): void {}
 
 	$onDidRunFileOperation(operation: FileOperation, files: SourceTargetPair[]): void {
 		switch (operation) {
 			case FileOperation.MOVE:
-				this._onDidRenameFile.fire(Object.freeze({ files: files.map(f => ({ oldUri: URI.revive(f.source!), newUri: URI.revive(f.target) })) }));
+				this._onDidRenameFile.fire(
+					Object.freeze({ files: files.map(f => ({ oldUri: URI.revive(f.source!), newUri: URI.revive(f.target) })) })
+				);
 				break;
 			case FileOperation.DELETE:
 				this._onDidDeleteFile.fire(Object.freeze({ files: files.map(f => URI.revive(f.target)) }));

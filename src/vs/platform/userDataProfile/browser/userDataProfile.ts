@@ -30,10 +30,7 @@ interface TauriBindings {
 
 async function loadTauri(): Promise<TauriBindings | undefined> {
 	try {
-		const [core, event] = await Promise.all([
-			import('@tauri-apps/api/core'),
-			import('@tauri-apps/api/event')
-		]);
+		const [core, event] = await Promise.all([import('@tauri-apps/api/core'), import('@tauri-apps/api/event')]);
 		return { invoke: core.invoke, listen: event.listen };
 	} catch {
 		return undefined;

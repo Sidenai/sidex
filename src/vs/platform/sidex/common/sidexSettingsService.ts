@@ -22,7 +22,7 @@ export class SideXSettingsService {
 	declare readonly _serviceBrand: undefined;
 	async get(section?: string): Promise<Record<string, unknown>> {
 		try {
-			return await invoke('settings_get', { section: section || null }) || {};
+			return (await invoke('settings_get', { section: section || null })) || {};
 		} catch {
 			return {};
 		}

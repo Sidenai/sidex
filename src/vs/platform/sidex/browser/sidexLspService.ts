@@ -26,7 +26,9 @@ function tauriListen<T>(event: string, handler: (payload: T) => void): Promise<(
 	const w = globalThis as unknown as TauriEventWindow;
 	const listen = w.__TAURI__?.event?.listen;
 	if (!listen) {
-		return Promise.resolve(() => { /* no-op */ });
+		return Promise.resolve(() => {
+			/* no-op */
+		});
 	}
 	return listen<T>(event, e => handler(e.payload));
 }
@@ -67,13 +69,17 @@ export class SideXLspService {
 	async getServerRegistry(): Promise<LspServerInfo[]> {
 		try {
 			return (await invoke<LspServerInfo[]>('lsp_get_server_registry')) ?? [];
-		} catch { return []; }
+		} catch {
+			return [];
+		}
 	}
 
 	async getSupportedLanguages(): Promise<string[]> {
 		try {
 			return (await invoke<string[]>('lsp_get_supported_languages')) ?? [];
-		} catch { return []; }
+		} catch {
+			return [];
+		}
 	}
 
 	async startServer(args: LspStartArgs): Promise<LspStartResult> {
@@ -91,7 +97,9 @@ export class SideXLspService {
 	async listServers(): Promise<number[]> {
 		try {
 			return (await invoke<number[]>('lsp_list_servers')) ?? [];
-		} catch { return []; }
+		} catch {
+			return [];
+		}
 	}
 
 	onNotification(handler: (notification: LspNotification) => void): Promise<() => void> {

@@ -1072,7 +1072,6 @@ export function setParentFlowTo(fromChildElement: HTMLElement, toParentElement: 
 function getParentFlowToElement(node: HTMLElement): HTMLElement | null {
 	const flowToParentId = node.dataset[parentFlowToDataKey];
 	if (typeof flowToParentId === 'string') {
-		 
 		return node.ownerDocument.getElementById(flowToParentId);
 	}
 	return null;
@@ -1304,62 +1303,50 @@ function createHeadElement<K extends keyof HTMLElementTagNameMap>(
 }
 
 export function isHTMLElement(e: unknown): e is HTMLElement {
-	 
 	return e instanceof HTMLElement || e instanceof getWindow(e as Node).HTMLElement;
 }
 
 export function isHTMLAnchorElement(e: unknown): e is HTMLAnchorElement {
-	 
 	return e instanceof HTMLAnchorElement || e instanceof getWindow(e as Node).HTMLAnchorElement;
 }
 
 export function isHTMLSpanElement(e: unknown): e is HTMLSpanElement {
-	 
 	return e instanceof HTMLSpanElement || e instanceof getWindow(e as Node).HTMLSpanElement;
 }
 
 export function isHTMLTextAreaElement(e: unknown): e is HTMLTextAreaElement {
-	 
 	return e instanceof HTMLTextAreaElement || e instanceof getWindow(e as Node).HTMLTextAreaElement;
 }
 
 export function isHTMLInputElement(e: unknown): e is HTMLInputElement {
-	 
 	return e instanceof HTMLInputElement || e instanceof getWindow(e as Node).HTMLInputElement;
 }
 
 export function isHTMLButtonElement(e: unknown): e is HTMLButtonElement {
-	 
 	return e instanceof HTMLButtonElement || e instanceof getWindow(e as Node).HTMLButtonElement;
 }
 
 export function isHTMLDivElement(e: unknown): e is HTMLDivElement {
-	 
 	return e instanceof HTMLDivElement || e instanceof getWindow(e as Node).HTMLDivElement;
 }
 
 export function isSVGElement(e: unknown): e is SVGElement {
-	 
 	return e instanceof SVGElement || e instanceof getWindow(e as Node).SVGElement;
 }
 
 export function isMouseEvent(e: unknown): e is MouseEvent {
-	 
 	return e instanceof MouseEvent || e instanceof getWindow(e as UIEvent).MouseEvent;
 }
 
 export function isKeyboardEvent(e: unknown): e is KeyboardEvent {
-	 
 	return e instanceof KeyboardEvent || e instanceof getWindow(e as UIEvent).KeyboardEvent;
 }
 
 export function isPointerEvent(e: unknown): e is PointerEvent {
-	 
 	return e instanceof PointerEvent || e instanceof getWindow(e as UIEvent).PointerEvent;
 }
 
 export function isDragEvent(e: unknown): e is DragEvent {
-	 
 	return e instanceof DragEvent || e instanceof getWindow(e as UIEvent).DragEvent;
 }
 

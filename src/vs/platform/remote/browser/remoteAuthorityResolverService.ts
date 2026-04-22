@@ -14,7 +14,7 @@ import {
 	IRemoteConnectionData,
 	ResolvedAuthority,
 	ResolvedOptions,
-	ResolverResult,
+	ResolverResult
 } from '../common/remoteAuthorityResolver.js';
 
 export class RemoteAuthorityResolverService extends Disposable implements IRemoteAuthorityResolverService {
@@ -29,7 +29,7 @@ export class RemoteAuthorityResolverService extends Disposable implements IRemot
 		_resourceUriProvider: ((uri: URI) => URI) | undefined,
 		_serverBasePath: string | undefined,
 		@IProductService productService: IProductService,
-		@ILogService private readonly _logService: ILogService,
+		@ILogService private readonly _logService: ILogService
 	) {
 		super();
 		RemoteAuthorities.setServerRootPath(productService, _serverBasePath);

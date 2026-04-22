@@ -7,7 +7,10 @@ import { InstantiationType, registerSingleton } from '../../../../platform/insta
 import { IDisposable } from '../../../../base/common/lifecycle.js';
 import { CancellationToken } from '../../../../base/common/cancellation.js';
 import { URI } from '../../../../base/common/uri.js';
-import { IUserDataProfile, ProfileResourceTypeFlags } from '../../../../platform/userDataProfile/common/userDataProfile.js';
+import {
+	IUserDataProfile,
+	ProfileResourceTypeFlags
+} from '../../../../platform/userDataProfile/common/userDataProfile.js';
 import {
 	IUserDataProfileImportExportService,
 	IUserDataProfileContentHandler,
@@ -22,11 +25,29 @@ class NullUserDataProfileImportExportService implements IUserDataProfileImportEx
 		return { dispose() {} };
 	}
 	unregisterProfileContentHandler(_id: string): void {}
-	async resolveProfileTemplate(_uri: URI): Promise<IUserDataProfileTemplate | null> { return null; }
+	async resolveProfileTemplate(_uri: URI): Promise<IUserDataProfileTemplate | null> {
+		return null;
+	}
 	async exportProfile(_profile: IUserDataProfile, _exportFlags?: ProfileResourceTypeFlags): Promise<void> {}
-	async createFromProfile(_from: IUserDataProfile, _options: IUserDataProfileCreateOptions, _token: CancellationToken): Promise<IUserDataProfile | undefined> { return undefined; }
-	async createProfileFromTemplate(_profileTemplate: IUserDataProfileTemplate, _options: IUserDataProfileCreateOptions, _token: CancellationToken): Promise<IUserDataProfile | undefined> { return undefined; }
+	async createFromProfile(
+		_from: IUserDataProfile,
+		_options: IUserDataProfileCreateOptions,
+		_token: CancellationToken
+	): Promise<IUserDataProfile | undefined> {
+		return undefined;
+	}
+	async createProfileFromTemplate(
+		_profileTemplate: IUserDataProfileTemplate,
+		_options: IUserDataProfileCreateOptions,
+		_token: CancellationToken
+	): Promise<IUserDataProfile | undefined> {
+		return undefined;
+	}
 	async createTroubleshootProfile(): Promise<void> {}
 }
 
-registerSingleton(IUserDataProfileImportExportService, NullUserDataProfileImportExportService, InstantiationType.Delayed);
+registerSingleton(
+	IUserDataProfileImportExportService,
+	NullUserDataProfileImportExportService,
+	InstantiationType.Delayed
+);

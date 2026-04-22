@@ -9,7 +9,7 @@ export function revealCommentThread(
 	_commentThread: unknown,
 	_comment: unknown,
 	_focusReply?: boolean,
-	_pinThread?: boolean,
+	_pinThread?: boolean
 ): void {
 	// no-op: comments feature removed
 }

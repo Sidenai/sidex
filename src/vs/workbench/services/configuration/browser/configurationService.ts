@@ -1482,9 +1482,7 @@ export class WorkspaceService extends Disposable implements IWorkbenchConfigurat
 					: 'user';
 			await invoke('settings_update', { key, value: value === undefined ? null : value, scope: scopeForRust });
 		} catch (error) {
-			this.logService.trace(
-				`WorkspaceService: settings_update bridge failed for key '${key}': ${error}`
-			);
+			this.logService.trace(`WorkspaceService: settings_update bridge failed for key '${key}': ${error}`);
 		}
 		switch (editableConfigurationTarget) {
 			case EditableConfigurationTarget.USER_LOCAL:

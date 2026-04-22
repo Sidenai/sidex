@@ -18,7 +18,10 @@ export interface IWebSocket {
 	readonly onOpen: Event<void>;
 	readonly onClose: Event<void>;
 	readonly onError: Event<unknown>;
-	traceSocketEvent?(type: SocketDiagnosticsEventType, data?: VSBuffer | Uint8Array | ArrayBuffer | ArrayBufferView | unknown): void;
+	traceSocketEvent?(
+		type: SocketDiagnosticsEventType,
+		data?: VSBuffer | Uint8Array | ArrayBuffer | ArrayBufferView | unknown
+	): void;
 	send(data: ArrayBuffer | ArrayBufferView<ArrayBuffer>): void;
 	close(): void;
 }

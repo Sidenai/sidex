@@ -85,10 +85,7 @@ export class NativeTextMate {
 	/**
 	 * Swaps the active theme, returning the resolved color palette.
 	 */
-	async updateTheme(
-		settings: NativeThemeSetting[],
-		colorMap?: string[]
-	): Promise<string[]> {
+	async updateTheme(settings: NativeThemeSetting[], colorMap?: string[]): Promise<string[]> {
 		const invoke = await this._invoke;
 		if (!invoke) {
 			return colorMap ?? [];
@@ -137,12 +134,14 @@ export class NativeTextMate {
 		if (!invoke) {
 			return undefined;
 		}
-		return invoke<NativeTokenizeLineBinaryResult>(
-			'textmate_tokenize_line_binary',
-			{ scopeName, lineText, prevStack, timeLimitMs }
-		);
+		return invoke<NativeTokenizeLineBinaryResult>('textmate_tokenize_line_binary', {
+			scopeName,
+			lineText,
+			prevStack,
+			timeLimitMs
+		});
 	}
-	
+
 	async tokenizeDocument(
 		scopeName: string,
 		lines: string[],
@@ -153,10 +152,12 @@ export class NativeTextMate {
 		if (!invoke) {
 			return undefined;
 		}
-		return invoke<{ lines: NativeTokenizeLineBinaryResult[]; finalStack: number }>(
-			'textmate_tokenize_document',
-			{ scopeName, lines, startStack, timeLimitMs }
-		);
+		return invoke<{ lines: NativeTokenizeLineBinaryResult[]; finalStack: number }>('textmate_tokenize_document', {
+			scopeName,
+			lines,
+			startStack,
+			timeLimitMs
+		});
 	}
 
 	/**

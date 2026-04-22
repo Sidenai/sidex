@@ -18,12 +18,12 @@ export const IExtHostManagedSockets = createDecorator<IExtHostManagedSockets>('I
 export class ExtHostManagedSockets implements IExtHostManagedSockets {
 	declare readonly _serviceBrand: undefined;
 
-	setFactory(_socketFactoryId: number, _makeConnection: () => Thenable<vscode.ManagedMessagePassing>): void { }
+	setFactory(_socketFactoryId: number, _makeConnection: () => Thenable<vscode.ManagedMessagePassing>): void {}
 
 	async $openRemoteSocket(_socketFactoryId: number): Promise<number> {
 		throw new Error('Managed sockets are not supported in SideX');
 	}
-	$remoteSocketWrite(_socketId: number, _buffer: VSBuffer): void { }
-	$remoteSocketEnd(_socketId: number): void { }
-	async $remoteSocketDrain(_socketId: number): Promise<void> { }
+	$remoteSocketWrite(_socketId: number, _buffer: VSBuffer): void {}
+	$remoteSocketEnd(_socketId: number): void {}
+	async $remoteSocketDrain(_socketId: number): Promise<void> {}
 }

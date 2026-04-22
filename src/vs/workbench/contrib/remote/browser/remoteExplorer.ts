@@ -20,7 +20,14 @@ import { IInstantiationService } from '../../../../platform/instantiation/common
 import { IOpenerService } from '../../../../platform/opener/common/opener.js';
 import { IThemeService } from '../../../../platform/theme/common/themeService.js';
 import { IHoverService } from '../../../../platform/hover/browser/hover.js';
-import { ISideXRemoteService, SshHost, WslDistro, ContainerEntry, CodespaceEntry, RemoteKind } from '../../../../platform/sidex/browser/sidexRemoteService.js';
+import {
+	ISideXRemoteService,
+	SshHost,
+	WslDistro,
+	ContainerEntry,
+	CodespaceEntry,
+	RemoteKind
+} from '../../../../platform/sidex/browser/sidexRemoteService.js';
 import { ICommandService } from '../../../../platform/commands/common/commands.js';
 import { Codicon } from '../../../../base/common/codicons.js';
 import { ThemeIcon } from '../../../../base/common/themables.js';
@@ -89,7 +96,7 @@ class RemoteSectionRenderer implements ITreeRenderer<RemoteSectionItem, void, IS
 		templateData.label.textContent = el.label;
 	}
 
-	disposeTemplate(_templateData: ISectionTemplateData): void { }
+	disposeTemplate(_templateData: ISectionTemplateData): void {}
 }
 
 // ── Leaf renderer ───────────────────────────────────────────────────────────
@@ -132,7 +139,7 @@ class RemoteLeafRenderer implements ITreeRenderer<RemoteLeafItem, void, ILeafTem
 		templateData.actionIcon.title = el.actionLabel ?? localize('remote.connect', 'Connect');
 	}
 
-	disposeTemplate(_templateData: ILeafTemplateData): void { }
+	disposeTemplate(_templateData: ILeafTemplateData): void {}
 }
 
 // ── Data source ─────────────────────────────────────────────────────────────
@@ -189,9 +196,20 @@ export class RemoteExplorerViewPane extends ViewPane {
 		@IHoverService hoverService: IHoverService,
 		@ISideXRemoteService private readonly remoteService: ISideXRemoteService,
 		@ICommandService private readonly commandService: ICommandService,
-		@IQuickInputService private readonly quickInputService: IQuickInputService,
+		@IQuickInputService private readonly quickInputService: IQuickInputService
 	) {
-		super(options, keybindingService, contextMenuService, configurationService, contextKeyService, viewDescriptorService, instantiationService, openerService, themeService, hoverService);
+		super(
+			options,
+			keybindingService,
+			contextMenuService,
+			configurationService,
+			contextKeyService,
+			viewDescriptorService,
+			instantiationService,
+			openerService,
+			themeService,
+			hoverService
+		);
 	}
 
 	protected override renderBody(container: HTMLElement): void {
@@ -209,17 +227,19 @@ export class RemoteExplorerViewPane extends ViewPane {
 			new RemoteDataSource(),
 			{
 				accessibilityProvider: new RemoteAccessibilityProvider(),
-				collapseByDefault: () => false,
+				collapseByDefault: () => false
 			}
 		);
 
 		this._register(this.tree);
 
-		this._register(this.tree.onDidOpen(e => {
-			if (e.element && e.element.kind === 'leaf') {
-				e.element.onActivate();
-			}
-		}));
+		this._register(
+			this.tree.onDidOpen(e => {
+				if (e.element && e.element.kind === 'leaf') {
+					e.element.onActivate();
+				}
+			})
+		);
 
 		this.refresh();
 	}
@@ -230,7 +250,9 @@ export class RemoteExplorerViewPane extends ViewPane {
 	}
 
 	async refresh(): Promise<void> {
-		if (!this.tree) { return; }
+		if (!this.tree) {
+			return;
+		}
 
 		const githubToken = await getCachedGitHubToken();
 
@@ -239,7 +261,7 @@ export class RemoteExplorerViewPane extends ViewPane {
 			this.remoteService.listWslDistros(),
 			this.remoteService.listContainers(),
 			this.remoteService.activeConnections(),
-			githubToken ? this.remoteService.listCodespaces(githubToken) : Promise.resolve([]),
+			githubToken ? this.remoteService.listCodespaces(githubToken) : Promise.resolve([])
 		]);
 
 		const active = activeConns.status === 'fulfilled' ? activeConns.value : [];
@@ -273,10 +295,7 @@ export class RemoteExplorerViewPane extends ViewPane {
 
 	// ── Section builders ──────────────────────────────────────────────────
 
-	private buildTunnelSection(
-		active: { label: string; kind: string }[],
-		githubToken: string | null,
-	): RemoteSectionItem {
+	private buildTunnelSection(active: { label: string; kind: string }[], githubToken: string | null): RemoteSectionItem {
 		const children: RemoteLeafItem[] = [];
 
 		for (const t of active.filter(c => c.kind === 'tunnel')) {
@@ -286,7 +305,7 @@ export class RemoteExplorerViewPane extends ViewPane {
 				label: t.label,
 				icon: Codicon.remote,
 				active: true,
-				onActivate: () => { },
+				onActivate: () => {}
 			});
 		}
 
@@ -298,7 +317,7 @@ export class RemoteExplorerViewPane extends ViewPane {
 			active: false,
 			description: localize('remote.tunnelsProvider', 'Remote-Tunnels'),
 			actionLabel: localize('remote.signIn', 'Sign In'),
-			onActivate: () => this.commandService.executeCommand('sidex.remote.signInTunnel', 'microsoft'),
+			onActivate: () => this.commandService.executeCommand('sidex.remote.signInTunnel', 'microsoft')
 		});
 
 		if (!githubToken) {
@@ -310,7 +329,7 @@ export class RemoteExplorerViewPane extends ViewPane {
 				active: false,
 				description: localize('remote.tunnelsProvider', 'Remote-Tunnels'),
 				actionLabel: localize('remote.signIn', 'Sign In'),
-				onActivate: () => this.commandService.executeCommand('sidex.remote.signInTunnel', 'github'),
+				onActivate: () => this.commandService.executeCommand('sidex.remote.signInTunnel', 'github')
 			});
 		}
 
@@ -319,14 +338,11 @@ export class RemoteExplorerViewPane extends ViewPane {
 			id: 'section-tunnels',
 			label: localize('remote.tunnels', 'Tunnels'),
 			icon: Codicon.remote,
-			children,
+			children
 		};
 	}
 
-	private buildSshSection(
-		hosts: SshHost[],
-		active: { label: string; kind: string }[],
-	): RemoteSectionItem {
+	private buildSshSection(hosts: SshHost[], active: { label: string; kind: string }[]): RemoteSectionItem {
 		const children: RemoteLeafItem[] = [];
 
 		if (hosts.length === 0) {
@@ -336,7 +352,7 @@ export class RemoteExplorerViewPane extends ViewPane {
 				label: localize('remote.ssh.noHosts', 'No SSH targets found in ~/.ssh/config'),
 				icon: Codicon.info,
 				active: false,
-				onActivate: () => { },
+				onActivate: () => {}
 			});
 		} else {
 			for (const host of hosts) {
@@ -349,7 +365,7 @@ export class RemoteExplorerViewPane extends ViewPane {
 					description: host.hostname ?? undefined,
 					icon: Codicon.vm,
 					active: isConnected,
-					onActivate: () => this.commandService.executeCommand('sidex.remote.connect', 'ssh' as RemoteKind, host),
+					onActivate: () => this.commandService.executeCommand('sidex.remote.connect', 'ssh' as RemoteKind, host)
 				});
 			}
 		}
@@ -359,14 +375,11 @@ export class RemoteExplorerViewPane extends ViewPane {
 			id: 'section-ssh',
 			label: localize('remote.ssh', 'SSH'),
 			icon: Codicon.remoteExplorer,
-			children,
+			children
 		};
 	}
 
-	private buildCodespacesSection(
-		spaces: CodespaceEntry[],
-		githubToken: string | null,
-	): RemoteSectionItem {
+	private buildCodespacesSection(spaces: CodespaceEntry[], githubToken: string | null): RemoteSectionItem {
 		const children: RemoteLeafItem[] = [];
 
 		if (!githubToken) {
@@ -377,7 +390,7 @@ export class RemoteExplorerViewPane extends ViewPane {
 				icon: Codicon.github,
 				active: false,
 				actionLabel: localize('remote.signIn', 'Sign In'),
-				onActivate: () => this.commandService.executeCommand('sidex.remote.signInTunnel', 'github'),
+				onActivate: () => this.commandService.executeCommand('sidex.remote.signInTunnel', 'github')
 			});
 		} else if (spaces.length === 0) {
 			children.push({
@@ -386,7 +399,7 @@ export class RemoteExplorerViewPane extends ViewPane {
 				label: localize('remote.codespaces.empty', 'No Codespaces found'),
 				icon: Codicon.info,
 				active: false,
-				onActivate: () => { },
+				onActivate: () => {}
 			});
 		} else {
 			for (const space of spaces) {
@@ -404,7 +417,7 @@ export class RemoteExplorerViewPane extends ViewPane {
 						} catch (err) {
 							this.commandService.executeCommand('sidex.notify.error', String(err));
 						}
-					},
+					}
 				});
 			}
 		}
@@ -414,7 +427,7 @@ export class RemoteExplorerViewPane extends ViewPane {
 			id: 'section-codespaces',
 			label: localize('remote.codespaces', 'GitHub Codespaces'),
 			icon: Codicon.github,
-			children,
+			children
 		};
 	}
 
@@ -426,7 +439,7 @@ export class RemoteExplorerViewPane extends ViewPane {
 			description: `WSL${distro.version} • ${distro.state}`,
 			icon: Codicon.terminalLinux,
 			active: false,
-			onActivate: () => this.commandService.executeCommand('sidex.remote.connect', 'wsl' as RemoteKind, distro),
+			onActivate: () => this.commandService.executeCommand('sidex.remote.connect', 'wsl' as RemoteKind, distro)
 		}));
 
 		return {
@@ -434,7 +447,7 @@ export class RemoteExplorerViewPane extends ViewPane {
 			id: 'section-wsl',
 			label: localize('remote.wsl', 'WSL Targets'),
 			icon: Codicon.vm,
-			children,
+			children
 		};
 	}
 
@@ -448,7 +461,7 @@ export class RemoteExplorerViewPane extends ViewPane {
 				label: localize('remote.containers.noContainers', 'No running containers found'),
 				icon: Codicon.info,
 				active: false,
-				onActivate: () => { },
+				onActivate: () => {}
 			});
 		} else {
 			for (const ctr of ctrs) {
@@ -460,9 +473,10 @@ export class RemoteExplorerViewPane extends ViewPane {
 					description: ctr.image,
 					icon: Codicon.package,
 					active: isRunning,
-					onActivate: () => isRunning
-						? this.commandService.executeCommand('sidex.remote.connect', 'container' as RemoteKind, ctr)
-						: undefined,
+					onActivate: () =>
+						isRunning
+							? this.commandService.executeCommand('sidex.remote.connect', 'container' as RemoteKind, ctr)
+							: undefined
 				});
 			}
 		}
@@ -472,7 +486,7 @@ export class RemoteExplorerViewPane extends ViewPane {
 			id: 'section-containers',
 			label: localize('remote.containers', 'Dev Containers'),
 			icon: Codicon.package,
-			children,
+			children
 		};
 	}
 }
@@ -494,9 +508,10 @@ export async function getCachedGitHubToken(): Promise<string | null> {
 	}
 	try {
 		const { invoke } = await import('@tauri-apps/api/core');
-		const token = (await invoke<string | null>('secret_get', {
-			key: 'sidex.remote.github.device-flow',
-		})) ?? null;
+		const token =
+			(await invoke<string | null>('secret_get', {
+				key: 'sidex.remote.github.device-flow'
+			})) ?? null;
 		_githubTokenCache = { value: token, fetched: true };
 		return token;
 	} catch {

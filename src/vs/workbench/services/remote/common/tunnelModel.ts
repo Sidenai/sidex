@@ -162,14 +162,24 @@ export class TunnelModel extends Disposable {
 	onCandidatesChanged = new Emitter<Map<string, { host: string; port: number }>>().event;
 	onEnvironmentTunnelsSet = new Emitter<void>().event;
 
-	get environmentTunnelsSet(): boolean { return false; }
-	get candidates(): CandidatePort[] { return []; }
-	get candidatesOrUndefined(): CandidatePort[] | undefined { return undefined; }
+	get environmentTunnelsSet(): boolean {
+		return false;
+	}
+	get candidates(): CandidatePort[] {
+		return [];
+	}
+	get candidatesOrUndefined(): CandidatePort[] | undefined {
+		return undefined;
+	}
 
-	async forward(_tunnelProperties: TunnelProperties, _attributes?: Attributes | null): Promise<undefined> { return undefined; }
+	async forward(_tunnelProperties: TunnelProperties, _attributes?: Attributes | null): Promise<undefined> {
+		return undefined;
+	}
 	async close(_host: string, _port: number, _reason: TunnelCloseReason): Promise<void> {}
 	async name(_host: string, _port: number, _name: string): Promise<void> {}
-	address(_host: string, _port: number): string | undefined { return undefined; }
+	address(_host: string, _port: number): string | undefined {
+		return undefined;
+	}
 	addEnvironmentTunnels(_tunnels: unknown): void {}
 	setCandidateFilter(_filter: unknown): void {}
 	async setCandidates(_candidates: CandidatePort[]): Promise<void> {}
@@ -180,7 +190,11 @@ export class TunnelModel extends Disposable {
 // Stub: PortsAttributes is now handled by sidex-remote Rust crate
 export class PortsAttributes extends Disposable {
 	readonly onDidChangeAttributes = new Emitter<void>().event;
-	getAttributes(_port: number, _host: string, _commandLine?: string): Attributes | undefined { return undefined; }
-	static providedActionToAction(_providedAction: unknown) { return undefined; }
+	getAttributes(_port: number, _host: string, _commandLine?: string): Attributes | undefined {
+		return undefined;
+	}
+	static providedActionToAction(_providedAction: unknown) {
+		return undefined;
+	}
 	async addAttributes(_port: number, _attributes: Partial<Attributes>, _target: unknown): Promise<void> {}
 }

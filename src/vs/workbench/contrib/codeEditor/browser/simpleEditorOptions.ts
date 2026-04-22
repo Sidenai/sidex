@@ -17,7 +17,7 @@ export function getSimpleEditorOptions(configurationService?: any): IEditorOptio
 		selectionHighlight: false,
 		scrollbar: {
 			horizontal: 'hidden',
-			alwaysConsumeMouseWheel: false,
+			alwaysConsumeMouseWheel: false
 		},
 		lineDecorationsWidth: 0,
 		overviewRulerBorder: false,
@@ -28,24 +28,24 @@ export function getSimpleEditorOptions(configurationService?: any): IEditorOptio
 		dragAndDrop: false,
 		revealHorizontalRightPadding: 5,
 		minimap: {
-			enabled: false,
+			enabled: false
 		},
 		guides: {
-			indentation: false,
+			indentation: false
 		},
 		accessibilitySupport: 'off',
 		cursorWidth: 1,
-		padding: { top: 8, bottom: 8 },
+		padding: { top: 8, bottom: 8 }
 	};
 }
 
 export function getSimpleCodeEditorWidgetOptions(): any {
 	return {
 		isSimpleWidget: true,
-		contributions: [],
+		contributions: []
 	};
 }
 
 export function setupSimpleEditorSelectionStyling(_container: HTMLElement): any {
-	return { dispose() { } };
+	return { dispose() {} };
 }

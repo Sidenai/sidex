@@ -28,7 +28,7 @@ export const enum AccessibilityVerbositySettingId {
 	Markers = 'accessibility.verbosity.markers',
 	Output = 'accessibility.verbosity.output',
 	Webview = 'accessibility.verbosity.webview',
-	PanelChat = 'accessibility.verbosity.panelChat',
+	PanelChat = 'accessibility.verbosity.panelChat'
 }
 
 export const accessibleViewIsShown = new RawContextKey<boolean>('accessibleViewIsShown', false);

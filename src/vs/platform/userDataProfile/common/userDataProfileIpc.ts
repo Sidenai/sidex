@@ -20,9 +20,13 @@ import { Disposable } from '../../../base/common/lifecycle.js';
 export class UserDataProfilesService extends Disposable implements IUserDataProfilesService {
 	readonly _serviceBrand: undefined;
 
-	get defaultProfile(): IUserDataProfile { return this.profiles[0]; }
+	get defaultProfile(): IUserDataProfile {
+		return this.profiles[0];
+	}
 	private _profiles: IUserDataProfile[] = [];
-	get profiles(): IUserDataProfile[] { return this._profiles; }
+	get profiles(): IUserDataProfile[] {
+		return this._profiles;
+	}
 
 	private readonly _onDidChangeProfiles = this._register(new Emitter<DidChangeProfilesEvent>());
 	readonly onDidChangeProfiles = this._onDidChangeProfiles.event;
@@ -35,39 +39,73 @@ export class UserDataProfilesService extends Disposable implements IUserDataProf
 	) {
 		super();
 		this._profiles = profiles.map(p => reviveProfile(p, this.profilesHome.scheme));
-		this._register(this.channel.listen<DidChangeProfilesEvent>('onDidChangeProfiles')(e => {
-			const added = e.added.map(p => reviveProfile(p, this.profilesHome.scheme));
-			const removed = e.removed.map(p => reviveProfile(p, this.profilesHome.scheme));
-			const updated = e.updated.map(p => reviveProfile(p, this.profilesHome.scheme));
-			this._profiles = e.all.map(p => reviveProfile(p, this.profilesHome.scheme));
-			this._onDidChangeProfiles.fire({ added, removed, updated, all: this.profiles });
-		}));
+		this._register(
+			this.channel.listen<DidChangeProfilesEvent>('onDidChangeProfiles')(e => {
+				const added = e.added.map(p => reviveProfile(p, this.profilesHome.scheme));
+				const removed = e.removed.map(p => reviveProfile(p, this.profilesHome.scheme));
+				const updated = e.updated.map(p => reviveProfile(p, this.profilesHome.scheme));
+				this._profiles = e.all.map(p => reviveProfile(p, this.profilesHome.scheme));
+				this._onDidChangeProfiles.fire({ added, removed, updated, all: this.profiles });
+			})
+		);
 		this.onDidResetWorkspaces = this.channel.listen<void>('onDidResetWorkspaces');
 	}
 
-	async createNamedProfile(name: string, options?: IUserDataProfileOptions, workspaceIdentifier?: IAnyWorkspaceIdentifier): Promise<IUserDataProfile> {
-		return reviveProfile(await this.channel.call<UriDto<IUserDataProfile>>('createNamedProfile', [name, options, workspaceIdentifier]), this.profilesHome.scheme);
+	async createNamedProfile(
+		name: string,
+		options?: IUserDataProfileOptions,
+		workspaceIdentifier?: IAnyWorkspaceIdentifier
+	): Promise<IUserDataProfile> {
+		return reviveProfile(
+			await this.channel.call<UriDto<IUserDataProfile>>('createNamedProfile', [name, options, workspaceIdentifier]),
+			this.profilesHome.scheme
+		);
 	}
 
-	async createProfile(id: string, name: string, options?: IUserDataProfileOptions, workspaceIdentifier?: IAnyWorkspaceIdentifier): Promise<IUserDataProfile> {
-		return reviveProfile(await this.channel.call<UriDto<IUserDataProfile>>('createProfile', [id, name, options, workspaceIdentifier]), this.profilesHome.scheme);
+	async createProfile(
+		id: string,
+		name: string,
+		options?: IUserDataProfileOptions,
+		workspaceIdentifier?: IAnyWorkspaceIdentifier
+	): Promise<IUserDataProfile> {
+		return reviveProfile(
+			await this.channel.call<UriDto<IUserDataProfile>>('createProfile', [id, name, options, workspaceIdentifier]),
+			this.profilesHome.scheme
+		);
 	}
 
 	async createTransientProfile(workspaceIdentifier?: IAnyWorkspaceIdentifier): Promise<IUserDataProfile> {
-		return reviveProfile(await this.channel.call<UriDto<IUserDataProfile>>('createTransientProfile', [workspaceIdentifier]), this.profilesHome.scheme);
+		return reviveProfile(
+			await this.channel.call<UriDto<IUserDataProfile>>('createTransientProfile', [workspaceIdentifier]),
+			this.profilesHome.scheme
+		);
 	}
 
 	async setProfileForWorkspace(workspaceIdentifier: IAnyWorkspaceIdentifier, profile: IUserDataProfile): Promise<void> {
 		await this.channel.call('setProfileForWorkspace', [workspaceIdentifier, profile]);
 	}
 
-	removeProfile(profile: IUserDataProfile): Promise<void> { return this.channel.call('removeProfile', [profile]); }
-
-	async updateProfile(profile: IUserDataProfile, updateOptions: IUserDataProfileUpdateOptions): Promise<IUserDataProfile> {
-		return reviveProfile(await this.channel.call<UriDto<IUserDataProfile>>('updateProfile', [profile, updateOptions]), this.profilesHome.scheme);
+	removeProfile(profile: IUserDataProfile): Promise<void> {
+		return this.channel.call('removeProfile', [profile]);
 	}
 
-	resetWorkspaces(): Promise<void> { return this.channel.call('resetWorkspaces'); }
-	cleanUp(): Promise<void> { return this.channel.call('cleanUp'); }
-	cleanUpTransientProfiles(): Promise<void> { return this.channel.call('cleanUpTransientProfiles'); }
+	async updateProfile(
+		profile: IUserDataProfile,
+		updateOptions: IUserDataProfileUpdateOptions
+	): Promise<IUserDataProfile> {
+		return reviveProfile(
+			await this.channel.call<UriDto<IUserDataProfile>>('updateProfile', [profile, updateOptions]),
+			this.profilesHome.scheme
+		);
+	}
+
+	resetWorkspaces(): Promise<void> {
+		return this.channel.call('resetWorkspaces');
+	}
+	cleanUp(): Promise<void> {
+		return this.channel.call('cleanUp');
+	}
+	cleanUpTransientProfiles(): Promise<void> {
+		return this.channel.call('cleanUpTransientProfiles');
+	}
 }

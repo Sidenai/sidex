@@ -14,25 +14,31 @@ export interface SearchResult {
 }
 
 export class SideXSearchService {
-	async searchText(directory: string, query: string, options?: {
-		caseSensitive?: boolean;
-		wholeWord?: boolean;
-		regex?: boolean;
-		include?: string;
-		exclude?: string;
-		maxResults?: number;
-	}): Promise<SearchResult[]> {
+	async searchText(
+		directory: string,
+		query: string,
+		options?: {
+			caseSensitive?: boolean;
+			wholeWord?: boolean;
+			regex?: boolean;
+			include?: string;
+			exclude?: string;
+			maxResults?: number;
+		}
+	): Promise<SearchResult[]> {
 		try {
-			return await invoke('search_text', {
-				dir: directory,
-				query,
-				caseSensitive: options?.caseSensitive ?? false,
-				wholeWord: options?.wholeWord ?? false,
-				regex: options?.regex ?? false,
-				include: options?.include ?? null,
-				exclude: options?.exclude ?? null,
-				maxResults: options?.maxResults ?? 1000,
-			}) || [];
+			return (
+				(await invoke('search_text', {
+					dir: directory,
+					query,
+					caseSensitive: options?.caseSensitive ?? false,
+					wholeWord: options?.wholeWord ?? false,
+					regex: options?.regex ?? false,
+					include: options?.include ?? null,
+					exclude: options?.exclude ?? null,
+					maxResults: options?.maxResults ?? 1000
+				})) || []
+			);
 		} catch (e) {
 			console.warn('[SideX] search failed:', e);
 			return [];
@@ -41,7 +47,7 @@ export class SideXSearchService {
 
 	async searchFiles(directory: string, pattern: string): Promise<string[]> {
 		try {
-			return await invoke('search_files', { dir: directory, pattern }) || [];
+			return (await invoke('search_files', { dir: directory, pattern })) || [];
 		} catch {
 			return [];
 		}

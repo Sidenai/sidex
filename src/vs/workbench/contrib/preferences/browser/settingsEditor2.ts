@@ -738,7 +738,6 @@ export class SettingsEditor2 extends EditorPane {
 		} else if (this._currentFocusContext === SettingsFocusContext.SettingControl) {
 			const element = this.focusedSettingDOMElement;
 			if (element) {
-				 
 				const control = element.querySelector(AbstractSettingRenderer.CONTROL_SELECTOR);
 				if (control) {
 					(<HTMLElement>control).focus();
@@ -773,7 +772,6 @@ export class SettingsEditor2 extends EditorPane {
 		this.settingsTree.domFocus();
 
 		if (focusSettingInput) {
-			 
 			const controlInFocusedRow = this.settingsTree
 				.getHTMLElement()
 				.querySelector(`.focused ${AbstractSettingRenderer.CONTROL_SELECTOR}`);
@@ -1044,7 +1042,6 @@ export class SettingsEditor2 extends EditorPane {
 	}
 
 	private onDidClickSetting(evt: ISettingLinkClickEvent, recursed?: boolean): void {
-		 
 		const targetElement = this.currentSettingsModel?.getElementsByName(evt.targetKey)?.[0];
 		let revealFailed = false;
 		if (targetElement) {
@@ -1088,7 +1085,6 @@ export class SettingsEditor2 extends EditorPane {
 					evt.targetKey
 				);
 				if (domElements && domElements[0]) {
-					 
 					const control = domElements[0].querySelector(AbstractSettingRenderer.CONTROL_SELECTOR);
 					if (control) {
 						(<HTMLElement>control).focus();
@@ -1900,7 +1896,6 @@ export class SettingsEditor2 extends EditorPane {
 				const newModel = this.settingsTreeModel.value;
 				let newElement: SettingsTreeElement | undefined;
 
-				 
 				const settings = newModel.getElementsByName(anchorId);
 				if (settings && settings.length > 0) {
 					newElement = settings[0];
@@ -1996,7 +1991,6 @@ export class SettingsEditor2 extends EditorPane {
 
 		// If the context view is focused, delay rendering settings
 		if (this.contextViewFocused()) {
-			 
 			const element = this.window.document.querySelector('.context-view');
 			if (element) {
 				this.scheduleRefresh(element as HTMLElement, key);
@@ -2030,7 +2024,6 @@ export class SettingsEditor2 extends EditorPane {
 		this.renderResultCountMessages(false);
 
 		if (key) {
-			 
 			const elements = this.currentSettingsModel?.getElementsByName(key);
 			if (elements?.length) {
 				if (elements.length >= 2) {
@@ -2079,7 +2072,7 @@ export class SettingsEditor2 extends EditorPane {
 		if (!this.currentSettingsModel) {
 			return;
 		}
-		 
+
 		const dataElements = this.currentSettingsModel.getElementsByName(key);
 		const isModified = dataElements && dataElements[0] && dataElements[0].isConfigured; // all elements are either configured or not
 		const elements = this.settingRenderers.getDOMElementsForSettingKey(this.settingsTree.getHTMLElement(), key);

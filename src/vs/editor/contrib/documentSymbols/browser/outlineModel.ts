@@ -68,7 +68,6 @@ export abstract class TreeElement {
 			return undefined;
 		}
 		for (const [, child] of element.children) {
-			 
 			const candidate = TreeElement.getElementById(id, child);
 			if (candidate) {
 				return candidate;
@@ -344,7 +343,6 @@ export class OutlineModel extends TreeElement {
 	}
 
 	getItemById(id: string): TreeElement | undefined {
-		 
 		return TreeElement.getElementById(id, this);
 	}
 

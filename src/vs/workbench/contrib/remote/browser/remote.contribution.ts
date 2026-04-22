@@ -8,7 +8,7 @@ import {
 	IViewContainersRegistry,
 	IViewsRegistry,
 	ViewContainerLocation,
-	Extensions as ViewContainerExtensions,
+	Extensions as ViewContainerExtensions
 } from '../../../common/views.js';
 import { SyncDescriptor } from '../../../../platform/instantiation/common/descriptors.js';
 import { Codicon } from '../../../../base/common/codicons.js';
@@ -23,12 +23,12 @@ import {
 	IStatusbarService,
 	StatusbarAlignment,
 	IStatusbarEntry,
-	IStatusbarEntryAccessor,
+	IStatusbarEntryAccessor
 } from '../../../services/statusbar/browser/statusbar.js';
 import {
 	IWorkbenchContributionsRegistry,
 	Extensions as WorkbenchExtensions,
-	IWorkbenchContribution,
+	IWorkbenchContribution
 } from '../../../common/contributions.js';
 import { LifecyclePhase } from '../../../services/lifecycle/common/lifecycle.js';
 import { Disposable } from '../../../../base/common/lifecycle.js';
@@ -37,7 +37,7 @@ import {
 	SshHost,
 	WslDistro,
 	ContainerEntry,
-	RemoteKind,
+	RemoteKind
 } from '../../../../platform/sidex/browser/sidexRemoteService.js';
 import { IViewsService } from '../../../services/views/common/viewsService.js';
 import { IQuickInputService, IQuickPickItem } from '../../../../platform/quickinput/common/quickInput.js';
@@ -52,16 +52,14 @@ import { INotificationService, Severity } from '../../../../platform/notificatio
 const remoteExplorerViewIcon = registerIcon(
 	'remote-explorer-view-icon',
 	Codicon.remoteExplorer,
-	localize('remoteExplorerViewIcon', 'View icon of the Remote Explorer view.'),
+	localize('remoteExplorerViewIcon', 'View icon of the Remote Explorer view.')
 );
 
 // ── View container ────────────────────────────────────────────────────────────
 
 export const REMOTE_EXPLORER_VIEWLET_ID = 'workbench.view.remote';
 
-const viewContainerRegistry = Registry.as<IViewContainersRegistry>(
-	ViewContainerExtensions.ViewContainersRegistry,
-);
+const viewContainerRegistry = Registry.as<IViewContainersRegistry>(ViewContainerExtensions.ViewContainersRegistry);
 
 const remoteViewContainer = viewContainerRegistry.registerViewContainer(
 	{
@@ -69,7 +67,7 @@ const remoteViewContainer = viewContainerRegistry.registerViewContainer(
 		title: localize2('remoteExplorer', 'Remote Explorer'),
 		ctorDescriptor: new SyncDescriptor(ViewPaneContainer, [
 			REMOTE_EXPLORER_VIEWLET_ID,
-			{ mergeViewWithContainerWhenSingleView: true },
+			{ mergeViewWithContainerWhenSingleView: true }
 		]),
 		storageId: 'workbench.remote.views.state',
 		icon: remoteExplorerViewIcon,
@@ -98,9 +96,9 @@ const remoteViewContainer = viewContainerRegistry.registerViewContainer(
 
 				return;
 			}
-		},
+		}
 	},
-	ViewContainerLocation.Sidebar,
+	ViewContainerLocation.Sidebar
 );
 
 // ── View ──────────────────────────────────────────────────────────────────────
@@ -117,15 +115,15 @@ viewsRegistry.registerViews(
 			order: 0,
 			canToggleVisibility: false,
 			canMoveView: false,
-		focusCommand: {
-			id: 'workbench.remote.focus',
-			keybindings: {
-				primary: KeyMod.CtrlCmd | KeyMod.Shift | KeyCode.F5,
-			},
-		},
-		},
+			focusCommand: {
+				id: 'workbench.remote.focus',
+				keybindings: {
+					primary: KeyMod.CtrlCmd | KeyMod.Shift | KeyCode.F5
+				}
+			}
+		}
 	],
-	remoteViewContainer,
+	remoteViewContainer
 );
 
 // ── Commands ──────────────────────────────────────────────────────────────────
@@ -137,12 +135,14 @@ registerAction2(
 				id: 'sidex.remote.refresh',
 				title: localize2('sidex.remote.refresh', 'Refresh Remote Explorer'),
 				icon: Codicon.refresh,
-				menu: [{
-					id: MenuId.ViewTitle,
-					group: 'navigation',
-					order: 1,
-					when: ContextKeyExpr.equals('view', RemoteExplorerViewPane.ID),
-				}],
+				menu: [
+					{
+						id: MenuId.ViewTitle,
+						group: 'navigation',
+						order: 1,
+						when: ContextKeyExpr.equals('view', RemoteExplorerViewPane.ID)
+					}
+				]
 			});
 		}
 		async run(accessor: ServicesAccessor): Promise<void> {
@@ -150,7 +150,7 @@ registerAction2(
 			const view = viewsService.getActiveViewWithId<RemoteExplorerViewPane>(RemoteExplorerViewPane.ID);
 			await view?.refresh();
 		}
-	},
+	}
 );
 
 registerAction2(
@@ -161,32 +161,27 @@ registerAction2(
 		async run(
 			accessor: ServicesAccessor,
 			type: RemoteKind,
-			payload: SshHost | WslDistro | ContainerEntry | { name: string },
+			payload: SshHost | WslDistro | ContainerEntry | { name: string }
 		): Promise<void> {
 			const remoteService = accessor.get(ISideXRemoteService);
 			const notifications = accessor.get(INotificationService);
 			try {
 				if (type === 'ssh') {
 					const host = payload as SshHost;
-					await remoteService.connectSsh(
-						host.host,
-						host.user ?? 'root',
-						host.port ?? undefined,
-						{ kind: 'agent' },
-					);
+					await remoteService.connectSsh(host.host, host.user ?? 'root', host.port ?? undefined, { kind: 'agent' });
 				}
 				// WSL / containers: fire and forget with a notification for now
 				else {
 					notifications.notify({
 						severity: Severity.Info,
-						message: localize('remote.notImplemented', 'Remote connect for {0} coming soon', type),
+						message: localize('remote.notImplemented', 'Remote connect for {0} coming soon', type)
 					});
 				}
 			} catch (err) {
 				notifications.error(String(err));
 			}
 		}
-	},
+	}
 );
 
 registerAction2(
@@ -195,14 +190,14 @@ registerAction2(
 			super({
 				id: 'sidex.remote.openExplorer',
 				title: localize2('sidex.remote.openExplorer', 'Remote Explorer'),
-				menu: [{ id: MenuId.CommandPalette }],
+				menu: [{ id: MenuId.CommandPalette }]
 			});
 		}
 		async run(accessor: ServicesAccessor): Promise<void> {
 			const viewsService = accessor.get(IViewsService);
 			await viewsService.openView(RemoteExplorerViewPane.ID, true);
 		}
-	},
+	}
 );
 
 registerAction2(
@@ -211,7 +206,7 @@ registerAction2(
 			super({
 				id: 'sidex.remote.openWindow',
 				title: localize2('sidex.remote.openWindow', 'Connect to…'),
-				menu: [{ id: MenuId.CommandPalette }],
+				menu: [{ id: MenuId.CommandPalette }]
 			});
 		}
 		async run(accessor: ServicesAccessor): Promise<void> {
@@ -228,22 +223,22 @@ registerAction2(
 				{
 					label: '$(remote) ' + localize('remote.pick.connectToTunnel', 'Connect to Tunnel…'),
 					description: localize('remote.pick.tunnelsProvider', 'Remote-Tunnels'),
-					action: () => commandService.executeCommand('sidex.remote.signInTunnel', 'github'),
+					action: () => commandService.executeCommand('sidex.remote.signInTunnel', 'github')
 				},
 				{
 					label: '$(terminal-cmd) ' + localize('remote.pick.connectToHost', 'Connect to Host…'),
 					description: localize('remote.pick.sshProvider', 'Remote-SSH'),
-					action: () => pickAndConnectSsh(quickInput, notifications, remoteService),
+					action: () => pickAndConnectSsh(quickInput, notifications, remoteService)
 				},
 				{
 					label: '$(terminal-linux) ' + localize('remote.pick.wsl', 'Connect to WSL…'),
 					description: localize('remote.pick.wslProvider', 'Remote-WSL'),
-					action: () => pickAndConnectWsl(quickInput, notifications, remoteService),
+					action: () => pickAndConnectWsl(quickInput, notifications, remoteService)
 				},
 				{
 					label: '$(package) ' + localize('remote.pick.container', 'Open Folder in Container…'),
 					description: localize('remote.pick.containerProvider', 'Dev Containers'),
-					action: () => pickAndAttachContainer(quickInput, notifications, remoteService),
+					action: () => pickAndAttachContainer(quickInput, notifications, remoteService)
 				},
 				{
 					label: '$(github) ' + localize('remote.pick.codespace', 'Connect to Codespace…'),
@@ -253,12 +248,15 @@ registerAction2(
 						// keychain authorization prompt on every invocation.
 						let token = await getCachedGitHubToken();
 						if (!token) {
-							token = (await quickInput.input({
-								prompt: localize('remote.codespace.tokenPrompt', 'GitHub personal access token with codespace scope'),
-								password: true,
-							})) ?? null;
+							token =
+								(await quickInput.input({
+									prompt: localize('remote.codespace.tokenPrompt', 'GitHub personal access token with codespace scope'),
+									password: true
+								})) ?? null;
 						}
-						if (!token) { return; }
+						if (!token) {
+							return;
+						}
 
 						try {
 							const spaces = await remoteService.listCodespaces(token);
@@ -270,34 +268,38 @@ registerAction2(
 										label: s.displayName,
 										description: `${s.repository} • ${s.branch}`,
 										detail: `${s.state} • ${s.machineType}`,
-										codespace: s,
+										codespace: s
 									})),
-									{ placeHolder: localize('remote.codespace.pick', 'Select a Codespace') },
+									{ placeHolder: localize('remote.codespace.pick', 'Select a Codespace') }
 								);
 								if (pick) {
 									try {
 										await remoteService.connectCodespace(pick.codespace.name, token);
-										notifications.info(localize('remote.codespace.connected', 'Connected to Codespace: {0}', pick.label));
+										notifications.info(
+											localize('remote.codespace.connected', 'Connected to Codespace: {0}', pick.label)
+										);
 									} catch (err) {
-										notifications.error(localize('remote.codespace.failed', 'Codespace connect failed: {0}', String(err)));
+										notifications.error(
+											localize('remote.codespace.failed', 'Codespace connect failed: {0}', String(err))
+										);
 									}
 								}
 							}
 						} catch (err) {
 							notifications.error(String(err));
 						}
-					},
-				},
+					}
+				}
 			];
 
 			const selected = await quickInput.pick(picks, {
-				placeHolder: localize('remote.pick.placeholder', 'Select an option to open a Remote Window'),
+				placeHolder: localize('remote.pick.placeholder', 'Select an option to open a Remote Window')
 			});
 			if (selected) {
 				await (selected as RemoteOption).action();
 			}
 		}
-	},
+	}
 );
 
 registerAction2(
@@ -305,7 +307,7 @@ registerAction2(
 		constructor() {
 			super({
 				id: 'sidex.remote.signInTunnel',
-				title: localize2('sidex.remote.signInTunnel', 'Sign in to Remote Tunnels'),
+				title: localize2('sidex.remote.signInTunnel', 'Sign in to Remote Tunnels')
 			});
 		}
 
@@ -328,7 +330,7 @@ registerAction2(
 					interval: number;
 				}>('https://github.com/login/device/code', 'POST', {
 					client_id: GITHUB_CLIENT_ID,
-					scope: 'codespace read:user',
+					scope: 'codespace read:user'
 				});
 
 				await clipboardService.writeText(deviceRes.user_code);
@@ -337,16 +339,12 @@ registerAction2(
 					message: localize(
 						'remote.github.code',
 						'Code {0} copied to clipboard. Paste it on GitHub to sign in.',
-						deviceRes.user_code,
-					),
+						deviceRes.user_code
+					)
 				});
 				await opener.open(URI.parse(deviceRes.verification_uri));
 
-				const token = await pollForGitHubToken(
-					deviceRes.device_code,
-					deviceRes.interval,
-					deviceRes.expires_in,
-				);
+				const token = await pollForGitHubToken(deviceRes.device_code, deviceRes.interval, deviceRes.expires_in);
 				if (!token) {
 					notifications.warn(localize('remote.github.timeout', 'GitHub sign-in timed out.'));
 					return;
@@ -354,12 +352,14 @@ registerAction2(
 
 				await storeGitHubToken(token);
 				clearCachedGitHubToken();
-				notifications.info(localize('remote.github.success', 'Signed in to GitHub. You can now list Codespaces and tunnels.'));
+				notifications.info(
+					localize('remote.github.success', 'Signed in to GitHub. You can now list Codespaces and tunnels.')
+				);
 			} catch (err) {
 				notifications.error(String(err));
 			}
 		}
-	},
+	}
 );
 
 // ── Remote-type connect flows ────────────────────────────────────────────────
@@ -367,7 +367,7 @@ registerAction2(
 async function pickAndConnectSsh(
 	quickInput: IQuickInputService,
 	notifications: INotificationService,
-	remoteService: ISideXRemoteService,
+	remoteService: ISideXRemoteService
 ): Promise<void> {
 	const hosts = await remoteService.listSshHosts();
 
@@ -380,22 +380,24 @@ async function pickAndConnectSsh(
 		...hosts.map(h => ({
 			label: `$(vm) ${h.host}`,
 			description: `${h.user ?? 'root'}@${h.hostname ?? h.host}${h.port ? `:${h.port}` : ''}`,
-			host: h,
+			host: h
 		})),
 		{ label: '', kind: 'separator' } as HostItem,
 		{
 			label: `$(add) ${localize('remote.ssh.manual', 'Add New SSH Host…')}`,
 			description: localize('remote.ssh.manualHint', 'user@hostname[:port]'),
-			manual: true,
-		},
+			manual: true
+		}
 	];
 
 	const pick = await quickInput.pick(items, {
 		placeHolder: hosts.length
 			? localize('remote.ssh.pick', 'Select an SSH host from ~/.ssh/config')
-			: localize('remote.ssh.empty', 'No SSH targets in ~/.ssh/config — add one below'),
+			: localize('remote.ssh.empty', 'No SSH targets in ~/.ssh/config — add one below')
 	});
-	if (!pick) { return; }
+	if (!pick) {
+		return;
+	}
 
 	let user: string;
 	let host: string;
@@ -404,9 +406,11 @@ async function pickAndConnectSsh(
 	if (pick.manual) {
 		const raw = await quickInput.input({
 			prompt: localize('remote.ssh.enter', 'Enter user@host[:port]'),
-			placeHolder: 'root@example.com:22',
+			placeHolder: 'root@example.com:22'
 		});
-		if (!raw) { return; }
+		if (!raw) {
+			return;
+		}
 		const match = raw.match(/^(?:([^@]+)@)?([^:]+)(?::(\d+))?$/);
 		if (!match) {
 			notifications.error(localize('remote.ssh.invalid', 'Invalid host format'));
@@ -432,15 +436,15 @@ async function pickAndConnectSsh(
 async function pickAndConnectWsl(
 	quickInput: IQuickInputService,
 	notifications: INotificationService,
-	remoteService: ISideXRemoteService,
+	remoteService: ISideXRemoteService
 ): Promise<void> {
 	const distros = await remoteService.listWslDistros();
 	if (!distros.length) {
 		notifications.info(
 			localize(
 				'remote.wsl.unavailable',
-				'WSL is not available on this machine. WSL requires Windows 10/11 with WSL installed.',
-			),
+				'WSL is not available on this machine. WSL requires Windows 10/11 with WSL installed.'
+			)
 		);
 		return;
 	}
@@ -450,11 +454,13 @@ async function pickAndConnectWsl(
 			label: `$(terminal-linux) ${d.name}`,
 			description: d.isDefault ? localize('remote.wsl.default', '(default)') : '',
 			detail: `${d.state} • WSL${d.version}`,
-			distro: d,
+			distro: d
 		})),
-		{ placeHolder: localize('remote.wsl.pick', 'Select a WSL distribution') },
+		{ placeHolder: localize('remote.wsl.pick', 'Select a WSL distribution') }
 	);
-	if (!pick) { return; }
+	if (!pick) {
+		return;
+	}
 
 	try {
 		await remoteService.connectWsl(pick.distro.name);
@@ -467,7 +473,7 @@ async function pickAndConnectWsl(
 async function pickAndAttachContainer(
 	quickInput: IQuickInputService,
 	notifications: INotificationService,
-	remoteService: ISideXRemoteService,
+	remoteService: ISideXRemoteService
 ): Promise<void> {
 	const containers = await remoteService.listContainers();
 
@@ -485,7 +491,7 @@ async function pickAndAttachContainer(
 				label: `$(package) ${c.name.replace(/^\//, '')}`,
 				description: c.image,
 				detail: `${c.status}${c.ports ? ` • ${c.ports}` : ''}`,
-				container: c,
+				container: c
 			});
 		}
 	}
@@ -494,22 +500,24 @@ async function pickAndAttachContainer(
 	items.push({
 		label: `$(file) ${localize('remote.container.openConfig', 'Open Folder with devcontainer.json…')}`,
 		description: localize('remote.container.configHint', 'Enter the path to a devcontainer.json file'),
-		configPath: '',
+		configPath: ''
 	});
 
 	if (!containers.length) {
 		notifications.info(
 			localize(
 				'remote.container.noRunning',
-				'No running containers found. Start one with Docker/Podman or pick a devcontainer.json file below.',
-			),
+				'No running containers found. Start one with Docker/Podman or pick a devcontainer.json file below.'
+			)
 		);
 	}
 
 	const pick = await quickInput.pick(items, {
-		placeHolder: localize('remote.container.pick', 'Select a running container or devcontainer.json'),
+		placeHolder: localize('remote.container.pick', 'Select a running container or devcontainer.json')
 	});
-	if (!pick) { return; }
+	if (!pick) {
+		return;
+	}
 
 	let configPath: string;
 	if (pick.container) {
@@ -517,9 +525,11 @@ async function pickAndAttachContainer(
 	} else {
 		const typed = await quickInput.input({
 			prompt: localize('remote.container.enterPath', 'Path to devcontainer.json'),
-			placeHolder: '/path/to/.devcontainer/devcontainer.json',
+			placeHolder: '/path/to/.devcontainer/devcontainer.json'
 		});
-		if (!typed) { return; }
+		if (!typed) {
+			return;
+		}
 		configPath = typed;
 	}
 
@@ -538,7 +548,7 @@ const GITHUB_CLIENT_ID = 'Ov23liCQ4Z5wGSG73N6F';
 async function tauriProxyJson<T>(
 	url: string,
 	method: 'GET' | 'POST',
-	body: Record<string, string> | undefined,
+	body: Record<string, string> | undefined
 ): Promise<T> {
 	const { invoke } = await import('@tauri-apps/api/core');
 	const bodyStr = body ? new URLSearchParams(body).toString() : null;
@@ -549,10 +559,10 @@ async function tauriProxyJson<T>(
 			method,
 			headers: {
 				accept: 'application/json',
-				'content-type': 'application/x-www-form-urlencoded',
+				'content-type': 'application/x-www-form-urlencoded'
 			},
-			body: bodyStr,
-		},
+			body: bodyStr
+		}
 	);
 	if (result.status < 200 || result.status >= 300) {
 		throw new Error(`GitHub ${method} ${url} → ${result.status}`);
@@ -565,7 +575,7 @@ async function tauriProxyJson<T>(
 async function pollForGitHubToken(
 	deviceCode: string,
 	intervalSecs: number,
-	expiresInSecs: number,
+	expiresInSecs: number
 ): Promise<string | null> {
 	const deadline = Date.now() + expiresInSecs * 1000;
 	let delay = Math.max(5, intervalSecs) * 1000;
@@ -574,21 +584,23 @@ async function pollForGitHubToken(
 		await new Promise(r => setTimeout(r, delay));
 		let res: { access_token?: string; error?: string; interval?: number };
 		try {
-			res = await tauriProxyJson<typeof res>(
-				'https://github.com/login/oauth/access_token',
-				'POST',
-				{
-					client_id: GITHUB_CLIENT_ID,
-					device_code: deviceCode,
-					grant_type: 'urn:ietf:params:oauth:grant-type:device_code',
-				},
-			);
+			res = await tauriProxyJson<typeof res>('https://github.com/login/oauth/access_token', 'POST', {
+				client_id: GITHUB_CLIENT_ID,
+				device_code: deviceCode,
+				grant_type: 'urn:ietf:params:oauth:grant-type:device_code'
+			});
 		} catch {
 			continue;
 		}
-		if (res.access_token) { return res.access_token; }
-		if (res.error === 'slow_down' && res.interval) { delay = res.interval * 1000; }
-		if (res.error === 'access_denied' || res.error === 'expired_token') { return null; }
+		if (res.access_token) {
+			return res.access_token;
+		}
+		if (res.error === 'slow_down' && res.interval) {
+			delay = res.interval * 1000;
+		}
+		if (res.error === 'access_denied' || res.error === 'expired_token') {
+			return null;
+		}
 	}
 	return null;
 }
@@ -597,7 +609,7 @@ async function storeGitHubToken(token: string): Promise<void> {
 	const { invoke } = await import('@tauri-apps/api/core');
 	await invoke('secret_set', {
 		key: 'sidex.remote.github.device-flow',
-		value: token,
+		value: token
 	});
 }
 
@@ -610,7 +622,7 @@ class RemoteStatusBarIndicator extends Disposable implements IWorkbenchContribut
 
 	constructor(
 		@IStatusbarService private readonly statusbarService: IStatusbarService,
-		@ISideXRemoteService private readonly remoteService: ISideXRemoteService,
+		@ISideXRemoteService private readonly remoteService: ISideXRemoteService
 	) {
 		super();
 		this.entry = this._register(
@@ -618,8 +630,8 @@ class RemoteStatusBarIndicator extends Disposable implements IWorkbenchContribut
 				this.buildEntry(null),
 				'status.host',
 				StatusbarAlignment.LEFT,
-				Number.MAX_SAFE_INTEGER,
-			),
+				Number.MAX_SAFE_INTEGER
+			)
 		);
 		this.updateFromConnections();
 	}
@@ -635,13 +647,15 @@ class RemoteStatusBarIndicator extends Disposable implements IWorkbenchContribut
 			text,
 			ariaLabel,
 			tooltip: localize('remote.statusbar.tooltip', 'Open a Remote Window'),
-			command: 'sidex.remote.openWindow',
+			command: 'sidex.remote.openWindow'
 		};
 	}
 
 	private async updateFromConnections(): Promise<void> {
 		const conns = await this.remoteService.activeConnections().catch(() => []);
-		if (!this.entry) { return; }
+		if (!this.entry) {
+			return;
+		}
 		const first = conns[0];
 		this.entry.update(this.buildEntry(first?.label ?? null));
 	}
@@ -649,5 +663,5 @@ class RemoteStatusBarIndicator extends Disposable implements IWorkbenchContribut
 
 Registry.as<IWorkbenchContributionsRegistry>(WorkbenchExtensions.Workbench).registerWorkbenchContribution(
 	RemoteStatusBarIndicator,
-	LifecyclePhase.Restored,
+	LifecyclePhase.Restored
 );

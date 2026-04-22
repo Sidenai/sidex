@@ -18,7 +18,7 @@ import { ISignService } from '../../sign/common/sign.js';
 export const enum ConnectionType {
 	Management = 1,
 	ExtensionHost = 2,
-	Tunnel = 3,
+	Tunnel = 3
 }
 
 export interface IRemoteExtensionHostStartParams {
@@ -58,12 +58,15 @@ export const enum PersistentConnectionEventType {
 	ReconnectionWait,
 	ReconnectionRunning,
 	ReconnectionPermanentFailure,
-	ConnectionGain,
+	ConnectionGain
 }
 
 export class ConnectionLostEvent {
 	public readonly type = PersistentConnectionEventType.ConnectionLost;
-	constructor(public readonly reconnectionToken: string, public readonly millisSinceLastIncomingData: number) {}
+	constructor(
+		public readonly reconnectionToken: string,
+		public readonly millisSinceLastIncomingData: number
+	) {}
 }
 
 export class ReconnectionWaitEvent {
@@ -72,7 +75,7 @@ export class ReconnectionWaitEvent {
 		public readonly reconnectionToken: string,
 		public readonly millisSinceLastIncomingData: number,
 		public readonly durationSeconds: number,
-		private readonly cancellableTimer: CancelablePromise<void>,
+		private readonly cancellableTimer: CancelablePromise<void>
 	) {}
 	public skipWait(): void {
 		this.cancellableTimer.cancel();
@@ -84,7 +87,7 @@ export class ReconnectionRunningEvent {
 	constructor(
 		public readonly reconnectionToken: string,
 		public readonly millisSinceLastIncomingData: number,
-		public readonly attempt: number,
+		public readonly attempt: number
 	) {}
 }
 
@@ -93,7 +96,7 @@ export class ConnectionGainEvent {
 	constructor(
 		public readonly reconnectionToken: string,
 		public readonly millisSinceLastIncomingData: number,
-		public readonly attempt: number,
+		public readonly attempt: number
 	) {}
 }
 
@@ -103,7 +106,7 @@ export class ReconnectionPermanentFailureEvent {
 		public readonly reconnectionToken: string,
 		public readonly millisSinceLastIncomingData: number,
 		public readonly attempt: number,
-		public readonly handled: boolean,
+		public readonly handled: boolean
 	) {}
 }
 
@@ -115,7 +118,11 @@ export type PersistentConnectionEvent =
 	| ReconnectionPermanentFailureEvent;
 
 export abstract class PersistentConnection extends Disposable {
-	public static triggerPermanentFailure(_millisSinceLastIncomingData: number, _attempt: number, _handled: boolean): void {}
+	public static triggerPermanentFailure(
+		_millisSinceLastIncomingData: number,
+		_attempt: number,
+		_handled: boolean
+	): void {}
 	public static debugTriggerReconnection(): void {}
 	public static debugPauseSocketWriting(): void {}
 
@@ -127,7 +134,7 @@ export abstract class PersistentConnection extends Disposable {
 		protected readonly _options: IConnectionOptions,
 		public readonly reconnectionToken: string,
 		public readonly protocol: PersistentProtocol,
-		_reconnectionFailureIsFatal: boolean,
+		_reconnectionFailureIsFatal: boolean
 	) {
 		super();
 	}
@@ -143,10 +150,12 @@ export class ManagementPersistentConnection extends PersistentConnection {
 		remoteAuthority: string,
 		clientId: string,
 		reconnectionToken: string,
-		protocol: PersistentProtocol,
+		protocol: PersistentProtocol
 	) {
 		super(ConnectionType.Management, options, reconnectionToken, protocol, true);
-		this.client = this._register(new Client<RemoteAgentConnectionContext>(protocol, { remoteAuthority, clientId }, options.ipcLogger));
+		this.client = this._register(
+			new Client<RemoteAgentConnectionContext>(protocol, { remoteAuthority, clientId }, options.ipcLogger)
+		);
 	}
 }
 
@@ -158,7 +167,7 @@ export class ExtensionHostPersistentConnection extends PersistentConnection {
 		_startArguments: IRemoteExtensionHostStartParams,
 		reconnectionToken: string,
 		protocol: PersistentProtocol,
-		debugPort: number | undefined,
+		debugPort: number | undefined
 	) {
 		super(ConnectionType.ExtensionHost, options, reconnectionToken, protocol, false);
 		this.debugPort = debugPort;
@@ -168,14 +177,14 @@ export class ExtensionHostPersistentConnection extends PersistentConnection {
 export async function connectRemoteAgentManagement(
 	_options: IConnectionOptions,
 	_remoteAuthority: string,
-	_clientId: string,
+	_clientId: string
 ): Promise<ManagementPersistentConnection> {
 	throw new Error('Remote agent connections are handled by Rust runtime');
 }
 
 export async function connectRemoteAgentExtensionHost(
 	_options: IConnectionOptions,
-	_startArguments: IRemoteExtensionHostStartParams,
+	_startArguments: IRemoteExtensionHostStartParams
 ): Promise<ExtensionHostPersistentConnection> {
 	throw new Error('Remote agent connections are handled by Rust runtime');
 }
@@ -183,7 +192,7 @@ export async function connectRemoteAgentExtensionHost(
 export async function connectRemoteAgentTunnel(
 	_options: IConnectionOptions,
 	_tunnelRemoteHost: string,
-	_tunnelRemotePort: number,
+	_tunnelRemotePort: number
 ): Promise<PersistentProtocol> {
 	throw new Error('Remote agent connections are handled by Rust runtime');
 }

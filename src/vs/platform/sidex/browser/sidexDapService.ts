@@ -26,7 +26,9 @@ function tauriListen<T>(event: string, handler: (payload: T) => void): Promise<(
 	const w = globalThis as unknown as TauriEventWindow;
 	const listen = w.__TAURI__?.event?.listen;
 	if (!listen) {
-		return Promise.resolve(() => { /* no-op */ });
+		return Promise.resolve(() => {
+			/* no-op */
+		});
 	}
 	return listen<T>(event, e => handler(e.payload));
 }
@@ -86,14 +88,18 @@ export class SideXDapService {
 	async getAdapterRegistry(): Promise<DebugAdapterInfo[]> {
 		try {
 			return (await invoke<DebugAdapterInfo[]>('dap_get_adapter_registry')) ?? [];
-		} catch { return []; }
+		} catch {
+			return [];
+		}
 	}
 
 	async getLaunchConfigs(workspace: string): Promise<DapLaunchConfigResponse> {
 		try {
 			return (
-				(await invoke<DapLaunchConfigResponse>('dap_get_launch_configs', { workspace })) ??
-				{ configs: [], compounds: [] }
+				(await invoke<DapLaunchConfigResponse>('dap_get_launch_configs', { workspace })) ?? {
+					configs: [],
+					compounds: []
+				}
 			);
 		} catch {
 			return { configs: [], compounds: [] };

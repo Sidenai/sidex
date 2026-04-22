@@ -5,7 +5,7 @@
 
 export enum NotebookCellKind {
 	Markup = 1,
-	Code = 2,
+	Code = 2
 }
 
 export class NotebookRange {
@@ -20,10 +20,7 @@ export class NotebookRange {
 	}
 
 	with(change: { start?: number; end?: number }): NotebookRange {
-		return new NotebookRange(
-			change.start ?? this.start,
-			change.end ?? this.end,
-		);
+		return new NotebookRange(change.start ?? this.start, change.end ?? this.end);
 	}
 }
 
@@ -47,11 +44,14 @@ export class NotebookCellOutputItem {
 	}
 
 	static error(value: Error): NotebookCellOutputItem {
-		return NotebookCellOutputItem.text(JSON.stringify({
-			name: value.name,
-			message: value.message,
-			stack: value.stack,
-		}), 'application/vnd.code.notebook.error');
+		return NotebookCellOutputItem.text(
+			JSON.stringify({
+				name: value.name,
+				message: value.message,
+				stack: value.stack
+			}),
+			'application/vnd.code.notebook.error'
+		);
 	}
 
 	mime: string;

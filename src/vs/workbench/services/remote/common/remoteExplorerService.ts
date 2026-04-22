@@ -126,11 +126,17 @@ class RemoteExplorerService implements IRemoteExplorerService {
 	targetType: string[] = [];
 	portsFeaturesEnabled: PortsEnablement = PortsEnablement.Disabled;
 
-	get tunnelModel(): TunnelModel { return this._tunnelModel; }
+	get tunnelModel(): TunnelModel {
+		return this._tunnelModel;
+	}
 
 	setEditable(_tunnelItem: ITunnelItem | undefined, _editId: TunnelEditId, _data: IEditableData | null): void {}
-	getEditableData(_tunnelItem: ITunnelItem | undefined, _editId?: TunnelEditId): IEditableData | undefined { return undefined; }
-	async forward(_tunnelProperties: TunnelProperties, _attributes?: Attributes | null): Promise<undefined> { return undefined; }
+	getEditableData(_tunnelItem: ITunnelItem | undefined, _editId?: TunnelEditId): IEditableData | undefined {
+		return undefined;
+	}
+	async forward(_tunnelProperties: TunnelProperties, _attributes?: Attributes | null): Promise<undefined> {
+		return undefined;
+	}
 	async close(_remote: { host: string; port: number }, _reason: TunnelCloseReason): Promise<void> {}
 	setTunnelInformation(_tunnelInformation: unknown): void {}
 	setCandidateFilter(_filter: ((candidates: CandidatePort[]) => Promise<CandidatePort[]>) | undefined): IDisposable {

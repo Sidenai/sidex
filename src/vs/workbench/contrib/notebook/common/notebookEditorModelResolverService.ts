@@ -6,7 +6,9 @@
 import { createDecorator } from '../../../../platform/instantiation/common/instantiation.js';
 import { URI } from '../../../../base/common/uri.js';
 
-export const INotebookEditorModelResolverService = createDecorator<INotebookEditorModelResolverService>('notebookEditorModelResolverService');
+export const INotebookEditorModelResolverService = createDecorator<INotebookEditorModelResolverService>(
+	'notebookEditorModelResolverService'
+);
 
 export interface INotebookEditorModelResolverService {
 	readonly _serviceBrand: undefined;

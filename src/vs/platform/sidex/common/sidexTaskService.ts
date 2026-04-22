@@ -28,7 +28,9 @@ function tauriListen<T>(event: string, handler: (payload: T) => void): Promise<(
 	const w = globalThis as unknown as TauriEventWindow;
 	const listen = w.__TAURI__?.event?.listen;
 	if (!listen) {
-		return Promise.resolve(() => { /* no-op outside Tauri */ });
+		return Promise.resolve(() => {
+			/* no-op outside Tauri */
+		});
 	}
 	return listen<T>(event, e => handler(e.payload));
 }
@@ -111,7 +113,7 @@ export class SideXTaskService {
 			args: options.args ?? null,
 			cwd: options.cwd ?? null,
 			env: options.env ?? null,
-			shell: options.shell ?? null,
+			shell: options.shell ?? null
 		});
 	}
 
@@ -198,7 +200,7 @@ export class SideXTaskService {
 		const taskId = await this.spawn(options);
 		const chunks: string[] = [];
 
-		return new Promise(async (resolve) => {
+		return new Promise(async resolve => {
 			const unlistenOutput = await this.onOutput(evt => {
 				if (evt.taskId === taskId) {
 					chunks.push(evt.data);

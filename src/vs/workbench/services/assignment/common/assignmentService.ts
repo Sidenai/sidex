@@ -23,8 +23,12 @@ export interface IWorkbenchAssignmentService extends IAssignmentService {
 class NullWorkbenchAssignmentService implements IWorkbenchAssignmentService {
 	declare readonly _serviceBrand: undefined;
 	readonly onDidRefetchAssignments = Event.None;
-	async getTreatment<T extends string | number | boolean>(_name: string): Promise<T | undefined> { return undefined; }
-	async getCurrentExperiments(): Promise<string[] | undefined> { return undefined; }
+	async getTreatment<T extends string | number | boolean>(_name: string): Promise<T | undefined> {
+		return undefined;
+	}
+	async getCurrentExperiments(): Promise<string[] | undefined> {
+		return undefined;
+	}
 	addTelemetryAssignmentFilter(_filter: IAssignmentFilter): void {}
 }
 

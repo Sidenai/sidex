@@ -29,7 +29,7 @@ export class SideXExtensionService {
 	private readonly _cache = new Map<string, CachedSearch>();
 	private readonly _inflight = new Map<string, Promise<MarketplaceExtensionResult[]>>();
 	private _debounceTimer: ReturnType<typeof setTimeout> | undefined;
-	
+
 	async searchMarketplace(query: string, page = 0): Promise<MarketplaceExtensionResult[]> {
 		const trimmed = query.trim();
 		if (!trimmed) {

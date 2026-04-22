@@ -27,8 +27,11 @@ export const IExtHostTerminalShellIntegration = createDecorator<IExtHostTerminal
 export class ExtHostTerminalShellIntegration extends Disposable implements IExtHostTerminalShellIntegration {
 	readonly _serviceBrand: undefined;
 
-	readonly onDidChangeTerminalShellIntegration = this._register(new Emitter<vscode.TerminalShellIntegrationChangeEvent>()).event;
-	readonly onDidStartTerminalShellExecution = this._register(new Emitter<vscode.TerminalShellExecutionStartEvent>()).event;
+	readonly onDidChangeTerminalShellIntegration = this._register(
+		new Emitter<vscode.TerminalShellIntegrationChangeEvent>()
+	).event;
+	readonly onDidStartTerminalShellExecution = this._register(new Emitter<vscode.TerminalShellExecutionStartEvent>())
+		.event;
 	readonly onDidEndTerminalShellExecution = this._register(new Emitter<vscode.TerminalShellExecutionEndEvent>()).event;
 
 	constructor(
@@ -38,7 +41,7 @@ export class ExtHostTerminalShellIntegration extends Disposable implements IExtH
 		super();
 	}
 
-	$shellIntegrationChange(_instanceId: number, _supportsExecuteCommandApi: boolean): void { }
+	$shellIntegrationChange(_instanceId: number, _supportsExecuteCommandApi: boolean): void {}
 	$shellExecutionStart(
 		_instanceId: number,
 		_supportsExecuteCommandApi: boolean,
@@ -46,16 +49,16 @@ export class ExtHostTerminalShellIntegration extends Disposable implements IExtH
 		_commandLineConfidence: TerminalShellExecutionCommandLineConfidence,
 		_isTrusted: boolean,
 		_cwd: string | undefined
-	): void { }
+	): void {}
 	$shellExecutionEnd(
 		_instanceId: number,
 		_commandLineValue: string,
 		_commandLineConfidence: TerminalShellExecutionCommandLineConfidence,
 		_isTrusted: boolean,
 		_exitCode: number | undefined
-	): void { }
-	$shellExecutionData(_instanceId: number, _data: string): void { }
-	$shellEnvChange(_instanceId: number, _shellEnvKeys: string[], _shellEnvValues: string[], _isTrusted: boolean): void { }
-	$cwdChange(_instanceId: number, _cwd: string | undefined): void { }
-	$closeTerminal(_instanceId: number): void { }
+	): void {}
+	$shellExecutionData(_instanceId: number, _data: string): void {}
+	$shellEnvChange(_instanceId: number, _shellEnvKeys: string[], _shellEnvValues: string[], _isTrusted: boolean): void {}
+	$cwdChange(_instanceId: number, _cwd: string | undefined): void {}
+	$closeTerminal(_instanceId: number): void {}
 }

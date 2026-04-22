@@ -52,25 +52,43 @@ export interface IExtHostTask extends ExtHostTaskShape {
 }
 
 namespace TaskDefinitionDTO {
-	export function from(value: vscode.TaskDefinition): tasks.ITaskDefinitionDTO | undefined { return value ?? undefined; }
-	export function to(value: tasks.ITaskDefinitionDTO): vscode.TaskDefinition | undefined { return value ?? undefined; }
+	export function from(value: vscode.TaskDefinition): tasks.ITaskDefinitionDTO | undefined {
+		return value ?? undefined;
+	}
+	export function to(value: tasks.ITaskDefinitionDTO): vscode.TaskDefinition | undefined {
+		return value ?? undefined;
+	}
 }
 namespace TaskPresentationOptionsDTO {
-	export function from(value: vscode.TaskPresentationOptions): tasks.ITaskPresentationOptionsDTO | undefined { return value ?? undefined; }
-	export function to(value: tasks.ITaskPresentationOptionsDTO): vscode.TaskPresentationOptions | undefined { return value ?? undefined; }
+	export function from(value: vscode.TaskPresentationOptions): tasks.ITaskPresentationOptionsDTO | undefined {
+		return value ?? undefined;
+	}
+	export function to(value: tasks.ITaskPresentationOptionsDTO): vscode.TaskPresentationOptions | undefined {
+		return value ?? undefined;
+	}
 }
 namespace ProcessExecutionOptionsDTO {
-	export function from(value: vscode.ProcessExecutionOptions): tasks.IProcessExecutionOptionsDTO | undefined { return value ?? undefined; }
-	export function to(value: tasks.IProcessExecutionOptionsDTO): vscode.ProcessExecutionOptions | undefined { return value ?? undefined; }
+	export function from(value: vscode.ProcessExecutionOptions): tasks.IProcessExecutionOptionsDTO | undefined {
+		return value ?? undefined;
+	}
+	export function to(value: tasks.IProcessExecutionOptionsDTO): vscode.ProcessExecutionOptions | undefined {
+		return value ?? undefined;
+	}
 }
 namespace ProcessExecutionDTO {
-	export function is(value: tasks.IShellExecutionDTO | tasks.IProcessExecutionDTO | tasks.ICustomExecutionDTO | undefined): value is tasks.IProcessExecutionDTO {
+	export function is(
+		value: tasks.IShellExecutionDTO | tasks.IProcessExecutionDTO | tasks.ICustomExecutionDTO | undefined
+	): value is tasks.IProcessExecutionDTO {
 		return !!value && !!(value as tasks.IProcessExecutionDTO).process;
 	}
 	export function from(value: vscode.ProcessExecution): tasks.IProcessExecutionDTO | undefined {
-		if (value == null) { return undefined; }
+		if (value == null) {
+			return undefined;
+		}
 		const result: tasks.IProcessExecutionDTO = { process: value.process, args: value.args };
-		if (value.options) { result.options = ProcessExecutionOptionsDTO.from(value.options); }
+		if (value.options) {
+			result.options = ProcessExecutionOptionsDTO.from(value.options);
+		}
 		return result;
 	}
 	export function to(value: tasks.IProcessExecutionDTO): types.ProcessExecution | undefined {
@@ -78,23 +96,44 @@ namespace ProcessExecutionDTO {
 	}
 }
 namespace ShellExecutionOptionsDTO {
-	export function from(value: vscode.ShellExecutionOptions): tasks.IShellExecutionOptionsDTO | undefined { return value ?? undefined; }
-	export function to(value: tasks.IShellExecutionOptionsDTO): vscode.ShellExecutionOptions | undefined { return value ?? undefined; }
+	export function from(value: vscode.ShellExecutionOptions): tasks.IShellExecutionOptionsDTO | undefined {
+		return value ?? undefined;
+	}
+	export function to(value: tasks.IShellExecutionOptionsDTO): vscode.ShellExecutionOptions | undefined {
+		return value ?? undefined;
+	}
 }
 namespace ShellExecutionDTO {
-	export function is(value: tasks.IShellExecutionDTO | tasks.IProcessExecutionDTO | tasks.ICustomExecutionDTO | undefined): value is tasks.IShellExecutionDTO {
-		return !!value && (!!(value as tasks.IShellExecutionDTO).commandLine || !!(value as tasks.IShellExecutionDTO).command);
+	export function is(
+		value: tasks.IShellExecutionDTO | tasks.IProcessExecutionDTO | tasks.ICustomExecutionDTO | undefined
+	): value is tasks.IShellExecutionDTO {
+		return (
+			!!value && (!!(value as tasks.IShellExecutionDTO).commandLine || !!(value as tasks.IShellExecutionDTO).command)
+		);
 	}
 	export function from(value: vscode.ShellExecution): tasks.IShellExecutionDTO | undefined {
-		if (value == null) { return undefined; }
+		if (value == null) {
+			return undefined;
+		}
 		const result: tasks.IShellExecutionDTO = {};
-		if (value.commandLine !== undefined) { result.commandLine = value.commandLine; } else { result.command = value.command; result.args = value.args; }
-		if (value.options) { result.options = ShellExecutionOptionsDTO.from(value.options); }
+		if (value.commandLine !== undefined) {
+			result.commandLine = value.commandLine;
+		} else {
+			result.command = value.command;
+			result.args = value.args;
+		}
+		if (value.options) {
+			result.options = ShellExecutionOptionsDTO.from(value.options);
+		}
 		return result;
 	}
 	export function to(value: tasks.IShellExecutionDTO): types.ShellExecution | undefined {
-		if (value == null || (value.command === undefined && value.commandLine === undefined)) { return undefined; }
-		return value.commandLine ? new types.ShellExecution(value.commandLine, value.options) : new types.ShellExecution(value.command!, value.args ? value.args : [], value.options);
+		if (value == null || (value.command === undefined && value.commandLine === undefined)) {
+			return undefined;
+		}
+		return value.commandLine
+			? new types.ShellExecution(value.commandLine, value.options)
+			: new types.ShellExecution(value.command!, value.args ? value.args : [], value.options);
 	}
 }
 

@@ -10,7 +10,10 @@ import { MenuId } from '../../../../platform/actions/common/actions.js';
 export const EditorLineNumberContextMenu = MenuId.EditorLineNumberContext;
 
 export interface IGutterActionsGenerator {
-	(context: { lineNumber: number; editor: ICodeEditor; accessor: any; preventDefaultContextMenuItems: boolean }, result: { push(action: IAction, group?: string): void }): void;
+	(
+		context: { lineNumber: number; editor: ICodeEditor; accessor: any; preventDefaultContextMenuItems: boolean },
+		result: { push(action: IAction, group?: string): void }
+	): void;
 }
 
 export class GutterActionsRegistry {

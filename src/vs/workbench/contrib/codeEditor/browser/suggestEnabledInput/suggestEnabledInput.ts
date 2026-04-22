@@ -22,7 +22,7 @@ const INPUT_STYLES = [
 	'outline:none',
 	'padding:0 2px',
 	'font-family:var(--vscode-font-family,inherit)',
-	'font-size:var(--vscode-font-size,13px)',
+	'font-size:var(--vscode-font-size,13px)'
 ].join(';');
 
 const WRAPPER_STYLES = [
@@ -36,10 +36,14 @@ const WRAPPER_STYLES = [
 	'background-color:var(--vscode-input-background)',
 	'color:var(--vscode-input-foreground)',
 	'border:1px solid var(--vscode-input-border,transparent)',
-	'border-radius:2px',
+	'border-radius:2px'
 ].join(';');
 
-function extractOptions(args: unknown[]): { parent: HTMLElement | undefined; placeholder?: string; ariaLabel?: string } {
+function extractOptions(args: unknown[]): {
+	parent: HTMLElement | undefined;
+	placeholder?: string;
+	ariaLabel?: string;
+} {
 	let parent: HTMLElement | undefined;
 	let placeholder: string | undefined;
 	let ariaLabel: string | undefined;
@@ -151,7 +155,7 @@ export class SuggestEnabledInput extends Widget {
 	get inputWidget(): { hasWidgetFocus(): boolean; focus(): void } {
 		return {
 			hasWidgetFocus: () => this.hasFocus(),
-			focus: () => this.focus(),
+			focus: () => this.focus()
 		};
 	}
 

@@ -16,9 +16,7 @@ import {
 import { IWorkbenchEnvironmentService } from '../../environment/common/environmentService.js';
 
 export class TunnelService extends AbstractTunnelService {
-	constructor(
-		@IWorkbenchEnvironmentService private environmentService: IWorkbenchEnvironmentService
-	) {
+	constructor(@IWorkbenchEnvironmentService private environmentService: IWorkbenchEnvironmentService) {
 		super();
 	}
 
@@ -43,7 +41,15 @@ export class TunnelService extends AbstractTunnelService {
 		}
 
 		if (isTunnelProvider(tunnelProvider)) {
-			return this.createWithProvider(tunnelProvider, remoteHost, remotePort, localPort, elevateIfNeeded, privacy, protocol);
+			return this.createWithProvider(
+				tunnelProvider,
+				remoteHost,
+				remotePort,
+				localPort,
+				elevateIfNeeded,
+				privacy,
+				protocol
+			);
 		}
 		return undefined;
 	}

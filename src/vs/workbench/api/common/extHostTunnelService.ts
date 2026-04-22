@@ -15,11 +15,7 @@ import {
 	TunnelOptions,
 	TunnelPrivacyId
 } from '../../../platform/tunnel/common/tunnel.js';
-import {
-	ExtHostTunnelServiceShape,
-	PortAttributesSelector,
-	TunnelDto
-} from './extHost.protocol.js';
+import { ExtHostTunnelServiceShape, PortAttributesSelector, TunnelDto } from './extHost.protocol.js';
 import { CandidatePort } from '../../services/remote/common/tunnelModel.js';
 import type * as vscode from 'vscode';
 
@@ -77,19 +73,36 @@ export class ExtHostTunnelService extends Disposable implements IExtHostTunnelSe
 	async openTunnel(_extension: IExtensionDescription, _forward: TunnelOptions): Promise<vscode.Tunnel | undefined> {
 		return undefined;
 	}
-	async getTunnels(): Promise<vscode.TunnelDescription[]> { return []; }
-	async setTunnelFactory(): Promise<IDisposable> { return toDisposable(() => { }); }
-	registerPortsAttributesProvider(): IDisposable { return toDisposable(() => { }); }
-	async registerTunnelProvider(): Promise<IDisposable> { return toDisposable(() => { }); }
-	async hasTunnelProvider(): Promise<boolean> { return false; }
+	async getTunnels(): Promise<vscode.TunnelDescription[]> {
+		return [];
+	}
+	async setTunnelFactory(): Promise<IDisposable> {
+		return toDisposable(() => {});
+	}
+	registerPortsAttributesProvider(): IDisposable {
+		return toDisposable(() => {});
+	}
+	async registerTunnelProvider(): Promise<IDisposable> {
+		return toDisposable(() => {});
+	}
+	async hasTunnelProvider(): Promise<boolean> {
+		return false;
+	}
 
-	async $forwardPort(_tunnelOptions: TunnelOptions, _tunnelCreationOptions: TunnelCreationOptions): Promise<TunnelDto | string | undefined> {
+	async $forwardPort(
+		_tunnelOptions: TunnelOptions,
+		_tunnelCreationOptions: TunnelCreationOptions
+	): Promise<TunnelDto | string | undefined> {
 		return undefined;
 	}
-	async $closeTunnel(_remote: { host: string; port: number }, _silent?: boolean): Promise<void> { }
-	async $onDidTunnelsChange(): Promise<void> { this._onDidChangeTunnels.fire(); }
-	async $registerCandidateFinder(_enable: boolean): Promise<void> { }
-	async $applyCandidateFilter(candidates: CandidatePort[]): Promise<CandidatePort[]> { return candidates; }
+	async $closeTunnel(_remote: { host: string; port: number }, _silent?: boolean): Promise<void> {}
+	async $onDidTunnelsChange(): Promise<void> {
+		this._onDidChangeTunnels.fire();
+	}
+	async $registerCandidateFinder(_enable: boolean): Promise<void> {}
+	async $applyCandidateFilter(candidates: CandidatePort[]): Promise<CandidatePort[]> {
+		return candidates;
+	}
 	async $providePortAttributes(
 		_handles: number[],
 		_ports: number[],

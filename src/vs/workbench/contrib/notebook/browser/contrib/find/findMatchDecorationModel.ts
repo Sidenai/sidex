@@ -14,8 +14,8 @@ export class FindMatchDecorationModel extends Disposable {
 		return null;
 	}
 
-	setAllFindMatchesDecorations(_cellFindMatches: any[]): void { }
-	setCurrentFindMatchDecoration(_cellIndex: number, _matchIndex: number): void { }
-	clearCurrentFindMatchDecoration(): void { }
-	highlightCurrentFindMatchDecoration(_cellIndex: number, _matchIndex: number): void { }
+	setAllFindMatchesDecorations(_cellFindMatches: any[]): void {}
+	setCurrentFindMatchDecoration(_cellIndex: number, _matchIndex: number): void {}
+	clearCurrentFindMatchDecoration(): void {}
+	highlightCurrentFindMatchDecoration(_cellIndex: number, _matchIndex: number): void {}
 }

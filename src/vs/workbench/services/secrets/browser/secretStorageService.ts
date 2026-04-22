@@ -12,10 +12,7 @@ import { Emitter, Event } from '../../../../base/common/event.js';
 import { IEncryptionService } from '../../../../platform/encryption/common/encryptionService.js';
 import { InstantiationType, registerSingleton } from '../../../../platform/instantiation/common/extensions.js';
 import { ILogService } from '../../../../platform/log/common/log.js';
-import {
-	BaseSecretStorageService,
-	ISecretStorageService
-} from '../../../../platform/secrets/common/secrets.js';
+import { BaseSecretStorageService, ISecretStorageService } from '../../../../platform/secrets/common/secrets.js';
 import { IStorageService } from '../../../../platform/storage/common/storage.js';
 
 interface TauriCore {

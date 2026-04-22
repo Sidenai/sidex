@@ -10,5 +10,5 @@ export class MenuPreventer {
 		return MenuPreventer.ID;
 	}
 
-	dispose(): void { }
+	dispose(): void {}
 }

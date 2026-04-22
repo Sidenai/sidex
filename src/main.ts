@@ -30,10 +30,22 @@ async function boot() {
 	await loadNlsMessages();
 
 	await Promise.all([
-		import('./vs/workbench/workbench.common.main.js').catch(e => { console.error('[SideX] Barrel "common" failed:', e); throw e; }),
-		import('./vs/workbench/browser/web.main.js').catch(e => { console.error('[SideX] Barrel "web.main" failed:', e); throw e; }),
-		import('./vs/workbench/browser/parts/dialogs/dialog.web.contribution.js').catch(e => { console.error('[SideX] Barrel "web-dialog" failed:', e); throw e; }),
-		import('./vs/workbench/workbench.web.main.js').catch(e => { console.error('[SideX] Barrel "web-services" failed:', e); throw e; }),
+		import('./vs/workbench/workbench.common.main.js').catch(e => {
+			console.error('[SideX] Barrel "common" failed:', e);
+			throw e;
+		}),
+		import('./vs/workbench/browser/web.main.js').catch(e => {
+			console.error('[SideX] Barrel "web.main" failed:', e);
+			throw e;
+		}),
+		import('./vs/workbench/browser/parts/dialogs/dialog.web.contribution.js').catch(e => {
+			console.error('[SideX] Barrel "web-dialog" failed:', e);
+			throw e;
+		}),
+		import('./vs/workbench/workbench.web.main.js').catch(e => {
+			console.error('[SideX] Barrel "web-services" failed:', e);
+			throw e;
+		})
 	]);
 
 	// SideX Rust bridge initialization — make services available before workbench creation
@@ -47,7 +59,7 @@ async function boot() {
 			SideXThemeService,
 			SideXExtensionService,
 			SideXKeymapService,
-			SideXFileSystemProvider,
+			SideXFileSystemProvider
 		} = await import('./vs/platform/sidex/common/sidexServices.js');
 
 		(globalThis as any).__SIDEX_SERVICES__ = {
@@ -59,7 +71,7 @@ async function boot() {
 			theme: new SideXThemeService(),
 			extensions: new SideXExtensionService(),
 			keymap: new SideXKeymapService(),
-			fileSystem: new SideXFileSystemProvider(),
+			fileSystem: new SideXFileSystemProvider()
 		};
 
 		console.log('[SideX] Rust bridge services initialized');
@@ -375,7 +387,9 @@ function setupMenuActions() {
 	// Listen for command execution via keyboard shortcuts forwarded from native menu
 	window.addEventListener('sidex-command', async (e: any) => {
 		const commandId = e.detail?.commandId;
-		if (!commandId) {return;}
+		if (!commandId) {
+			return;
+		}
 		if (
 			commandId === 'workbench.action.files.openFolder' ||
 			commandId === 'workbench.action.files.openFolderViaWorkspace'

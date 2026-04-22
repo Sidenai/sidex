@@ -693,7 +693,6 @@ class DOMFocusController<T> implements IDisposable {
 			return;
 		}
 
-		 
 		const tabIndexElement = focusedDomElement.querySelector('[tabIndex]');
 
 		if (!tabIndexElement || !isHTMLElement(tabIndexElement) || tabIndexElement.tabIndex === -1) {

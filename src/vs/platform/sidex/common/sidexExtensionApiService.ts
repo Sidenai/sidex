@@ -80,7 +80,7 @@ export class SidexExtensionApiService implements ISidexExtensionApiService {
 
 	async getNamespaces(): Promise<ExtNamespace[]> {
 		try {
-			return (await invoke<string[]>('ext_api_get_namespaces')) as ExtNamespace[] ?? [];
+			return ((await invoke<string[]>('ext_api_get_namespaces')) as ExtNamespace[]) ?? [];
 		} catch {
 			return [];
 		}
@@ -113,7 +113,7 @@ export class SidexExtensionApiService implements ISidexExtensionApiService {
 		return invoke<ExtCommandResult>('ext_api_call', {
 			namespace,
 			action,
-			params: args ?? null,
+			params: args ?? null
 		});
 	}
 
@@ -144,10 +144,13 @@ export class SidexExtensionApiService implements ISidexExtensionApiService {
 					const params = args.length === 1 ? args[0] : args.length > 1 ? args : undefined;
 					return this.callCommand(id, params);
 				},
-				metadata: { description: label },
+				metadata: { description: label }
 			});
 
-			this._registeredCommands.set(id, toDisposable(() => disposable.dispose()));
+			this._registeredCommands.set(
+				id,
+				toDisposable(() => disposable.dispose())
+			);
 		}
 	}
 

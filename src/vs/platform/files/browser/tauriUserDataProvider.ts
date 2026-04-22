@@ -53,7 +53,11 @@ export class TauriUserDataProvider extends TauriFileSystemProvider {
 		return super.readFile(await this.toFileUri(resource));
 	}
 
-	override async writeFile(resource: URI, content: Uint8Array, opts: Parameters<TauriFileSystemProvider['writeFile']>[2]) {
+	override async writeFile(
+		resource: URI,
+		content: Uint8Array,
+		opts: Parameters<TauriFileSystemProvider['writeFile']>[2]
+	) {
 		return super.writeFile(await this.toFileUri(resource), content, opts);
 	}
 

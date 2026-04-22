@@ -13,26 +13,34 @@ export class OpenScmGroupAction extends Action {
 		super(OpenScmGroupAction.ID, 'Open Changes');
 	}
 
-	override async run(): Promise<void> { }
+	override async run(): Promise<void> {}
 }
 
 export class ScmHistoryItemResolver {
 	static readonly scheme = 'scm-history-item';
 
-	public static getMultiDiffSourceUri(provider: { id: string; rootUri?: URI }, historyItemId: string, historyItemParentId: string | undefined, historyItemDisplayId: string | undefined): URI {
-		return URI.from({
-			scheme: ScmHistoryItemResolver.scheme,
-			path: provider.rootUri?.fsPath,
-			query: JSON.stringify({
-				repositoryId: provider.id,
-				historyItemId,
-				historyItemParentId,
-				historyItemDisplayId
-			})
-		}, true);
+	public static getMultiDiffSourceUri(
+		provider: { id: string; rootUri?: URI },
+		historyItemId: string,
+		historyItemParentId: string | undefined,
+		historyItemDisplayId: string | undefined
+	): URI {
+		return URI.from(
+			{
+				scheme: ScmHistoryItemResolver.scheme,
+				path: provider.rootUri?.fsPath,
+				query: JSON.stringify({
+					repositoryId: provider.id,
+					historyItemId,
+					historyItemParentId,
+					historyItemDisplayId
+				})
+			},
+			true
+		);
 	}
 
-	constructor(..._args: any[]) { }
+	constructor(..._args: any[]) {}
 
 	async resolveHistoryItemGroupBase(_historyItemGroup: any): Promise<any> {
 		return undefined;

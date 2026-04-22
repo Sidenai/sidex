@@ -459,7 +459,7 @@ export class FileMatchRenderer
 
 		// when hidesExplorerArrows: true, then the file nodes should still have a twistie because it would otherwise
 		// be hard to tell whether the node is collapsed or expanded.
-		 
+
 		const twistieContainer = templateData.el.parentElement?.parentElement?.querySelector('.monaco-tl-twistie');
 		twistieContainer?.classList.add('force-twistie');
 	}

@@ -1121,7 +1121,6 @@ export class BrowserTitlebarPart extends Part implements ITitlebarPart {
 		if (this.customMenubar.value) {
 			this.customMenubar.value.toggleFocus();
 		} else {
-			 
 			(this.element.querySelector('[tabindex]:not([tabindex="-1"])') as HTMLElement | null)?.focus();
 		}
 	}

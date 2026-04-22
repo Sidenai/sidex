@@ -6,7 +6,7 @@
 export class NotebookEditor {
 	static readonly ID: string = 'workbench.editor.notebook';
 
-	constructor(..._args: any[]) { }
+	constructor(..._args: any[]) {}
 
 	getId(): string {
 		return NotebookEditor.ID;

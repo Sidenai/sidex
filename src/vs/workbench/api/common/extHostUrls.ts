@@ -14,15 +14,15 @@ export class ExtHostUrls implements ExtHostUrlsShape {
 	declare _serviceBrand: undefined;
 
 	registerUriHandler(_extension: IExtensionDescription, _handler: vscode.UriHandler): vscode.Disposable {
-		return toDisposable(() => { });
+		return toDisposable(() => {});
 	}
 
-	async $handleExternalUri(_handle: number, _uri: UriComponents): Promise<void> { }
+	async $handleExternalUri(_handle: number, _uri: UriComponents): Promise<void> {}
 
 	async createAppUri(uri: URI): Promise<vscode.Uri> {
 		return URI.revive(uri);
 	}
 }
 
-export interface IExtHostUrlsService extends ExtHostUrls { }
+export interface IExtHostUrlsService extends ExtHostUrls {}
 export const IExtHostUrlsService = createDecorator<IExtHostUrlsService>('IExtHostUrlsService');

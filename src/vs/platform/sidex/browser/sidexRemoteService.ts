@@ -113,7 +113,7 @@ function toHost(r: RawSshHost): SshHost {
 		hostname: r.hostname,
 		port: r.port,
 		user: r.user,
-		identityFile: r.identity_file,
+		identityFile: r.identity_file
 	};
 }
 
@@ -130,7 +130,7 @@ function toCodespace(r: RawCodespace): CodespaceEntry {
 		machineType: r.machine_type,
 		state: r.state,
 		createdAt: r.created_at,
-		lastUsed: r.last_used,
+		lastUsed: r.last_used
 	};
 }
 
@@ -139,7 +139,7 @@ function toConnection(r: RawConnection): RemoteConnection {
 		id: r.id,
 		kind: r.kind as RemoteKind,
 		label: r.label,
-		connectedSecs: r.connected_secs,
+		connectedSecs: r.connected_secs
 	};
 }
 
@@ -152,7 +152,9 @@ export interface ISideXRemoteService extends SideXRemoteService {
 export class SideXRemoteService {
 	declare readonly _serviceBrand: undefined;
 	async listSshHosts(): Promise<SshHost[]> {
-		if (!isTauri()) { return []; }
+		if (!isTauri()) {
+			return [];
+		}
 		const raw = (await invoke<RawSshHost[]>('remote_list_ssh_hosts')) ?? [];
 		return raw.map(toHost);
 	}
@@ -162,7 +164,7 @@ export class SideXRemoteService {
 			host,
 			user,
 			port: port ?? null,
-			auth,
+			auth
 		});
 		return toConnection(raw);
 	}
@@ -188,13 +190,17 @@ export class SideXRemoteService {
 	}
 
 	async listWslDistros(): Promise<WslDistro[]> {
-		if (!isTauri()) { return []; }
+		if (!isTauri()) {
+			return [];
+		}
 		const raw = (await invoke<RawWslDistro[]>('remote_list_wsl_distros')) ?? [];
 		return raw.map(toDistro);
 	}
 
 	async listContainers(): Promise<ContainerEntry[]> {
-		if (!isTauri()) { return []; }
+		if (!isTauri()) {
+			return [];
+		}
 		return (await invoke<ContainerEntry[]>('remote_list_containers')) ?? [];
 	}
 
@@ -208,7 +214,9 @@ export class SideXRemoteService {
 	}
 
 	async activeConnections(): Promise<RemoteConnection[]> {
-		if (!isTauri()) { return []; }
+		if (!isTauri()) {
+			return [];
+		}
 		const raw = (await invoke<RawConnection[]>('remote_active_connections')) ?? [];
 		return raw.map(toConnection);
 	}

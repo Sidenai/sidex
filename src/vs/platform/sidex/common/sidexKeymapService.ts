@@ -30,7 +30,7 @@ export class SideXKeymapService {
 	declare readonly _serviceBrand: undefined;
 	async getDefaults(): Promise<KeybindingInfo[]> {
 		try {
-			return await invoke('keymap_get_defaults') || [];
+			return (await invoke('keymap_get_defaults')) || [];
 		} catch {
 			return [];
 		}
@@ -38,7 +38,7 @@ export class SideXKeymapService {
 
 	async getAll(): Promise<KeybindingInfo[]> {
 		try {
-			return await invoke('keymap_get_all') || [];
+			return (await invoke('keymap_get_all')) || [];
 		} catch {
 			return [];
 		}

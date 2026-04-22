@@ -56,27 +56,43 @@ export class CopilotAssignmentFilterProvider extends Disposable implements IExpe
 	) {
 		super();
 
-		this.copilotExtensionVersion = this._storageService.get(StorageVersionKeys.CopilotExtensionVersion, StorageScope.PROFILE);
-		this.copilotChatExtensionVersion = this._storageService.get(StorageVersionKeys.CopilotChatExtensionVersion, StorageScope.PROFILE);
-		this.copilotCompletionsVersion = this._storageService.get(StorageVersionKeys.CompletionsVersion, StorageScope.PROFILE);
+		this.copilotExtensionVersion = this._storageService.get(
+			StorageVersionKeys.CopilotExtensionVersion,
+			StorageScope.PROFILE
+		);
+		this.copilotChatExtensionVersion = this._storageService.get(
+			StorageVersionKeys.CopilotChatExtensionVersion,
+			StorageScope.PROFILE
+		);
+		this.copilotCompletionsVersion = this._storageService.get(
+			StorageVersionKeys.CompletionsVersion,
+			StorageScope.PROFILE
+		);
 		this.copilotSku = this._storageService.get(StorageVersionKeys.CopilotSku, StorageScope.PROFILE);
 		this.copilotInternalOrg = this._storageService.get(StorageVersionKeys.CopilotInternalOrg, StorageScope.PROFILE);
 		this.copilotTrackingId = this._storageService.get(StorageVersionKeys.CopilotTrackingId, StorageScope.PROFILE);
 		this.copilotIsSn = this._storageService.get(StorageVersionKeys.CopilotIsSn, StorageScope.PROFILE);
 		this.copilotIsFcv1 = this._storageService.get(StorageVersionKeys.CopilotIsFcv1, StorageScope.PROFILE);
 
-		this._register(this._extensionService.onDidChangeExtensionsStatus(extensionIdentifiers => {
-			if (extensionIdentifiers.some(identifier =>
-				ExtensionIdentifier.equals(identifier, 'github.copilot') ||
-				ExtensionIdentifier.equals(identifier, 'github.copilot-chat')
-			)) {
-				this.updateExtensionVersions();
-			}
-		}));
+		this._register(
+			this._extensionService.onDidChangeExtensionsStatus(extensionIdentifiers => {
+				if (
+					extensionIdentifiers.some(
+						identifier =>
+							ExtensionIdentifier.equals(identifier, 'github.copilot') ||
+							ExtensionIdentifier.equals(identifier, 'github.copilot-chat')
+					)
+				) {
+					this.updateExtensionVersions();
+				}
+			})
+		);
 
-		this._register(this._defaultAccountService.onDidChangeCopilotTokenInfo(() => {
-			this.updateCopilotTokenInfo();
-		}));
+		this._register(
+			this._defaultAccountService.onDidChangeCopilotTokenInfo(() => {
+				this.updateCopilotTokenInfo();
+			})
+		);
 
 		this.updateExtensionVersions();
 		this.updateCopilotTokenInfo();
@@ -95,7 +111,9 @@ export class CopilotAssignmentFilterProvider extends Disposable implements IExpe
 
 			copilotExtensionVersion = copilotExtension?.version;
 			copilotChatExtensionVersion = copilotChatExtension?.version;
-			copilotCompletionsVersion = (copilotChatExtension as typeof copilotChatExtension & { completionsCoreVersion?: string })?.completionsCoreVersion;
+			copilotCompletionsVersion = (
+				copilotChatExtension as typeof copilotChatExtension & { completionsCoreVersion?: string }
+			)?.completionsCoreVersion;
 		} catch (error) {
 			this._logService.error('Failed to update extension version assignments', error);
 		}
@@ -112,9 +130,24 @@ export class CopilotAssignmentFilterProvider extends Disposable implements IExpe
 		this.copilotChatExtensionVersion = copilotChatExtensionVersion;
 		this.copilotCompletionsVersion = copilotCompletionsVersion;
 
-		this._storageService.store(StorageVersionKeys.CopilotExtensionVersion, this.copilotExtensionVersion, StorageScope.PROFILE, StorageTarget.MACHINE);
-		this._storageService.store(StorageVersionKeys.CopilotChatExtensionVersion, this.copilotChatExtensionVersion, StorageScope.PROFILE, StorageTarget.MACHINE);
-		this._storageService.store(StorageVersionKeys.CompletionsVersion, this.copilotCompletionsVersion, StorageScope.PROFILE, StorageTarget.MACHINE);
+		this._storageService.store(
+			StorageVersionKeys.CopilotExtensionVersion,
+			this.copilotExtensionVersion,
+			StorageScope.PROFILE,
+			StorageTarget.MACHINE
+		);
+		this._storageService.store(
+			StorageVersionKeys.CopilotChatExtensionVersion,
+			this.copilotChatExtensionVersion,
+			StorageScope.PROFILE,
+			StorageTarget.MACHINE
+		);
+		this._storageService.store(
+			StorageVersionKeys.CompletionsVersion,
+			this.copilotCompletionsVersion,
+			StorageScope.PROFILE,
+			StorageTarget.MACHINE
+		);
 
 		this._onDidChangeFilters.fire();
 	}
@@ -131,8 +164,18 @@ export class CopilotAssignmentFilterProvider extends Disposable implements IExpe
 		this.copilotIsSn = newIsSn;
 		this.copilotIsFcv1 = newIsFcv1;
 
-		this._storageService.store(StorageVersionKeys.CopilotIsSn, this.copilotIsSn, StorageScope.PROFILE, StorageTarget.MACHINE);
-		this._storageService.store(StorageVersionKeys.CopilotIsFcv1, this.copilotIsFcv1, StorageScope.PROFILE, StorageTarget.MACHINE);
+		this._storageService.store(
+			StorageVersionKeys.CopilotIsSn,
+			this.copilotIsSn,
+			StorageScope.PROFILE,
+			StorageTarget.MACHINE
+		);
+		this._storageService.store(
+			StorageVersionKeys.CopilotIsFcv1,
+			this.copilotIsFcv1,
+			StorageScope.PROFILE,
+			StorageTarget.MACHINE
+		);
 
 		this._onDidChangeFilters.fire();
 	}
@@ -146,11 +189,17 @@ export class CopilotAssignmentFilterProvider extends Disposable implements IExpe
 	getFilterValue(filter: string): string | null {
 		switch (filter) {
 			case ExtensionsFilter.CopilotExtensionVersion:
-				return this.copilotExtensionVersion ? CopilotAssignmentFilterProvider.trimVersionSuffix(this.copilotExtensionVersion) : null;
+				return this.copilotExtensionVersion
+					? CopilotAssignmentFilterProvider.trimVersionSuffix(this.copilotExtensionVersion)
+					: null;
 			case ExtensionsFilter.CompletionsVersionInCopilotChat:
-				return this.copilotCompletionsVersion ? CopilotAssignmentFilterProvider.trimVersionSuffix(this.copilotCompletionsVersion) : null;
+				return this.copilotCompletionsVersion
+					? CopilotAssignmentFilterProvider.trimVersionSuffix(this.copilotCompletionsVersion)
+					: null;
 			case ExtensionsFilter.CopilotChatExtensionVersion:
-				return this.copilotChatExtensionVersion ? CopilotAssignmentFilterProvider.trimVersionSuffix(this.copilotChatExtensionVersion) : null;
+				return this.copilotChatExtensionVersion
+					? CopilotAssignmentFilterProvider.trimVersionSuffix(this.copilotChatExtensionVersion)
+					: null;
 			case ExtensionsFilter.CopilotSku:
 				return this.copilotSku ?? null;
 			case ExtensionsFilter.MicrosoftInternalOrg:

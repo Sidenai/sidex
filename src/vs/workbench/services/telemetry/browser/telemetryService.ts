@@ -10,11 +10,7 @@ import {
 	OmitMetadata,
 	StrictPropertyCheck
 } from '../../../../platform/telemetry/common/gdprTypings.js';
-import {
-	ITelemetryData,
-	ITelemetryService,
-	TelemetryLevel
-} from '../../../../platform/telemetry/common/telemetry.js';
+import { ITelemetryData, ITelemetryService, TelemetryLevel } from '../../../../platform/telemetry/common/telemetry.js';
 
 // Stub: telemetry is now handled by our Rust telemetry crate
 export class TelemetryService implements ITelemetryService {

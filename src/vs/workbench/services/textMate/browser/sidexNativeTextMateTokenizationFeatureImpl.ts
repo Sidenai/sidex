@@ -17,13 +17,13 @@ import {
 	ITokenizationSupport,
 	LazyTokenizationSupport,
 	TokenizationRegistry,
-	TokenizationResult,
+	TokenizationResult
 } from '../../../../editor/common/languages.js';
 import { ILanguageService } from '../../../../editor/common/languages/language.js';
 import { nullTokenizeEncoded } from '../../../../editor/common/languages/nullTokenize.js';
 import {
 	generateTokensCSSForColorMap,
-	generateTokensCSSForFontMap,
+	generateTokensCSSForFontMap
 } from '../../../../editor/common/languages/supports/tokenization.js';
 import { ITextModel } from '../../../../editor/common/model.js';
 import { IConfigurationService } from '../../../../platform/configuration/common/configuration.js';
@@ -31,7 +31,11 @@ import { IExtensionResourceLoaderService } from '../../../../platform/extensionR
 import { ILogService } from '../../../../platform/log/common/log.js';
 import { IFontTokenOptions } from '../../../../platform/theme/common/themeService.js';
 import { ExtensionMessageCollector, IExtensionPointUser } from '../../extensions/common/extensionsRegistry.js';
-import { ITextMateThemingRule, IWorkbenchColorTheme, IWorkbenchThemeService } from '../../themes/common/workbenchThemeService.js';
+import {
+	ITextMateThemingRule,
+	IWorkbenchColorTheme,
+	IWorkbenchThemeService
+} from '../../themes/common/workbenchThemeService.js';
 import { ITMSyntaxExtensionPoint, grammarsExtPoint } from '../common/TMGrammars.js';
 import { IValidGrammarDefinition } from '../common/TMScopeRegistry.js';
 import * as resources from '../../../../base/common/resources.js';
@@ -80,7 +84,7 @@ class SidexNativeBackgroundTokenizer implements IBackgroundTokenizer {
 		private readonly _store: IBackgroundTokenizationStore,
 		private readonly _scopeName: string,
 		private readonly _encodedLanguageId: LanguageId,
-		private readonly _maxTokenizationLineLength: IObservable<number>,
+		private readonly _maxTokenizationLineLength: IObservable<number>
 	) {
 		// Whenever the document changes, re-tokenize from the earliest touched line.
 		this._contentChangeDisposable = this._textModel.onDidChangeContent(e => {
@@ -153,19 +157,19 @@ class SidexNativeBackgroundTokenizer implements IBackgroundTokenizer {
 			}
 			if (warmupLines.length > 0 && !this._disposed) {
 				try {
-					const warmup = await native.tokenizeDocument(
-						this._scopeName,
-						warmupLines,
-						undefined,
-					);
+					const warmup = await native.tokenizeDocument(this._scopeName, warmupLines, undefined);
 					if (warmup && warmup.lines.length > 0) {
 						startHandle = warmup.finalStack;
 					}
-				} catch { /* fall through with handle=0 */ }
+				} catch {
+					/* fall through with handle=0 */
+				}
 			}
 		}
 
-		if (this._disposed) { return; }
+		if (this._disposed) {
+			return;
+		}
 
 		// ── Phase 2: tokenize from startLine to end in CHUNK_SIZE-line batches ─
 		// Each chunk is ONE IPC call instead of one call per line.
@@ -175,7 +179,9 @@ class SidexNativeBackgroundTokenizer implements IBackgroundTokenizer {
 		let handle = startHandle;
 
 		for (let chunkStart = startLine; chunkStart <= lineCount; chunkStart += CHUNK_SIZE) {
-			if (this._disposed) { return; }
+			if (this._disposed) {
+				return;
+			}
 
 			const chunkEnd = Math.min(chunkStart + CHUNK_SIZE - 1, lineCount);
 			const chunkLines: string[] = [];
@@ -186,18 +192,18 @@ class SidexNativeBackgroundTokenizer implements IBackgroundTokenizer {
 
 			let chunkResults: { tokens: number[]; ruleStack: number }[] | undefined;
 			try {
-				const response = await native.tokenizeDocument(
-					this._scopeName,
-					chunkLines,
-					handle === 0 ? undefined : handle,
-				);
+				const response = await native.tokenizeDocument(this._scopeName, chunkLines, handle === 0 ? undefined : handle);
 				if (response) {
 					chunkResults = response.lines;
 					handle = response.finalStack;
 				}
-			} catch { /* fall through */ }
+			} catch {
+				/* fall through */
+			}
 
-			if (this._disposed) { return; }
+			if (this._disposed) {
+				return;
+			}
 
 			// Push the chunk into the store in one shot.
 			const builder = new ContiguousMultilineTokensBuilder();
@@ -234,7 +240,7 @@ class SidexNativeTokenizationSupport implements ITokenizationSupport, IDisposabl
 	constructor(
 		private readonly _scopeName: string,
 		private readonly _encodedLanguageId: LanguageId,
-		private readonly _maxTokenizationLineLength: IObservable<number>,
+		private readonly _maxTokenizationLineLength: IObservable<number>
 	) {}
 
 	getInitialState(): IState {
@@ -255,14 +261,14 @@ class SidexNativeTokenizationSupport implements ITokenizationSupport, IDisposabl
 
 	createBackgroundTokenizer(
 		textModel: ITextModel,
-		store: IBackgroundTokenizationStore,
+		store: IBackgroundTokenizationStore
 	): IBackgroundTokenizer | undefined {
 		return new SidexNativeBackgroundTokenizer(
 			textModel,
 			store,
 			this._scopeName,
 			this._encodedLanguageId,
-			this._maxTokenizationLineLength,
+			this._maxTokenizationLineLength
 		);
 	}
 
@@ -293,7 +299,7 @@ export class SidexTextMateTokenizationFeature extends Disposable implements ITex
 		@IExtensionResourceLoaderService private readonly _extensionResourceLoaderService: IExtensionResourceLoaderService,
 		@ILogService private readonly _logService: ILogService,
 		@IConfigurationService private readonly _configurationService: IConfigurationService,
-		@INotificationService private readonly _notificationService: INotificationService,
+		@INotificationService private readonly _notificationService: INotificationService
 	) {
 		super();
 
@@ -309,13 +315,13 @@ export class SidexTextMateTokenizationFeature extends Disposable implements ITex
 		this._register(
 			this._themeService.onDidColorThemeChange(() => {
 				this._updateTheme(this._themeService.getColorTheme(), false);
-			}),
+			})
 		);
 
 		this._register(
 			this._languageService.onDidRequestRichLanguageFeatures(languageId => {
 				this._createdModes.push(languageId);
-			}),
+			})
 		);
 	}
 
@@ -330,7 +336,7 @@ export class SidexTextMateTokenizationFeature extends Disposable implements ITex
 
 	public startDebugMode(_printFn: (str: string) => void, _onStop: () => void): void {
 		this._notificationService.info(
-			nls.localize('sidex.textmate.noDebug', 'TextMate debug mode is not available with the native Rust tokenizer.'),
+			nls.localize('sidex.textmate.noDebug', 'TextMate debug mode is not available with the native Rust tokenizer.')
 		);
 	}
 
@@ -338,9 +344,7 @@ export class SidexTextMateTokenizationFeature extends Disposable implements ITex
 	// Grammar registration
 	// -------------------------------------------------------------------------
 
-	private _handleGrammarsExtPoint(
-		extensions: readonly IExtensionPointUser<ITMSyntaxExtensionPoint[]>[],
-	): void {
+	private _handleGrammarsExtPoint(extensions: readonly IExtensionPointUser<ITMSyntaxExtensionPoint[]>[]): void {
 		this._grammarDefinitions = null;
 		this._tokenizersRegistrations.clear();
 
@@ -358,12 +362,10 @@ export class SidexTextMateTokenizationFeature extends Disposable implements ITex
 					const scopeName = validated.scopeName;
 
 					const lazySupport = new LazyTokenizationSupport(() =>
-						this._createNativeTokenizationSupport(language, scopeName, validated),
+						this._createNativeTokenizationSupport(language, scopeName, validated)
 					);
 					this._tokenizersRegistrations.add(lazySupport);
-					this._tokenizersRegistrations.add(
-						TokenizationRegistry.registerFactory(language, lazySupport),
-					);
+					this._tokenizersRegistrations.add(TokenizationRegistry.registerFactory(language, lazySupport));
 				}
 			}
 		}
@@ -376,7 +378,7 @@ export class SidexTextMateTokenizationFeature extends Disposable implements ITex
 	private async _createNativeTokenizationSupport(
 		languageId: string,
 		scopeName: string,
-		def: IValidGrammarDefinition,
+		def: IValidGrammarDefinition
 	): Promise<(ITokenizationSupport & IDisposable) | null> {
 		if (!this._languageService.isRegisteredLanguageId(languageId)) {
 			return null;
@@ -405,7 +407,7 @@ export class SidexTextMateTokenizationFeature extends Disposable implements ITex
 				grammarJson,
 				initialLanguageId: this._languageService.languageIdCodec.encodeLanguageId(languageId),
 				embeddedLanguages: Object.keys(embeddedLanguages).length > 0 ? embeddedLanguages : undefined,
-				injectionScopeNames: def.injectTo,
+				injectionScopeNames: def.injectTo
 			});
 		} catch (err) {
 			this._logService.error(`[SideX-TextMate] Failed to load grammar for ${languageId} (${scopeName}):`, err);
@@ -416,7 +418,7 @@ export class SidexTextMateTokenizationFeature extends Disposable implements ITex
 		const maxTokenizationLineLength = this._observableConfigValue<number>(
 			'editor.maxTokenizationLineLength',
 			languageId,
-			-1,
+			-1
 		);
 
 		return new SidexNativeTokenizationSupport(scopeName, encodedLanguageId, maxTokenizationLineLength);
@@ -456,9 +458,9 @@ export class SidexTextMateTokenizationFeature extends Disposable implements ITex
 				? {
 						fontStyle: rule.settings.fontStyle,
 						foreground: rule.settings.foreground,
-						background: rule.settings.background,
+						background: rule.settings.background
 					}
-				: {},
+				: {}
 		}));
 
 		// Rust expects `colorMap` as `Option<Vec<String>>`.  VS Code's
@@ -468,13 +470,10 @@ export class SidexTextMateTokenizationFeature extends Disposable implements ITex
 		// holes with undefined, so the callback always fires and we always
 		// produce a dense array of strings.
 		const rawColorMap = this._currentTokenColorMap ?? [];
-		const colorMapArg: string[] = Array.from(
-			{ length: rawColorMap.length },
-			(_, i) => {
-				const c = rawColorMap[i];
-				return (c === null || c === undefined) ? '' : String(c);
-			},
-		);
+		const colorMapArg: string[] = Array.from({ length: rawColorMap.length }, (_, i) => {
+			const c = rawColorMap[i];
+			return c === null || c === undefined ? '' : String(c);
+		});
 
 		getNativeTextMate()
 			.updateTheme(nativeSettings, colorMapArg)
@@ -489,9 +488,16 @@ export class SidexTextMateTokenizationFeature extends Disposable implements ITex
 
 	private _validateGrammarDefinition(
 		extension: IExtensionPointUser<ITMSyntaxExtensionPoint[]>,
-		grammar: ITMSyntaxExtensionPoint,
+		grammar: ITMSyntaxExtensionPoint
 	): IValidGrammarDefinition | null {
-		if (!_validateGrammarExtensionPoint(extension.description.extensionLocation, grammar, extension.collector, this._languageService)) {
+		if (
+			!_validateGrammarExtensionPoint(
+				extension.description.extensionLocation,
+				grammar,
+				extension.collector,
+				this._languageService
+			)
+		) {
 			return null;
 		}
 
@@ -510,17 +516,21 @@ export class SidexTextMateTokenizationFeature extends Disposable implements ITex
 		if (grammar.tokenTypes) {
 			for (const scope of Object.keys(grammar.tokenTypes)) {
 				switch (grammar.tokenTypes[scope]) {
-					case 'string': tokenTypes[scope] = 2; break;
-					case 'other': tokenTypes[scope] = 0; break;
-					case 'comment': tokenTypes[scope] = 1; break;
+					case 'string':
+						tokenTypes[scope] = 2;
+						break;
+					case 'other':
+						tokenTypes[scope] = 0;
+						break;
+					case 'comment':
+						tokenTypes[scope] = 1;
+						break;
 				}
 			}
 		}
 
 		const validLanguageId =
-			grammar.language && this._languageService.isRegisteredLanguageId(grammar.language)
-				? grammar.language
-				: undefined;
+			grammar.language && this._languageService.isRegisteredLanguageId(grammar.language) ? grammar.language : undefined;
 
 		return {
 			location: grammarLocation,
@@ -531,7 +541,7 @@ export class SidexTextMateTokenizationFeature extends Disposable implements ITex
 			injectTo: grammar.injectTo,
 			balancedBracketSelectors: asStringArray(grammar.balancedBracketScopes, ['*']),
 			unbalancedBracketSelectors: asStringArray(grammar.unbalancedBracketScopes, []),
-			sourceExtensionId: extension.description.id,
+			sourceExtensionId: extension.description.id
 		};
 	}
 
@@ -547,7 +557,7 @@ export class SidexTextMateTokenizationFeature extends Disposable implements ITex
 						handleChange(e);
 					}
 				}),
-			() => this._configurationService.getValue<T>(key, { overrideIdentifier: languageId }) ?? defaultValue,
+			() => this._configurationService.getValue<T>(key, { overrideIdentifier: languageId }) ?? defaultValue
 		);
 	}
 }
@@ -564,10 +574,7 @@ function toColorMap(colorMap: string[]): Color[] {
 	return result;
 }
 
-function equalsTokenRules(
-	a: ITextMateThemingRule[] | null,
-	b: ITextMateThemingRule[] | null,
-): boolean {
+function equalsTokenRules(a: ITextMateThemingRule[] | null, b: ITextMateThemingRule[] | null): boolean {
 	if (!b || !a || b.length !== a.length) {
 		return false;
 	}
@@ -580,11 +587,7 @@ function equalsTokenRules(
 		const s1 = r1.settings;
 		const s2 = r2.settings;
 		if (s1 && s2) {
-			if (
-				s1.fontStyle !== s2.fontStyle ||
-				s1.foreground !== s2.foreground ||
-				s1.background !== s2.background
-			) {
+			if (s1.fontStyle !== s2.fontStyle || s1.foreground !== s2.foreground || s1.background !== s2.background) {
 				return false;
 			}
 		} else if (!s1 || !s2) {
@@ -605,47 +608,74 @@ function _validateGrammarExtensionPoint(
 	extensionLocation: URI,
 	syntax: ITMSyntaxExtensionPoint,
 	collector: ExtensionMessageCollector,
-	languageService: ILanguageService,
+	languageService: ILanguageService
 ): boolean {
 	if (
 		syntax.language &&
 		(typeof syntax.language !== 'string' || !languageService.isRegisteredLanguageId(syntax.language))
 	) {
 		collector.error(
-			nls.localize('invalid.language', 'Unknown language in `contributes.{0}.language`. Provided value: {1}', 'grammars', String(syntax.language)),
+			nls.localize(
+				'invalid.language',
+				'Unknown language in `contributes.{0}.language`. Provided value: {1}',
+				'grammars',
+				String(syntax.language)
+			)
 		);
 		return false;
 	}
 	if (!syntax.scopeName || typeof syntax.scopeName !== 'string') {
 		collector.error(
-			nls.localize('invalid.scopeName', 'Expected string in `contributes.{0}.scopeName`. Provided value: {1}', 'grammars', String(syntax.scopeName)),
+			nls.localize(
+				'invalid.scopeName',
+				'Expected string in `contributes.{0}.scopeName`. Provided value: {1}',
+				'grammars',
+				String(syntax.scopeName)
+			)
 		);
 		return false;
 	}
 	if (!syntax.path || typeof syntax.path !== 'string') {
 		collector.error(
-			nls.localize('invalid.path.0', 'Expected string in `contributes.{0}.path`. Provided value: {1}', 'grammars', String(syntax.path)),
+			nls.localize(
+				'invalid.path.0',
+				'Expected string in `contributes.{0}.path`. Provided value: {1}',
+				'grammars',
+				String(syntax.path)
+			)
 		);
 		return false;
 	}
-	if (
-		syntax.injectTo &&
-		(!Array.isArray(syntax.injectTo) || syntax.injectTo.some(s => typeof s !== 'string'))
-	) {
+	if (syntax.injectTo && (!Array.isArray(syntax.injectTo) || syntax.injectTo.some(s => typeof s !== 'string'))) {
 		collector.error(
-			nls.localize('invalid.injectTo', 'Invalid value in `contributes.{0}.injectTo`. Must be an array of language scope names. Provided value: {1}', 'grammars', JSON.stringify(syntax.injectTo)),
+			nls.localize(
+				'invalid.injectTo',
+				'Invalid value in `contributes.{0}.injectTo`. Must be an array of language scope names. Provided value: {1}',
+				'grammars',
+				JSON.stringify(syntax.injectTo)
+			)
 		);
 		return false;
 	}
 	if (syntax.embeddedLanguages && !types.isObject(syntax.embeddedLanguages)) {
 		collector.error(
-			nls.localize('invalid.embeddedLanguages', 'Invalid value in `contributes.{0}.embeddedLanguages`. Must be an object map from scope name to language. Provided value: {1}', 'grammars', JSON.stringify(syntax.embeddedLanguages)),
+			nls.localize(
+				'invalid.embeddedLanguages',
+				'Invalid value in `contributes.{0}.embeddedLanguages`. Must be an object map from scope name to language. Provided value: {1}',
+				'grammars',
+				JSON.stringify(syntax.embeddedLanguages)
+			)
 		);
 		return false;
 	}
 	if (syntax.tokenTypes && !types.isObject(syntax.tokenTypes)) {
 		collector.error(
-			nls.localize('invalid.tokenTypes', 'Invalid value in `contributes.{0}.tokenTypes`. Must be an object map from scope name to token type. Provided value: {1}', 'grammars', JSON.stringify(syntax.tokenTypes)),
+			nls.localize(
+				'invalid.tokenTypes',
+				'Invalid value in `contributes.{0}.tokenTypes`. Must be an object map from scope name to token type. Provided value: {1}',
+				'grammars',
+				JSON.stringify(syntax.tokenTypes)
+			)
 		);
 		return false;
 	}
@@ -658,8 +688,8 @@ function _validateGrammarExtensionPoint(
 				"Expected `contributes.{0}.path` ({1}) to be included inside extension's folder ({2}). This might make the extension non-portable.",
 				'grammars',
 				grammarLocation.path,
-				extensionLocation.path,
-			),
+				extensionLocation.path
+			)
 		);
 	}
 	return true;

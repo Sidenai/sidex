@@ -25,7 +25,6 @@ import { invoke, isTauri } from '../../../../sidex-bridge.js';
  * single SQLite table without colliding.
  */
 export class TauriStorageDatabase extends Disposable implements IStorageDatabase {
-
 	private readonly _onDidChangeItemsExternal = this._register(new Emitter<IStorageItemsChangeEvent>());
 	readonly onDidChangeItemsExternal: Event<IStorageItemsChangeEvent> = this._onDidChangeItemsExternal.event;
 

@@ -29,7 +29,9 @@ export interface SideXDirEntry {
 	type: 'file' | 'directory' | 'symlink';
 }
 
-export const ISideXFileSystemProviderService = createDecorator<ISideXFileSystemProviderService>('sidexFileSystemProviderService');
+export const ISideXFileSystemProviderService = createDecorator<ISideXFileSystemProviderService>(
+	'sidexFileSystemProviderService'
+);
 
 export interface ISideXFileSystemProviderService extends SideXFileSystemProvider {
 	readonly _serviceBrand: undefined;
@@ -83,18 +85,20 @@ export class SideXFileSystemProvider {
 			size: raw.size,
 			mtime: raw.modified * 1000,
 			ctime: raw.created * 1000,
-			readonly: raw.readonly,
+			readonly: raw.readonly
 		};
 	}
 
 	async readDir(path: string): Promise<SideXDirEntry[]> {
-		const entries = await invoke<Array<{
-			name: string;
-			path: string;
-			is_dir: boolean;
-			is_file: boolean;
-			is_symlink: boolean;
-		}>>('read_dir', { path });
+		const entries = await invoke<
+			Array<{
+				name: string;
+				path: string;
+				is_dir: boolean;
+				is_file: boolean;
+				is_symlink: boolean;
+			}>
+		>('read_dir', { path });
 
 		if (!Array.isArray(entries)) {
 			return [];
@@ -103,9 +107,7 @@ export class SideXFileSystemProvider {
 		return entries.map(e => ({
 			name: e.name,
 			path: e.path,
-			type: e.is_dir ? 'directory' as const
-				: e.is_symlink ? 'symlink' as const
-					: 'file' as const,
+			type: e.is_dir ? ('directory' as const) : e.is_symlink ? ('symlink' as const) : ('file' as const)
 		}));
 	}
 

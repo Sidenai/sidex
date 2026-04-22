@@ -914,7 +914,6 @@ export interface ISettingLinkClickEvent {
 }
 
 function removeChildrenFromTabOrder(node: Element): void {
-	 
 	const focusableElements = node.querySelectorAll(`
 		[tabindex="0"],
 		input:not([tabindex="-1"]),
@@ -932,7 +931,6 @@ function removeChildrenFromTabOrder(node: Element): void {
 }
 
 function addChildrenToTabOrder(node: Element): void {
-	 
 	const focusableElements = node.querySelectorAll(`[${AbstractSettingRenderer.ELEMENT_FOCUSABLE_ATTR}="true"]`);
 
 	focusableElements.forEach(element => {
@@ -1529,7 +1527,7 @@ class SettingArrayRenderer
 
 	renderTemplate(container: HTMLElement): ISettingListItemTemplate {
 		const common = this.renderCommonTemplate(null, container, 'list');
-		 
+
 		const descriptionElement = common.containerElement.querySelector('.setting-item-description')!;
 		const validationErrorMessageElement = $('.setting-item-validation-message');
 		descriptionElement.after(validationErrorMessageElement);
@@ -1662,7 +1660,6 @@ abstract class AbstractSettingObjectRenderer
 		widget.domNode.classList.add(AbstractSettingRenderer.CONTROL_CLASS);
 		common.toDispose.add(widget);
 
-		 
 		const descriptionElement = common.containerElement.querySelector('.setting-item-description')!;
 		const validationErrorMessageElement = $('.setting-item-validation-message');
 		descriptionElement.after(validationErrorMessageElement);
@@ -2184,7 +2181,7 @@ class SettingEnumRenderer
 
 		common.toDispose.add(selectBox);
 		selectBox.render(common.controlElement);
-		 
+
 		const selectElement = common.controlElement.querySelector('select');
 		if (selectElement) {
 			selectElement.classList.add(AbstractSettingRenderer.CONTROL_CLASS);
@@ -2701,7 +2698,6 @@ export class SettingTreeRenderers extends Disposable {
 	}
 
 	showContextMenu(element: SettingsTreeSettingElement, settingDOMElement: HTMLElement): void {
-		 
 		const toolbarElement = settingDOMElement.querySelector('.monaco-toolbar');
 		if (toolbarElement) {
 			this._contextMenuService.showContextMenu({
@@ -2722,7 +2718,6 @@ export class SettingTreeRenderers extends Disposable {
 	}
 
 	getDOMElementsForSettingKey(treeContainer: HTMLElement, key: string): NodeListOf<HTMLElement> {
-		 
 		return treeContainer.querySelectorAll(`[${AbstractSettingRenderer.SETTING_KEY_ATTR}="${key}"]`);
 	}
 

@@ -7,7 +7,7 @@ import { URI } from '../../../../base/common/uri.js';
 
 export const enum CellKind {
 	Markup = 1,
-	Code = 2,
+	Code = 2
 }
 
 export const enum CellEditType {
@@ -19,12 +19,12 @@ export const enum CellEditType {
 	Move = 6,
 	OutputItems = 7,
 	PartialMetadata = 8,
-	PartialInternalMetadata = 9,
+	PartialInternalMetadata = 9
 }
 
 export const enum CellStatusbarAlignment {
 	Left = 1,
-	Right = 2,
+	Right = 2
 }
 
 export const enum NotebookCellsChangeType {
@@ -37,7 +37,7 @@ export const enum NotebookCellsChangeType {
 	ChangeCellMetadata = 7,
 	ChangeCellInternalMetadata = 8,
 	ChangeCellContent = 9,
-	ChangeDocumentMetadata = 10,
+	ChangeDocumentMetadata = 10
 }
 
 export interface NotebookDocumentMetadata {
@@ -147,7 +147,10 @@ export interface IWorkspaceNotebookCellEdit {
 	metadata?: unknown;
 	resource: URI;
 	notebookVersionId: number | undefined;
-	cellEdit: ICellMetadataEdit | IDocumentMetadataEdit | { editType: CellEditType.Replace; index: number; count: number; cells: unknown[] };
+	cellEdit:
+		| ICellMetadataEdit
+		| IDocumentMetadataEdit
+		| { editType: CellEditType.Replace; index: number; count: number; cells: unknown[] };
 }
 
 export type NotebookPriorityInfo = { filenamePattern?: string };
@@ -157,9 +160,13 @@ export namespace CellUri {
 		return notebook.with({ scheme: 'vscode-notebook-cell', fragment: `${handle}` });
 	}
 	export function parse(cell: URI): { notebook: URI; handle: number } | undefined {
-		if (cell.scheme !== 'vscode-notebook-cell') { return undefined; }
+		if (cell.scheme !== 'vscode-notebook-cell') {
+			return undefined;
+		}
 		const match = /^(\d+)$/.exec(cell.fragment);
-		if (!match) { return undefined; }
+		if (!match) {
+			return undefined;
+		}
 		return { notebook: cell.with({ scheme: cell.query || 'file', fragment: '' }), handle: parseInt(match[1], 10) };
 	}
 }
@@ -177,7 +184,7 @@ export interface INotebookExclusiveDocumentFilter {
 export const enum NotebookFindScopeType {
 	None = 0,
 	Cells = 1,
-	Text = 2,
+	Text = 2
 }
 
 export const enum NotebookSetting {
@@ -200,7 +207,7 @@ export const enum NotebookSetting {
 	outputFontFamily = 'notebook.output.fontFamily',
 	outputLineHeight = 'notebook.output.lineHeight',
 	textOutputLineLimit = 'notebook.output.textLineLimit',
-	cellChat = 'notebook.experimental.cellChat',
+	cellChat = 'notebook.experimental.cellChat'
 }
 
 export const INTERACTIVE_WINDOW_EDITOR_ID = 'interactive';
@@ -208,7 +215,7 @@ export const REPL_EDITOR_ID = 'repl';
 
 export const enum SelectionStateType {
 	Handle = 0,
-	Index = 1,
+	Index = 1
 }
 
 export interface ISelectionState {

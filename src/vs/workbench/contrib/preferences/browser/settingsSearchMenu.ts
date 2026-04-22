@@ -41,9 +41,8 @@ export class SettingsSearchFilterDropdownMenuActionViewItem extends DropdownMenu
 		});
 
 		const widget = this.searchWidget.inputWidget;
-		this.suggestController = typeof (widget as any).getContribution === 'function'
-			? SuggestController.get(widget as any)
-			: null;
+		this.suggestController =
+			typeof (widget as any).getContribution === 'function' ? SuggestController.get(widget as any) : null;
 	}
 
 	override render(container: HTMLElement): void {

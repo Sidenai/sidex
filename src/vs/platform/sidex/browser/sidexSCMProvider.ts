@@ -45,26 +45,34 @@ export class SideXSCMProvider {
 	declare readonly _serviceBrand: undefined;
 	async getStatus(repoRoot: string): Promise<GitFileStatus[]> {
 		try {
-			return await invoke('git_status', { repoRoot }) as GitFileStatus[] || [];
-		} catch { return []; }
+			return ((await invoke('git_status', { repoRoot })) as GitFileStatus[]) || [];
+		} catch {
+			return [];
+		}
 	}
 
 	async getDiff(repoRoot: string, file?: string): Promise<string> {
 		try {
-			return await invoke('git_diff', { repoRoot, file: file ?? null }) as string || '';
-		} catch { return ''; }
+			return ((await invoke('git_diff', { repoRoot, file: file ?? null })) as string) || '';
+		} catch {
+			return '';
+		}
 	}
 
 	async getLog(repoRoot: string, maxCount: number = 50): Promise<GitLogEntry[]> {
 		try {
-			return await invoke('git_log', { repoRoot, maxCount }) as GitLogEntry[] || [];
-		} catch { return []; }
+			return ((await invoke('git_log', { repoRoot, maxCount })) as GitLogEntry[]) || [];
+		} catch {
+			return [];
+		}
 	}
 
 	async getBranches(repoRoot: string): Promise<GitBranch[]> {
 		try {
-			return await invoke('git_branches', { repoRoot }) as GitBranch[] || [];
-		} catch { return []; }
+			return ((await invoke('git_branches', { repoRoot })) as GitBranch[]) || [];
+		} catch {
+			return [];
+		}
 	}
 
 	async stage(repoRoot: string, paths: string[]): Promise<void> {
@@ -89,8 +97,10 @@ export class SideXSCMProvider {
 
 	async isRepo(path: string): Promise<boolean> {
 		try {
-			return await invoke('git_is_repo', { path }) as boolean;
-		} catch { return false; }
+			return (await invoke('git_is_repo', { path })) as boolean;
+		} catch {
+			return false;
+		}
 	}
 }
 

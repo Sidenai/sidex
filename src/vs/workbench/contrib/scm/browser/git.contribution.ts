@@ -1344,8 +1344,7 @@ class TauriGitContribution extends Disposable implements IWorkbenchContribution 
 					}
 
 					const status = (resource as any)?._status ?? '';
-					const isUntracked =
-						typeof status === 'string' && (status === 'untracked' || status.includes('?'));
+					const isUntracked = typeof status === 'string' && (status === 'untracked' || status.includes('?'));
 
 					const relPath = uri.fsPath.startsWith(rootPath + '/')
 						? uri.fsPath.substring(rootPath.length + 1)

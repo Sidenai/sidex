@@ -93,7 +93,6 @@ export class GlyphHoverWidget extends Disposable implements IOverlayWidget, IHov
 	}
 
 	private _updateFont(): void {
-		 
 		const codeClasses: HTMLElement[] = Array.prototype.slice.call(
 			this._hover.contentsDomNode.getElementsByClassName('code')
 		);
