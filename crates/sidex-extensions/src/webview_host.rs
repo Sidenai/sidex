@@ -306,7 +306,7 @@ impl WebviewHost {
             return Some(panel.html.clone());
         };
 
-        let meta = format!("<meta http-equiv=\"Content-Security-Policy\" content=\"{csp}\">",);
+        let meta = format!("<meta http-equiv=\"Content-Security-Policy\" content=\"{csp}\">");
 
         let html = if let Some(pos) = panel.html.find("<head>") {
             let insert_at = pos + "<head>".len();

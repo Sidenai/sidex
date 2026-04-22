@@ -44,7 +44,7 @@ fn build_http_client() -> reqwest::Client {
             env!("CARGO_PKG_VERSION"),
             " (+https://github.com/sidenai/sidex)"
         ))
-        .tcp_keepalive(Some(std::time::Duration::from_secs(60)))
+        .tcp_keepalive(Some(std::time::Duration::from_mins(1)))
         .http2_keep_alive_interval(Some(std::time::Duration::from_secs(30)))
         .http2_keep_alive_timeout(std::time::Duration::from_secs(10))
         .http2_keep_alive_while_idle(true)
