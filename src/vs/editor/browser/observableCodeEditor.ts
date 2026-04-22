@@ -172,7 +172,7 @@ export class ObservableCodeEditor extends Disposable {
 				this.versionId.read(reader);
 				return this.model.read(reader)?.getValue() ?? '';
 			},
-			(value, tx) => {
+			(value, _tx) => {
 				const model = this.model.get();
 				if (model !== null) {
 					if (value !== model.getValue()) {
@@ -569,7 +569,7 @@ export class ObservableCodeEditor extends Disposable {
 		);
 
 		store.add(
-			this.editor.onMouseLeave(E => {
+			this.editor.onMouseLeave(_E => {
 				isHovered.set(false, undefined);
 			})
 		);

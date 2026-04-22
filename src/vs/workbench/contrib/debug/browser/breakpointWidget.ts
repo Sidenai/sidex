@@ -688,7 +688,7 @@ class AcceptBreakpointWidgetInputAction extends EditorCommand {
 		});
 	}
 
-	runEditorCommand(accessor: ServicesAccessor, editor: ICodeEditor): void {
+	runEditorCommand(accessor: ServicesAccessor, _editor: ICodeEditor): void {
 		accessor.get(IPrivateBreakpointWidgetService).close(true);
 	}
 }
@@ -708,7 +708,7 @@ class CloseBreakpointWidgetCommand extends EditorCommand {
 		});
 	}
 
-	runEditorCommand(accessor: ServicesAccessor, editor: ICodeEditor, args: unknown): void {
+	runEditorCommand(accessor: ServicesAccessor, editor: ICodeEditor, _args: unknown): void {
 		const debugContribution = editor.getContribution<IBreakpointEditorContribution>(BREAKPOINT_EDITOR_CONTRIBUTION_ID);
 		if (debugContribution) {
 			// if focus is in outer editor we need to use the debug contribution to close

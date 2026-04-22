@@ -312,7 +312,7 @@ export function addToValueTree(
 	if (typeof curr === 'object' && curr !== null) {
 		try {
 			(curr as IStringDictionary<unknown>)[last] = value; // workaround https://github.com/microsoft/vscode/issues/13606
-		} catch (e) {
+		} catch (_e) {
 			conflictReporter(`Ignoring ${key} as ${segments.join('.')} is ${JSON.stringify(curr)}`);
 		}
 	} else {

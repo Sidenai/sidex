@@ -99,7 +99,7 @@ export class TextMateTokenizationWorker implements IWebWorkerServerRequestHandle
 
 		return new TMGrammarFactory(
 			{
-				logTrace: (msg: string) => {
+				logTrace: (_msg: string) => {
 					/* console.log(msg) */
 				},
 				logError: (msg: string, err: unknown) => console.error(msg, err),

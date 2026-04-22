@@ -5,7 +5,7 @@
 
 import type { IEditorOptions } from '../../../../editor/common/config/editorOptions.js';
 
-export function getSimpleEditorOptions(configurationService?: any): IEditorOptions {
+export function getSimpleEditorOptions(_configurationService?: any): IEditorOptions {
 	return {
 		wordWrap: 'on',
 		overviewRulerLanes: 0,

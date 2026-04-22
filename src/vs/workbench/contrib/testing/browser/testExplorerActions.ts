@@ -2105,7 +2105,7 @@ abstract class GoToRelatedCodeAction extends TestNavigationAction {
 		_languageFeaturesService: unknown,
 		model: ITextModel,
 		position: Position,
-		token: CancellationToken
+		_token: CancellationToken
 	): Promise<ReferencesModel | undefined> {
 		const testsAtCursor = await getTestsAtCursor(this.testService, this.uriIdentityService, model.uri, position);
 		const code = await Promise.all(testsAtCursor.map(t => this.testService.getCodeRelatedToTest(t)));

@@ -503,11 +503,11 @@ export abstract class ZoneWidget implements IHorizontalSashLayoutProvider {
 
 	protected abstract _fillContainer(container: HTMLElement): void;
 
-	protected _onWidth(widthInPixel: number): void {
+	protected _onWidth(_widthInPixel: number): void {
 		// implement in subclass
 	}
 
-	protected _doLayout(heightInPixel: number, widthInPixel: number): void {
+	protected _doLayout(_heightInPixel: number, _widthInPixel: number): void {
 		// implement in subclass
 	}
 

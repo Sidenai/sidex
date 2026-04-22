@@ -75,7 +75,7 @@ class RuntimeStatusMarkdownRenderer extends Disposable implements IExtensionFeat
 				emitter.fire(this.createElement(manifest, disposables));
 			}
 		}));
-		disposables.add(this.extensionFeaturesManagementService.onDidChangeAccessData(e => emitter.fire(this.createElement(manifest, disposables))));
+		disposables.add(this.extensionFeaturesManagementService.onDidChangeAccessData(_e => emitter.fire(this.createElement(manifest, disposables))));
 		return {
 			onDidChange: emitter.event,
 			data: this.createElement(manifest, disposables),

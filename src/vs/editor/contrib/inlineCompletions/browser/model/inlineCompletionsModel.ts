@@ -324,7 +324,7 @@ export class InlineCompletionsModel extends Disposable {
 					}
 
 					transaction(tx => {
-						this._fetchSpecificProviderSignal.trigger(tx, { provider, changeHint: changeHint ?? undefined });
+						this._fetchSpecificProviderSignal.trigger(tx, { provider, changeHint: (changeHint ?? undefined) as any });
 						this.trigger(tx);
 					});
 				})
@@ -693,7 +693,7 @@ export class InlineCompletionsModel extends Disposable {
 		const idx =
 			this._selectedInlineCompletionId === undefined
 				? -1
-				: filteredCompletions.findIndex(v => v.semanticId === selectedInlineCompletionId);
+				: filteredCompletions.findIndex(v => (v as any).semanticId === selectedInlineCompletionId);
 		if (idx === -1) {
 			// Reset the selection so that the selection does not jump back when it appears again
 			this._selectedInlineCompletionId.set(undefined, undefined);
@@ -705,7 +705,7 @@ export class InlineCompletionsModel extends Disposable {
 	public readonly selectedInlineCompletion = derived<InlineCompletionItem | undefined>(this, reader => {
 		const filteredCompletions = this._inlineCompletionItems.read(reader);
 		const idx = this.selectedInlineCompletionIndex.read(reader);
-		return filteredCompletions[idx];
+		return filteredCompletions[idx] as any;
 	});
 
 	public readonly activeCommands = derivedOpts<InlineCompletionCommand[]>(
@@ -780,7 +780,7 @@ export class InlineCompletionsModel extends Disposable {
 				return false;
 			}
 		},
-		reader => {
+		((reader: any) => {
 			const model = this.textModel;
 
 			if (this._suppressInSnippetMode.read(reader) && this._isInSnippetMode.read(reader)) {
@@ -803,7 +803,6 @@ export class InlineCompletionsModel extends Disposable {
 
 				let nextEditUri =
 					(item.inlineEdit?.command?.id === 'vscode.open' || item.inlineEdit?.command?.id === '_workbench.open') &&
-					// eslint-disable-next-line local/code-no-any-casts
 					item.inlineEdit?.command.arguments?.length
 						? URI.from(<any>item.inlineEdit?.command.arguments[0])
 						: undefined;
@@ -887,7 +886,7 @@ export class InlineCompletionsModel extends Disposable {
 					suggestItem: undefined
 				};
 			}
-		}
+		}) as any
 	);
 
 	public readonly status = derived(this, reader => {
@@ -936,7 +935,7 @@ export class InlineCompletionsModel extends Disposable {
 			: [this.selectedInlineCompletion.read(reader)].filter(isDefined);
 
 		const augmentedCompletion = mapFindFirst(candidateInlineCompletions, completion => {
-			let r = completion.getSingleTextEdit();
+			let r = (completion as any).getSingleTextEdit();
 			r = singleTextRemoveCommonPrefix(
 				r,
 				model,
@@ -1075,7 +1074,7 @@ export class InlineCompletionsModel extends Disposable {
 		const completions = this._inlineCompletionItems.get() || [];
 		if (completions.length > 0) {
 			const newIdx = (this.selectedInlineCompletionIndex.get() + delta + completions.length) % completions.length;
-			this._selectedInlineCompletionId.set(completions[newIdx].semanticId, undefined);
+			this._selectedInlineCompletionId.set((completions[newIdx] as any).semanticId, undefined);
 		} else {
 			this._selectedInlineCompletionId.set(undefined, undefined);
 		}
@@ -1369,12 +1368,12 @@ export class InlineCompletionsModel extends Disposable {
 
 		// This assumes that the inline completion and the model use the same EOL style.
 		const alreadyAcceptedLength = this.textModel.getValueInRange(
-			augmentedCompletion.completion.editRange,
+			(augmentedCompletion.completion as any).editRange,
 			EndOfLinePreference.LF
 		).length;
 		const acceptedLength = alreadyAcceptedLength + itemEdit.text.length;
 
-		augmentedCompletion.completion.reportPartialAccept(
+		(augmentedCompletion.completion as any).reportPartialAccept(
 			itemEdit.text.length,
 			{
 				kind: PartialAcceptTriggerKind.Suggest,
@@ -1597,8 +1596,11 @@ export function isSuggestionInViewport(
 }
 
 function skuFromAccount(account: IDefaultAccount | null): InlineSuggestSku | undefined {
-	if (account?.entitlementsData?.access_type_sku && account?.entitlementsData?.copilot_plan) {
-		return { type: account.entitlementsData.access_type_sku, plan: account.entitlementsData.copilot_plan };
+	if ((account?.entitlementsData as any)?.access_type_sku && (account?.entitlementsData as any)?.copilot_plan) {
+		return {
+			type: (account.entitlementsData as any).access_type_sku,
+			plan: (account.entitlementsData as any).copilot_plan
+		};
 	}
 	return undefined;
 }

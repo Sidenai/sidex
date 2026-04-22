@@ -150,27 +150,27 @@ export class ViewportRenderStrategy extends BaseRenderStrategy {
 	//    there are lines that used to be visible but are no longer, so those ranges must be
 	//    cleared and uploaded to the GPU.
 
-	public override onConfigurationChanged(e: ViewConfigurationChangedEvent): boolean {
+	public override onConfigurationChanged(_e: ViewConfigurationChangedEvent): boolean {
 		return true;
 	}
 
-	public override onDecorationsChanged(e: ViewDecorationsChangedEvent): boolean {
+	public override onDecorationsChanged(_e: ViewDecorationsChangedEvent): boolean {
 		return true;
 	}
 
-	public override onTokensChanged(e: ViewTokensChangedEvent): boolean {
+	public override onTokensChanged(_e: ViewTokensChangedEvent): boolean {
 		return true;
 	}
 
-	public override onLinesDeleted(e: ViewLinesDeletedEvent): boolean {
+	public override onLinesDeleted(_e: ViewLinesDeletedEvent): boolean {
 		return true;
 	}
 
-	public override onLinesInserted(e: ViewLinesInsertedEvent): boolean {
+	public override onLinesInserted(_e: ViewLinesInsertedEvent): boolean {
 		return true;
 	}
 
-	public override onLinesChanged(e: ViewLinesChangedEvent): boolean {
+	public override onLinesChanged(_e: ViewLinesChangedEvent): boolean {
 		return true;
 	}
 
@@ -181,23 +181,19 @@ export class ViewportRenderStrategy extends BaseRenderStrategy {
 		const dpr = getActiveWindow().devicePixelRatio;
 		this._scrollOffsetValueBuffer[0] = (e?.scrollLeft ?? this._context.viewLayout.getCurrentScrollLeft()) * dpr;
 		this._scrollOffsetValueBuffer[1] = (e?.scrollTop ?? this._context.viewLayout.getCurrentScrollTop()) * dpr;
-		this._device.queue.writeBuffer(
-			this._scrollOffsetBindBuffer,
-			0,
-			this._scrollOffsetValueBuffer as Float32Array<ArrayBuffer>
-		);
+		this._device.queue.writeBuffer(this._scrollOffsetBindBuffer, 0, this._scrollOffsetValueBuffer as Float32Array);
 		return true;
 	}
 
-	public override onThemeChanged(e: ViewThemeChangedEvent): boolean {
+	public override onThemeChanged(_e: ViewThemeChangedEvent): boolean {
 		return true;
 	}
 
-	public override onLineMappingChanged(e: ViewLineMappingChangedEvent): boolean {
+	public override onLineMappingChanged(_e: ViewLineMappingChangedEvent): boolean {
 		return true;
 	}
 
-	public override onZonesChanged(e: ViewZonesChangedEvent): boolean {
+	public override onZonesChanged(_e: ViewZonesChangedEvent): boolean {
 		return true;
 	}
 
@@ -505,7 +501,7 @@ export class ViewportRenderStrategy extends BaseRenderStrategy {
 		return visibleObjectCount;
 	}
 
-	draw(pass: GPURenderPassEncoder, viewportData: ViewportData): void {
+	draw(pass: GPURenderPassEncoder, _viewportData: ViewportData): void {
 		if (this._visibleObjectCount <= 0) {
 			throw new BugIndicatingError('Attempt to draw 0 objects');
 		}

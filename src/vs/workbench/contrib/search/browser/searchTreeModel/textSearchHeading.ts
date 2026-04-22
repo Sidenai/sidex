@@ -131,7 +131,7 @@ export abstract class TextSearchHeadingImpl<QueryType extends ITextSearchQuery>
 
 	remove(
 		matches: ISearchTreeFileMatch | ISearchTreeFolderMatch | (ISearchTreeFileMatch | ISearchTreeFolderMatch)[],
-		ai = false
+		_ai = false
 	): void {
 		if (!Array.isArray(matches)) {
 			matches = [matches];

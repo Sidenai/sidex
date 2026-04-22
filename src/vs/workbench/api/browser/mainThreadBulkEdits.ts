@@ -77,7 +77,7 @@ export function reviveWorkspaceEditDto(
 		}
 		if (ResourceFileEdit.is(edit)) {
 			if (edit.options) {
-				const inContents = (edit as IWorkspaceFileEditDto).options?.contents;
+				const inContents = (edit as unknown as IWorkspaceFileEditDto).options?.contents;
 				if (inContents) {
 					if (inContents.type === 'base64') {
 						edit.options.contents = Promise.resolve(decodeBase64(inContents.value));

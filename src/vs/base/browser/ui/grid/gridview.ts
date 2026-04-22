@@ -200,7 +200,6 @@ export interface GridBranchNode {
 export type GridNode = GridLeafNode | GridBranchNode;
 
 export function isGridBranchNode(node: GridNode): node is GridBranchNode {
-	// eslint-disable-next-line local/code-no-any-casts
 	return !!(node as any).children;
 }
 
@@ -444,7 +443,7 @@ class BranchNode implements ISplitView<ILayoutContext>, IDisposable {
 		readonly splitviewProportionalLayout: boolean,
 		size: number = 0,
 		orthogonalSize: number = 0,
-		edgeSnapping: boolean = false,
+		_edgeSnapping: boolean = false,
 		childDescriptors?: INodeDescriptor[]
 	) {
 		this._styles = styles;

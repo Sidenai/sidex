@@ -186,7 +186,7 @@ export class ExtHostTesting extends Disposable implements ExtHostTestingShape {
 			return cap as TestControllerCapability;
 		};
 
-		const controller: vscode.TestController = {
+		const controller = {
 			items: collection.root.children,
 			get label() {
 				return label;
@@ -206,7 +206,7 @@ export class ExtHostTesting extends Disposable implements ExtHostTestingShape {
 			get id() {
 				return controllerId;
 			},
-			get relatedCodeProvider() {
+			get relatedCodeProvider(): any {
 				return info.relatedCodeProvider;
 			},
 			set relatedCodeProvider(value: vscode.TestRelatedCodeProvider | undefined) {
@@ -267,7 +267,7 @@ export class ExtHostTesting extends Disposable implements ExtHostTestingShape {
 			dispose: () => {
 				disposable.dispose();
 			}
-		};
+		} as vscode.TestController;
 
 		const info: ControllerInfo = { controller, collection, profiles, extension, activeProfiles };
 		proxy.$registerTestController(controllerId, label, getCapability());
@@ -353,7 +353,7 @@ export class ExtHostTesting extends Disposable implements ExtHostTestingShape {
 			[...this.controllers.values()].map(async c => {
 				let tests: vscode.TestItem[] | undefined | null;
 				try {
-					tests = await c.relatedCodeProvider?.provideRelatedTests?.(doc.document, position, token);
+					tests = await (c as any).relatedCodeProvider?.provideRelatedTests?.(doc.document, position, token);
 				} catch (e) {
 					if (!token.isCancellationRequested) {
 						this.logService.warn(`Error thrown while providing related tests for ${c.controller.label}`, e);
@@ -386,7 +386,7 @@ export class ExtHostTesting extends Disposable implements ExtHostTestingShape {
 			return [];
 		}
 
-		const locations = await controller.relatedCodeProvider?.provideRelatedCode?.(test.actual, token);
+		const locations = await (controller as any).relatedCodeProvider?.provideRelatedCode?.(test.actual, token);
 		return locations?.map(Convert.location.from) ?? [];
 	}
 
@@ -468,7 +468,7 @@ export class ExtHostTesting extends Disposable implements ExtHostTestingShape {
 					const o = Convert.TestResults.to(r);
 					const taskWithCoverage = r.tasks.findIndex(t => t.hasCoverage);
 					if (taskWithCoverage !== -1) {
-						o.getDetailedCoverage = (uri, token = CancellationToken.None) =>
+						(o as any).getDetailedCoverage = (uri: any, token = CancellationToken.None) =>
 							this.proxy
 								.$getCoverageDetails(r.id, taskWithCoverage, uri, token)
 								.then(r => r.map(Convert.TestCoverage.to));
@@ -553,7 +553,7 @@ export class ExtHostTesting extends Disposable implements ExtHostTestingShape {
 		await Promise.all(
 			[...this.followupProviders].map(async provider => {
 				try {
-					const r = await provider.provideFollowup(results, test, req.taskIndex, req.messageIndex, token);
+					const r = await (provider.provideFollowup as any)(results, test, req.taskIndex, req.messageIndex, token);
 					if (r) {
 						followups = followups.concat(r);
 					}
@@ -1519,7 +1519,7 @@ function findTestInResultSnapshot(extId: TestId, snapshot: readonly Readonly<vsc
 			return item;
 		}
 
-		snapshot = item.children;
+		snapshot = (item as any).children;
 	}
 
 	return undefined;

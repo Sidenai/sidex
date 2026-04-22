@@ -1413,7 +1413,7 @@ export abstract class AbstractExtensionManagementService
 									task.extension.manifest.version,
 									StatisticType.Uninstall
 								);
-							} catch (error) {
+							} catch (_error) {
 								/* ignore */
 							}
 						}
@@ -1444,7 +1444,7 @@ export abstract class AbstractExtensionManagementService
 				// cancel the tasks
 				try {
 					task.cancel();
-				} catch (error) {
+				} catch (_error) {
 					/* ignore */
 				}
 				if (!processedTasks.includes(task)) {

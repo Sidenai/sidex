@@ -228,7 +228,7 @@ export const testsInFile = async function* (
 
 	queue.push(existing.length ? existing.map(e => e.item.extId) : testService.collection.rootIds);
 
-	let n = 0;
+	let _n = 0;
 	let gather: IncrementalTestCollectionItem[] = [];
 	while (queue.size > 0) {
 		const next = queue.pop()!;
@@ -246,7 +246,7 @@ export const testsInFile = async function* (
 		}
 
 		for (const id of ids) {
-			n++;
+			_n++;
 			const test = testService.collection.getNodeById(id);
 			if (!test) {
 				continue; // possible because we expand async and things could delete

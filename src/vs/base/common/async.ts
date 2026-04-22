@@ -528,7 +528,7 @@ export class Barrier {
 
 	constructor() {
 		this._isOpen = false;
-		this._promise = new Promise<boolean>((c, e) => {
+		this._promise = new Promise<boolean>((c, _e) => {
 			this._completePromise = c;
 		});
 	}
@@ -1496,7 +1496,7 @@ export let _runWhenIdle: (
 (function () {
 	const safeGlobal: any = globalThis;
 	if (typeof safeGlobal.requestIdleCallback !== 'function' || typeof safeGlobal.cancelIdleCallback !== 'function') {
-		_runWhenIdle = (_targetWindow, runner, timeout?) => {
+		_runWhenIdle = (_targetWindow, runner, _timeout?) => {
 			setTimeout0(() => {
 				if (disposed) {
 					return;
@@ -1642,7 +1642,7 @@ export class TaskSequentializer {
 	private _running?: IRunningTask;
 	private _queued?: IQueuedTask;
 
-	isRunning(taskId?: number): this is ITaskSequentializerWithRunningTask {
+	isRunning(taskId?: number): boolean {
 		if (typeof taskId === 'number') {
 			return this._running?.taskId === taskId;
 		}
@@ -2408,7 +2408,7 @@ class ProducerConsumer<T> {
 		if (value.ok) {
 			deferred.complete(value.value);
 		} else {
-			deferred.error(value.error);
+			deferred.error((value as { ok: false; error: Error }).error);
 		}
 	}
 
@@ -2418,7 +2418,7 @@ class ProducerConsumer<T> {
 			if (value.ok) {
 				return Promise.resolve(value.value);
 			} else {
-				return Promise.reject(value.error);
+				return Promise.reject((value as { ok: false; error: Error }).error);
 			}
 		} else {
 			const deferred = new DeferredPromise<T>();

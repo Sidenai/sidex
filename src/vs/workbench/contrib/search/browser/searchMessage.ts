@@ -56,7 +56,6 @@ export const renderSearchMessage = (
 					const parsed = URI.parse(href, true);
 					if (parsed.scheme === Schemas.command && message.trusted) {
 						const result = await commandService.executeCommand(parsed.path);
-						// eslint-disable-next-line local/code-no-any-casts
 						if ((result as any)?.triggerSearch) {
 							triggerSearch();
 						}

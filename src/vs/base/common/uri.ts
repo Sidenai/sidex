@@ -429,7 +429,7 @@ export class URI implements UriComponents {
 	static revive(data: UriComponents | URI | undefined | null): URI | undefined | null;
 	static revive(data: UriComponents | URI | undefined | null): URI | undefined | null {
 		if (!data) {
-			return data;
+			return data as any;
 		} else if (data instanceof URI) {
 			return data;
 		} else {
@@ -500,7 +500,6 @@ class Uri extends URI {
 	}
 
 	override toJSON(): UriComponents {
-		// eslint-disable-next-line local/code-no-dangerous-type-assertions
 		const res = <UriState>{
 			$mid: MarshalledId.Uri
 		};

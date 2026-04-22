@@ -136,11 +136,11 @@ import { asCssVariable } from '../../../../../platform/theme/common/colorUtils.j
 export class ExplorerDelegate implements IListVirtualDelegate<ExplorerItem> {
 	static readonly ITEM_HEIGHT = 22;
 
-	getHeight(element: ExplorerItem): number {
+	getHeight(_element: ExplorerItem): number {
 		return ExplorerDelegate.ITEM_HEIGHT;
 	}
 
-	getTemplateId(element: ExplorerItem): string {
+	getTemplateId(_element: ExplorerItem): string {
 		return FilesRenderer.ID;
 	}
 }
@@ -1054,7 +1054,7 @@ export class FilesRenderer
 						if (templateData.currentContext) {
 							this.updateWidth(templateData.currentContext);
 						}
-					} catch (e) {
+					} catch (_e) {
 						// noop since the element might no longer be in the tree, no update of width necessary
 					}
 				});
@@ -1355,7 +1355,7 @@ export class FilesRenderer
 					done(false, true);
 				}
 			}),
-			DOM.addStandardDisposableListener(inputBox.inputElement, DOM.EventType.KEY_UP, (e: IKeyboardEvent) => {
+			DOM.addStandardDisposableListener(inputBox.inputElement, DOM.EventType.KEY_UP, (_e: IKeyboardEvent) => {
 				showInputBoxNotification();
 			}),
 			DOM.addDisposableListener(inputBox.inputElement, DOM.EventType.BLUR, async () => {

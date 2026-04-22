@@ -250,7 +250,7 @@ export class CursorMoveCommands {
 		return result;
 	}
 
-	public static selectAll(viewModel: IViewModel, cursor: CursorState): PartialCursorState {
+	public static selectAll(viewModel: IViewModel, _cursor: CursorState): PartialCursorState {
 		const lineCount = viewModel.model.getLineCount();
 		const maxColumn = viewModel.model.getLineMaxColumn(lineCount);
 

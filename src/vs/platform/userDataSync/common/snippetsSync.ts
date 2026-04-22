@@ -145,7 +145,7 @@ export class SnippetsSynchroniser extends AbstractSynchroniser implements IUserD
 
 	protected async getMergeResult(
 		resourcePreview: ISnippetsResourcePreview,
-		token: CancellationToken
+		_token: CancellationToken
 	): Promise<IMergeResult> {
 		return resourcePreview.previewResult;
 	}
@@ -154,7 +154,7 @@ export class SnippetsSynchroniser extends AbstractSynchroniser implements IUserD
 		resourcePreview: ISnippetsResourcePreview,
 		resource: URI,
 		content: string | null | undefined,
-		token: CancellationToken
+		_token: CancellationToken
 	): Promise<IAcceptResult> {
 		/* Accept local resource */
 		if (
@@ -253,7 +253,7 @@ export class SnippetsSynchroniser extends AbstractSynchroniser implements IUserD
 			// Delete the preview
 			try {
 				await this.fileService.del(previewResource);
-			} catch (e) {
+			} catch (_e) {
 				/* ignore */
 			}
 		}
@@ -564,7 +564,7 @@ export class SnippetsSynchroniser extends AbstractSynchroniser implements IUserD
 			if (Object.keys(localSnippets).length) {
 				return true;
 			}
-		} catch (error) {
+		} catch (_error) {
 			/* ignore error */
 		}
 		return false;

@@ -799,7 +799,7 @@ export class SettingsEditor2 extends EditorPane {
 		}
 
 		// Do not select all if the user is already searching.
-		this.searchWidget.focus(selectAll && !this.searchInputDelayer.isTriggered);
+		(this.searchWidget as any).focus(selectAll && !this.searchInputDelayer.isTriggered);
 	}
 
 	clearSearchResults(): void {
@@ -828,7 +828,7 @@ export class SettingsEditor2 extends EditorPane {
 			label += `. ${this.lastSyncedLabel}`;
 		}
 
-		this.searchWidget.updateAriaLabel(label);
+		(this.searchWidget as any).updateAriaLabel(label);
 	}
 
 	/**
@@ -1350,7 +1350,7 @@ export class SettingsEditor2 extends EditorPane {
 				const { element, height } = params;
 				try {
 					this.settingsTree.updateElementHeight(element, height);
-				} catch (e) {
+				} catch (_e) {
 					// the element was not found
 				}
 			})
@@ -1479,7 +1479,7 @@ export class SettingsEditor2 extends EditorPane {
 		value: unknown,
 		manualReset: boolean,
 		languageFilter: string | undefined,
-		scope: ConfigurationScope | undefined
+		_scope: ConfigurationScope | undefined
 	): Promise<void> {
 		// ConfigurationService displays the error if this fails.
 		// Force a render afterwards because onDidConfigurationUpdate doesn't fire if the update doesn't result in an effective setting value change.
@@ -1781,7 +1781,7 @@ export class SettingsEditor2 extends EditorPane {
 							this.extensionGalleryService.getManifest(extension, CancellationToken.None),
 							EXTENSION_FETCH_TIMEOUT_MS
 						)) ?? null;
-				} catch (e) {
+				} catch (_e) {
 					// Likely a networking issue.
 					// Skip adding a button for this extension to the Settings editor.
 					continue;
@@ -1924,7 +1924,7 @@ export class SettingsEditor2 extends EditorPane {
 				if (newElement) {
 					try {
 						this.settingsTree.reveal(newElement, 0);
-					} catch (e) {
+					} catch (_e) {
 						// Ignore the error
 					}
 				}
@@ -2596,7 +2596,7 @@ class SyncControls extends Disposable {
 		@ICommandService private readonly commandService: ICommandService,
 		@IUserDataSyncService private readonly userDataSyncService: IUserDataSyncService,
 		@IUserDataSyncEnablementService private readonly userDataSyncEnablementService: IUserDataSyncEnablementService,
-		@ITelemetryService telemetryService: ITelemetryService
+		@ITelemetryService _telemetryService: ITelemetryService
 	) {
 		super();
 
@@ -2620,7 +2620,7 @@ class SyncControls extends Disposable {
 
 		this.updateLastSyncedTime();
 		this._register(
-			this.userDataSyncService.onDidChangeLastSyncTime(() => {
+			(this.userDataSyncService as any).onDidChangeLastSyncTime(() => {
 				this.updateLastSyncedTime();
 			})
 		);

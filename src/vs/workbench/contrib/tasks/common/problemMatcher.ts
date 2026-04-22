@@ -215,7 +215,7 @@ export async function getResource(filename: string, matcher: ProblemMatcher, fil
 			let stat: IFileStatWithPartialMetadata | undefined = undefined;
 			try {
 				stat = await fileService.stat(relative);
-			} catch (ex) {
+			} catch (_ex) {
 				// Do nothing, we just need to catch file resolution errors.
 			}
 			if (stat) {
@@ -345,11 +345,11 @@ abstract class AbstractLineMatcher implements ILineMatcher {
 		this.logService = logService;
 	}
 
-	public handle(lines: string[], start: number = 0): IHandleResult {
+	public handle(lines: string[], _start: number = 0): IHandleResult {
 		return { match: null, continue: false };
 	}
 
-	public next(line: string): IProblemMatch | null {
+	public next(_line: string): IProblemMatch | null {
 		return null;
 	}
 
@@ -452,7 +452,7 @@ abstract class AbstractLineMatcher implements ILineMatcher {
 					marker: marker
 				};
 			}
-		} catch (err) {
+		} catch (_err) {
 			console.error(`Failed to convert problem data into match: ${JSON.stringify(data)}`);
 		}
 		return undefined;
@@ -578,7 +578,7 @@ class SingleLineMatcher extends AbstractLineMatcher {
 		return { match: null, continue: false };
 	}
 
-	public override next(line: string): IProblemMatch | null {
+	public override next(_line: string): IProblemMatch | null {
 		return null;
 	}
 }
@@ -1200,7 +1200,7 @@ export class ProblemPatternParser extends Parser {
 		let result: RegExp | undefined;
 		try {
 			result = new RegExp(value);
-		} catch (err) {
+		} catch (_err) {
 			this.error(
 				localize(
 					'ProblemPatternParser.invalidRegexp',
@@ -1652,7 +1652,7 @@ class ProblemPatternRegistryImpl implements IProblemPatternRegistry {
 	constructor() {
 		this.patterns = Object.create(null);
 		this.fillDefaults();
-		this.readyPromise = new Promise<void>((resolve, reject) => {
+		this.readyPromise = new Promise<void>((resolve, _reject) => {
 			problemPatternExtPoint.setHandler((extensions, delta) => {
 				// We get all statically know extension during startup in one batch
 				try {
@@ -1692,7 +1692,7 @@ class ProblemPatternRegistryImpl implements IProblemPatternRegistry {
 							parser.reset();
 						}
 					});
-				} catch (error) {
+				} catch (_error) {
 					// Do nothing
 				}
 				resolve(undefined);
@@ -2113,7 +2113,7 @@ export class ProblemMatcherParser extends Parser {
 		}
 		try {
 			result = new RegExp(value);
-		} catch (err) {
+		} catch (_err) {
 			this.error(
 				localize(
 					'ProblemMatcherParser.invalidRegexp',
@@ -2152,7 +2152,7 @@ class ProblemMatcherRegistryImpl implements IProblemMatcherRegistry {
 	constructor() {
 		this.matchers = Object.create(null);
 		this.fillDefaults();
-		this.readyPromise = new Promise<void>((resolve, reject) => {
+		this.readyPromise = new Promise<void>((resolve, _reject) => {
 			problemMatchersExtPoint.setHandler((extensions, delta) => {
 				try {
 					delta.removed.forEach(extension => {
@@ -2176,7 +2176,7 @@ class ProblemMatcherRegistryImpl implements IProblemMatcherRegistry {
 					if (delta.removed.length > 0 || delta.added.length > 0) {
 						this._onMatchersChanged.fire();
 					}
-				} catch (error) {}
+				} catch (_error) {}
 				const matcher = this.get('tsc-watch');
 				if (matcher) {
 					(matcher as unknown as Record<string, unknown>).tscWatch = true;

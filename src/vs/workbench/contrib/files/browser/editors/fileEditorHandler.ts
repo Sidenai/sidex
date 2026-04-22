@@ -29,7 +29,7 @@ interface ISerializedFileEditorInput {
 }
 
 export class FileEditorInputSerializer implements IEditorSerializer {
-	canSerialize(editorInput: EditorInput): boolean {
+	canSerialize(_editorInput: EditorInput): boolean {
 		return true;
 	}
 

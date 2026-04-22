@@ -171,7 +171,7 @@ export class UserSettingsRenderer extends Disposable implements IPreferencesRend
 		}
 	}
 
-	clearFocus(setting: ISetting): void {
+	clearFocus(_setting: ISetting): void {
 		this.settingHighlighter.clear(true);
 	}
 
@@ -651,8 +651,8 @@ class UnsupportedSettingsRenderer extends Disposable implements languages.CodeAc
 	async provideCodeActions(
 		model: ITextModel,
 		range: Range | Selection,
-		context: languages.CodeActionContext,
-		token: CancellationToken
+		_context: languages.CodeActionContext,
+		_token: CancellationToken
 	): Promise<languages.CodeActionList> {
 		const actions: languages.CodeAction[] = [];
 		const codeActionsByRange = this.codeActions.get(model.uri);

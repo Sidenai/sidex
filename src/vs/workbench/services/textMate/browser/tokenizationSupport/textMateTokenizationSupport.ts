@@ -47,7 +47,7 @@ export class TextMateTokenizationSupport extends Disposable implements ITokeniza
 		return this._initialState;
 	}
 
-	public tokenize(line: string, hasEOL: boolean, state: IState): TokenizationResult {
+	public tokenize(_line: string, _hasEOL: boolean, _state: IState): TokenizationResult {
 		throw new Error('Not supported!');
 	}
 

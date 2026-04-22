@@ -160,7 +160,7 @@ export class ReplaceService implements IReplaceService {
 					let ref: IReference<IResolvedNotebookEditorModel> | undefined;
 					try {
 						ref = await this.notebookEditorModelResolverService.resolve(notebookResource);
-						await ref.object.save({ source: ReplaceService.REPLACE_SAVE_SOURCE });
+						await (ref.object as any).save({ source: ReplaceService.REPLACE_SAVE_SOURCE });
 					} finally {
 						ref?.dispose();
 					}

@@ -128,7 +128,7 @@ export class TreeSitterTree extends Disposable {
 		return this._ranges;
 	}
 
-	public getInjectionTrees(startIndex: number, languageId: string): TreeSitterTree | undefined {
+	public getInjectionTrees(_startIndex: number, _languageId: string): TreeSitterTree | undefined {
 		// TODO
 		return undefined;
 	}
@@ -376,7 +376,7 @@ export class TreeSitterTree extends Disposable {
 		return constrainedChanges;
 	}
 
-	private async _parseAndUpdateTree(version: number): Promise<TreeSitter.Tree | undefined> {
+	private async _parseAndUpdateTree(_version: number): Promise<TreeSitter.Tree | undefined> {
 		const tree = await this._parse();
 		if (tree) {
 			this._lastFullyParsed?.delete();
@@ -415,7 +415,7 @@ export class TreeSitterTree extends Disposable {
 			// Parse in small chunks to prevent blocking during scroll
 			// The progressCallback will yield every 16ms (1 frame at 60fps)
 			newTree = this._parser.parse(
-				(index: number, position?: TreeSitter.Point) => this._parseCallback(index),
+				(index: number, _position?: TreeSitter.Point) => this._parseCallback(index),
 				this._tree.get(),
 				{ progressCallback, includedRanges: this._ranges }
 			);

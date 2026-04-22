@@ -474,7 +474,7 @@ class MoveViewsBetweenPanelsAction extends Action2 {
 		super(desc);
 	}
 
-	run(accessor: ServicesAccessor, ...args: unknown[]): void {
+	run(accessor: ServicesAccessor, ..._args: unknown[]): void {
 		const viewDescriptorService = accessor.get(IViewDescriptorService);
 		const layoutService = accessor.get(IWorkbenchLayoutService);
 		const viewsService = accessor.get(IViewsService);

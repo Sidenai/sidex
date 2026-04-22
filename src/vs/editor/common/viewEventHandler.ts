@@ -32,58 +32,58 @@ export class ViewEventHandler extends Disposable {
 
 	// --- begin event handlers
 
-	public onCompositionStart(e: viewEvents.ViewCompositionStartEvent): boolean {
+	public onCompositionStart(_e: viewEvents.ViewCompositionStartEvent): boolean {
 		return false;
 	}
-	public onCompositionEnd(e: viewEvents.ViewCompositionEndEvent): boolean {
+	public onCompositionEnd(_e: viewEvents.ViewCompositionEndEvent): boolean {
 		return false;
 	}
-	public onConfigurationChanged(e: viewEvents.ViewConfigurationChangedEvent): boolean {
+	public onConfigurationChanged(_e: viewEvents.ViewConfigurationChangedEvent): boolean {
 		return false;
 	}
-	public onCursorStateChanged(e: viewEvents.ViewCursorStateChangedEvent): boolean {
+	public onCursorStateChanged(_e: viewEvents.ViewCursorStateChangedEvent): boolean {
 		return false;
 	}
-	public onDecorationsChanged(e: viewEvents.ViewDecorationsChangedEvent): boolean {
+	public onDecorationsChanged(_e: viewEvents.ViewDecorationsChangedEvent): boolean {
 		return false;
 	}
-	public onFlushed(e: viewEvents.ViewFlushedEvent): boolean {
+	public onFlushed(_e: viewEvents.ViewFlushedEvent): boolean {
 		return false;
 	}
-	public onFocusChanged(e: viewEvents.ViewFocusChangedEvent): boolean {
+	public onFocusChanged(_e: viewEvents.ViewFocusChangedEvent): boolean {
 		return false;
 	}
-	public onLanguageConfigurationChanged(e: viewEvents.ViewLanguageConfigurationEvent): boolean {
+	public onLanguageConfigurationChanged(_e: viewEvents.ViewLanguageConfigurationEvent): boolean {
 		return false;
 	}
-	public onLineMappingChanged(e: viewEvents.ViewLineMappingChangedEvent): boolean {
+	public onLineMappingChanged(_e: viewEvents.ViewLineMappingChangedEvent): boolean {
 		return false;
 	}
-	public onLinesChanged(e: viewEvents.ViewLinesChangedEvent): boolean {
+	public onLinesChanged(_e: viewEvents.ViewLinesChangedEvent): boolean {
 		return false;
 	}
-	public onLinesDeleted(e: viewEvents.ViewLinesDeletedEvent): boolean {
+	public onLinesDeleted(_e: viewEvents.ViewLinesDeletedEvent): boolean {
 		return false;
 	}
-	public onLinesInserted(e: viewEvents.ViewLinesInsertedEvent): boolean {
+	public onLinesInserted(_e: viewEvents.ViewLinesInsertedEvent): boolean {
 		return false;
 	}
-	public onRevealRangeRequest(e: viewEvents.ViewRevealRangeRequestEvent): boolean {
+	public onRevealRangeRequest(_e: viewEvents.ViewRevealRangeRequestEvent): boolean {
 		return false;
 	}
-	public onScrollChanged(e: viewEvents.ViewScrollChangedEvent): boolean {
+	public onScrollChanged(_e: viewEvents.ViewScrollChangedEvent): boolean {
 		return false;
 	}
-	public onThemeChanged(e: viewEvents.ViewThemeChangedEvent): boolean {
+	public onThemeChanged(_e: viewEvents.ViewThemeChangedEvent): boolean {
 		return false;
 	}
-	public onTokensChanged(e: viewEvents.ViewTokensChangedEvent): boolean {
+	public onTokensChanged(_e: viewEvents.ViewTokensChangedEvent): boolean {
 		return false;
 	}
-	public onTokensColorsChanged(e: viewEvents.ViewTokensColorsChangedEvent): boolean {
+	public onTokensColorsChanged(_e: viewEvents.ViewTokensColorsChangedEvent): boolean {
 		return false;
 	}
-	public onZonesChanged(e: viewEvents.ViewZonesChangedEvent): boolean {
+	public onZonesChanged(_e: viewEvents.ViewZonesChangedEvent): boolean {
 		return false;
 	}
 

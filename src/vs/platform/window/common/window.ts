@@ -257,7 +257,10 @@ export const enum CustomTitleBarVisibility {
 	NEVER = 'never'
 }
 
-export function hasCustomTitlebar(configurationService: IConfigurationService, titleBarStyle?: TitlebarStyle): boolean {
+export function hasCustomTitlebar(
+	_configurationService: IConfigurationService,
+	_titleBarStyle?: TitlebarStyle
+): boolean {
 	// Returns if it possible to have a custom title bar in the curren session
 	// Does not imply that the title bar is visible
 	return true;

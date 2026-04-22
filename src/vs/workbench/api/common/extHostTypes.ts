@@ -1621,7 +1621,7 @@ export class TreeItem {
 	tooltip?: string | vscode.MarkdownString;
 	checkboxState?: vscode.TreeItemCheckboxState;
 
-	static isTreeItem(thing: any, extension: IExtensionDescription): thing is TreeItem {
+	static isTreeItem(thing: any, _extension: IExtensionDescription): thing is TreeItem {
 		const treeItemThing = thing as vscode.TreeItem;
 
 		if (treeItemThing.checkboxState !== undefined) {
@@ -2310,7 +2310,7 @@ export class FileSystemError extends Error {
 	constructor(
 		uriOrMessage?: string | URI,
 		code: FileSystemProviderErrorCode = FileSystemProviderErrorCode.Unknown,
-		terminator?: Function
+		terminator?: (...args: any[]) => any
 	) {
 		super(URI.isUri(uriOrMessage) ? uriOrMessage.toString(true) : uriOrMessage);
 

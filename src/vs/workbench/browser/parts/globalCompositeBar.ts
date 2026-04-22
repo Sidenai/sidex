@@ -306,7 +306,7 @@ abstract class AbstractGlobalActivityActionViewItem extends CompositeBarActionVi
 		);
 	}
 
-	protected async resolveContextMenuActions(disposables: DisposableStore): Promise<IAction[]> {
+	protected async resolveContextMenuActions(_disposables: DisposableStore): Promise<IAction[]> {
 		return this.contextMenuActionsProvider();
 	}
 
@@ -746,7 +746,7 @@ export class GlobalActivityActionViewItem extends AbstractGlobalActivityActionVi
 		);
 		this._register(action);
 		this._register(
-			this.userDataProfileService.onDidChangeCurrentProfile(e => {
+			this.userDataProfileService.onDidChangeCurrentProfile(_e => {
 				action.compositeBarActionItem = {
 					...action.compositeBarActionItem,
 					classNames: ThemeIcon.asClassNameArray(

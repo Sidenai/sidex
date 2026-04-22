@@ -93,7 +93,7 @@ export class LinkDetector extends Disposable implements IEditorContribution {
 			})
 		);
 		this._register(
-			clickLinkGesture.onCancel(e => {
+			clickLinkGesture.onCancel(_e => {
 				this.cleanUpActiveLinkDecoration();
 			})
 		);
@@ -113,7 +113,7 @@ export class LinkDetector extends Disposable implements IEditorContribution {
 			})
 		);
 		this._register(
-			editor.onDidChangeModelContent(e => {
+			editor.onDidChangeModelContent(_e => {
 				if (!this.editor.hasModel()) {
 					return;
 				}
@@ -121,7 +121,7 @@ export class LinkDetector extends Disposable implements IEditorContribution {
 			})
 		);
 		this._register(
-			editor.onDidChangeModel(e => {
+			editor.onDidChangeModel(_e => {
 				this.currentOccurrences = {};
 				this.activeLinkDecorationId = null;
 				this.stop();
@@ -129,13 +129,13 @@ export class LinkDetector extends Disposable implements IEditorContribution {
 			})
 		);
 		this._register(
-			editor.onDidChangeModelLanguage(e => {
+			editor.onDidChangeModelLanguage(_e => {
 				this.stop();
 				this.computeLinks.schedule(0);
 			})
 		);
 		this._register(
-			this.providers.onDidChange(e => {
+			this.providers.onDidChange(_e => {
 				this.stop();
 				this.computeLinks.schedule(0);
 			})

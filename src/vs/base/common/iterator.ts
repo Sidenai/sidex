@@ -10,8 +10,8 @@ export namespace Iterable {
 		return !!thing && typeof thing === 'object' && typeof (thing as Iterable<T>)[Symbol.iterator] === 'function';
 	}
 
-	const _empty: Iterable<never> = Object.freeze([]);
-	export function empty<T = never>(): readonly never[] {
+	const _empty: Iterable<never> = Object.freeze([] as never[]);
+	export function empty<_T = never>(): readonly never[] {
 		return _empty as readonly never[];
 	}
 

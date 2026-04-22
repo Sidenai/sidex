@@ -23,7 +23,7 @@ export class MainThreadTheming implements MainThreadThemingShape {
 		this._themeService = themeService;
 		this._proxy = extHostContext.getProxy(ExtHostContext.ExtHostTheming);
 
-		this._themeChangeListener = this._themeService.onDidColorThemeChange(e => {
+		this._themeChangeListener = this._themeService.onDidColorThemeChange(_e => {
 			this._proxy.$onColorThemeChange(this._themeService.getColorTheme().type);
 		});
 		this._proxy.$onColorThemeChange(this._themeService.getColorTheme().type);

@@ -153,7 +153,7 @@ const ClipboardEventUtils = {
 				if (metadata.version !== 1) {
 					metadata = null;
 				}
-			} catch (err) {
+			} catch (_err) {
 				// no problem!
 			}
 		}

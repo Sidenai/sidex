@@ -229,7 +229,7 @@ export function registerNotificationCommands(
 	});
 
 	// Hide Toasts
-	CommandsRegistry.registerCommand(HIDE_NOTIFICATION_TOAST, accessor => {
+	CommandsRegistry.registerCommand(HIDE_NOTIFICATION_TOAST, _accessor => {
 		toasts.hide();
 	});
 

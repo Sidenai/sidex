@@ -620,7 +620,6 @@ export class CommandDetectionCapability extends Disposable implements ICommandDe
 						? this._terminal.registerMarker(e.promptStartLine - (buffer.baseY + buffer.cursorY))
 						: undefined;
 				this._cwd = e.cwd;
-				// eslint-disable-next-line local/code-no-dangerous-type-assertions
 				this._onCommandStarted.fire({ marker } as ITerminalCommand);
 				continue;
 			}
@@ -692,7 +691,6 @@ class UnixPtyHeuristics extends Disposable {
 		}
 		this._hooks.commandMarkers.length = 0;
 
-		// eslint-disable-next-line local/code-no-dangerous-type-assertions
 		this._hooks.onCommandStartedEmitter.fire({
 			marker: options?.marker || currentCommand.commandStartMarker,
 			markProperties: options?.markProperties
@@ -978,7 +976,6 @@ class WindowsPtyHeuristics extends Disposable {
 				this._capability.currentCommand.commandStartLineContent = line.translateToString(true);
 			}
 		}
-		// eslint-disable-next-line local/code-no-dangerous-type-assertions
 		this._hooks.onCommandStartedEmitter.fire({
 			marker: this._capability.currentCommand.commandStartMarker
 		} as ITerminalCommand);
@@ -989,7 +986,7 @@ class WindowsPtyHeuristics extends Disposable {
 		);
 	}
 
-	handleCommandExecuted(options: IHandleCommandOptions | undefined) {
+	handleCommandExecuted(_options: IHandleCommandOptions | undefined) {
 		if (this._tryAdjustCommandStartMarkerScheduler) {
 			this._flushPendingHandleCommandStartTask();
 		}
@@ -1122,7 +1119,7 @@ class WindowsPtyHeuristics extends Disposable {
 		const cursorX = this._terminal.buffer.active.cursorX;
 		const cursorY = this._terminal.buffer.active.cursorY;
 		let totalDelay = 0;
-		return new Promise<void>((resolve, reject) => {
+		return new Promise<void>((resolve, _reject) => {
 			const interval = setInterval(() => {
 				if (cursorX !== this._terminal.buffer.active.cursorX || cursorY !== this._terminal.buffer.active.cursorY) {
 					resolve();

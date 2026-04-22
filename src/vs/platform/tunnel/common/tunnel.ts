@@ -6,7 +6,7 @@
 import { CancellationToken } from '../../../base/common/cancellation.js';
 import { Emitter, Event } from '../../../base/common/event.js';
 import { IDisposable, Disposable } from '../../../base/common/lifecycle.js';
-import { OperatingSystem } from '../../../base/common/platform.js';
+
 import { URI } from '../../../base/common/uri.js';
 import { createDecorator } from '../../instantiation/common/instantiation.js';
 import { IAddressProvider } from '../../remote/common/remoteAgentConnection.js';

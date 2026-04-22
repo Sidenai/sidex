@@ -13,18 +13,18 @@ import { IToolbarActions } from '../../../common/editor.js';
 export class NoEditorTabsControl extends EditorTabsControl {
 	private activeEditor: EditorInput | null = null;
 
-	protected prepareEditorActions(editorActions: IToolbarActions): IToolbarActions {
+	protected prepareEditorActions(_editorActions: IToolbarActions): IToolbarActions {
 		return {
 			primary: [],
 			secondary: []
 		};
 	}
 
-	openEditor(editor: EditorInput): boolean {
+	openEditor(_editor: EditorInput): boolean {
 		return this.handleOpenedEditors();
 	}
 
-	openEditors(editors: EditorInput[]): boolean {
+	openEditors(_editors: EditorInput[]): boolean {
 		return this.handleOpenedEditors();
 	}
 
@@ -46,13 +46,13 @@ export class NoEditorTabsControl extends EditorTabsControl {
 		return false;
 	}
 
-	beforeCloseEditor(editor: EditorInput): void {}
+	beforeCloseEditor(_editor: EditorInput): void {}
 
-	closeEditor(editor: EditorInput): void {
+	closeEditor(_editor: EditorInput): void {
 		this.handleClosedEditors();
 	}
 
-	closeEditors(editors: EditorInput[]): void {
+	closeEditors(_editors: EditorInput[]): void {
 		this.handleClosedEditors();
 	}
 
@@ -60,21 +60,21 @@ export class NoEditorTabsControl extends EditorTabsControl {
 		this.activeEditor = this.tabsModel.activeEditor;
 	}
 
-	moveEditor(editor: EditorInput, fromIndex: number, targetIndex: number): void {}
+	moveEditor(_editor: EditorInput, _fromIndex: number, _targetIndex: number): void {}
 
-	pinEditor(editor: EditorInput): void {}
+	pinEditor(_editor: EditorInput): void {}
 
-	stickEditor(editor: EditorInput): void {}
+	stickEditor(_editor: EditorInput): void {}
 
-	unstickEditor(editor: EditorInput): void {}
+	unstickEditor(_editor: EditorInput): void {}
 
-	setActive(isActive: boolean): void {}
+	setActive(_isActive: boolean): void {}
 
 	updateEditorSelections(): void {}
 
-	updateEditorLabel(editor: EditorInput): void {}
+	updateEditorLabel(_editor: EditorInput): void {}
 
-	updateEditorDirty(editor: EditorInput): void {}
+	updateEditorDirty(_editor: EditorInput): void {}
 
 	getHeight(): number {
 		return 0;

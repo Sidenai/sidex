@@ -92,7 +92,7 @@ export class ExtHostTimeline implements IExtHostTimeline {
 				scheme: scheme,
 				onDidChange: undefined,
 				async provideTimeline(uri: URI, options: TimelineOptions, token: CancellationToken) {
-					if (options?.resetCache) {
+					if ((options as any)?.resetCache) {
 						timelineDisposables.clear();
 
 						// For now, only allow the caching of a single Uri
@@ -130,7 +130,7 @@ export class ExtHostTimeline implements IExtHostTimeline {
 	private convertTimelineItem(source: string, commandConverter: CommandsConverter, disposables: DisposableStore) {
 		return (uri: URI, options?: TimelineOptions) => {
 			let items: Map<string, vscode.TimelineItem> | undefined;
-			if (options?.cacheResults) {
+			if ((options as any)?.cacheResults) {
 				let itemsByUri = this._itemsBySourceAndUriMap.get(source);
 				if (itemsByUri === undefined) {
 					itemsByUri = new Map();
@@ -172,16 +172,11 @@ export class ExtHostTimeline implements IExtHostTimeline {
 					tooltip = props.tooltip;
 				}
 				// TODO @jkearl, remove once migration complete.
-				// eslint-disable-next-line local/code-no-any-casts
 				else if (MarkdownStringType.isMarkdownString((props as any).detail)) {
 					console.warn('Using deprecated TimelineItem.detail, migrate to TimelineItem.tooltip');
-					// eslint-disable-next-line local/code-no-any-casts
 					tooltip = MarkdownString.from((props as any).detail);
-				}
-				// eslint-disable-next-line local/code-no-any-casts
-				else if (isString((props as any).detail)) {
+				} else if (isString((props as any).detail)) {
 					console.warn('Using deprecated TimelineItem.detail, migrate to TimelineItem.tooltip');
-					// eslint-disable-next-line local/code-no-any-casts
 					tooltip = (props as any).detail;
 				}
 

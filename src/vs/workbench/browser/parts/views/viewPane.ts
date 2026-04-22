@@ -580,7 +580,7 @@ export abstract class ViewPane extends Pane implements IView {
 			this._register(
 				this.viewDescriptorService
 					.getViewContainerModel(viewContainerModel)
-					.onDidChangeContainerInfo(({ title }) => this.updateTitle(this.title))
+					.onDidChangeContainerInfo(() => this.updateTitle(this.title))
 			);
 		} else {
 			console.error(`View container model not found for view ${this.id}`);
@@ -1017,10 +1017,9 @@ export function getLocationBasedViewColors(location: ViewContainerLocation | nul
 }
 
 export abstract class ViewAction<T extends IView> extends Action2 {
-	override readonly desc: Readonly<IAction2Options> & { viewId: string };
+	declare readonly desc: Readonly<IAction2Options> & { viewId: string };
 	constructor(desc: Readonly<IAction2Options> & { viewId: string }) {
 		super(desc);
-		this.desc = desc;
 	}
 
 	run(accessor: ServicesAccessor, ...args: unknown[]): unknown {

@@ -36,7 +36,7 @@ export class BrowserWorkingCopyBackupTracker extends WorkingCopyBackupTracker im
 		);
 	}
 
-	protected onFinalBeforeShutdown(reason: ShutdownReason): boolean {
+	protected onFinalBeforeShutdown(_reason: ShutdownReason): boolean {
 		// Web: we cannot perform long running in the shutdown phase
 		// As such we need to check sync if there are any modified working
 		// copies that have not been backed up yet and then prevent the

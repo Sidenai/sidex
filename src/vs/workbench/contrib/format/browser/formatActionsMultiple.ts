@@ -459,7 +459,7 @@ registerEditorAction(
 			});
 		}
 
-		async run(accessor: ServicesAccessor, editor: ICodeEditor, args: unknown): Promise<void> {
+		async run(accessor: ServicesAccessor, editor: ICodeEditor, _args: unknown): Promise<void> {
 			if (!editor.hasModel()) {
 				return;
 			}

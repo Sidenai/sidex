@@ -26,7 +26,7 @@ export class MainThreadSecretState extends Disposable implements MainThreadSecre
 		extHostContext: IExtHostContext,
 		@ISecretStorageService private readonly secretStorageService: ISecretStorageService,
 		@ILogService private readonly logService: ILogService,
-		@IBrowserWorkbenchEnvironmentService environmentService: IBrowserWorkbenchEnvironmentService
+		@IBrowserWorkbenchEnvironmentService _environmentService: IBrowserWorkbenchEnvironmentService
 	) {
 		super();
 

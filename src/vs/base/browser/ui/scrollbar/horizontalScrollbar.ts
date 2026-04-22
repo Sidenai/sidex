@@ -88,7 +88,7 @@ export class HorizontalScrollbar extends AbstractScrollbar {
 		return this._shouldRender;
 	}
 
-	protected _pointerDownRelativePosition(offsetX: number, offsetY: number): number {
+	protected _pointerDownRelativePosition(offsetX: number, _offsetY: number): number {
 		return offsetX;
 	}
 

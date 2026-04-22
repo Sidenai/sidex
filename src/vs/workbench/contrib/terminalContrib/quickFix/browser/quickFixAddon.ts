@@ -167,7 +167,7 @@ export class TerminalQuickFixAddon extends Disposable implements ITerminalAddon,
 		);
 	}
 
-	activate(terminal: Terminal): void {
+	activate(terminal: any): void {
 		this._terminal = terminal;
 	}
 

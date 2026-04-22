@@ -33,7 +33,7 @@ export class CommitCharacterController {
 			})
 		);
 		this._disposables.add(
-			model.onDidCancel(e => {
+			model.onDidCancel(_e => {
 				this.reset();
 			})
 		);

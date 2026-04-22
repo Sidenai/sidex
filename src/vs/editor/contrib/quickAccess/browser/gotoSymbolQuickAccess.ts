@@ -73,7 +73,7 @@ export abstract class AbstractGotoSymbolQuickAccessProvider extends AbstractEdit
 	static SCOPE_PREFIX = ':';
 	static PREFIX_BY_CATEGORY = `${this.PREFIX}${this.SCOPE_PREFIX}`;
 
-	protected override readonly options: IGotoSymbolQuickAccessProviderOptions;
+	declare protected readonly options: IGotoSymbolQuickAccessProviderOptions;
 
 	constructor(
 		@ILanguageFeaturesService private readonly _languageFeaturesService: ILanguageFeaturesService,

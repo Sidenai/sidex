@@ -155,7 +155,7 @@ export async function getEvaluatableExpressionAtPosition(
 				supports.map(async support => {
 					try {
 						return await support.provideEvaluatableExpression(model, position, token ?? CancellationToken.None);
-					} catch (err) {
+					} catch (_err) {
 						return undefined;
 					}
 				})

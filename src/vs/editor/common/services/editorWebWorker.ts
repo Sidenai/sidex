@@ -594,7 +594,7 @@ export class EditorWorker implements IDisposable, IWorkerTextModelSyncChannelSer
 
 		try {
 			return Promise.resolve(
-				(this._foreignModule as Record<string, Function>)[method].apply(this._foreignModule, args)
+				(this._foreignModule as Record<string, (...args: any[]) => any>)[method].apply(this._foreignModule, args)
 			);
 		} catch (e) {
 			return Promise.reject(e);

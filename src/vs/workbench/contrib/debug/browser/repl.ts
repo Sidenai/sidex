@@ -1055,7 +1055,7 @@ class ReplOptions extends Disposable implements IReplOptions {
 	) {
 		super();
 
-		this._register(this.themeService.onDidColorThemeChange(e => this.update()));
+		this._register(this.themeService.onDidColorThemeChange(_e => this.update()));
 		this._register(
 			this.viewDescriptorService.onDidChangeLocation(e => {
 				if (e.views.some(v => v.id === viewId)) {
@@ -1188,7 +1188,7 @@ class ReplCopyAllAction extends EditorAction {
 		});
 	}
 
-	run(accessor: ServicesAccessor, editor: ICodeEditor): void | Promise<void> {
+	run(accessor: ServicesAccessor, _editor: ICodeEditor): void | Promise<void> {
 		const clipboardService = accessor.get(IClipboardService);
 		const repl = getReplView(accessor.get(IViewsService));
 		if (repl) {
@@ -1420,7 +1420,7 @@ registerAction2(
 			try {
 				const evaluation = await session.evaluate(element.originalExpression, stackFrame.frameId, 'clipboard');
 				return evaluation?.body.result;
-			} catch (e) {
+			} catch (_e) {
 				return;
 			}
 		}

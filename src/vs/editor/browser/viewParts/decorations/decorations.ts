@@ -42,7 +42,7 @@ export class DecorationsOverlay extends DynamicViewOverlay {
 
 	// --- begin event handlers
 
-	public override onConfigurationChanged(e: viewEvents.ViewConfigurationChangedEvent): boolean {
+	public override onConfigurationChanged(_e: viewEvents.ViewConfigurationChangedEvent): boolean {
 		const options = this._context.configuration.options;
 		this._typicalHalfwidthCharacterWidth = options.get(EditorOption.fontInfo).typicalHalfwidthCharacterWidth;
 		// Invalidate cache on configuration change
@@ -50,28 +50,28 @@ export class DecorationsOverlay extends DynamicViewOverlay {
 		this._cachedViewportRange = null;
 		return true;
 	}
-	public override onDecorationsChanged(e: viewEvents.ViewDecorationsChangedEvent): boolean {
+	public override onDecorationsChanged(_e: viewEvents.ViewDecorationsChangedEvent): boolean {
 		// Invalidate cache when decorations change
 		this._cachedDecorations = null;
 		this._cachedViewportRange = null;
 		return true;
 	}
-	public override onFlushed(e: viewEvents.ViewFlushedEvent): boolean {
+	public override onFlushed(_e: viewEvents.ViewFlushedEvent): boolean {
 		return true;
 	}
-	public override onLinesChanged(e: viewEvents.ViewLinesChangedEvent): boolean {
+	public override onLinesChanged(_e: viewEvents.ViewLinesChangedEvent): boolean {
 		return true;
 	}
-	public override onLinesDeleted(e: viewEvents.ViewLinesDeletedEvent): boolean {
+	public override onLinesDeleted(_e: viewEvents.ViewLinesDeletedEvent): boolean {
 		return true;
 	}
-	public override onLinesInserted(e: viewEvents.ViewLinesInsertedEvent): boolean {
+	public override onLinesInserted(_e: viewEvents.ViewLinesInsertedEvent): boolean {
 		return true;
 	}
 	public override onScrollChanged(e: viewEvents.ViewScrollChangedEvent): boolean {
 		return e.scrollTopChanged || e.scrollWidthChanged;
 	}
-	public override onZonesChanged(e: viewEvents.ViewZonesChangedEvent): boolean {
+	public override onZonesChanged(_e: viewEvents.ViewZonesChangedEvent): boolean {
 		return true;
 	}
 	// --- end event handlers

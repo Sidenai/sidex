@@ -147,8 +147,8 @@ export class FindOptionsWidget extends Widget implements IOverlayWidget {
 			})
 		);
 
-		this._register(dom.addDisposableListener(this._domNode, dom.EventType.MOUSE_LEAVE, e => this._onMouseLeave()));
-		this._register(dom.addDisposableListener(this._domNode, 'mouseover', e => this._onMouseOver()));
+		this._register(dom.addDisposableListener(this._domNode, dom.EventType.MOUSE_LEAVE, _e => this._onMouseLeave()));
+		this._register(dom.addDisposableListener(this._domNode, 'mouseover', _e => this._onMouseOver()));
 	}
 
 	private _keybindingLabelFor(actionId: string): string {

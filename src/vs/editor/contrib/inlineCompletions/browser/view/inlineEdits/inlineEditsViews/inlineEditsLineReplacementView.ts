@@ -242,7 +242,7 @@ export class InlineEditsLineReplacementView extends Disposable implements IInlin
 			if (!layout || this._viewZoneInfo.read(reader) !== undefined) {
 				return 0;
 			}
-			return layout.read(reader).lowerText.bottom + this._editor.editor.getScrollTop();
+			return (layout.read(reader) as any).lowerText.bottom + this._editor.editor.getScrollTop();
 		});
 		this._div = n
 			.div(
@@ -263,8 +263,8 @@ export class InlineEditsLineReplacementView extends Disposable implements IInlin
 						const separatorWidth = this._editorType.read(reader) === InlineCompletionEditorType.DiffEditor ? 3 : 1;
 
 						modifiedLineElements.lines.forEach((l, i) => {
-							l.style.width = `${layoutProps.lowerText.width}px`;
-							l.style.height = `${layoutProps.modifiedLineHeights[i]}px`;
+							l.style.width = `${(layoutProps as any).lowerText.width}px`;
+							l.style.height = `${(layoutProps as any).modifiedLineHeights[i]}px`;
 							l.style.position = 'relative';
 						});
 
@@ -288,7 +288,7 @@ export class InlineEditsLineReplacementView extends Disposable implements IInlin
 										style: {
 											position: 'absolute',
 											...rectToProps(reader =>
-												layout.read(reader).background.translateX(-contentLeft).withMargin(separatorWidth)
+												(layout.read(reader) as any).background.translateX(-contentLeft).withMargin(separatorWidth)
 											),
 											borderRadius: `${INLINE_EDITS_BORDER_RADIUS}px`,
 
@@ -301,7 +301,7 @@ export class InlineEditsLineReplacementView extends Disposable implements IInlin
 										class: 'originalOverlayLineReplacement',
 										style: {
 											position: 'absolute',
-											...rectToProps(reader => layout.read(reader).background.translateX(-contentLeft)),
+											...rectToProps(reader => (layout.read(reader) as any).background.translateX(-contentLeft)),
 											borderRadius: `${INLINE_EDITS_BORDER_RADIUS}px`,
 
 											border: getEditorBlendedColor(originalBorderColor, this._themeService).map(
@@ -317,7 +317,7 @@ export class InlineEditsLineReplacementView extends Disposable implements IInlin
 											class: 'modifiedOverlayLineReplacement',
 											style: {
 												position: 'absolute',
-												...rectToProps(reader => layout.read(reader).lowerBackground.translateX(-contentLeft)),
+												...rectToProps(reader => (layout.read(reader) as any).lowerBackground.translateX(-contentLeft)),
 												borderRadius: `0 0 ${INLINE_EDITS_BORDER_RADIUS}px ${INLINE_EDITS_BORDER_RADIUS}px`,
 												background: editorBackground,
 												boxShadow: `${asCssVariable(scrollbarShadow)} 0 6px 6px -6px`,
@@ -327,10 +327,10 @@ export class InlineEditsLineReplacementView extends Disposable implements IInlin
 												cursor: 'pointer',
 												pointerEvents: 'auto'
 											},
-											onmousedown: e => {
+											onmousedown: ((e: any) => {
 												e.preventDefault(); // This prevents that the editor loses focus
-											},
-											onclick: e => this._onDidClick.fire(InlineEditClickEvent.create(e))
+											}) as any,
+											onclick: ((e: any) => this._onDidClick.fire(InlineEditClickEvent.create(e))) as any
 										},
 										[
 											n.div({
@@ -351,7 +351,7 @@ export class InlineEditsLineReplacementView extends Disposable implements IInlin
 											style: {
 												position: 'absolute',
 												boxSizing: 'border-box',
-												...rectToProps(reader => layout.read(reader).lowerText.translateX(-contentLeft)),
+												...rectToProps(reader => (layout.read(reader) as any).lowerText.translateX(-contentLeft)),
 												fontFamily: this._editor.getOption(EditorOption.fontFamily),
 												fontSize: this._editor.getOption(EditorOption.fontSize),
 												fontWeight: this._editor.getOption(EditorOption.fontWeight),
@@ -381,7 +381,8 @@ export class InlineEditsLineReplacementView extends Disposable implements IInlin
 			autorunDelta(this._viewZoneInfo, ({ lastValue, newValue }) => {
 				if (
 					lastValue === newValue ||
-					(lastValue?.height === newValue?.height && lastValue?.lineNumber === newValue?.lineNumber)
+					((lastValue as any)?.height === (newValue as any)?.height &&
+						(lastValue as any)?.lineNumber === (newValue as any)?.lineNumber)
 				) {
 					return;
 				}
@@ -390,7 +391,7 @@ export class InlineEditsLineReplacementView extends Disposable implements IInlin
 					if (!newValue) {
 						return;
 					}
-					this.addViewZone(newValue, changeAccessor);
+					this.addViewZone(newValue as any, changeAccessor);
 				});
 			})
 		);

@@ -116,7 +116,7 @@ export class TreeSitterSyntaxTokenBackend extends AbstractSyntaxTokenBackend {
 					})
 				);
 				reader.store.add(
-					tokModel.onDidChangeBackgroundTokenization(e => {
+					tokModel.onDidChangeBackgroundTokenization(_e => {
 						this._backgroundTokenizationState = BackgroundTokenizationState.Completed;
 						this._onDidChangeBackgroundTokenizationState.fire();
 					})
@@ -191,15 +191,15 @@ export class TreeSitterSyntaxTokenBackend extends AbstractSyntaxTokenBackend {
 		return model.hasAccurateTokensForLine(lineNumber);
 	}
 
-	public override isCheapToTokenize(lineNumber: number): boolean {
+	public override isCheapToTokenize(_lineNumber: number): boolean {
 		// TODO @alexr00 determine what makes it cheap to tokenize?
 		return true;
 	}
 
 	public override getTokenTypeIfInsertingCharacter(
-		lineNumber: number,
-		column: number,
-		character: string
+		_lineNumber: number,
+		_column: number,
+		_character: string
 	): StandardTokenType {
 		// TODO @alexr00 implement once we have custom parsing and don't just feed in the whole text model value
 		return StandardTokenType.Other;

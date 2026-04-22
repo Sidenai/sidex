@@ -118,7 +118,7 @@ pub fn get_all_keybinding_entries<S: ::std::hash::BuildHasher>(
         }
     }
 
-    entries.sort_by(|a, b| a.command_title.cmp(&b.command_title));
+    entries.sort_by_key(|a| a.command_title.clone());
     entries
 }
 

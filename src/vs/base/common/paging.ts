@@ -69,7 +69,7 @@ export function singlePagePager<T>(elements: T[]): IPager<T> {
 		firstPage: elements,
 		total: elements.length,
 		pageSize: elements.length,
-		getPage: (pageIndex: number, cancellationToken: CancellationToken): Promise<T[]> => {
+		getPage: (_pageIndex: number, _cancellationToken: CancellationToken): Promise<T[]> => {
 			return Promise.resolve(elements);
 		}
 	};

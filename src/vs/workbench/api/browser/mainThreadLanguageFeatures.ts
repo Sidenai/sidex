@@ -145,7 +145,7 @@ export class MainThreadLanguageFeatures extends Disposable implements MainThread
 		data: ILocationDto | ILocationDto[] | undefined
 	): languages.Location | languages.Location[] | undefined {
 		if (!data) {
-			return data;
+			return data as any;
 		} else if (Array.isArray(data)) {
 			data.forEach(l => MainThreadLanguageFeatures._reviveLocationDto(l));
 			return <languages.Location[]>data;
@@ -178,7 +178,7 @@ export class MainThreadLanguageFeatures extends Disposable implements MainThread
 		data: IWorkspaceSymbolDto | IWorkspaceSymbolDto[] | undefined
 	): search.IWorkspaceSymbol | search.IWorkspaceSymbol[] | undefined {
 		if (!data) {
-			return data;
+			return data as any;
 		} else if (Array.isArray(data)) {
 			data.forEach(MainThreadLanguageFeatures._reviveWorkspaceSymbolDto);
 			return <search.IWorkspaceSymbol[]>data;
@@ -878,12 +878,12 @@ export class MainThreadLanguageFeatures extends Disposable implements MainThread
 			): Promise<languages.CompletionList | undefined> => {
 				const result = await this._proxy.$provideCompletionItems(handle, model.uri, position, context, token);
 				if (!result) {
-					return result;
+					return result as any;
 				}
 				return {
 					suggestions: result[ISuggestResultDtoField.completions].map(d =>
 						MainThreadLanguageFeatures._inflateSuggestDto(result[ISuggestResultDtoField.defaultRanges], d, extensionId)
-					),
+					) as any,
 					incomplete: result[ISuggestResultDtoField.isIncomplete] || false,
 					duration: result[ISuggestResultDtoField.duration],
 					dispose: () => {
@@ -1232,7 +1232,6 @@ export class MainThreadLanguageFeatures extends Disposable implements MainThread
 					outgoing.forEach(value => {
 						value.to = MainThreadLanguageFeatures._reviveCallHierarchyItemDto(value.to);
 					});
-					// eslint-disable-next-line local/code-no-any-casts
 					return <any>outgoing;
 				},
 				provideIncomingCalls: async (item, token) => {
@@ -1248,7 +1247,6 @@ export class MainThreadLanguageFeatures extends Disposable implements MainThread
 					incoming.forEach(value => {
 						value.from = MainThreadLanguageFeatures._reviveCallHierarchyItemDto(value.from);
 					});
-					// eslint-disable-next-line local/code-no-any-casts
 					return <any>incoming;
 				}
 			})
@@ -1514,7 +1512,11 @@ class MainThreadPasteEditProvider implements languages.DocumentPasteEditProvider
 		}
 		if (metadata.supportsResolve) {
 			this.resolveDocumentPasteEdit = async (edit: languages.DocumentPasteEdit, token: CancellationToken) => {
-				const resolved = await this._proxy.$resolvePasteEdit(this._handle, (<IPasteEditDto>edit)._cacheId!, token);
+				const resolved = await this._proxy.$resolvePasteEdit(
+					this._handle,
+					(edit as unknown as IPasteEditDto)._cacheId!,
+					token
+				);
 				if (typeof resolved.insertText !== 'undefined') {
 					edit.insertText = resolved.insertText;
 				}
@@ -1554,7 +1556,7 @@ class MainThreadDocumentOnDropEditProvider implements languages.DocumentDropEdit
 			this.resolveDocumentDropEdit = async (edit, token) => {
 				const resolved = await this._proxy.$resolvePasteEdit(
 					this._handle,
-					(<IDocumentDropEditDto>edit)._cacheId!,
+					(edit as unknown as IDocumentDropEditDto)._cacheId!,
 					token
 				);
 				if (resolved.additionalEdit) {
@@ -1790,7 +1792,7 @@ class ExtensionBackedInlineCompletionsProvider
 		completions: IdentifiableInlineCompletions,
 		item: IdentifiableInlineCompletion,
 		updatedInsertText: string,
-		editDeltaInfo: EditDeltaInfo
+		_editDeltaInfo: EditDeltaInfo
 	): Promise<void> {
 		if (this._supportsHandleEvents) {
 			await this._proxy.$handleInlineCompletionDidShow(this.handle, completions.pid, item.idx, updatedInsertText);
@@ -1818,7 +1820,7 @@ class ExtensionBackedInlineCompletionsProvider
 		completions: IdentifiableInlineCompletions,
 		item: IdentifiableInlineCompletion,
 		reason: languages.InlineCompletionEndOfLifeReason<IdentifiableInlineCompletion>,
-		lifetimeSummary: languages.LifetimeSummary
+		_lifetimeSummary: languages.LifetimeSummary
 	): Promise<void> {
 		function mapReason<T1, T2>(
 			reason: languages.InlineCompletionEndOfLifeReason<T1>,

@@ -159,7 +159,7 @@ export class SearchResultImpl extends Disposable implements ISearchResult {
 						} else if (isSearchTreeFolderMatchWithResource(currentElement)) {
 							currentElement.parent().remove(currentElement);
 						} else if (isSearchTreeFolderMatchNoRoot(currentElement)) {
-							const parent = currentElement.parent();
+							const parent = (currentElement as any).parent();
 							if (isTextSearchHeading(parent)) {
 								parent.remove(currentElement);
 							}
@@ -194,7 +194,7 @@ export class SearchResultImpl extends Disposable implements ISearchResult {
 
 	private onDidAddNotebookEditorWidget(widget: NotebookEditorWidget): void {
 		this._onWillChangeModelListener?.dispose();
-		this._onWillChangeModelListener = widget.onWillChangeModel(model => {
+		this._onWillChangeModelListener = (widget as any).onWillChangeModel((model: any) => {
 			if (model) {
 				this.onNotebookEditorWidgetRemoved(widget, model?.uri);
 			}
@@ -202,7 +202,7 @@ export class SearchResultImpl extends Disposable implements ISearchResult {
 
 		this._onDidChangeModelListener?.dispose();
 		// listen to view model change as we are searching on both inputs and outputs
-		this._onDidChangeModelListener = widget.onDidAttachViewModel(() => {
+		this._onDidChangeModelListener = (widget as any).onDidAttachViewModel(() => {
 			if (widget.hasModel()) {
 				this.onNotebookEditorWidgetAdded(widget, widget.textModel.uri);
 			}

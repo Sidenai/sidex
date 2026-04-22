@@ -13,22 +13,22 @@ export class Position {
 		readonly character: number
 	) {}
 
-	isBefore(other: Position): boolean {
+	isBefore(_other: Position): boolean {
 		return false;
 	}
-	isBeforeOrEqual(other: Position): boolean {
+	isBeforeOrEqual(_other: Position): boolean {
 		return false;
 	}
-	isAfter(other: Position): boolean {
+	isAfter(_other: Position): boolean {
 		return false;
 	}
-	isAfterOrEqual(other: Position): boolean {
+	isAfterOrEqual(_other: Position): boolean {
 		return false;
 	}
-	isEqual(other: Position): boolean {
+	isEqual(_other: Position): boolean {
 		return false;
 	}
-	compareTo(other: Position): number {
+	compareTo(_other: Position): number {
 		return 0;
 	}
 	translate(lineDelta?: number, characterDelta?: number): Position;
@@ -54,16 +54,16 @@ export class Range {
 
 	isEmpty = false;
 	isSingleLine = false;
-	contains(positionOrRange: Position | Range): boolean {
+	contains(_positionOrRange: Position | Range): boolean {
 		return false;
 	}
-	isEqual(other: Range): boolean {
+	isEqual(_other: Range): boolean {
 		return false;
 	}
-	intersection(range: Range): Range | undefined {
+	intersection(_range: Range): Range | undefined {
 		return undefined;
 	}
-	union(other: Range): Range {
+	union(_other: Range): Range {
 		return new Range(0, 0, 0, 0);
 	}
 

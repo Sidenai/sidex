@@ -35,7 +35,7 @@ export namespace GPULifecycle {
 			device.queue.writeBuffer(
 				buffer,
 				0,
-				(isFunction(initialValues) ? initialValues() : initialValues) as Float32Array<ArrayBuffer>
+				(isFunction(initialValues) ? initialValues() : initialValues) as Float32Array
 			);
 		}
 		return wrapDestroyableInDisposable(buffer);

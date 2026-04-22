@@ -67,7 +67,7 @@ export class CodeLensCache implements ICodeLensCache {
 			storageService.onWillSaveState,
 			e => e.reason === WillSaveStateReason.SHUTDOWN
 		);
-		Event.once(onWillSaveStateBecauseOfShutdown)(e => {
+		Event.once(onWillSaveStateBecauseOfShutdown)(_e => {
 			storageService.store(key, this._serialize(), StorageScope.WORKSPACE, StorageTarget.MACHINE);
 		});
 	}

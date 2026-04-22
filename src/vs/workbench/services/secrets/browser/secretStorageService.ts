@@ -8,7 +8,7 @@
  *  are protected by the OS.
  *--------------------------------------------------------------------------------------------*/
 
-import { Emitter, Event } from '../../../../base/common/event.js';
+import { Emitter } from '../../../../base/common/event.js';
 import { IEncryptionService } from '../../../../platform/encryption/common/encryptionService.js';
 import { InstantiationType, registerSingleton } from '../../../../platform/instantiation/common/extensions.js';
 import { ILogService } from '../../../../platform/log/common/log.js';
@@ -47,8 +47,8 @@ export class BrowserSecretStorageService extends BaseSecretStorageService {
 		this._register(this._ownChange.event(key => this.onDidChangeSecretEmitter.fire(key)));
 	}
 
-	override get type(): 'native' | 'unknown' {
-		return 'native';
+	override get type(): 'in-memory' | 'persisted' | 'unknown' {
+		return 'unknown'; // backed by OS keyring, closest match
 	}
 
 	private async invoke<T>(cmd: string, args?: Record<string, unknown>): Promise<T | undefined> {
@@ -59,7 +59,7 @@ export class BrowserSecretStorageService extends BaseSecretStorageService {
 		try {
 			return await invoke<T>(cmd, args);
 		} catch (error) {
-			this.logService.warn(`[sidex-auth] ${cmd} failed`, error);
+			this._logService.warn(`[sidex-auth] ${cmd} failed`, error);
 			return undefined;
 		}
 	}
@@ -82,10 +82,6 @@ export class BrowserSecretStorageService extends BaseSecretStorageService {
 	override async keys(): Promise<string[]> {
 		return (await this.invoke<string[]>('secret_keys')) ?? [];
 	}
-
-	get onDidChangeSecret(): Event<string> {
-		return this.onDidChangeSecretEmitter.event;
-	}
 }
 
-registerSingleton(ISecretStorageService, BrowserSecretStorageService, InstantiationType.Delayed);
+registerSingleton(ISecretStorageService, BrowserSecretStorageService as any, InstantiationType.Delayed);

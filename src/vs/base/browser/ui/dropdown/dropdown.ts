@@ -137,7 +137,7 @@ export class BaseDropdown extends ActionRunner {
 		return !!this.visible;
 	}
 
-	protected onEvent(_e: Event, activeElement: HTMLElement): void {
+	protected onEvent(_e: Event, _activeElement: HTMLElement): void {
 		this.hide();
 	}
 

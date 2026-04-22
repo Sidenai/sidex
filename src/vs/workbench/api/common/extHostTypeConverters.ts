@@ -12,7 +12,7 @@ import * as htmlContent from '../../../base/common/htmlContent.js';
 import { DisposableStore } from '../../../base/common/lifecycle.js';
 import { ResourceMap, ResourceSet } from '../../../base/common/map.js';
 import * as marked from '../../../base/common/marked/marked.js';
-import { parse, revive } from '../../../base/common/marshalling.js';
+import { parse } from '../../../base/common/marshalling.js';
 import { Mimes } from '../../../base/common/mime.js';
 import { cloneAndChange } from '../../../base/common/objects.js';
 import { IPrefixTreeNode, WellDefinedPrefixTree } from '../../../base/common/prefixTree.js';
@@ -399,7 +399,7 @@ export namespace MarkdownString {
 				isTrusted: markup.isTrusted,
 				supportThemeIcons: markup.supportThemeIcons,
 				supportHtml: markup.supportHtml,
-				supportAlertSyntax: markup.supportAlertSyntax,
+				supportAlertSyntax: (markup as any).supportAlertSyntax,
 				baseUri: markup.baseUri
 			};
 		} else if (typeof markup === 'string') {
@@ -417,7 +417,7 @@ export namespace MarkdownString {
 				let uri = URI.parse(href, true);
 				uri = uri.with({ query: _uriMassage(uri.query, resUris) });
 				resUris[href] = uri;
-			} catch (e) {
+			} catch (_e) {
 				// ignore
 			}
 			return '';
@@ -443,7 +443,7 @@ export namespace MarkdownString {
 		let data: unknown;
 		try {
 			data = parse(part);
-		} catch (e) {
+		} catch (_e) {
 			// ignore
 		}
 		if (!data) {
@@ -497,7 +497,6 @@ export function fromRangeOrRangeWithMessage(ranges: vscode.Range[] | vscode.Deco
 					: r.hoverMessage
 						? MarkdownString.from(r.hoverMessage)
 						: undefined,
-				// eslint-disable-next-line local/code-no-any-casts
 				renderOptions: <any>/* URI vs Uri */ r.renderOptions
 			};
 		});
@@ -883,7 +882,6 @@ export namespace DocumentSymbol {
 			result.tags = info.tags.map(SymbolTag.to);
 		}
 		if (info.children) {
-			// eslint-disable-next-line local/code-no-any-casts
 			result.children = info.children.map(to) as any;
 		}
 		return result;
@@ -1401,7 +1399,7 @@ export namespace DocumentLink {
 		if (link.url) {
 			try {
 				target = typeof link.url === 'string' ? URI.parse(link.url, true) : URI.revive(link.url);
-			} catch (err) {
+			} catch (_err) {
 				// ignore
 			}
 		}
@@ -1747,7 +1745,7 @@ export namespace NotebookData {
 			cells: []
 		};
 		for (const cell of data.cells) {
-			types.NotebookCellData.validate(cell);
+			(types.NotebookCellData as any).validate(cell);
 			res.cells.push(NotebookCellData.from(cell));
 		}
 		return res;
@@ -1767,7 +1765,7 @@ export namespace NotebookCellData {
 		return {
 			cellKind: NotebookCellKind.from(data.kind),
 			language: data.languageId,
-			mime: data.mime,
+			mime: (data as any).mime,
 			source: data.value,
 			metadata: data.metadata,
 			internalMetadata: NotebookCellExecutionSummary.from(data.executionSummary ?? {}),
@@ -1776,15 +1774,12 @@ export namespace NotebookCellData {
 	}
 
 	export function to(data: extHostProtocol.NotebookCellDataDto): vscode.NotebookCellData {
-		return new types.NotebookCellData(
-			NotebookCellKind.to(data.cellKind),
-			data.source,
-			data.language,
-			data.mime,
-			data.outputs ? data.outputs.map(NotebookCellOutput.to) : undefined,
-			data.metadata,
-			data.internalMetadata ? NotebookCellExecutionSummary.to(data.internalMetadata) : undefined
-		);
+		const cell = new types.NotebookCellData(NotebookCellKind.to(data.cellKind), data.source, data.language);
+		(cell as any).mime = data.mime;
+		cell.outputs = data.outputs ? data.outputs.map(NotebookCellOutput.to) : undefined;
+		cell.metadata = data.metadata;
+		cell.executionSummary = data.internalMetadata ? NotebookCellExecutionSummary.to(data.internalMetadata) : undefined;
+		return cell;
 	}
 }
 
@@ -1804,7 +1799,7 @@ export namespace NotebookCellOutputItem {
 export namespace NotebookCellOutput {
 	export function from(output: vscode.NotebookCellOutput): extHostProtocol.NotebookOutputDto {
 		return {
-			outputId: output.id,
+			outputId: (output as any).id,
 			items: output.items.map(NotebookCellOutputItem.from),
 			metadata: output.metadata
 		};
@@ -1812,7 +1807,7 @@ export namespace NotebookCellOutput {
 
 	export function to(output: extHostProtocol.NotebookOutputDto): vscode.NotebookCellOutput {
 		const items = output.items.map(NotebookCellOutputItem.to);
-		return new types.NotebookCellOutput(items, output.outputId, output.metadata);
+		return new types.NotebookCellOutput(items, output.metadata);
 	}
 }
 
@@ -1918,7 +1913,7 @@ export namespace NotebookKernelSourceAction {
 			label: item.label,
 			description: item.description,
 			detail: item.detail,
-			documentation: item.documentation
+			documentation: (item as any).documentation
 		};
 	}
 }
@@ -2082,13 +2077,13 @@ export namespace TestResults {
 					.map(TestMessage.to)
 			})),
 			children: []
-		};
+		} as any;
 
 		if (node.children) {
 			for (const child of node.children.values()) {
 				const c = convertTestResultItem(child, snapshot);
 				if (c) {
-					snapshot.children.push(c);
+					(snapshot as any).children.push(c);
 				}
 			}
 		}
@@ -2511,15 +2506,15 @@ export namespace InlineCompletionEndOfLifeReason {
 				kind: types.InlineCompletionEndOfLifeReasonKind.Ignored,
 				supersededBy: supersededBy,
 				userTypingDisagreed: reason.userTypingDisagreed
-			};
+			} as any as vscode.InlineCompletionEndOfLifeReason;
 		} else if (reason.kind === languages.InlineCompletionEndOfLifeReasonKind.Accepted) {
 			return {
 				kind: types.InlineCompletionEndOfLifeReasonKind.Accepted
-			};
+			} as any as vscode.InlineCompletionEndOfLifeReason;
 		}
 		return {
 			kind: types.InlineCompletionEndOfLifeReasonKind.Rejected
-		};
+		} as any as vscode.InlineCompletionEndOfLifeReason;
 	}
 }
 
@@ -2546,8 +2541,8 @@ export namespace DebugTreeItem {
 	export function from(item: vscode.DebugTreeItem, id: number): IDebugVisualizationTreeItem {
 		return {
 			id,
-			label: item.label,
-			description: item.description,
+			label: item.label as string,
+			description: item.description as string,
 			canEdit: item.canEdit,
 			collapsibleState: (item.collapsibleState || DebugTreeItemCollapsibleState.None) as DebugTreeItemCollapsibleState,
 			contextValue: item.contextValue

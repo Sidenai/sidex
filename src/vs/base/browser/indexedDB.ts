@@ -84,7 +84,7 @@ export class IndexedDB {
 
 			// Delete the db
 			const deleteRequest = indexedDB.deleteDatabase(database.name);
-			deleteRequest.onerror = err => e(deleteRequest.error);
+			deleteRequest.onerror = _err => e(deleteRequest.error);
 			deleteRequest.onsuccess = () => c();
 		});
 	}

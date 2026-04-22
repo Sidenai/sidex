@@ -24,7 +24,7 @@ export interface JSONStringifyReplacer {
 function safeStringify(obj: any, replacer: JSONStringifyReplacer | null): string {
 	try {
 		return JSON.stringify(obj, <(key: string, value: any) => any>replacer);
-	} catch (err) {
+	} catch (_err) {
 		return 'null';
 	}
 }
@@ -181,7 +181,7 @@ export class RPCProtocol extends Disposable implements IRPCProtocol {
 		return Promise.resolve();
 	}
 
-	private _onWillSendRequest(req: number): void {
+	private _onWillSendRequest(_req: number): void {
 		if (this._unacknowledgedCount === 0) {
 			// Since this is the first request we are sending in a while,
 			// mark this moment as the start for the countdown to unresponsive time
@@ -193,7 +193,7 @@ export class RPCProtocol extends Disposable implements IRPCProtocol {
 		}
 	}
 
-	private _onDidReceiveAcknowledge(req: number): void {
+	private _onDidReceiveAcknowledge(_req: number): void {
 		// The next possible unresponsive time is now + delta.
 		this._unresponsiveTime = Date.now() + RPCProtocol.UNRESPONSIVE_TIME;
 		this._unacknowledgedCount--;

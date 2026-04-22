@@ -452,7 +452,7 @@ CommandsRegistry.registerCommand({
 
 CommandsRegistry.registerCommand({
 	id: CALLSTACK_TOP_ID,
-	handler: async (accessor: ServicesAccessor, _: string, context: CallStackContext | unknown) => {
+	handler: async (accessor: ServicesAccessor, _: string, _context: CallStackContext | unknown) => {
 		const debugService = accessor.get(IDebugService);
 		goToTopOfCallStack(debugService);
 	}
@@ -460,7 +460,7 @@ CommandsRegistry.registerCommand({
 
 CommandsRegistry.registerCommand({
 	id: CALLSTACK_BOTTOM_ID,
-	handler: async (accessor: ServicesAccessor, _: string, context: CallStackContext | unknown) => {
+	handler: async (accessor: ServicesAccessor, _: string, _context: CallStackContext | unknown) => {
 		const debugService = accessor.get(IDebugService);
 		await goToBottomOfCallStack(debugService);
 	}
@@ -468,7 +468,7 @@ CommandsRegistry.registerCommand({
 
 CommandsRegistry.registerCommand({
 	id: CALLSTACK_UP_ID,
-	handler: async (accessor: ServicesAccessor, _: string, context: CallStackContext | unknown) => {
+	handler: async (accessor: ServicesAccessor, _: string, _context: CallStackContext | unknown) => {
 		const debugService = accessor.get(IDebugService);
 		navigateCallStack(debugService, false);
 	}
@@ -476,7 +476,7 @@ CommandsRegistry.registerCommand({
 
 CommandsRegistry.registerCommand({
 	id: CALLSTACK_DOWN_ID,
-	handler: async (accessor: ServicesAccessor, _: string, context: CallStackContext | unknown) => {
+	handler: async (accessor: ServicesAccessor, _: string, _context: CallStackContext | unknown) => {
 		const debugService = accessor.get(IDebugService);
 		navigateCallStack(debugService, true);
 	}
@@ -499,7 +499,7 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 	when: CONTEXT_IN_DEBUG_REPL,
 	primary: KeyMod.CtrlCmd | KeyCode.PageDown,
 	mac: { primary: KeyMod.Shift | KeyMod.CtrlCmd | KeyCode.BracketRight },
-	handler: async (accessor: ServicesAccessor, _: string, context: CallStackContext | unknown) => {
+	handler: async (accessor: ServicesAccessor, _: string, _context: CallStackContext | unknown) => {
 		changeDebugConsoleFocus(accessor, true);
 	}
 });
@@ -510,7 +510,7 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 	when: CONTEXT_IN_DEBUG_REPL,
 	primary: KeyMod.CtrlCmd | KeyCode.PageUp,
 	mac: { primary: KeyMod.Shift | KeyMod.CtrlCmd | KeyCode.BracketLeft },
-	handler: async (accessor: ServicesAccessor, _: string, context: CallStackContext | unknown) => {
+	handler: async (accessor: ServicesAccessor, _: string, _context: CallStackContext | unknown) => {
 		changeDebugConsoleFocus(accessor, false);
 	}
 });
@@ -613,7 +613,7 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 		CONTEXT_DEBUG_STATE.isEqualTo('stopped')
 	),
 	weight: KeybindingWeight.WorkbenchContrib,
-	handler: async (accessor: ServicesAccessor, _: string, context: CallStackContext | unknown) => {
+	handler: async (accessor: ServicesAccessor, _: string, _context: CallStackContext | unknown) => {
 		const quickInputService = accessor.get(IQuickInputService);
 		const debugService = accessor.get(IDebugService);
 		const session = debugService.getViewModel().focusedSession;

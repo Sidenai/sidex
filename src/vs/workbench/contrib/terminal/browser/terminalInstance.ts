@@ -138,7 +138,7 @@ import { IHistoryService } from '../../../services/history/common/history.js';
 import { isHorizontal, IWorkbenchLayoutService } from '../../../services/layout/browser/layoutService.js';
 import { IPathService } from '../../../services/path/common/pathService.js';
 import { IPreferencesService } from '../../../services/preferences/common/preferences.js';
-import { importAMDNodeModule } from '../../../../amdX.js';
+import { importAMDNodeModule as _importAMDNodeModule } from '../../../../amdX.js';
 import type { IMarker, Terminal as XTermTerminal, IBufferLine } from '@xterm/xterm';
 import { AccessibilityCommandId } from '../../accessibility/common/accessibilityCommands.js';
 import { terminalStrings } from '../common/terminalStrings.js';
@@ -1149,7 +1149,7 @@ export class TerminalInstance extends Disposable implements ITerminalInstance {
 				}
 				xterm.raw.options.windowsPty = processTraits.windowsPty;
 				// Enable reflow cursor to avoid prompt loss: https://github.com/microsoft/vscode/issues/274372
-				xterm.raw.options.reflowCursorLine =
+				(xterm.raw.options as any).reflowCursorLine =
 					processTraits?.windowsPty?.backend === 'conpty' &&
 					!!this._terminalConfigurationService.config.windowsUseConptyDll;
 			})
@@ -1790,7 +1790,7 @@ export class TerminalInstance extends Disposable implements ITerminalInstance {
 		);
 		this.capabilities.add(processManager.capabilities);
 		this._register(
-			processManager.onProcessReady(async e => {
+			processManager.onProcessReady(async _e => {
 				this._onProcessIdReady.fire(this);
 				this._initialCwd = await this.getInitialCwd();
 				// Set the initial name based on the _resolved_ shell launch config, this will also
@@ -2432,8 +2432,8 @@ export class TerminalInstance extends Disposable implements ITerminalInstance {
 	}
 
 	private async _updatePtyDimensions(rawXterm: XTermTerminal): Promise<void> {
-		const pixelWidth = rawXterm.dimensions?.css.canvas.width;
-		const pixelHeight = rawXterm.dimensions?.css.canvas.height;
+		const pixelWidth = (rawXterm as any).dimensions?.css.canvas.width;
+		const pixelHeight = (rawXterm as any).dimensions?.css.canvas.height;
 		const roundedPixelWidth = pixelWidth ? Math.round(pixelWidth) : undefined;
 		const roundedPixelHeight = pixelHeight ? Math.round(pixelHeight) : undefined;
 		await this._processManager.setDimensions(
@@ -2918,7 +2918,7 @@ export class TerminalInstance extends Disposable implements ITerminalInstance {
 		// Allow contributions to handle the mouse event first
 		for (const contrib of this._contributions.values()) {
 			const result = await contrib.handleMouseEvent?.(event);
-			if (result?.handled) {
+			if (result && (result as any).handled) {
 				return { cancelContextMenu: true };
 			}
 		}
@@ -3010,11 +3010,11 @@ class TerminalInstanceDragAndDropController extends Disposable implements dom.ID
 			this._container.appendChild(this._dropOverlay);
 		}
 	}
-	onDragLeave(e: DragEvent) {
+	onDragLeave(_e: DragEvent) {
 		this._clearDropOverlay();
 	}
 
-	onDragEnd(e: DragEvent) {
+	onDragEnd(_e: DragEvent) {
 		this._clearDropOverlay();
 	}
 
@@ -3314,7 +3314,7 @@ export function parseExitResult(
 ): { code: number | undefined; message: string | undefined } | undefined {
 	// Only return a message if the exit code is non-zero
 	if (exitCodeOrError === undefined || exitCodeOrError === 0) {
-		return { code: exitCodeOrError, message: undefined };
+		return { code: exitCodeOrError as any, message: undefined };
 	}
 
 	const code = isNumber(exitCodeOrError) ? exitCodeOrError : exitCodeOrError.code;

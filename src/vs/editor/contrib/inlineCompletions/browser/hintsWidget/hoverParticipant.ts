@@ -124,7 +124,7 @@ export class InlineCompletionsHoverParticipant implements IEditorHoverParticipan
 		return null;
 	}
 
-	computeSync(anchor: HoverAnchor, lineDecorations: IModelDecoration[]): InlineCompletionsHover[] {
+	computeSync(anchor: HoverAnchor, _lineDecorations: IModelDecoration[]): InlineCompletionsHover[] {
 		if (this._editor.getOption(EditorOption.inlineSuggest).showToolbar !== 'onHover') {
 			return [];
 		}
@@ -195,7 +195,7 @@ export class InlineCompletionsHoverParticipant implements IEditorHoverParticipan
 		return new RenderedHoverParts([renderedHoverPart]);
 	}
 
-	getAccessibleContent(hoverPart: InlineCompletionsHover): string {
+	getAccessibleContent(_hoverPart: InlineCompletionsHover): string {
 		return nls.localize('hoverAccessibilityStatusBar', 'There are inline completions here');
 	}
 

@@ -98,7 +98,7 @@ function format(args: any, verbose: boolean = false): string {
 		if (typeof a === 'object') {
 			try {
 				a = JSON.stringify(a);
-			} catch (e) {}
+			} catch (_e) {}
 		}
 
 		result += (i > 0 ? ' ' : '') + a;
@@ -751,16 +751,16 @@ export abstract class AbstractLoggerService extends Disposable implements ILogge
 
 export class NullLogger implements ILogger {
 	readonly onDidChangeLogLevel: Event<LogLevel> = new Emitter<LogLevel>().event;
-	setLevel(level: LogLevel): void {}
+	setLevel(_level: LogLevel): void {}
 	getLevel(): LogLevel {
 		return LogLevel.Info;
 	}
-	trace(message: string, ...args: unknown[]): void {}
-	debug(message: string, ...args: unknown[]): void {}
-	info(message: string, ...args: unknown[]): void {}
-	warn(message: string, ...args: unknown[]): void {}
-	error(message: string | Error, ...args: unknown[]): void {}
-	critical(message: string | Error, ...args: unknown[]): void {}
+	trace(_message: string, ..._args: unknown[]): void {}
+	debug(_message: string, ..._args: unknown[]): void {}
+	info(_message: string, ..._args: unknown[]): void {}
+	warn(_message: string, ..._args: unknown[]): void {}
+	error(_message: string | Error, ..._args: unknown[]): void {}
+	critical(_message: string | Error, ..._args: unknown[]): void {}
 	dispose(): void {}
 	flush(): void {}
 }
@@ -773,7 +773,7 @@ export class NullLoggerService extends AbstractLoggerService {
 	constructor() {
 		super(LogLevel.Off, URI.parse('log:///log'));
 	}
-	protected override doCreateLogger(resource: URI, logLevel: LogLevel, options?: ILoggerOptions): ILogger {
+	protected override doCreateLogger(_resource: URI, _logLevel: LogLevel, _options?: ILoggerOptions): ILogger {
 		return new NullLogger();
 	}
 }

@@ -112,7 +112,7 @@ export class MainThreadFileSystemEventService implements MainThreadFileSystemEve
 					return;
 				}
 
-				const needsConfirmation = data.edit.edits.some(edit => edit.metadata?.needsConfirmation);
+				const needsConfirmation = data.edit.edits.some(edit => (edit.metadata as any)?.needsConfirmation);
 				let showPreview = storageService.getBoolean(
 					MainThreadFileSystemEventService.MementoKeyAdditionalEdits,
 					StorageScope.PROFILE
@@ -301,7 +301,7 @@ export class MainThreadFileSystemEventService implements MainThreadFileSystemEve
 				if (!stat.isDirectory) {
 					opts.recursive = false;
 				}
-			} catch (error) {
+			} catch (_error) {
 				// ignore
 			}
 		}

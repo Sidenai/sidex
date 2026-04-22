@@ -178,7 +178,7 @@ class SearchEditorModelFactory {
 		languageService: ILanguageService,
 		modelService: IModelService,
 		workingCopyBackupService: IWorkingCopyBackupService,
-		instantiationService: IInstantiationService
+		_instantiationService: IInstantiationService
 	): Promise<SearchEditorData | undefined> {
 		const backup = await workingCopyBackupService.resolve({ resource, typeId: SearchEditorWorkingCopyTypeId });
 

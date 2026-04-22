@@ -68,7 +68,7 @@ export abstract class AbstractGotoLineQuickAccessProvider extends AbstractEditor
 	protected provideWithTextEditor(
 		context: IQuickAccessTextEditorContext,
 		picker: IQuickPick<IGotoLineQuickPickItem, { useSeparators: true }>,
-		token: CancellationToken
+		_token: CancellationToken
 	): IDisposable {
 		const editor = context.editor;
 		const disposables = new DisposableStore();

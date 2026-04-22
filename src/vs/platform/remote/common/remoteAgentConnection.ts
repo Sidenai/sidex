@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { CancelablePromise } from '../../../base/common/async.js';
-import { CancellationToken } from '../../../base/common/cancellation.js';
+
 import { Emitter } from '../../../base/common/event.js';
 import { Disposable } from '../../../base/common/lifecycle.js';
 import { IIPCLogger } from '../../../base/parts/ipc/common/ipc.js';

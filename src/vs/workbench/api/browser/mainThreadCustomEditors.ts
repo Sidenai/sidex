@@ -181,7 +181,7 @@ export class MainThreadCustomEditors extends Disposable implements extHostProtoc
 		const disposables = new DisposableStore();
 
 		disposables.add(
-			this._customEditorService.registerCustomEditorCapabilities(viewType, {
+			(this._customEditorService as any).registerCustomEditorCapabilities(viewType, {
 				supportsMultipleEditorsPerDocument
 			})
 		);
@@ -191,23 +191,22 @@ export class MainThreadCustomEditors extends Disposable implements extHostProtoc
 				canResolve: webviewInput => {
 					return webviewInput instanceof CustomEditorInput && webviewInput.viewType === viewType;
 				},
-				resolveWebview: async (webviewInput: CustomEditorInput, cancellation: CancellationToken) => {
+				resolveWebview: async (webviewInput: WebviewInput, cancellation: CancellationToken) => {
+					const customEditorInput = webviewInput as unknown as CustomEditorInput;
 					const handle = generateUuid();
-					const resource = webviewInput.resource;
+					const resource = customEditorInput.resource;
 
-					webviewInput.webview.origin = this._webviewOriginStore.getOrigin(viewType, extension.id);
+					customEditorInput.webview.origin = this._webviewOriginStore.getOrigin(viewType, extension.id);
 
-					this.mainThreadWebviewPanels.addWebviewInput(handle, webviewInput, { serializeBuffersForPostMessage });
-					webviewInput.webview.options = options;
-					webviewInput.webview.extension = extension;
+					this.mainThreadWebviewPanels.addWebviewInput(handle, webviewInput as any, { serializeBuffersForPostMessage });
+					customEditorInput.webview.options = options;
+					customEditorInput.webview.extension = extension;
 
-					// If there's an old resource this was a move and we must resolve the backup at the same time as the webview
-					// This is because the backup must be ready upon model creation, and the input resolve method comes after
-					let backupId = webviewInput.backupId;
-					if (webviewInput.oldResource && !webviewInput.backupId) {
-						const backup = this._editorRenameBackups.get(webviewInput.oldResource.toString());
+					let backupId = (customEditorInput as any).backupId;
+					if ((customEditorInput as any).oldResource && !(customEditorInput as any).backupId) {
+						const backup = this._editorRenameBackups.get((customEditorInput as any).oldResource.toString());
 						backupId = backup?.backupId;
-						this._editorRenameBackups.delete(webviewInput.oldResource.toString());
+						this._editorRenameBackups.delete((customEditorInput as any).oldResource.toString());
 					}
 
 					let modelRef: IReference<ICustomEditorModel>;
@@ -230,14 +229,13 @@ export class MainThreadCustomEditors extends Disposable implements extHostProtoc
 						return;
 					}
 
-					const disposeSub = webviewInput.webview.onDidDispose(() => {
+					const disposeSub = customEditorInput.webview.onDidDispose(() => {
 						disposeSub.dispose();
 						inputDisposeSub.dispose();
 
-						// If the model is still dirty, make sure we have time to save it
-						if (modelRef.object.isDirty()) {
-							const sub = modelRef.object.onDidChangeDirty(() => {
-								if (!modelRef.object.isDirty()) {
+						if ((modelRef.object as any).isDirty()) {
+							const sub = (modelRef.object as any).onDidChangeDirty(() => {
+								if (!(modelRef.object as any).isDirty()) {
 									sub.dispose();
 									modelRef.dispose();
 								}
@@ -248,16 +246,14 @@ export class MainThreadCustomEditors extends Disposable implements extHostProtoc
 						modelRef.dispose();
 					});
 
-					// Also listen for when the input is disposed (e.g., during SaveAs when the webview is transferred to a new editor).
-					// In this case, webview.onDidDispose won't fire because the webview is reused.
-					const inputDisposeSub = webviewInput.onWillDispose(() => {
+					const inputDisposeSub = (customEditorInput as any).onWillDispose(() => {
 						inputDisposeSub.dispose();
 						disposeSub.dispose();
 						modelRef.dispose();
 					});
 
 					if (capabilities.supportsMove) {
-						webviewInput.onMove(async (newResource: URI) => {
+						(customEditorInput as any).onMove(async (newResource: URI) => {
 							const oldModel = modelRef;
 							modelRef = await this.getOrCreateCustomEditorModel(
 								modelType,
@@ -279,17 +275,17 @@ export class MainThreadCustomEditors extends Disposable implements extHostProtoc
 							handle,
 							viewType,
 							{
-								title: webviewInput.getTitle(),
-								contentOptions: webviewInput.webview.contentOptions,
-								options: webviewInput.webview.options,
-								active: webviewInput === this._editorService.activeEditor
+								title: (customEditorInput as any).getTitle(),
+								contentOptions: customEditorInput.webview.contentOptions,
+								options: customEditorInput.webview.options,
+								active: (webviewInput as any) === this._editorService.activeEditor
 							},
-							editorGroupToColumn(this._editorGroupService, webviewInput.group || 0),
+							editorGroupToColumn(this._editorGroupService, (customEditorInput as any).group || 0),
 							cancellation
 						);
 					} catch (error) {
 						onUnexpectedError(error);
-						webviewInput.webview.setHtml(this.mainThreadWebview.getWebviewResolvedFailedContent(viewType));
+						customEditorInput.webview.setHtml(this.mainThreadWebview.getWebviewResolvedFailedContent(viewType));
 						modelRef.dispose();
 						return;
 					}
@@ -328,7 +324,7 @@ export class MainThreadCustomEditors extends Disposable implements extHostProtoc
 				return this._customEditorService.models.add(resource, viewType, model);
 			}
 			case CustomEditorModelType.Custom: {
-				const model = MainThreadCustomEditorModel.create(
+				const model = (MainThreadCustomEditorModel as any).create(
 					this._instantiationService,
 					this._proxyCustomEditors,
 					viewType,
@@ -337,7 +333,7 @@ export class MainThreadCustomEditors extends Disposable implements extHostProtoc
 					() => {
 						return Array.from(this.mainThreadWebviewPanels.webviewInputs).filter(
 							editor => editor instanceof CustomEditorInput && isEqual(editor.resource, resource)
-						) as CustomEditorInput[];
+						) as unknown as CustomEditorInput[];
 					},
 					cancellation
 				);
@@ -390,7 +386,7 @@ export class MainThreadCustomEditors extends Disposable implements extHostProtoc
 							// This cast is safe because we do an instanceof check above and a custom document backup data is always returned
 							this._editorRenameBackups.set(
 								model.editorResource.toString(),
-								workingCopy.meta as CustomDocumentBackupData
+								workingCopy.meta as unknown as CustomDocumentBackupData
 							);
 						}
 					}
@@ -456,7 +452,7 @@ class MainThreadCustomEditorModel extends ResourceWorkingCopy implements ICustom
 		const editors = getEditors();
 		let untitledDocumentData: VSBuffer | undefined;
 		if (editors.length !== 0) {
-			untitledDocumentData = editors[0].untitledDocumentData;
+			untitledDocumentData = (editors[0] as any).untitledDocumentData;
 		}
 		const { editable } = await proxy.$createCustomDocument(
 			resource,
@@ -794,11 +790,11 @@ class MainThreadCustomEditorModel extends ResourceWorkingCopy implements ICustom
 		}
 		const primaryEditor = editors[0];
 
-		const backupMeta: CustomDocumentBackupData = {
+		const backupMeta = {
 			viewType: this.viewType,
 			editorResource: this._editorResource,
-			customTitle: primaryEditor.getWebviewTitle(),
-			iconPath: primaryEditor.iconPath,
+			customTitle: (primaryEditor as any).getWebviewTitle(),
+			iconPath: (primaryEditor as any).iconPath,
 			backupId: '',
 			extension: primaryEditor.extension
 				? {
@@ -811,10 +807,10 @@ class MainThreadCustomEditorModel extends ResourceWorkingCopy implements ICustom
 				options: primaryEditor.webview.options,
 				state: primaryEditor.webview.state
 			}
-		};
+		} as unknown as CustomDocumentBackupData;
 
 		const backupData: IWorkingCopyBackup = {
-			meta: backupMeta
+			meta: backupMeta as any
 		};
 
 		if (!this._editable) {

@@ -14,6 +14,7 @@ export interface ICellViewModel {
 
 export interface CellWebviewFindMatch {
 	readonly index: number;
+	readonly searchPreviewInfo?: any;
 }
 
 export interface CellFindMatchWithIndex {

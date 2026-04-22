@@ -177,7 +177,7 @@ export class Action extends Disposable implements IAction {
 		}
 	}
 
-	async run(event?: unknown, data?: ITelemetryData): Promise<void> {
+	async run(event?: unknown, _data?: ITelemetryData): Promise<void> {
 		if (this._actionCallback) {
 			await this._actionCallback(event);
 		}
@@ -309,7 +309,7 @@ export function toAction(props: {
 	enabled?: boolean;
 	checked?: boolean;
 	class?: string;
-	run: Function;
+	run: (...args: any[]) => any;
 }): IAction {
 	return {
 		id: props.id,

@@ -1700,9 +1700,9 @@ export class ExtensionManagementService
 		throw new Error('Not Supported');
 	}
 	installExtensionsFromProfile(
-		extensions: IExtensionIdentifier[],
-		fromProfileLocation: URI,
-		toProfileLocation: URI
+		_extensions: IExtensionIdentifier[],
+		_fromProfileLocation: URI,
+		_toProfileLocation: URI
 	): Promise<ILocalExtension[]> {
 		throw new Error('Not Supported');
 	}

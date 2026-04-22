@@ -597,7 +597,7 @@ export function deserializeSearchError(error: Error): SearchError {
 	try {
 		const details = JSON.parse(errorMsg);
 		return new SearchError(details.message, details.code);
-	} catch (e) {
+	} catch (_e) {
 		return new SearchError(errorMsg, SearchErrorCode.other);
 	}
 }
@@ -669,10 +669,8 @@ export type ISerializedSearchComplete = ISerializedSearchSuccess | ISerializedSe
 export function isSerializedSearchComplete(
 	arg: ISerializedSearchProgressItem | ISerializedSearchComplete
 ): arg is ISerializedSearchComplete {
-	// eslint-disable-next-line local/code-no-any-casts
 	if ((arg as any).type === 'error') {
 		return true;
-		// eslint-disable-next-line local/code-no-any-casts
 	} else if ((arg as any).type === 'success') {
 		return true;
 	} else {

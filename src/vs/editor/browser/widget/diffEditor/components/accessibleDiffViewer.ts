@@ -228,7 +228,9 @@ class ViewModel extends Disposable {
 				// This ensures editor commands (like revert/stage) work
 				const currentViewItem = this.currentElement.read(reader);
 				if (currentViewItem && currentViewItem.type !== LineType.Header) {
-					const lineNumber = currentViewItem.modifiedLineNumber ?? currentViewItem.diff.modified.startLineNumber;
+					const lineNumber =
+						currentViewItem.modifiedLineNumber ??
+						('diff' in currentViewItem ? currentViewItem.diff.modified.startLineNumber : 1);
 					this._models.modifiedSetSelection(Range.fromPositions(new Position(lineNumber, 1)));
 				}
 			})

@@ -116,7 +116,7 @@ pub fn theme_list() -> Result<Vec<ThemeInfo>, String> {
         })
         .collect();
 
-    infos.sort_by(|a, b| a.label.cmp(&b.label));
+    infos.sort_by_key(|a| a.label.clone());
     Ok(infos)
 }
 

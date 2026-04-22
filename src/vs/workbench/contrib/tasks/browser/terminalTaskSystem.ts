@@ -152,7 +152,7 @@ class VariableResolver {
 		return value.replace(VariableResolver._regex, () => resolvedReplacers.shift()!);
 	}
 
-	private async _replacer(match: string, args: string[]): Promise<string> {
+	private async _replacer(match: string, _args: string[]): Promise<string> {
 		// Strip out the ${} because the map contains them variables without those characters.
 		const result = this.values.get(match.substring(2, match.length - 1));
 		if (result !== undefined && result !== null) {
@@ -342,7 +342,7 @@ export class TerminalTaskSystem extends Disposable implements ITaskSystem {
 				started: {},
 				promise: this._executeTask(task, resolver, trigger, new Set(), new Map(), undefined)
 			};
-			executeResult.promise.then(summary => {
+			executeResult.promise.then(_summary => {
 				this._lastTask = this._currentTask;
 			});
 			return executeResult;
@@ -392,7 +392,7 @@ export class TerminalTaskSystem extends Disposable implements ITaskSystem {
 				this._isRerun = true;
 			}
 			const result = this.run(this._lastTask.task, this._lastTask.resolver);
-			result.promise.then(summary => {
+			result.promise.then(_summary => {
 				this._isRerun = false;
 			});
 			return result;
@@ -512,7 +512,7 @@ export class TerminalTaskSystem extends Disposable implements ITaskSystem {
 		return Object.keys(this._busyTasks).map(key => this._busyTasks[key]);
 	}
 
-	public customExecutionComplete(task: Task, result: number): Promise<void> {
+	public customExecutionComplete(task: Task, _result: number): Promise<void> {
 		const activeTerminal = this._activeTasks[task.getMapKey()];
 		if (!activeTerminal?.terminal) {
 			return Promise.reject(new Error('Expected to have a terminal for a custom execution task'));
@@ -561,7 +561,7 @@ export class TerminalTaskSystem extends Disposable implements ITaskSystem {
 		if (!terminal) {
 			return Promise.resolve<ITaskTerminateResponse>({ success: false, task: undefined });
 		}
-		return new Promise<ITaskTerminateResponse>((resolve, reject) => {
+		return new Promise<ITaskTerminateResponse>((resolve, _reject) => {
 			const onDisposedListener = terminal.onDisposed(terminal => {
 				this._fireTaskEvent(TaskEvent.terminated(task, terminal.instanceId, terminal.exitReason));
 				onDisposedListener.dispose();
@@ -571,7 +571,7 @@ export class TerminalTaskSystem extends Disposable implements ITaskSystem {
 				try {
 					onExit.dispose();
 					this._fireTaskEvent(TaskEvent.terminated(task, terminal.instanceId, terminal.exitReason));
-				} catch (error) {
+				} catch (_error) {
 					// Do nothing.
 				}
 				resolve({ success: true, task: task });
@@ -586,13 +586,13 @@ export class TerminalTaskSystem extends Disposable implements ITaskSystem {
 			const terminal = terminalData?.terminal;
 			if (terminal) {
 				promises.push(
-					new Promise<ITaskTerminateResponse>((resolve, reject) => {
+					new Promise<ITaskTerminateResponse>((resolve, _reject) => {
 						const onExit = terminal.onExit(() => {
 							const task = terminalData.task;
 							try {
 								onExit.dispose();
 								this._fireTaskEvent(TaskEvent.terminated(task, terminal.instanceId, terminal.exitReason));
-							} catch (error) {
+							} catch (_error) {
 								// Do nothing.
 							}
 							if (this._activeTasks[key] === terminalData) {
@@ -1221,7 +1221,7 @@ export class TerminalTaskSystem extends Disposable implements ITaskSystem {
 				});
 			}
 
-			promise = new Promise<ITaskSummary>((resolve, reject) => {
+			promise = new Promise<ITaskSummary>((resolve, _reject) => {
 				const onExit = terminal!.onExit(terminalLaunchResult => {
 					const exitCode = typeof terminalLaunchResult === 'number' ? terminalLaunchResult : terminalLaunchResult?.code;
 					onData?.dispose();
@@ -1254,7 +1254,7 @@ export class TerminalTaskSystem extends Disposable implements ITaskSystem {
 						try {
 							this._terminalService.setActiveInstance(terminal!);
 							this._terminalGroupService.showPanel(false);
-						} catch (e) {
+						} catch (_e) {
 							// If the terminal has already been disposed, then setting the active instance will fail. #99828
 							// There is nothing else to do here.
 						}
@@ -1358,7 +1358,7 @@ export class TerminalTaskSystem extends Disposable implements ITaskSystem {
 			const onData = terminal.onLineData(line => {
 				startStopProblemMatcher.processLine(line);
 			});
-			promise = new Promise<ITaskSummary>((resolve, reject) => {
+			promise = new Promise<ITaskSummary>((resolve, _reject) => {
 				const onExit = terminal!.onExit(terminalLaunchResult => {
 					const exitCode = typeof terminalLaunchResult === 'number' ? terminalLaunchResult : terminalLaunchResult?.code;
 					onExit.dispose();
@@ -1393,7 +1393,7 @@ export class TerminalTaskSystem extends Disposable implements ITaskSystem {
 						try {
 							this._terminalService.setActiveInstance(terminal);
 							this._terminalGroupService.showPanel(false);
-						} catch (e) {
+						} catch (_e) {
 							// If the terminal has already been disposed, then setting the active instance will fail. #99828
 							// There is nothing else to do here.
 						}
@@ -1493,7 +1493,7 @@ export class TerminalTaskSystem extends Disposable implements ITaskSystem {
 		command: CommandString,
 		args: CommandString[],
 		waitOnExit: WaitOnExitValue,
-		presentationOptions: IPresentationOptions
+		_presentationOptions: IPresentationOptions
 	): Promise<IShellLaunchConfig | undefined> {
 		let shellLaunchConfig: IShellLaunchConfig;
 		const isShellCommand = task.command.runtime === RuntimeType.Shell;
@@ -2033,7 +2033,7 @@ export class TerminalTaskSystem extends Disposable implements ITaskSystem {
 		this._terminalCreationQueue = this._terminalCreationQueue.then(() =>
 			this._doCreateTerminal(task, group, launchConfigs)
 		);
-		const terminal: ITerminalInstance = (await this._terminalCreationQueue)!;
+		const terminal = (await this._terminalCreationQueue) as ITerminalInstance;
 		if (task.configurationProperties.isBackground) {
 			terminal.shellLaunchConfig.reconnectionProperties = {
 				ownerId: TaskTerminalType,
@@ -2402,7 +2402,7 @@ export class TerminalTaskSystem extends Disposable implements ITaskSystem {
 			let cwd: string | undefined;
 			try {
 				cwd = await this._resolveVariable(resolver, '${workspaceFolder}');
-			} catch (e) {
+			} catch (_e) {
 				// No workspace
 			}
 			return { cwd };

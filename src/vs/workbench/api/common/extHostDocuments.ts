@@ -237,10 +237,10 @@ export class ExtHostDocuments implements ExtHostDocumentsShape {
 				}),
 				reason,
 				detailedReason: events.detailedReason
-					? {
+					? ({
 							source: events.detailedReason.source as string,
 							metadata: events.detailedReason
-						}
+						} as any)
 					: undefined
 			})
 		);

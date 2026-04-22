@@ -138,7 +138,6 @@ export function transformErrorForSerialization(error: any): any;
 export function transformErrorForSerialization(error: any): any {
 	if (error instanceof Error) {
 		const { name, message, cause } = error;
-		// eslint-disable-next-line local/code-no-any-casts
 		const stack: string = (<any>error).stacktrace || (<any>error).stack;
 		return {
 			$isError: true,
@@ -178,7 +177,7 @@ export function transformErrorFromSerialization(data: SerializedError): Error {
 export interface V8CallSite {
 	getThis(): unknown;
 	getTypeName(): string | null;
-	getFunction(): Function | undefined;
+	getFunction(): ((...args: any[]) => any) | undefined;
 	getFunctionName(): string | null;
 	getMethodName(): string | null;
 	getFileName(): string | null;

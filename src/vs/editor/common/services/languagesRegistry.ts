@@ -95,7 +95,7 @@ export class LanguagesRegistry extends Disposable {
 		if (useModesRegistry) {
 			this._initializeFromRegistry();
 			this._register(
-				ModesRegistry.onDidChangeLanguages(m => {
+				ModesRegistry.onDidChangeLanguages(_m => {
 					this._initializeFromRegistry();
 				})
 			);

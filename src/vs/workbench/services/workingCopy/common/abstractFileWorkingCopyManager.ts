@@ -158,7 +158,7 @@ export abstract class BaseFileWorkingCopyManager<M extends IFileWorkingCopyModel
 		let saveSuccess = false;
 		try {
 			saveSuccess = await workingCopy.save();
-		} catch (error) {
+		} catch (_error) {
 			// Ignore
 		}
 

@@ -144,11 +144,11 @@ Registry.as<IEditorPaneRegistry>(EditorExtensions.EditorPane).registerEditorPane
 );
 
 class PreferencesEditorInputSerializer implements IEditorSerializer {
-	canSerialize(editorInput: EditorInput): boolean {
+	canSerialize(_editorInput: EditorInput): boolean {
 		return true;
 	}
 
-	serialize(editorInput: EditorInput): string {
+	serialize(_editorInput: EditorInput): string {
 		return '';
 	}
 
@@ -167,11 +167,11 @@ Registry.as<IEditorPaneRegistry>(EditorExtensions.EditorPane).registerEditorPane
 );
 
 class KeybindingsEditorInputSerializer implements IEditorSerializer {
-	canSerialize(editorInput: EditorInput): boolean {
+	canSerialize(_editorInput: EditorInput): boolean {
 		return true;
 	}
 
-	serialize(editorInput: EditorInput): string {
+	serialize(_editorInput: EditorInput): string {
 		return '';
 	}
 
@@ -181,11 +181,11 @@ class KeybindingsEditorInputSerializer implements IEditorSerializer {
 }
 
 class SettingsEditor2InputSerializer implements IEditorSerializer {
-	canSerialize(editorInput: EditorInput): boolean {
+	canSerialize(_editorInput: EditorInput): boolean {
 		return true;
 	}
 
-	serialize(input: SettingsEditor2Input): string {
+	serialize(_input: SettingsEditor2Input): string {
 		return '';
 	}
 
@@ -1279,7 +1279,7 @@ class PreferencesActionsContribution extends Disposable implements IWorkbenchCon
 			weight: KeybindingWeight.WorkbenchContrib,
 			when: ContextKeyExpr.and(CONTEXT_KEYBINDINGS_EDITOR, CONTEXT_KEYBINDING_FOCUS, CONTEXT_WHEN_FOCUS.toNegated()),
 			primary: KeyCode.Enter,
-			handler: (accessor, args: unknown) => {
+			handler: (accessor, _args: unknown) => {
 				const editorPane = accessor.get(IEditorService).activeEditorPane;
 				if (editorPane instanceof KeybindingsEditor) {
 					editorPane.defineKeybinding(editorPane.activeKeybindingEntry!, false);
@@ -1292,7 +1292,7 @@ class PreferencesActionsContribution extends Disposable implements IWorkbenchCon
 			weight: KeybindingWeight.WorkbenchContrib,
 			when: ContextKeyExpr.and(CONTEXT_KEYBINDINGS_EDITOR, CONTEXT_KEYBINDING_FOCUS),
 			primary: KeyChord(KeyMod.CtrlCmd | KeyCode.KeyK, KeyMod.CtrlCmd | KeyCode.KeyA),
-			handler: (accessor, args: unknown) => {
+			handler: (accessor, _args: unknown) => {
 				const editorPane = accessor.get(IEditorService).activeEditorPane;
 				if (editorPane instanceof KeybindingsEditor) {
 					editorPane.defineKeybinding(editorPane.activeKeybindingEntry!, true);
@@ -1305,7 +1305,7 @@ class PreferencesActionsContribution extends Disposable implements IWorkbenchCon
 			weight: KeybindingWeight.WorkbenchContrib,
 			when: ContextKeyExpr.and(CONTEXT_KEYBINDINGS_EDITOR, CONTEXT_KEYBINDING_FOCUS),
 			primary: KeyChord(KeyMod.CtrlCmd | KeyCode.KeyK, KeyMod.CtrlCmd | KeyCode.KeyE),
-			handler: (accessor, args: unknown) => {
+			handler: (accessor, _args: unknown) => {
 				const editorPane = accessor.get(IEditorService).activeEditorPane;
 				if (editorPane instanceof KeybindingsEditor && editorPane.activeKeybindingEntry!.keybindingItem.keybinding) {
 					editorPane.defineWhenExpression(editorPane.activeKeybindingEntry!);
@@ -1321,7 +1321,7 @@ class PreferencesActionsContribution extends Disposable implements IWorkbenchCon
 			mac: {
 				primary: KeyMod.CtrlCmd | KeyCode.Backspace
 			},
-			handler: (accessor, args: unknown) => {
+			handler: (accessor, _args: unknown) => {
 				const editorPane = accessor.get(IEditorService).activeEditorPane;
 				if (editorPane instanceof KeybindingsEditor) {
 					editorPane.removeKeybinding(editorPane.activeKeybindingEntry!);
@@ -1334,7 +1334,7 @@ class PreferencesActionsContribution extends Disposable implements IWorkbenchCon
 			weight: KeybindingWeight.WorkbenchContrib,
 			when: ContextKeyExpr.and(CONTEXT_KEYBINDINGS_EDITOR, CONTEXT_KEYBINDING_FOCUS),
 			primary: 0,
-			handler: (accessor, args: unknown) => {
+			handler: (accessor, _args: unknown) => {
 				const editorPane = accessor.get(IEditorService).activeEditorPane;
 				if (editorPane instanceof KeybindingsEditor) {
 					editorPane.resetKeybinding(editorPane.activeKeybindingEntry!);
@@ -1347,7 +1347,7 @@ class PreferencesActionsContribution extends Disposable implements IWorkbenchCon
 			weight: KeybindingWeight.WorkbenchContrib,
 			when: ContextKeyExpr.and(CONTEXT_KEYBINDINGS_EDITOR),
 			primary: KeyMod.CtrlCmd | KeyCode.KeyF,
-			handler: (accessor, args: unknown) => {
+			handler: (accessor, _args: unknown) => {
 				const editorPane = accessor.get(IEditorService).activeEditorPane;
 				if (editorPane instanceof KeybindingsEditor) {
 					editorPane.focusSearch();
@@ -1361,7 +1361,7 @@ class PreferencesActionsContribution extends Disposable implements IWorkbenchCon
 			when: ContextKeyExpr.and(CONTEXT_KEYBINDINGS_EDITOR, CONTEXT_KEYBINDINGS_SEARCH_FOCUS),
 			primary: KeyMod.Alt | KeyCode.KeyK,
 			mac: { primary: KeyMod.CtrlCmd | KeyMod.Alt | KeyCode.KeyK },
-			handler: (accessor, args: unknown) => {
+			handler: (accessor, _args: unknown) => {
 				const editorPane = accessor.get(IEditorService).activeEditorPane;
 				if (editorPane instanceof KeybindingsEditor) {
 					editorPane.recordSearchKeys();
@@ -1375,7 +1375,7 @@ class PreferencesActionsContribution extends Disposable implements IWorkbenchCon
 			when: ContextKeyExpr.and(CONTEXT_KEYBINDINGS_EDITOR),
 			primary: KeyMod.Alt | KeyCode.KeyP,
 			mac: { primary: KeyMod.CtrlCmd | KeyMod.Alt | KeyCode.KeyP },
-			handler: (accessor, args: unknown) => {
+			handler: (accessor, _args: unknown) => {
 				const editorPane = accessor.get(IEditorService).activeEditorPane;
 				if (editorPane instanceof KeybindingsEditor) {
 					editorPane.toggleSortByPrecedence();
@@ -1388,7 +1388,7 @@ class PreferencesActionsContribution extends Disposable implements IWorkbenchCon
 			weight: KeybindingWeight.WorkbenchContrib,
 			when: ContextKeyExpr.and(CONTEXT_KEYBINDINGS_EDITOR, CONTEXT_KEYBINDING_FOCUS),
 			primary: 0,
-			handler: (accessor, args: unknown) => {
+			handler: (accessor, _args: unknown) => {
 				const editorPane = accessor.get(IEditorService).activeEditorPane;
 				if (editorPane instanceof KeybindingsEditor) {
 					editorPane.showSimilarKeybindings(editorPane.activeKeybindingEntry!);
@@ -1401,7 +1401,7 @@ class PreferencesActionsContribution extends Disposable implements IWorkbenchCon
 			weight: KeybindingWeight.WorkbenchContrib,
 			when: ContextKeyExpr.and(CONTEXT_KEYBINDINGS_EDITOR, CONTEXT_KEYBINDING_FOCUS, CONTEXT_WHEN_FOCUS.negate()),
 			primary: KeyMod.CtrlCmd | KeyCode.KeyC,
-			handler: async (accessor, args: unknown) => {
+			handler: async (accessor, _args: unknown) => {
 				const editorPane = accessor.get(IEditorService).activeEditorPane;
 				if (editorPane instanceof KeybindingsEditor) {
 					await editorPane.copyKeybinding(editorPane.activeKeybindingEntry!);
@@ -1414,7 +1414,7 @@ class PreferencesActionsContribution extends Disposable implements IWorkbenchCon
 			weight: KeybindingWeight.WorkbenchContrib,
 			when: ContextKeyExpr.and(CONTEXT_KEYBINDINGS_EDITOR, CONTEXT_KEYBINDING_FOCUS),
 			primary: 0,
-			handler: async (accessor, args: unknown) => {
+			handler: async (accessor, _args: unknown) => {
 				const editorPane = accessor.get(IEditorService).activeEditorPane;
 				if (editorPane instanceof KeybindingsEditor) {
 					await editorPane.copyKeybindingCommand(editorPane.activeKeybindingEntry!);
@@ -1427,7 +1427,7 @@ class PreferencesActionsContribution extends Disposable implements IWorkbenchCon
 			weight: KeybindingWeight.WorkbenchContrib,
 			when: ContextKeyExpr.and(CONTEXT_KEYBINDINGS_EDITOR, CONTEXT_KEYBINDING_FOCUS),
 			primary: 0,
-			handler: async (accessor, args: unknown) => {
+			handler: async (accessor, _args: unknown) => {
 				const editorPane = accessor.get(IEditorService).activeEditorPane;
 				if (editorPane instanceof KeybindingsEditor) {
 					await editorPane.copyKeybindingCommandTitle(editorPane.activeKeybindingEntry!);
@@ -1440,7 +1440,7 @@ class PreferencesActionsContribution extends Disposable implements IWorkbenchCon
 			weight: KeybindingWeight.WorkbenchContrib,
 			when: ContextKeyExpr.and(CONTEXT_KEYBINDINGS_EDITOR, CONTEXT_KEYBINDINGS_SEARCH_FOCUS),
 			primary: KeyMod.CtrlCmd | KeyCode.DownArrow,
-			handler: (accessor, args: unknown) => {
+			handler: (accessor, _args: unknown) => {
 				const editorPane = accessor.get(IEditorService).activeEditorPane;
 				if (editorPane instanceof KeybindingsEditor) {
 					editorPane.focusKeybindings();
@@ -1453,7 +1453,7 @@ class PreferencesActionsContribution extends Disposable implements IWorkbenchCon
 			weight: KeybindingWeight.WorkbenchContrib,
 			when: ContextKeyExpr.and(CONTEXT_KEYBINDINGS_EDITOR, CONTEXT_WHEN_FOCUS, SuggestContext.Visible.toNegated()),
 			primary: KeyCode.Escape,
-			handler: async (accessor, args: unknown) => {
+			handler: async (accessor, _args: unknown) => {
 				const editorPane = accessor.get(IEditorService).activeEditorPane;
 				if (editorPane instanceof KeybindingsEditor) {
 					editorPane.rejectWhenExpression(editorPane.activeKeybindingEntry!);
@@ -1466,7 +1466,7 @@ class PreferencesActionsContribution extends Disposable implements IWorkbenchCon
 			weight: KeybindingWeight.WorkbenchContrib,
 			when: ContextKeyExpr.and(CONTEXT_KEYBINDINGS_EDITOR, CONTEXT_WHEN_FOCUS, SuggestContext.Visible.toNegated()),
 			primary: KeyCode.Enter,
-			handler: async (accessor, args: unknown) => {
+			handler: async (accessor, _args: unknown) => {
 				const editorPane = accessor.get(IEditorService).activeEditorPane;
 				if (editorPane instanceof KeybindingsEditor) {
 					editorPane.acceptWhenExpression(editorPane.activeKeybindingEntry!);
@@ -1715,7 +1715,7 @@ class SettingsEditorContribution extends Disposable {
 	) {
 		super();
 		this._createPreferencesRenderer();
-		this._register(this.editor.onDidChangeModel(e => this._createPreferencesRenderer()));
+		this._register(this.editor.onDidChangeModel(_e => this._createPreferencesRenderer()));
 		this._register(this.workspaceContextService.onDidChangeWorkbenchState(() => this._createPreferencesRenderer()));
 	}
 

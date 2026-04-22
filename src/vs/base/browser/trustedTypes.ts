@@ -6,8 +6,6 @@
 import { onUnexpectedError } from '../common/errors.js';
 import { getMonacoEnvironment } from './browser.js';
 
-type TrustedTypePolicyOptions = import('trusted-types/lib/index.d.ts').TrustedTypePolicyOptions;
-
 export function createTrustedTypesPolicy<Options extends TrustedTypePolicyOptions>(
 	policyName: string,
 	policyOptions?: Options
@@ -23,7 +21,6 @@ export function createTrustedTypesPolicy<Options extends TrustedTypePolicyOption
 		}
 	}
 	try {
-		// eslint-disable-next-line local/code-no-any-casts
 		return (globalThis as any).trustedTypes?.createPolicy(policyName, policyOptions);
 	} catch (err) {
 		onUnexpectedError(err);

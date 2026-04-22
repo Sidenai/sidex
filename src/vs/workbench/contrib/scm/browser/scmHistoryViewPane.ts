@@ -704,9 +704,9 @@ class HistoryItemRenderer implements ICompressibleTreeRenderer<
 	}
 
 	renderCompressedElements(
-		node: ITreeNode<ICompressedTreeNode<SCMHistoryItemViewModelTreeElement>, LabelFuzzyScore>,
-		index: number,
-		templateData: HistoryItemTemplate
+		_node: ITreeNode<ICompressedTreeNode<SCMHistoryItemViewModelTreeElement>, LabelFuzzyScore>,
+		_index: number,
+		_templateData: HistoryItemTemplate
 	): void {
 		throw new Error('Should never happen since node is incompressible');
 	}
@@ -936,7 +936,7 @@ class HistoryItemChangeRenderer implements ICompressibleTreeRenderer<
 		>,
 		index: number,
 		templateData: HistoryItemChangeTemplate,
-		details?: ITreeElementRenderDetails | undefined
+		_details?: ITreeElementRenderDetails | undefined
 	): void {
 		const historyItemViewModel = isSCMHistoryItemChangeViewModelTreeElement(elementOrNode.element)
 			? elementOrNode.element.historyItemViewModel
@@ -984,7 +984,7 @@ class HistoryItemChangeRenderer implements ICompressibleTreeRenderer<
 		>,
 		index: number,
 		templateData: HistoryItemChangeTemplate,
-		details?: ITreeElementRenderDetails | undefined
+		_details?: ITreeElementRenderDetails | undefined
 	): void {
 		const compressed = node.element as ICompressedTreeNode<
 			IResourceNode<SCMHistoryItemChangeViewModelTreeElement, SCMHistoryItemViewModelTreeElement>
@@ -1100,9 +1100,9 @@ class HistoryItemLoadMoreRenderer implements ICompressibleTreeRenderer<
 	}
 
 	renderCompressedElements(
-		node: ITreeNode<ICompressedTreeNode<SCMHistoryItemLoadMoreTreeElement>, void>,
-		index: number,
-		templateData: LoadMoreTemplate
+		_node: ITreeNode<ICompressedTreeNode<SCMHistoryItemLoadMoreTreeElement>, void>,
+		_index: number,
+		_templateData: LoadMoreTemplate
 	): void {
 		throw new Error('Should never happen since node is incompressible');
 	}
@@ -1358,7 +1358,7 @@ class SCMHistoryTreeDragAndDrop implements ITreeDragAndDrop<TreeElement> {
 		originalEvent.dataTransfer.setData(CodeDataTransfers.SCM_HISTORY_ITEM, JSON.stringify(historyItems));
 	}
 
-	getDragLabel(elements: TreeElement[], originalEvent: DragEvent): string | undefined {
+	getDragLabel(elements: TreeElement[], _originalEvent: DragEvent): string | undefined {
 		if (elements.length === 1) {
 			const element = elements[0];
 			return this._getTreeElementLabel(element);
@@ -1368,21 +1368,21 @@ class SCMHistoryTreeDragAndDrop implements ITreeDragAndDrop<TreeElement> {
 	}
 
 	onDragOver(
-		data: IDragAndDropData,
-		targetElement: TreeElement | undefined,
-		targetIndex: number | undefined,
-		targetSector: ListViewTargetSector | undefined,
-		originalEvent: DragEvent
+		_data: IDragAndDropData,
+		_targetElement: TreeElement | undefined,
+		_targetIndex: number | undefined,
+		_targetSector: ListViewTargetSector | undefined,
+		_originalEvent: DragEvent
 	): boolean {
 		return false;
 	}
 
 	drop(
-		data: IDragAndDropData,
-		targetElement: TreeElement | undefined,
-		targetIndex: number | undefined,
-		targetSector: ListViewTargetSector | undefined,
-		originalEvent: DragEvent
+		_data: IDragAndDropData,
+		_targetElement: TreeElement | undefined,
+		_targetIndex: number | undefined,
+		_targetSector: ListViewTargetSector | undefined,
+		_originalEvent: DragEvent
 	): void {}
 
 	private _getDragAndDropData(data: ElementsDragAndDropData<TreeElement, TreeElement[]>): SCMHistoryItemTransferData[] {

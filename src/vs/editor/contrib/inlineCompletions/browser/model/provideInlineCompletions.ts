@@ -99,7 +99,7 @@ export function provideInlineCompletions(
 								return undefined;
 							}
 							if (item.insertText !== undefined) {
-								const t = new TextReplacement(Range.lift(item.range) ?? defaultReplaceRange, item.insertText);
+								const t = new TextReplacement(Range.lift(item.range) ?? defaultReplaceRange, item.insertText as string);
 								if (inlineCompletionIsVisible(t, undefined, model, position)) {
 									return undefined;
 								}
@@ -365,7 +365,7 @@ export interface IInlineSuggestDataActionJumpTo {
 }
 
 export class InlineSuggestData {
-	public static createForTest(action: IInlineSuggestDataAction | undefined, targetUri: URI): InlineSuggestData {
+	public static createForTest(action: IInlineSuggestDataAction | undefined, _targetUri: URI): InlineSuggestData {
 		const mockInlineCompletion: InlineCompletion = {
 			insertText: action?.kind === 'edit' ? action.insertText : '',
 			range: action?.kind === 'edit' ? action.range : undefined,

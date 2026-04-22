@@ -16,7 +16,7 @@ import { IStatusbarService, StatusbarAlignment } from '../../../services/statusb
 import type { IStatusbarEntryAccessor } from '../../../services/statusbar/browser/statusbar.js';
 import type { ITextModel } from '../../../../editor/common/model.js';
 import type { Position } from '../../../../editor/common/core/position.js';
-import type { CancellationToken } from '../../../../base/common/cancellation.js';
+import type { CancellationToken as _CancellationToken } from '../../../../base/common/cancellation.js';
 import type {
 	CompletionContext,
 	CompletionItem,
@@ -37,7 +37,7 @@ import type {
 	IWorkspaceTextEdit,
 	ILinksList,
 	IColorInformation,
-	IColorPresentation,
+	IColorPresentation as _IColorPresentation,
 	SelectionRange,
 	SemanticTokens,
 	SemanticTokensLegend,
@@ -65,7 +65,7 @@ import {
 } from './extensionPlatformClient.js';
 import { listen } from '@tauri-apps/api/event';
 import { ITerminalService, ITerminalGroupService } from '../../terminal/browser/terminal.js';
-import { INotificationService, Severity } from '../../../../platform/notification/common/notification.js';
+import { INotificationService, Severity as _Severity } from '../../../../platform/notification/common/notification.js';
 import { IProgressService, ProgressLocation } from '../../../../platform/progress/common/progress.js';
 import { IOpenerService } from '../../../../platform/opener/common/opener.js';
 import { IDebugService } from '../../debug/common/debug.js';
@@ -75,7 +75,7 @@ import { IWebviewWorkbenchService } from '../../webviewPanel/browser/webviewWork
 import type { WebviewInput } from '../../webviewPanel/browser/webviewEditorInput.js';
 import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
 import { Registry } from '../../../../platform/registry/common/platform.js';
-import { Extensions as ViewExtensions, type IViewsRegistry, type ITreeViewDescriptor, type ITreeViewDataProvider, type ITreeItem } from '../../../common/views.js';
+import { Extensions as ViewExtensions, type IViewsRegistry, type ITreeViewDescriptor, type ITreeViewDataProvider as _ITreeViewDataProvider, type ITreeItem as _ITreeItem } from '../../../common/views.js';
 import { TreeView, TreeViewPane } from '../../../browser/parts/views/treeView.js';
 import { SyncDescriptor } from '../../../../platform/instantiation/common/descriptors.js';
 import { IWorkbenchExtensionManagementService } from '../../../services/extensionManagement/common/extensionManagement.js';
@@ -358,7 +358,7 @@ class TauriExtensionHostContribution extends Disposable implements IWorkbenchCon
 		this._wasmProviderRegistrations.push(
 			this.languageFeatures.completionProvider.register(wasmLanguages, {
 				_debugDisplayName: 'wasmExtHost',
-				provideCompletionItems: async (model, position, context, _token) => {
+				provideCompletionItems: async (model, position, _context, _token) => {
 					try {
 						const result = await wasmProvideCompletionAll(
 							model.uri.toString(),
@@ -1056,7 +1056,7 @@ class TauriExtensionHostContribution extends Disposable implements IWorkbenchCon
 		const webviewHandles = new Map<string, { webview: any; listeners: IDisposable[] }>();
 
 		const registration = this.webviewViewService.register(viewId, {
-			resolve: async (webviewView, cancellation) => {
+			resolve: async (webviewView, _cancellation) => {
 				const webviewHandle = `wvv-${viewId}-${++this._msgId}`;
 				const listeners: IDisposable[] = [];
 
@@ -1440,7 +1440,7 @@ class TauriExtensionHostContribution extends Disposable implements IWorkbenchCon
 			this._providerRegistrations.push(
 				this.languageFeatures.documentSemanticTokensProvider.register(selectors(caps.semanticTokens), {
 					getLegend: () => this._semanticTokensLegend,
-					provideDocumentSemanticTokens: (model, lastResultId, _token) =>
+					provideDocumentSemanticTokens: (model, _lastResultId, _token) =>
 						this._provideSemanticTokens(model),
 					releaseDocumentSemanticTokens: () => {},
 				})
@@ -2253,7 +2253,7 @@ class TauriExtensionHostContribution extends Disposable implements IWorkbenchCon
 			this._trackedEditors.set(editorId, { editor, uri: model.uri.toString(), listeners });
 		};
 
-		const untrackEditor = (editor: ICodeEditor) => {
+		const _untrackEditor = (editor: ICodeEditor) => {
 			const editorId = getEditorId(editor);
 			const entry = this._trackedEditors.get(editorId);
 			if (entry) {
@@ -2386,7 +2386,7 @@ class TauriExtensionHostContribution extends Disposable implements IWorkbenchCon
 	}
 
 
-	private async _onShowTextDocument(uri: string, options?: any): Promise<void> {
+	private async _onShowTextDocument(uri: string, _options?: any): Promise<void> {
 		if (!uri) {
 			return;
 		}

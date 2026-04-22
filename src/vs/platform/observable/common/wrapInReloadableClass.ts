@@ -26,11 +26,10 @@ type Result<TArgs extends any[]> = new (...args: TArgs) => IDisposable;
 class BaseClass {
 	constructor(public readonly instantiationService: IInstantiationService) {}
 
-	public init(...params: any[]): void {}
+	public init(..._params: any[]): void {}
 }
 
 function createWrapper<T extends any[]>(getClass: () => any, B: new (...args: T) => BaseClass) {
-	// eslint-disable-next-line local/code-no-any-casts
 	return class ReloadableWrapper extends B {
 		private _autorun: IDisposable | undefined = undefined;
 
@@ -62,7 +61,6 @@ class BaseClass0 extends BaseClass {
 export function wrapInReloadableClass1<TArgs extends [any, ...BrandedService[]]>(
 	getClass: () => Result<TArgs>
 ): Result<GetLeadingNonServiceArgs<TArgs>> {
-	// eslint-disable-next-line local/code-no-any-casts
 	return !isHotReloadEnabled() ? (getClass() as any) : createWrapper(getClass, BaseClass1);
 }
 

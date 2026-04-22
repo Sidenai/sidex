@@ -23,7 +23,7 @@ class ExtensionUrlHandler implements IExtensionContributedURLHandler {
 		readonly extensionDisplayName: string
 	) {}
 
-	async handleURL(uri: URI, options?: IOpenURLOptions): Promise<boolean> {
+	async handleURL(uri: URI, _options?: IOpenURLOptions): Promise<boolean> {
 		if (!ExtensionIdentifier.equals(this.extensionId, uri.authority)) {
 			return false;
 		}

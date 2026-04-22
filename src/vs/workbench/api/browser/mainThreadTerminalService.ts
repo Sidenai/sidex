@@ -479,7 +479,7 @@ export class MainThreadTerminalService extends Disposable implements MainThreadT
 						if (result && Array.isArray(result)) {
 							return result.map(r => parseQuickFix(id, extensionId, r));
 						} else if (result) {
-							return parseQuickFix(id, extensionId, result);
+							return parseQuickFix(id, extensionId, result as any);
 						}
 					}
 					return;

@@ -668,7 +668,7 @@ export class TerminalCompletionService extends Disposable implements ITerminalCo
 							if (realpath && !isEqual(child.resource, realpath)) {
 								detail = `${getFriendlyPath(this._labelService, child.resource, resourceOptions.pathSeparator, kind, shellType)} -> ${getFriendlyPath(this._labelService, realpath, resourceOptions.pathSeparator, kind, shellType)}`;
 							}
-						} catch (error) {
+						} catch (_error) {
 							// Ignore errors resolving symlink targets - they may be dangling links
 						}
 					}
@@ -860,7 +860,7 @@ function addPathRelativePrefix(
 export function escapeTerminalCompletionLabel(
 	label: string,
 	shellType: TerminalShellType | undefined,
-	pathSeparator: string
+	_pathSeparator: string
 ): string {
 	// Only escape for bash/zsh/fish; PowerShell and cmd have different rules
 	if (

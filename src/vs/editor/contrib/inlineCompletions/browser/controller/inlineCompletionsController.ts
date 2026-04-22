@@ -212,7 +212,7 @@ export class InlineCompletionsController extends Disposable {
 			{ min: 50, max: 50 }
 		);
 		this.model.recomputeInitiallyAndOnChange(this._store);
-		this._hideInlineEditOnSelectionChange = this._editorObs.getOption(EditorOption.inlineSuggest).map(val => true);
+		this._hideInlineEditOnSelectionChange = this._editorObs.getOption(EditorOption.inlineSuggest).map(_val => true);
 
 		this._view.recomputeInitiallyAndOnChange(this._store);
 
@@ -327,7 +327,7 @@ export class InlineCompletionsController extends Disposable {
 
 		this._register(
 			runOnChange(this._editorObs.selections, (_value, _, changes) => {
-				if (changes.some(e => e.reason === CursorChangeReason.Explicit || e.source === 'api')) {
+				if (changes.some(e => (e as any).reason === CursorChangeReason.Explicit || (e as any).source === 'api')) {
 					if (!this._hideInlineEditOnSelectionChange.get() && this.model.get()?.state.get()?.kind === 'inlineEdit') {
 						return;
 					}

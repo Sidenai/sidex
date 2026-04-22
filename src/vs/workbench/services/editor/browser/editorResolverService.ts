@@ -303,7 +303,7 @@ export class EditorResolverService extends Disposable implements IEditorResolver
 		};
 	}
 
-	bufferChangeEvents(callback: Function): void {
+	bufferChangeEvents(callback: (...args: any[]) => any): void {
 		this._onDidChangeEditorRegistrations.pause();
 		try {
 			callback();

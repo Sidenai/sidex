@@ -638,7 +638,7 @@ export class InlineEditsGutterIndicator extends Disposable {
 								ref: this._iconRef,
 
 								tabIndex: 0,
-								onclick: () => {
+								onclick: (() => {
 									const layout = this._layout.get();
 									const acceptOnClick = layout?.icon.get() === Codicon.check;
 
@@ -653,18 +653,17 @@ export class InlineEditsGutterIndicator extends Disposable {
 									} else {
 										data.model.jump();
 									}
-								},
+								}) as any,
 
-								onmouseenter: () => {
+								onmouseenter: (() => {
 									// TODO show hover when hovering ghost text etc.
 									this._showHover();
-								},
+								}) as any,
 								style: {
 									cursor: 'pointer',
 									zIndex: '20',
 									position: 'absolute',
 									backgroundColor: this._gutterIndicatorStyles.map(v => v.background),
-									// eslint-disable-next-line local/code-no-any-casts
 									['--vscodeIconForeground' as any]: this._gutterIndicatorStyles.map(v => v.foreground),
 									border: this._gutterIndicatorStyles.map(v => `1px solid ${v.border}`),
 									boxSizing: 'border-box',
@@ -742,7 +741,6 @@ function getRotationFromDirection(direction: 'top' | 'bottom' | 'right'): number
 
 function withStyles<T extends HTMLElement>(element: T, styles: { [key: string]: string }): T {
 	for (const key in styles) {
-		// eslint-disable-next-line local/code-no-any-casts
 		element.style[key as any] = styles[key];
 	}
 	return element;

@@ -258,7 +258,7 @@ export class NativeEditContext extends AbstractEditContext {
 			})
 		);
 		this._register(
-			editContextAddDisposableListener(this._editContext, 'compositionstart', e => {
+			editContextAddDisposableListener(this._editContext, 'compositionstart', _e => {
 				this._updateEditContext();
 				// Utlimately fires onDidCompositionStart() on the editor to notify for example suggest model of composition state
 				// Updates the composition state of the cursor controller which determines behavior of typing with interceptors
@@ -268,7 +268,7 @@ export class NativeEditContext extends AbstractEditContext {
 			})
 		);
 		this._register(
-			editContextAddDisposableListener(this._editContext, 'compositionend', e => {
+			editContextAddDisposableListener(this._editContext, 'compositionend', _e => {
 				this._updateEditContext();
 				// Utlimately fires compositionEnd() on the editor to notify for example suggest model of composition state
 				// Updates the composition state of the cursor controller which determines behavior of typing with interceptors
@@ -333,7 +333,7 @@ export class NativeEditContext extends AbstractEditContext {
 		return this._primarySelection.getPosition();
 	}
 
-	public override onBeforeRender(viewportData: ViewportData): void {
+	public override onBeforeRender(_viewportData: ViewportData): void {
 		// We need to read the position of the container dom node
 		// It is best to do this before we begin touching the DOM at all
 		// Because the sync layout will be fast if we do it here
@@ -363,24 +363,24 @@ export class NativeEditContext extends AbstractEditContext {
 		return true;
 	}
 
-	public override onDecorationsChanged(e: ViewDecorationsChangedEvent): boolean {
+	public override onDecorationsChanged(_e: ViewDecorationsChangedEvent): boolean {
 		// true for inline decorations that can end up relayouting text
 		return true;
 	}
 
-	public override onFlushed(e: ViewFlushedEvent): boolean {
+	public override onFlushed(_e: ViewFlushedEvent): boolean {
 		return true;
 	}
 
-	public override onLinesChanged(e: ViewLinesChangedEvent): boolean {
+	public override onLinesChanged(_e: ViewLinesChangedEvent): boolean {
 		return true;
 	}
 
-	public override onLinesDeleted(e: ViewLinesDeletedEvent): boolean {
+	public override onLinesDeleted(_e: ViewLinesDeletedEvent): boolean {
 		return true;
 	}
 
-	public override onLinesInserted(e: ViewLinesInsertedEvent): boolean {
+	public override onLinesInserted(_e: ViewLinesInsertedEvent): boolean {
 		return true;
 	}
 
@@ -390,7 +390,7 @@ export class NativeEditContext extends AbstractEditContext {
 		return true;
 	}
 
-	public override onZonesChanged(e: ViewZonesChangedEvent): boolean {
+	public override onZonesChanged(_e: ViewZonesChangedEvent): boolean {
 		return true;
 	}
 

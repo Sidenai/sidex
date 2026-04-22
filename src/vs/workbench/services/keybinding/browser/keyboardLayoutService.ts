@@ -5,7 +5,7 @@
 
 import * as nls from '../../../../nls.js';
 import { Emitter, Event } from '../../../../base/common/event.js';
-import { AppResourcePath, FileAccess } from '../../../../base/common/network.js';
+import { AppResourcePath as _AppResourcePath, FileAccess as _FileAccess } from '../../../../base/common/network.js';
 import { Disposable } from '../../../../base/common/lifecycle.js';
 import { KeymapInfo, IRawMixedKeyboardMapping, IKeymapInfo } from '../common/keymapInfo.js';
 import { InstantiationType, registerSingleton } from '../../../../platform/instantiation/common/extensions.js';
@@ -332,7 +332,7 @@ export class BrowserKeyboardMapperFactoryBase extends Disposable {
 		}
 	}
 
-	private _setKeyboardData(keymapInfo: KeymapInfo): void {
+	private _setKeyboardData(_keymapInfo: KeymapInfo): void {
 		this._initialized = true;
 
 		this._keyboardMapper = null;
@@ -481,9 +481,9 @@ export class BrowserKeyboardMapperFactoryBase extends Disposable {
 export class BrowserKeyboardMapperFactory extends BrowserKeyboardMapperFactoryBase {
 	constructor(
 		configurationService: IConfigurationService,
-		notificationService: INotificationService,
-		storageService: IStorageService,
-		commandService: ICommandService
+		_notificationService: INotificationService,
+		_storageService: IStorageService,
+		_commandService: ICommandService
 	) {
 		// super(notificationService, storageService, commandService);
 		super(configurationService);
@@ -563,7 +563,7 @@ class UserKeyboardLayout extends Disposable {
 			} else {
 				this._keyboardLayout = null;
 			}
-		} catch (e) {
+		} catch (_e) {
 			this._keyboardLayout = null;
 		}
 

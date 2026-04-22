@@ -15,7 +15,10 @@ import {
 	SCMInputChangeReason,
 	ISCMInputValueProviderContext
 } from '../common/scm.js';
-import { IInstantiationService, ServicesAccessor } from '../../../../platform/instantiation/common/instantiation.js';
+import {
+	IInstantiationService,
+	ServicesAccessor as _ServicesAccessor
+} from '../../../../platform/instantiation/common/instantiation.js';
 import {
 	IContextViewService,
 	IContextMenuService,
@@ -24,7 +27,7 @@ import {
 import {
 	IContextKeyService,
 	IContextKey,
-	ContextKeyExpr,
+	ContextKeyExpr as _ContextKeyExpr,
 	RawContextKey
 } from '../../../../platform/contextkey/common/contextkey.js';
 import { ICommandService } from '../../../../platform/commands/common/commands.js';
@@ -32,9 +35,9 @@ import { IKeybindingService } from '../../../../platform/keybinding/common/keybi
 import {
 	MenuItemAction,
 	IMenuService,
-	registerAction2,
+	registerAction2 as _registerAction2,
 	MenuId,
-	Action2
+	Action2 as _Action2
 } from '../../../../platform/actions/common/actions.js';
 import { IAction, ActionRunner, Action } from '../../../../base/common/actions.js';
 import { ActionBar } from '../../../../base/browser/ui/actionbar/actionbar.js';
@@ -290,7 +293,7 @@ class SCMInputWidgetToolbar extends WorkbenchToolBar {
 
 		this.actionRunner = this._disposables.value.add(new SCMInputWidgetActionRunner(input, this.storageService));
 		this._disposables.value.add(
-			this.actionRunner.onWillRun(e => {
+			this.actionRunner.onWillRun(_e => {
 				if ((this.actionRunner as SCMInputWidgetActionRunner).runningActions.size === 0) {
 					super.setActions([this._cancelAction], []);
 					this._onDidChange.fire();
@@ -298,7 +301,7 @@ class SCMInputWidgetToolbar extends WorkbenchToolBar {
 			})
 		);
 		this._disposables.value.add(
-			this.actionRunner.onDidRun(e => {
+			this.actionRunner.onDidRun(_e => {
 				if ((this.actionRunner as SCMInputWidgetActionRunner).runningActions.size === 0) {
 					updateToolbar();
 				}
@@ -561,7 +564,7 @@ export class SCMInputWidget {
 		this.repositoryDisposables.add(
 			input.onDidChangeValidationMessage(e => this.setValidation(e, { focus: true, timeout: true }))
 		);
-		this.repositoryDisposables.add(input.onDidChangeValidateInput(e => triggerValidation()));
+		this.repositoryDisposables.add(input.onDidChangeValidateInput(_e => triggerValidation()));
 		this.repositoryDisposables.add(input.onDidClearValidation(() => this.clearValidation()));
 
 		// Keep API in sync with model and validate
@@ -1005,4 +1008,4 @@ export class SCMInputWidget {
 	}
 }
 
-setupSimpleEditorSelectionStyling('.scm-view .scm-editor-container');
+setupSimpleEditorSelectionStyling('.scm-view .scm-editor-container' as any);

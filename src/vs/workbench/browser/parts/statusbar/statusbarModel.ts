@@ -54,7 +54,7 @@ export class StatusbarViewModel extends Disposable {
 		if (hiddenRaw) {
 			try {
 				this.hidden = new Set(JSON.parse(hiddenRaw));
-			} catch (error) {
+			} catch (_error) {
 				// ignore parsing errors
 			}
 		}

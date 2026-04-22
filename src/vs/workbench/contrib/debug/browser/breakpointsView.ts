@@ -1942,9 +1942,9 @@ class FunctionBreakpointInputRenderer implements ICompressibleTreeRenderer<
 	}
 
 	renderCompressedElements(
-		node: ITreeNode<ICompressedTreeNode<IFunctionBreakpoint>, void>,
+		_node: ITreeNode<ICompressedTreeNode<IFunctionBreakpoint>, void>,
 		_index: number,
-		data: IFunctionBreakpointInputTemplateData
+		_data: IFunctionBreakpointInputTemplateData
 	): void {
 		// Function breakpoints are not compressible
 	}
@@ -2100,9 +2100,9 @@ class DataBreakpointInputRenderer implements ICompressibleTreeRenderer<
 	}
 
 	renderCompressedElements(
-		node: ITreeNode<ICompressedTreeNode<IDataBreakpoint>, void>,
+		_node: ITreeNode<ICompressedTreeNode<IDataBreakpoint>, void>,
 		_index: number,
-		data: IDataBreakpointInputTemplateData
+		_data: IDataBreakpointInputTemplateData
 	): void {
 		// Data breakpoints are not compressible
 	}
@@ -2230,9 +2230,9 @@ class ExceptionBreakpointInputRenderer implements ICompressibleTreeRenderer<
 	}
 
 	renderCompressedElements(
-		node: ITreeNode<ICompressedTreeNode<IExceptionBreakpoint>, void>,
+		_node: ITreeNode<ICompressedTreeNode<IExceptionBreakpoint>, void>,
 		_index: number,
-		data: IExceptionBreakpointInputTemplateData
+		_data: IExceptionBreakpointInputTemplateData
 	): void {
 		// Exception breakpoints are not compressible
 	}

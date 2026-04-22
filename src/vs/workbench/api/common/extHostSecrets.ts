@@ -45,6 +45,6 @@ export class ExtensionSecrets implements vscode.SecretStorage {
 	}
 
 	keys(): Promise<string[]> {
-		return this.#secretState.keys(this._id) || [];
+		return this.#secretState.keys(this._id) || Promise.resolve([]);
 	}
 }

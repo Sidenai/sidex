@@ -495,11 +495,11 @@ export class ViewLinesGpu extends ViewPart implements IViewLines {
 		}
 	}
 
-	public prepareRender(ctx: RenderingContext): void {
+	public prepareRender(_ctx: RenderingContext): void {
 		throw new BugIndicatingError('Should not be called');
 	}
 
-	public override render(ctx: RestrictedRenderingContext): void {
+	public override render(_ctx: RestrictedRenderingContext): void {
 		throw new BugIndicatingError('Should not be called');
 	}
 
@@ -513,45 +513,45 @@ export class ViewLinesGpu extends ViewPart implements IViewLines {
 	// from that side. Luckily rendering is cheap, it's only when uploaded data changes does it
 	// start to cost.
 
-	override onConfigurationChanged(e: viewEvents.ViewConfigurationChangedEvent): boolean {
+	override onConfigurationChanged(_e: viewEvents.ViewConfigurationChangedEvent): boolean {
 		this._refreshGlyphRasterizer();
 		this._maxLineWidth = 0;
 		return true;
 	}
-	override onCursorStateChanged(e: viewEvents.ViewCursorStateChangedEvent): boolean {
+	override onCursorStateChanged(_e: viewEvents.ViewCursorStateChangedEvent): boolean {
 		return true;
 	}
-	override onDecorationsChanged(e: viewEvents.ViewDecorationsChangedEvent): boolean {
+	override onDecorationsChanged(_e: viewEvents.ViewDecorationsChangedEvent): boolean {
 		return true;
 	}
-	override onFlushed(e: viewEvents.ViewFlushedEvent): boolean {
+	override onFlushed(_e: viewEvents.ViewFlushedEvent): boolean {
 		this._maxLineWidth = 0;
 		return true;
 	}
 
-	override onLinesChanged(e: viewEvents.ViewLinesChangedEvent): boolean {
+	override onLinesChanged(_e: viewEvents.ViewLinesChangedEvent): boolean {
 		return true;
 	}
-	override onLinesDeleted(e: viewEvents.ViewLinesDeletedEvent): boolean {
+	override onLinesDeleted(_e: viewEvents.ViewLinesDeletedEvent): boolean {
 		this._maxLineWidth = 0;
 		return true;
 	}
-	override onLinesInserted(e: viewEvents.ViewLinesInsertedEvent): boolean {
+	override onLinesInserted(_e: viewEvents.ViewLinesInsertedEvent): boolean {
 		return true;
 	}
-	override onLineMappingChanged(e: viewEvents.ViewLineMappingChangedEvent): boolean {
+	override onLineMappingChanged(_e: viewEvents.ViewLineMappingChangedEvent): boolean {
 		return true;
 	}
-	override onRevealRangeRequest(e: viewEvents.ViewRevealRangeRequestEvent): boolean {
+	override onRevealRangeRequest(_e: viewEvents.ViewRevealRangeRequestEvent): boolean {
 		return true;
 	}
-	override onScrollChanged(e: viewEvents.ViewScrollChangedEvent): boolean {
+	override onScrollChanged(_e: viewEvents.ViewScrollChangedEvent): boolean {
 		return true;
 	}
-	override onThemeChanged(e: viewEvents.ViewThemeChangedEvent): boolean {
+	override onThemeChanged(_e: viewEvents.ViewThemeChangedEvent): boolean {
 		return true;
 	}
-	override onZonesChanged(e: viewEvents.ViewZonesChangedEvent): boolean {
+	override onZonesChanged(_e: viewEvents.ViewZonesChangedEvent): boolean {
 		return true;
 	}
 

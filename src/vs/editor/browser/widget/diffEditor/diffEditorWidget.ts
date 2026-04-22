@@ -430,7 +430,9 @@ export class DiffEditorWidget extends DelegatingEditor implements IDiffEditor {
 			)
 		).recomputeInitiallyAndOnChange(this._store);
 
-		const visibility = this._accessibleDiffViewerVisible.map<CSSStyle['visibility']>(v => (v ? 'hidden' : 'visible'));
+		const visibility: IObservable<CSSStyle['visibility']> = this._accessibleDiffViewerVisible.map(v =>
+			v ? 'hidden' : 'visible'
+		);
 		this._register(applyStyle(this.elements.modified, { visibility }));
 		this._register(applyStyle(this.elements.original, { visibility }));
 
@@ -475,13 +477,13 @@ export class DiffEditorWidget extends DelegatingEditor implements IDiffEditor {
 		});
 
 		this._register(
-			Event.runAndSubscribe(this._editors.modified.onDidChangeCursorPosition, e =>
-				this._handleCursorPositionChange(e, true)
+			Event.runAndSubscribe(this._editors.modified.onDidChangeCursorPosition, (e: unknown) =>
+				this._handleCursorPositionChange(e as ICursorPositionChangedEvent, true)
 			)
 		);
 		this._register(
-			Event.runAndSubscribe(this._editors.original.onDidChangeCursorPosition, e =>
-				this._handleCursorPositionChange(e, false)
+			Event.runAndSubscribe(this._editors.original.onDidChangeCursorPosition, (e: unknown) =>
+				this._handleCursorPositionChange(e as ICursorPositionChangedEvent, false)
 			)
 		);
 
@@ -523,7 +525,7 @@ export class DiffEditorWidget extends DelegatingEditor implements IDiffEditor {
 				}
 				for (const m of [model.model.original, model.model.modified]) {
 					store.add(
-						m.onWillDispose(e => {
+						m.onWillDispose(_e => {
 							onUnexpectedError(
 								new BugIndicatingError('TextModel got disposed before DiffEditorWidget model got reset')
 							);
@@ -615,7 +617,6 @@ export class DiffEditorWidget extends DelegatingEditor implements IDiffEditor {
 			this._editors.original.restoreViewState(diffEditorState.original);
 			this._editors.modified.restoreViewState(diffEditorState.modified);
 			if (diffEditorState.modelState) {
-				// eslint-disable-next-line local/code-no-any-casts
 				this._diffModel.get()?.restoreSerializedState(diffEditorState.modelState as any);
 			}
 		}
@@ -806,7 +807,7 @@ export class DiffEditorWidget extends DelegatingEditor implements IDiffEditor {
 	}
 
 	goToDiff(target: 'previous' | 'next'): void {
-		const diffs = this._diffModel.get()?.diff.get()?.mappings;
+		const diffs = this._diffModel.get()?.diff.get()?.mappings as readonly DiffMapping[] | undefined;
 		if (!diffs || diffs.length === 0) {
 			return;
 		}

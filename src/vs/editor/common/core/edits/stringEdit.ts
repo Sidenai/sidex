@@ -22,7 +22,6 @@ export abstract class BaseStringEdit<
 		}
 		let result = edits[0];
 		for (let i = 1; i < edits.length; i++) {
-			// eslint-disable-next-line local/code-no-any-casts
 			result = result.compose(edits[i]) as any;
 		}
 		return result;
@@ -497,7 +496,7 @@ export interface IEditData<T> {
 }
 
 export class VoidEditData implements IEditData<VoidEditData> {
-	join(other: VoidEditData): VoidEditData | undefined {
+	join(_other: VoidEditData): VoidEditData | undefined {
 		return this;
 	}
 }

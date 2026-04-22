@@ -879,7 +879,7 @@ export class EditorPart extends Part<IEditorPartMemento> implements IEditorPart,
 			if (viewSize.width === group.minimumWidth || viewSize.height === group.minimumHeight) {
 				this.arrangeGroups(GroupsArrangement.EXPAND, group);
 			}
-		} catch (error) {
+		} catch (_error) {
 			// ignore: method might be called too early before view is known to grid
 		}
 	}
@@ -1283,8 +1283,8 @@ export class EditorPart extends Part<IEditorPartMemento> implements IEditorPart,
 
 		this._register(
 			CompositeDragAndDropObserver.INSTANCE.registerTarget(this.element, {
-				onDragStart: e => overlay.classList.add('visible'),
-				onDragEnd: e => overlay.classList.remove('visible')
+				onDragStart: _e => overlay.classList.add('visible'),
+				onDragEnd: _e => overlay.classList.remove('visible')
 			})
 		);
 

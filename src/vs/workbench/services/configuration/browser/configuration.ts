@@ -127,7 +127,7 @@ export class DefaultConfiguration extends BaseDefaultConfiguration {
 							this.cachedConfigurationDefaultsOverrides = JSON.parse(content);
 						}
 					}
-				} catch (error) {
+				} catch (_error) {
 					/* ignore */
 				}
 				this.cachedConfigurationDefaultsOverrides = isObject(this.cachedConfigurationDefaultsOverrides)
@@ -171,7 +171,7 @@ export class DefaultConfiguration extends BaseDefaultConfiguration {
 				localStorage.removeItem(DefaultConfiguration.DEFAULT_OVERRIDES_CACHE_EXISTS_KEY);
 				await this.configurationCache.remove(this.cacheKey);
 			}
-		} catch (error) {
+		} catch (_error) {
 			/* Ignore error */
 		}
 	}
@@ -684,7 +684,7 @@ class FileServiceBasedRemoteUserConfiguration extends Disposable {
 			const content = await this.resolveContent();
 			this.parser.parse(content, this.parseOptions);
 			return this.parser.configurationModel;
-		} catch (e) {
+		} catch (_e) {
 			return ConfigurationModel.createEmptyModel(this.logService);
 		}
 	}
@@ -789,7 +789,7 @@ class CachedRemoteUserConfiguration extends Disposable {
 				this.parser.parse(parsed.content, this.parseOptions);
 				this.configurationModel = this.parser.configurationModel;
 			}
-		} catch (e) {
+		} catch (_e) {
 			/* Ignore error */
 		}
 		return this.configurationModel;
@@ -914,7 +914,7 @@ export class WorkspaceConfiguration extends Disposable {
 		this._workspaceConfigurationDisposables.clear();
 		this._workspaceConfiguration = this._workspaceConfigurationDisposables.add(fileServiceBasedWorkspaceConfiguration);
 		this._workspaceConfigurationDisposables.add(
-			this._workspaceConfiguration.onDidChange(e => this.onDidWorkspaceConfigurationChange(true, false))
+			this._workspaceConfiguration.onDidChange(_e => this.onDidWorkspaceConfigurationChange(true, false))
 		);
 		this._initialized = true;
 	}
@@ -1085,7 +1085,7 @@ class CachedWorkspaceConfiguration {
 				this.workspaceConfigurationModelParser.parse(parsed.content, configurationParseOptions);
 				this.consolidate();
 			}
-		} catch (e) {}
+		} catch (_e) {}
 	}
 
 	get workspaceIdentifier(): IWorkspaceIdentifier | null {
@@ -1133,7 +1133,7 @@ class CachedWorkspaceConfiguration {
 			} else {
 				await this.configurationCache.remove(key);
 			}
-		} catch (error) {}
+		} catch (_error) {}
 	}
 
 	private getKey(workspaceIdentifier: IWorkspaceIdentifier): ConfigurationKey {
@@ -1189,7 +1189,7 @@ class CachedFolderConfiguration {
 				}
 			}
 			this.consolidate();
-		} catch (e) {}
+		} catch (_e) {}
 		return this.configurationModel;
 	}
 
@@ -1272,14 +1272,14 @@ export class FolderConfiguration extends Disposable {
 				this.folderConfiguration = this._register(
 					this.createFileServiceBasedConfiguration(fileService, uriIdentityService, logService)
 				);
-				this._register(this.folderConfiguration.onDidChange(e => this.onDidFolderConfigurationChange()));
+				this._register(this.folderConfiguration.onDidChange(_e => this.onDidFolderConfigurationChange()));
 				this.onDidFolderConfigurationChange();
 			});
 		} else {
 			this.folderConfiguration = this._register(
 				this.createFileServiceBasedConfiguration(fileService, uriIdentityService, logService)
 			);
-			this._register(this.folderConfiguration.onDidChange(e => this.onDidFolderConfigurationChange()));
+			this._register(this.folderConfiguration.onDidChange(_e => this.onDidFolderConfigurationChange()));
 		}
 	}
 

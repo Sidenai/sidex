@@ -427,7 +427,7 @@ export class InlineEditsLongDistanceHint extends Disposable implements IInlineEd
 	private readonly _widgetContent = derived(
 		this,
 		(
-			reader // TODO@hediet: remove when n.div lazily creates previewEditor.element node
+			_reader // TODO@hediet: remove when n.div lazily creates previewEditor.element node
 		) =>
 			n.div(
 				{
@@ -450,12 +450,12 @@ export class InlineEditsLongDistanceHint extends Disposable implements IInlineEd
 						transition: 'opacity 200ms ease-in-out',
 						...rectToProps(reader => this._previewEditorLayoutInfo.read(reader)?.widgetRect)
 					},
-					onmousedown: e => {
+					onmousedown: ((e: any) => {
 						e.preventDefault(); // This prevents that the editor loses focus
-					},
-					onclick: () => {
+					}) as any,
+					onclick: (() => {
 						this._viewState.read(undefined)?.model.jump();
-					}
+					}) as any
 				},
 				[
 					n.div(
@@ -469,7 +469,7 @@ export class InlineEditsLongDistanceHint extends Disposable implements IInlineEd
 							}
 						},
 						[
-							derived(this, r => this._previewEditor.element) // --
+							derived(this, _r => this._previewEditor.element) // --
 						]
 					),
 					n.div(

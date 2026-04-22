@@ -402,7 +402,7 @@ impl Buffer {
     /// remain valid as later edits are applied.
     pub fn apply_edits(&mut self, edits: &[EditOperation]) -> Vec<ChangeEvent> {
         let mut sorted: Vec<&EditOperation> = edits.iter().collect();
-        sorted.sort_by(|a, b| b.range.start.cmp(&a.range.start));
+        sorted.sort_by_key(|e| std::cmp::Reverse(e.range.start));
         sorted.iter().map(|edit| self.apply_edit(edit)).collect()
     }
 
@@ -481,12 +481,10 @@ impl Buffer {
             #[allow(clippy::cast_possible_truncation)]
             let count = prefix.chars().filter(|&c| c == '\t').count() as u32;
             count
-        } else if info.tab_size == 0 {
-            0
         } else {
             #[allow(clippy::cast_possible_truncation)]
             let spaces: u32 = prefix.chars().filter(|&c| c == ' ').count() as u32;
-            spaces / info.tab_size
+            spaces.checked_div(info.tab_size).unwrap_or(0)
         }
     }
 
@@ -1201,7 +1199,7 @@ impl Buffer {
     /// order as the input edits.
     pub fn apply_edits_with_undo(&mut self, edits: &[EditOperation]) -> Vec<EditResult> {
         let mut indexed: Vec<(usize, &EditOperation)> = edits.iter().enumerate().collect();
-        indexed.sort_by(|a, b| b.1.range.start.cmp(&a.1.range.start));
+        indexed.sort_by_key(|e| std::cmp::Reverse(e.1.range.start));
 
         let mut results: Vec<(usize, EditResult)> = Vec::with_capacity(edits.len());
 

@@ -58,7 +58,7 @@ class ExtHostBrowserTab {
 			close(): Promise<void> {
 				return that._close();
 			}
-		};
+		} as any;
 	}
 
 	update(data: BrowserTabDto): boolean {
@@ -121,7 +121,7 @@ class ExtHostBrowserCDPSession {
 			close(): Promise<void> {
 				return that._close();
 			}
-		};
+		} as any;
 	}
 
 	dispose(): void {
@@ -215,7 +215,7 @@ export class ExtHostBrowsers extends Disposable implements ExtHostBrowsersShape 
 		const viewColumn = typeConverters.ViewColumn.from(options?.viewColumn);
 		const dto = await this._proxy.$openBrowserTab(url, viewColumn, {
 			preserveFocus: options?.preserveFocus,
-			inactive: options?.background
+			inactive: (options as any)?.background
 		});
 
 		return this._getOrCreateTab(dto).value;

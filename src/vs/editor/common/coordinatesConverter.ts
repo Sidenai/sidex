@@ -99,11 +99,11 @@ export class IdentityCoordinatesConverter implements ICoordinatesConverter {
 		return true;
 	}
 
-	public getModelLineViewLineCount(modelLineNumber: number): number {
+	public getModelLineViewLineCount(_modelLineNumber: number): number {
 		return 1;
 	}
 
-	public getViewLineNumberOfModelPosition(modelLineNumber: number, modelColumn: number): number {
+	public getViewLineNumberOfModelPosition(modelLineNumber: number, _modelColumn: number): number {
 		return modelLineNumber;
 	}
 }

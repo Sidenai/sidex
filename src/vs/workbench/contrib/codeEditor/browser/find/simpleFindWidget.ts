@@ -21,6 +21,11 @@ export interface ISimpleFindWidgetOpts {
 }
 
 export abstract class SimpleFindWidget extends Widget {
+	readonly state: any;
+	readonly focusTracker: any;
+	inputValue: string = '';
+	isVisible: boolean = false;
+
 	constructor(_opts?: ISimpleFindWidgetOpts, ..._services: any[]) {
 		super();
 	}
@@ -33,9 +38,25 @@ export abstract class SimpleFindWidget extends Widget {
 		return document.createElement('div');
 	}
 
+	getFindInputDomNode(): HTMLElement {
+		return document.createElement('div');
+	}
+
 	reveal(_initialInput?: string, _animated?: boolean): void {}
 	hide(_animated?: boolean): void {}
 	layout(_width?: number): void {}
+	updateResultCount(): void {}
+	updateButtons(_e: any): void {}
+
+	_getWholeWordValue(): boolean {
+		return false;
+	}
+	_getRegexValue(): boolean {
+		return false;
+	}
+	_getCaseSensitiveValue(): boolean {
+		return false;
+	}
 
 	protected _onInputChange(): void {}
 	protected _onFocusTrackerFocus(): void {}

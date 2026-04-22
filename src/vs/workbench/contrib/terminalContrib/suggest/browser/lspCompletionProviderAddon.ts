@@ -40,7 +40,7 @@ export class LspCompletionProviderAddon extends Disposable implements ITerminalA
 		this.triggerCharacters = provider.triggerCharacters ? [...provider.triggerCharacters, ' ', '('] : [' ', '('];
 	}
 
-	activate(terminal: Terminal): void {
+	activate(_terminal: Terminal): void {
 		// console.log('activate');
 	}
 

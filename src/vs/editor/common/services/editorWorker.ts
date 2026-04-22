@@ -10,7 +10,7 @@ import { IChange } from '../diff/legacyLinesDiffComputer.js';
 import { IColorInformation, IInplaceReplaceSupportResult, TextEdit } from '../languages.js';
 import { UnicodeHighlighterOptions } from './unicodeTextModelHighlighter.js';
 import { createDecorator } from '../../../platform/instantiation/common/instantiation.js';
-import type { EditorWorker } from './editorWebWorker.js';
+import type { EditorWorker as _EditorWorker } from './editorWebWorker.js';
 import { SectionHeader, FindSectionHeaderOptions } from './findSectionHeaders.js';
 import { StringEdit } from '../core/edits/stringEdit.js';
 

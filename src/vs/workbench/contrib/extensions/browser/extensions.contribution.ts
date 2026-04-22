@@ -2061,7 +2061,7 @@ registerAction2(class ExtensionsGallerySignInAction extends Action2 {
 Registry.as<IConfigurationMigrationRegistry>(ConfigurationMigrationExtensions.ConfigurationMigration)
 	.registerConfigurationMigrations([{
 		key: AutoUpdateConfigurationKey,
-		migrateFn: (value, accessor) => {
+		migrateFn: (value, _accessor) => {
 			if (value === 'onlySelectedExtensions') {
 				return { value: false };
 			}

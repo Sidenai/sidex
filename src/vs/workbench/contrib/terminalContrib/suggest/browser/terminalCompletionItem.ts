@@ -198,7 +198,7 @@ export class TerminalCompletionItem extends SimpleCompletionItem {
 						this.completion.documentation = resolved.documentation;
 					}
 				}
-			} catch (error) {
+			} catch (_error) {
 				return;
 			}
 		})();

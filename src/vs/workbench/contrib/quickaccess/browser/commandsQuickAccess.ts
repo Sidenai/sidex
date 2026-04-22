@@ -142,15 +142,15 @@ export class CommandsQuickAccessProvider extends AbstractEditorCommandsQuickAcce
 		}));
 	}
 
-	protected hasAdditionalCommandPicks(filter: string, token: CancellationToken): boolean {
+	protected hasAdditionalCommandPicks(_filter: string, _token: CancellationToken): boolean {
 		return false;
 	}
 
 	protected async getAdditionalCommandPicks(
-		allPicks: ICommandQuickPick[],
-		picksSoFar: ICommandQuickPick[],
-		filter: string,
-		token: CancellationToken
+		_allPicks: ICommandQuickPick[],
+		_picksSoFar: ICommandQuickPick[],
+		_filter: string,
+		_token: CancellationToken
 	): Promise<Array<ICommandQuickPick | IQuickPickSeparator>> {
 		return [];
 	}
@@ -200,8 +200,8 @@ export class CommandsQuickAccessProvider extends AbstractEditorCommandsQuickAcce
 				commandWhen: action.item.precondition?.serialize(),
 				commandAlias,
 				label: stripIcons(label),
-				commandDescription,
-				commandCategory: category
+				commandDescription: commandDescription as any,
+				commandCategory: category as any
 			});
 		}
 

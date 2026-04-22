@@ -25,7 +25,7 @@
     "paths": {
       "vs/*": ["vs/*"]
     },
-    "types": ["vite/client"]
+    "types": ["vite/client", "@webgpu/types", "trusted-types"]
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "src-tauri", "dist", "**/test/**"]

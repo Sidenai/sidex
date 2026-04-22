@@ -927,7 +927,7 @@ export class SuggestAddon extends Disposable implements ITerminalAddon, ISuggest
 	}
 
 	private _ensureSuggestWidget(
-		terminal: Terminal
+		_terminal: Terminal
 	): SimpleSuggestWidget<TerminalCompletionModel, TerminalCompletionItem> {
 		if (!this._suggestWidget) {
 			this._suggestWidget = this._register(

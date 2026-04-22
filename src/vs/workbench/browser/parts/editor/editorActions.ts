@@ -849,7 +849,7 @@ abstract class AbstractCloseAllAction extends Action2 {
 				const group = editorGroupService.getGroup(groupId);
 				await group?.openEditor(editor);
 			}
-		} catch (error) {
+		} catch (_error) {
 			// ignore any error as the revealing is just convinience
 		}
 	}

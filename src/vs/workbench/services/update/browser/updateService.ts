@@ -8,10 +8,11 @@
  *    1. invokes Rust Tauri commands for each VS Code lifecycle method
  *    2. subscribes to a single `sidex://update/state-change` Tauri event
  *       and re-dispatches it through the workbench `onStateChange` emitter
- *
- *  The wire format matches the VS Code `State` union shape exactly so no
- *  translation is needed beyond `JSON.parse` on the event payload.
  *--------------------------------------------------------------------------------------------*/
+
+export interface IUpdateProvider {
+	checkForUpdate(): Promise<boolean>;
+}
 
 import { Emitter, Event } from '../../../../base/common/event.js';
 import { InstantiationType, registerSingleton } from '../../../../platform/instantiation/common/extensions.js';

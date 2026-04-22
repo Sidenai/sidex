@@ -429,7 +429,7 @@ export abstract class EditorAction extends EditorCommand {
 		return this.run(accessor, editor, args || {});
 	}
 
-	protected reportTelemetry(accessor: ServicesAccessor, editor: ICodeEditor) {
+	protected reportTelemetry(accessor: ServicesAccessor, _editor: ICodeEditor) {
 		type EditorActionInvokedClassification = {
 			owner: 'alexdima';
 			comment: 'An editor action has been invoked.';

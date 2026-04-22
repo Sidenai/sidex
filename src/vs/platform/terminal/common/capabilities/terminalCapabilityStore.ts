@@ -224,6 +224,5 @@ function createCapabilityEvent<T extends TerminalCapability>(
 ): AnyTerminalCapabilityChangeEvent {
 	// HACK: This cast is required to convert a generic type to a discriminated union, this is
 	// necessary in order to enable type narrowing on the event consumer side.
-	// eslint-disable-next-line local/code-no-dangerous-type-assertions
 	return { id: capability, capability: impl } as AnyTerminalCapabilityChangeEvent;
 }

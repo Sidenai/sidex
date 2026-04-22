@@ -415,7 +415,7 @@ export class AdapterManager extends Disposable implements IAdapterManager {
 		// We want to get the debuggers that have configuration providers in the case we are fetching configurations
 		// Or if a breakpoint can be set in the current file (good hint that an extension can handle it)
 		if (
-			(!languageLabel || gettingConfigurations || (model && this.canSetBreakpointsIn(model))) &&
+			(!languageLabel || gettingConfigurations || (model && this.canSetBreakpointsIn(model as any))) &&
 			candidates.length === 0
 		) {
 			await this.activateDebuggers('onDebugInitialConfigurations');

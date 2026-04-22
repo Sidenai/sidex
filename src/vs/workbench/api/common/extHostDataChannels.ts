@@ -33,7 +33,7 @@ export class ExtHostDataChannels implements IExtHostDataChannels {
 			channel = new DataChannelImpl<T>(channelId);
 			this._channels.set(channelId, channel);
 		}
-		return channel;
+		return channel as any;
 	}
 
 	$onDidReceiveData(channelId: string, data: any): void {
@@ -44,17 +44,24 @@ export class ExtHostDataChannels implements IExtHostDataChannels {
 	}
 }
 
-class DataChannelImpl<T> extends Disposable implements vscode.DataChannel<T> {
+class DataChannelImpl<T> extends Disposable {
 	private readonly _onDidReceiveData = new Emitter<vscode.DataChannelEvent<T>>();
 	public readonly onDidReceiveData: Event<vscode.DataChannelEvent<T>> = this._onDidReceiveData.event;
+	public readonly onDidReceiveMessage: Event<any> = this._onDidReceiveData.event;
+	public readonly label: string;
 
 	constructor(private readonly channelId: string) {
 		super();
+		this.label = channelId;
 		this._register(this._onDidReceiveData);
 	}
 
 	_fireDidReceiveData(data: T): void {
-		this._onDidReceiveData.fire({ data });
+		this._onDidReceiveData.fire({ data } as any);
+	}
+
+	send(_data: T): void {
+		// no-op stub
 	}
 
 	override toString(): string {

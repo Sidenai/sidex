@@ -109,7 +109,7 @@ Registry.as<IDragAndDropContributionRegistry>(DragAndDropExtensions.DragAndDropC
 			for (const terminalEditor of terminalEditors) {
 				editors.push({ resource: URI.parse(terminalEditor) });
 			}
-		} catch (error) {
+		} catch (_error) {
 			// Invalid transfer
 		}
 		return editors;

@@ -1644,7 +1644,7 @@ type FilesToPaste = { type: 'paths'; files: URI[] } | { type: 'data'; files: Fil
 async function getFilesToPaste(
 	fileList: FileList | undefined,
 	clipboardService: IClipboardService,
-	hostService: IHostService
+	_hostService: IHostService
 ): Promise<FilesToPaste> {
 	if (fileList && fileList.length > 0) {
 		// with a `fileList` we support natively pasting file from disk from clipboard

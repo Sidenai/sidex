@@ -282,7 +282,7 @@ export abstract class ExtHostDebugServiceBase
 		}
 
 		this._debugVisualizationTrees.set(key, provider);
-		this._debugServiceProxy.$registerDebugVisualizerTree(key, !!provider.editItem);
+		this._debugServiceProxy.$registerDebugVisualizerTree(key, !!(provider as any).editItem);
 		return toDisposable(() => {
 			this._debugServiceProxy.$unregisterDebugVisualizerTree(key);
 			this._debugVisualizationTrees.delete(id);
@@ -308,7 +308,7 @@ export abstract class ExtHostDebugServiceBase
 			return undefined;
 		}
 
-		const r = await this._debugVisualizationTrees.get(e.provider)?.editItem?.(e.item, value);
+		const r = await (this._debugVisualizationTrees.get(e.provider) as any)?.editItem?.(e.item, value);
 		return this.convertVisualizerTreeItem(e.provider, r || e.item);
 	}
 
@@ -341,7 +341,6 @@ export abstract class ExtHostDebugServiceBase
 	}
 
 	public asDebugSourceUri(src: vscode.DebugProtocolSource, session?: vscode.DebugSession): URI {
-		// eslint-disable-next-line local/code-no-any-casts
 		const source = <any>src;
 
 		if (typeof source.sourceReference === 'number' && source.sourceReference > 0) {
@@ -443,13 +442,14 @@ export abstract class ExtHostDebugServiceBase
 	): vscode.DebugVisualizationContext | undefined {
 		const session = this._debugSessions.get(context.sessionId);
 		return (
-			session && {
+			session &&
+			({
 				session: session.api,
 				variable: context.variable,
 				containerId: context.containerId,
 				frameId: context.frameId,
 				threadId: context.threadId
-			}
+			} as any)
 		);
 	}
 
@@ -478,7 +478,7 @@ export abstract class ExtHostDebugServiceBase
 			const icon = v.iconPath ? this.getIconPathOrClass(v.iconPath) : undefined;
 			return {
 				id,
-				name: v.name,
+				name: (v as any).name,
 				iconClass: icon?.iconClass,
 				iconPath: icon?.iconPath,
 				visualization: this.serializeVisualization(extensionId, v.visualization)
@@ -608,11 +608,8 @@ export abstract class ExtHostDebugServiceBase
 			},
 
 			// Check debugUI for back-compat, #147264
-			// eslint-disable-next-line local/code-no-any-casts
 			suppressDebugStatusbar: options.suppressDebugStatusbar ?? (options as any).debugUI?.simple,
-			// eslint-disable-next-line local/code-no-any-casts
 			suppressDebugToolbar: options.suppressDebugToolbar ?? (options as any).debugUI?.simple,
-			// eslint-disable-next-line local/code-no-any-casts
 			suppressDebugView: options.suppressDebugView ?? (options as any).debugUI?.simple
 		});
 	}
@@ -699,8 +696,8 @@ export abstract class ExtHostDebugServiceBase
 	// RPC methods (ExtHostDebugServiceShape)
 
 	public async $runInTerminal(
-		args: DebugProtocol.RunInTerminalRequestArguments,
-		sessionId: string
+		_args: DebugProtocol.RunInTerminalRequestArguments,
+		_sessionId: string
 	): Promise<number | undefined> {
 		return Promise.resolve(undefined);
 	}
@@ -721,7 +718,7 @@ export abstract class ExtHostDebugServiceBase
 
 	protected createDebugAdapter(
 		adapter: vscode.DebugAdapterDescriptor,
-		session: ExtHostDebugSession
+		_session: ExtHostDebugSession
 	): AbstractDebugAdapter | undefined {
 		if (adapter instanceof DebugAdapterInlineImplementation) {
 			return new DirectDebugAdapter(adapter.implementation);
@@ -801,7 +798,6 @@ export abstract class ExtHostDebugServiceBase
 								// Try to catch details for #233167
 								message = convertToVSCPaths(message, true);
 							} catch (e) {
-								// eslint-disable-next-line local/code-no-any-casts
 								const type = message.type + '_' + ((message as any).command ?? (message as any).event ?? '');
 								this._telemetryProxy.$publicLog2<
 									DebugProtocolMessageErrorEvent,
@@ -929,7 +925,6 @@ export abstract class ExtHostDebugServiceBase
 					const bp = this._breakpoints.get(bpd.id);
 					if (bp) {
 						if (bp instanceof FunctionBreakpoint && bpd.type === 'function') {
-							// eslint-disable-next-line local/code-no-any-casts
 							const fbp = <any>bp;
 							fbp.enabled = bpd.enabled;
 							fbp.condition = bpd.condition;
@@ -937,7 +932,6 @@ export abstract class ExtHostDebugServiceBase
 							fbp.logMessage = bpd.logMessage;
 							fbp.functionName = bpd.functionName;
 						} else if (bp instanceof SourceBreakpoint && bpd.type === 'source') {
-							// eslint-disable-next-line local/code-no-any-casts
 							const sbp = <any>bp;
 							sbp.enabled = bpd.enabled;
 							sbp.condition = bpd.condition;
@@ -1120,7 +1114,7 @@ export abstract class ExtHostDebugServiceBase
 		};
 	}
 
-	protected convertImplementationToDto(x: DebugAdapterInlineImplementation): IDebugAdapterImpl {
+	protected convertImplementationToDto(_x: DebugAdapterInlineImplementation): IDebugAdapterImpl {
 		return {
 			type: 'implementation'
 		};
@@ -1178,7 +1172,7 @@ export abstract class ExtHostDebugServiceBase
 					tuple.factory.createDebugAdapterTracker(session.api)
 				).then(
 					p => p,
-					err => null
+					_err => null
 				)
 			);
 
@@ -1191,7 +1185,7 @@ export abstract class ExtHostDebugServiceBase
 				return undefined;
 			}),
 			new Promise<undefined>(resolve => setTimeout(() => resolve(undefined), 1000))
-		]).catch(err => {
+		]).catch(_err => {
 			// ignore errors
 			return undefined;
 		});
@@ -1228,8 +1222,8 @@ export abstract class ExtHostDebugServiceBase
 	}
 
 	protected daExecutableFromPackage(
-		session: ExtHostDebugSession,
-		extensionRegistry: ExtensionDescriptionRegistry
+		_session: ExtHostDebugSession,
+		_extensionRegistry: ExtensionDescriptionRegistry
 	): DebugAdapterExecutable | undefined {
 		return undefined;
 	}

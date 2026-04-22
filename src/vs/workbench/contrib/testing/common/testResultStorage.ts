@@ -210,15 +210,15 @@ export class InMemoryResultStorage extends BaseTestResultStorage {
 		return Promise.resolve();
 	}
 
-	protected readOutputForResultId(id: string): Promise<VSBufferReadableStream> {
+	protected readOutputForResultId(_id: string): Promise<VSBufferReadableStream> {
 		throw new Error('Method not implemented.');
 	}
 
-	protected storeOutputForResultId(id: string, input: VSBufferWriteableStream): Promise<void> {
+	protected storeOutputForResultId(_id: string, _input: VSBufferWriteableStream): Promise<void> {
 		throw new Error('Method not implemented.');
 	}
 
-	protected readOutputRangeForResultId(id: string, offset: number, length: number): Promise<VSBuffer> {
+	protected readOutputRangeForResultId(_id: string, _offset: number, _length: number): Promise<VSBuffer> {
 		throw new Error('Method not implemented.');
 	}
 }

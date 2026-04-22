@@ -224,7 +224,7 @@ export class InlineEditsWordReplacementView extends Disposable implements IInlin
 			if (!layout) {
 				return 0;
 			}
-			return layout.read(reader).modifiedLine.bottom + BORDER_WIDTH + this._editor.editor.getScrollTop();
+			return (layout.read(reader) as any).modifiedLine.bottom + BORDER_WIDTH + this._editor.editor.getScrollTop();
 		});
 		this._root = n
 			.div(
@@ -244,10 +244,10 @@ export class InlineEditsWordReplacementView extends Disposable implements IInlin
 						const modifiedBorderColor = getModifiedBorderColor(this._tabAction)
 							.map(c => asCssVariable(c))
 							.read(reader);
-						this._line.style.lineHeight = `${layout.read(reader).modifiedLine.height + 2 * BORDER_WIDTH}px`;
+						this._line.style.lineHeight = `${(layout.read(reader) as any).modifiedLine.height + 2 * BORDER_WIDTH}px`;
 
 						const secondaryElementHovered = constObservable(false); //this._secondaryElement.map((e, r) => e?.isHovered.read(r) ?? false);
-						const alternativeAction = layout.map(l => l.alternativeAction);
+						const alternativeAction = layout.map(l => (l as any).alternativeAction);
 						const alternativeActionActive = derived(
 							reader =>
 								(alternativeAction.read(reader)?.active.read(reader) ?? false) || secondaryElementHovered.read(reader)
@@ -308,13 +308,18 @@ export class InlineEditsWordReplacementView extends Disposable implements IInlin
 										style: {
 											position: 'absolute',
 											...rectToProps(reader =>
-												layout.read(reader).lowerBackground.withMargin(BORDER_WIDTH, 2 * BORDER_WIDTH, BORDER_WIDTH, 0)
+												(layout.read(reader) as any).lowerBackground.withMargin(
+													BORDER_WIDTH,
+													2 * BORDER_WIDTH,
+													BORDER_WIDTH,
+													0
+												)
 											),
 											background: editorBackground,
 											cursor: 'pointer',
 											pointerEvents: 'auto'
 										},
-										onmousedown: e => this._mouseDown(e)
+										onmousedown: ((e: any) => this._mouseDown(e)) as any
 									}),
 									n.div(
 										{
@@ -322,7 +327,7 @@ export class InlineEditsWordReplacementView extends Disposable implements IInlin
 											style: {
 												position: 'absolute',
 												...rectToProps(reader =>
-													layout.read(reader).modifiedLine.withMargin(BORDER_WIDTH, 2 * BORDER_WIDTH)
+													(layout.read(reader) as any).modifiedLine.withMargin(BORDER_WIDTH, 2 * BORDER_WIDTH)
 												),
 												width: undefined,
 												pointerEvents: 'auto',
@@ -335,7 +340,7 @@ export class InlineEditsWordReplacementView extends Disposable implements IInlin
 
 												outline: `2px solid ${editorBackground}`
 											},
-											onmousedown: e => this._mouseDown(e)
+											onmousedown: ((e: any) => this._mouseDown(e)) as any
 										},
 										[
 											n.div(
@@ -346,7 +351,7 @@ export class InlineEditsWordReplacementView extends Disposable implements IInlin
 														fontSize: this._editor.getOption(EditorOption.fontSize),
 														fontWeight: this._editor.getOption(EditorOption.fontWeight),
 														width: rectToProps(reader =>
-															layout.read(reader).codeLine.withMargin(BORDER_WIDTH, 2 * BORDER_WIDTH)
+															(layout.read(reader) as any).codeLine.withMargin(BORDER_WIDTH, 2 * BORDER_WIDTH)
 														).width,
 														borderRadius: `${INLINE_EDITS_BORDER_RADIUS}px`,
 														border: primaryActionStyles.map(s => `${BORDER_WIDTH}px solid ${s.borderColor}`),
@@ -428,7 +433,7 @@ export class InlineEditsWordReplacementView extends Disposable implements IInlin
 										{
 											style: {
 												position: 'absolute',
-												...rectToProps(reader => layout.read(reader).originalLine.withMargin(BORDER_WIDTH)),
+												...rectToProps(reader => (layout.read(reader) as any).originalLine.withMargin(BORDER_WIDTH)),
 												boxSizing: 'border-box',
 												borderRadius: `${INLINE_EDITS_BORDER_RADIUS}px`,
 												border: `${BORDER_WIDTH}px solid ${originalBorderColor}`,
@@ -447,11 +452,13 @@ export class InlineEditsWordReplacementView extends Disposable implements IInlin
 											fill: 'none',
 											style: {
 												position: 'absolute',
-												left: layout.map(l => l.modifiedLine.left - 16),
-												top: layout.map(l => l.modifiedLine.top + Math.round((l.lineHeight - 14 - 5) / 2)),
+												left: layout.map(l => (l as any).modifiedLine.left - 16),
+												top: layout.map(
+													l => (l as any).modifiedLine.top + Math.round(((l as any).lineHeight - 14 - 5) / 2)
+												),
 												pointerEvents: 'none'
 											},
-											onmousedown: e => this._mouseDown(e)
+											onmousedown: ((e: any) => this._mouseDown(e)) as any
 										},
 										[
 											n.svgElem('path', {

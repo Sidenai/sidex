@@ -29,8 +29,8 @@ export class DebugConsoleQuickAccess extends PickerQuickAccessProvider<IPickerQu
 
 	protected _getPicks(
 		filter: string,
-		disposables: DisposableStore,
-		token: CancellationToken
+		_disposables: DisposableStore,
+		_token: CancellationToken
 	):
 		| Picks<IPickerQuickAccessItem>
 		| Promise<Picks<IPickerQuickAccessItem>>
@@ -74,7 +74,7 @@ export class DebugConsoleQuickAccess extends PickerQuickAccessProvider<IPickerQu
 			return {
 				label,
 				highlights: { label: highlights },
-				accept: (keyMod, event) => {
+				accept: (_keyMod, _event) => {
 					this._debugService.focusStackFrame(undefined, undefined, session, { explicit: true });
 					if (!this._viewsService.isViewVisible(REPL_VIEW_ID)) {
 						this._viewsService.openView(REPL_VIEW_ID, true);

@@ -3,7 +3,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 export class CustomTextEditorModel {
-	static async create(): Promise<CustomTextEditorModel> {
+	static async create(..._args: any[]): Promise<CustomTextEditorModel> {
 		return new CustomTextEditorModel();
 	}
 }

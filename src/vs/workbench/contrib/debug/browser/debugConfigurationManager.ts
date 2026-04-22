@@ -972,8 +972,8 @@ class UserLaunch extends AbstractLaunch implements ILaunch {
 
 	async openConfigFile({
 		preserveFocus,
-		type,
-		useInitialContent
+		type: _type,
+		useInitialContent: _useInitialContent
 	}: {
 		preserveFocus: boolean;
 		type?: string;

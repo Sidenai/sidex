@@ -332,7 +332,7 @@ export class ExtensionsSynchroniser extends AbstractSynchroniser implements IUse
 
 	protected async getMergeResult(
 		resourcePreview: IExtensionResourcePreview,
-		token: CancellationToken
+		_token: CancellationToken
 	): Promise<IMergeResult> {
 		return { ...resourcePreview.previewResult, hasConflicts: false };
 	}
@@ -340,8 +340,8 @@ export class ExtensionsSynchroniser extends AbstractSynchroniser implements IUse
 	protected async getAcceptResult(
 		resourcePreview: IExtensionResourcePreview,
 		resource: URI,
-		content: string | null | undefined,
-		token: CancellationToken
+		_content: string | null | undefined,
+		_token: CancellationToken
 	): Promise<IExtensionResourceMergeResult> {
 		/* Accept local resource */
 		if (this.extUri.isEqual(resource, this.localResource)) {
@@ -516,7 +516,7 @@ export class ExtensionsSynchroniser extends AbstractSynchroniser implements IUse
 			if (localExtensions.some(e => e.installed || e.disabled)) {
 				return true;
 			}
-		} catch (error) {
+		} catch (_error) {
 			/* ignore error */
 		}
 		return false;

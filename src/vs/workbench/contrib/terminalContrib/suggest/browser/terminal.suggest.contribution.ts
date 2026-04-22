@@ -282,7 +282,7 @@ class TerminalSuggestContribution extends DisposableStore implements ITerminalCo
 		this._loadLspCompletionAddon(this._ctx.instance.xterm.raw);
 	}
 
-	private _updateContainerForTarget(target: TerminalLocation | undefined): void {
+	private _updateContainerForTarget(_target: TerminalLocation | undefined): void {
 		const addon = this._addon.value;
 		if (!addon || !this._ctx.instance.xterm?.raw) {
 			return;

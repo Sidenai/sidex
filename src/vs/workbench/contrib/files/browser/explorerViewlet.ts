@@ -215,7 +215,7 @@ export class ExplorerViewPaneContainer extends ViewPaneContainer {
 		);
 
 		this.viewletVisibleContextKey = ExplorerViewletVisibleContext.bindTo(contextKeyService);
-		this._register(this.contextService.onDidChangeWorkspaceName(e => this.updateTitleArea()));
+		this._register(this.contextService.onDidChangeWorkspaceName(_e => this.updateTitleArea()));
 	}
 
 	override create(parent: HTMLElement): void {

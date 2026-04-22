@@ -60,8 +60,7 @@ import {
 	TERMINAL_FIND_MATCH_HIGHLIGHT_BORDER_COLOR,
 	TERMINAL_OVERVIEW_RULER_CURSOR_FOREGROUND_COLOR,
 	TERMINAL_SELECTION_FOREGROUND_COLOR,
-	TERMINAL_INACTIVE_SELECTION_BACKGROUND_COLOR,
-	TERMINAL_OVERVIEW_RULER_BORDER_COLOR
+	TERMINAL_INACTIVE_SELECTION_BACKGROUND_COLOR
 } from '../../common/terminalColorRegistry.js';
 import { ShellIntegrationAddon } from '../../../../../platform/terminal/common/xterm/shellIntegrationAddon.js';
 import { IInstantiationService } from '../../../../../platform/instantiation/common/instantiation.js';
@@ -315,7 +314,6 @@ export class XtermTerminal
 				minimumContrastRatio: config.minimumContrastRatio,
 				tabStopWidth: config.tabStopWidth,
 				cursorBlink: config.cursorBlinking,
-				blinkIntervalDuration: config.textBlinking ? TextBlinkConstants.IntervalDuration : 0,
 				cursorStyle: vscodeToXtermCursorStyle<'cursorStyle'>(config.cursorStyle),
 				cursorInactiveStyle: vscodeToXtermCursorStyle(config.cursorStyleInactive),
 				cursorWidth: config.cursorWidth,
@@ -346,7 +344,7 @@ export class XtermTerminal
 					getCellSizePixels: true,
 					getWinSizeChars: true
 				}
-			})
+			} as any)
 		);
 		this._updateSmoothScrolling();
 		interface ITerminalWithCore extends RawXtermTerminal {
@@ -405,7 +403,7 @@ export class XtermTerminal
 			this._telemetryService,
 			this._logService
 		);
-		this.raw.loadAddon(this._shellIntegrationAddon);
+		this.raw.loadAddon(this._shellIntegrationAddon as any);
 		this._xtermAddonLoader.importAddon('clipboard').then(ClipboardAddon => {
 			if (this._store.isDisposed) {
 				return;
@@ -627,7 +625,7 @@ export class XtermTerminal
 		this._attached = { container, options };
 		// Screen must be created at this point as xterm.open is called
 
-		return this._attached?.container.querySelector('.xterm-screen')!;
+		return this._attached!.container.querySelector('.xterm-screen')!;
 	}
 
 	private _setFocused(isFocused: boolean) {
@@ -668,7 +666,7 @@ export class XtermTerminal
 		this.raw.options.ignoreBracketedPasteMode = config.ignoreBracketedPasteMode;
 		this.raw.options.rescaleOverlappingGlyphs = config.rescaleOverlappingGlyphs;
 		this.raw.options.allowTransparency = config.enableImages;
-		this.raw.options.vtExtensions = {
+		(this.raw.options as any).vtExtensions = {
 			kittyKeyboard: config.enableKittyKeyboardProtocol,
 			win32InputMode: config.enableWin32InputMode
 		};
@@ -765,12 +763,12 @@ export class XtermTerminal
 					})
 				);
 				this._store.add(
-					this._searchAddon.onBeforeSearch(() => {
+					(this._searchAddon as any).onBeforeSearch(() => {
 						this._onBeforeSearch.fire();
 					})
 				);
 				this._store.add(
-					this._searchAddon.onAfterSearch(() => {
+					(this._searchAddon as any).onAfterSearch(() => {
 						this._onAfterSearch.fire();
 					})
 				);
@@ -939,7 +937,7 @@ export class XtermTerminal
 
 	private _setTextBlinking(enabled: boolean): void {
 		const blinkIntervalDuration = enabled ? TextBlinkConstants.IntervalDuration : 0;
-		const options = this.raw.options;
+		const options = this.raw.options as any;
 		if (options.blinkIntervalDuration !== blinkIntervalDuration) {
 			options.blinkIntervalDuration = blinkIntervalDuration;
 		}
@@ -982,7 +980,7 @@ export class XtermTerminal
 		const Addon = await this._xtermAddonLoader.importAddon('webgl');
 		this._webglAddon = new Addon({
 			customGlyphs: this._terminalConfigurationService.config.customGlyphs
-		});
+		} as any);
 		try {
 			this.raw.loadAddon(this._webglAddon);
 			this._logService.trace('Webgl was loaded');
@@ -1064,7 +1062,7 @@ export class XtermTerminal
 					'terminal/imageAddonActivated'
 				);
 				this._register(
-					this._imageAddon.onImageAdded(() => {
+					(this._imageAddon as any).onImageAdded(() => {
 						type TerminalImageAddedClassification = {
 							owner: 'anthonykim1';
 							comment: 'Tracks when an image is added to the terminal via the image addon';
@@ -1133,7 +1131,7 @@ export class XtermTerminal
 		}
 
 		const config = this._terminalConfigurationService.config;
-		const hideOverviewRuler = ['never', 'gutter'].includes(config.shellIntegration?.decorationsEnabled ?? '');
+		const _hideOverviewRuler = ['never', 'gutter'].includes(config.shellIntegration?.decorationsEnabled ?? '');
 
 		const foregroundColor = theme.getColor(TERMINAL_FOREGROUND_COLOR);
 		const backgroundColor = this._xtermColorProvider.getBackgroundColor(theme);
@@ -1151,9 +1149,6 @@ export class XtermTerminal
 			selectionBackground: selectionBackgroundColor?.toString(),
 			selectionInactiveBackground: selectionInactiveBackgroundColor?.toString(),
 			selectionForeground: selectionForegroundColor?.toString(),
-			overviewRulerBorder: hideOverviewRuler
-				? '#0000'
-				: theme.getColor(TERMINAL_OVERVIEW_RULER_BORDER_COLOR)?.toString(),
 			scrollbarSliderActiveBackground: theme.getColor(scrollbarSliderActiveBackground)?.toString(),
 			scrollbarSliderBackground: theme.getColor(scrollbarSliderBackground)?.toString(),
 			scrollbarSliderHoverBackground: theme.getColor(scrollbarSliderHoverBackground)?.toString(),
@@ -1173,7 +1168,7 @@ export class XtermTerminal
 			brightMagenta: theme.getColor(ansiColorIdentifiers[13])?.toString(),
 			brightCyan: theme.getColor(ansiColorIdentifiers[14])?.toString(),
 			brightWhite: theme.getColor(ansiColorIdentifiers[15])?.toString()
-		};
+		} as any as ITheme;
 	}
 
 	private _updateTheme(theme?: IColorTheme): void {

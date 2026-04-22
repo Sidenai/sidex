@@ -110,7 +110,7 @@ async function resolveConfigurationVariables(
 			if (isString(value)) {
 				try {
 					env[key] = await variableResolver(value);
-				} catch (e) {
+				} catch (_e) {
 					env[key] = value;
 				}
 			}

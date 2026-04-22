@@ -401,7 +401,7 @@ export class DecorationAddon extends Disposable implements ITerminalAddon, IDeco
 		if (command?.exitCode === undefined && !command?.markProperties) {
 			return [];
 		} else if (command?.markProperties || markProperties) {
-			return [this._createHover(element, command || markProperties, markProperties?.hoverMessage)];
+			return [this._createHover(element, (command || markProperties) as any, markProperties?.hoverMessage)];
 		}
 		return [...this._createContextMenu(element, command), this._createHover(element, command)];
 	}

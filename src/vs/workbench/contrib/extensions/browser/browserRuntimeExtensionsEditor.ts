@@ -15,11 +15,11 @@ export class RuntimeExtensionsEditor extends AbstractRuntimeExtensionsEditor {
 		return null;
 	}
 
-	protected _getUnresponsiveProfile(extensionId: ExtensionIdentifier): IExtensionHostProfile | undefined {
+	protected _getUnresponsiveProfile(_extensionId: ExtensionIdentifier): IExtensionHostProfile | undefined {
 		return undefined;
 	}
 
-	protected _createSlowExtensionAction(element: IRuntimeExtension): Action | null {
+	protected _createSlowExtensionAction(_element: IRuntimeExtension): Action | null {
 		return null;
 	}
 

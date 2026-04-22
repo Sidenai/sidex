@@ -80,7 +80,7 @@ export class TextMateWorkerTokenizerController extends Disposable {
 		);
 
 		this._register(
-			this._model.onDidChangeLanguage(e => {
+			this._model.onDidChangeLanguage(_e => {
 				const languageId = this._model.getLanguageId();
 				const encodedLanguageId = this._languageIdCodec.encodeLanguageId(languageId);
 				this._worker.$acceptModelLanguageChanged(this.controllerId, languageId, encodedLanguageId);

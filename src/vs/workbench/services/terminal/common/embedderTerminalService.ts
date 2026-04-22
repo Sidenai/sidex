@@ -71,7 +71,7 @@ class EmbedderTerminalService implements IEmbedderTerminalService {
 		const slc: EmbedderTerminal = {
 			name: options.name,
 			isFeatureTerminal: true,
-			customPtyImplementation(terminalId, cols, rows) {
+			customPtyImplementation(terminalId, _cols, _rows) {
 				return new EmbedderTerminalProcess(terminalId, options.pty);
 			}
 		};

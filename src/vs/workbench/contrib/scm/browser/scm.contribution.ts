@@ -22,7 +22,12 @@ import {
 	HISTORY_VIEW_PANE_ID
 } from '../common/scm.js';
 import { KeyMod, KeyCode } from '../../../../base/common/keyCodes.js';
-import { MenuRegistry, MenuId, registerAction2, Action2 } from '../../../../platform/actions/common/actions.js';
+import {
+	MenuRegistry,
+	MenuId,
+	registerAction2 as _registerAction2,
+	Action2 as _Action2
+} from '../../../../platform/actions/common/actions.js';
 import { SCMActiveResourceContextKeyController, SCMActiveRepositoryController } from './activity.js';
 import { LifecyclePhase } from '../../../services/lifecycle/common/lifecycle.js';
 import {
@@ -67,12 +72,12 @@ import {
 	EditorContributionInstantiation,
 	registerEditorContribution
 } from '../../../../editor/browser/editorExtensions.js';
-import { RemoteNameContext, ResourceContextKey } from '../../../common/contextkeys.js';
+import { RemoteNameContext, ResourceContextKey as _ResourceContextKey } from '../../../common/contextkeys.js';
 import { AccessibleViewRegistry } from '../../../../platform/accessibility/browser/accessibleViewRegistry.js';
 import { SCMAccessibilityHelp } from './scmAccessibilityHelp.js';
 import { EditorContextKeys } from '../../../../editor/common/editorContextKeys.js';
 import { SCMInputContextKeys } from './scmInput.js';
-import product from '../../../../platform/product/common/product.js';
+import _product from '../../../../platform/product/common/product.js';
 
 ModesRegistry.registerLanguage({
 	id: 'scminput',

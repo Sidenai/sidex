@@ -58,7 +58,7 @@ export interface IUntitledFileWorkingCopy<M extends IUntitledFileWorkingCopyMode
 	/**
 	 * Whether we have a resolved model or not.
 	 */
-	isResolved(): this is IResolvedUntitledFileWorkingCopy<M>;
+	isResolved(): boolean;
 }
 
 export interface IResolvedUntitledFileWorkingCopy<
@@ -178,7 +178,7 @@ export class UntitledFileWorkingCopy<M extends IUntitledFileWorkingCopyModel>
 	async resolve(): Promise<void> {
 		this.trace('resolve()');
 
-		if (this.isResolved()) {
+		if (this.model) {
 			this.trace('resolve() - exit (already resolved)');
 
 			// return early if the untitled file working copy is already
@@ -257,7 +257,7 @@ export class UntitledFileWorkingCopy<M extends IUntitledFileWorkingCopyModel>
 		this._onDidChangeContent.fire();
 	}
 
-	isResolved(): this is IResolvedUntitledFileWorkingCopy<M> {
+	isResolved(): boolean {
 		return !!this.model;
 	}
 
@@ -278,8 +278,8 @@ export class UntitledFileWorkingCopy<M extends IUntitledFileWorkingCopyModel>
 		// copy and loosing the initial value.
 		if (this.isResolved()) {
 			content = await raceCancellation(this.model.snapshot(SnapshotContext.Backup, token), token);
-		} else if (this.initialContents) {
-			content = this.initialContents.value;
+		} else if ((this as any).initialContents) {
+			content = (this as any).initialContents.value;
 		}
 
 		return { content };
@@ -292,7 +292,7 @@ export class UntitledFileWorkingCopy<M extends IUntitledFileWorkingCopyModel>
 	async save(options?: ISaveOptions): Promise<boolean> {
 		this.trace('save()');
 
-		const result = await this.saveDelegate(this, options);
+		const result = await this.saveDelegate(this as any, options);
 
 		// Emit Save Event
 		if (result) {

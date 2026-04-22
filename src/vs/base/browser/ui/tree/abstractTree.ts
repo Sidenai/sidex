@@ -104,7 +104,7 @@ class TreeElementsDragAndDropData<T, TFilterData, TContext> extends ElementsDrag
 	}
 }
 
-function asTreeDragAndDropData<T, TFilterData>(data: IDragAndDropData): IDragAndDropData {
+function asTreeDragAndDropData<_T, _TFilterData>(data: IDragAndDropData): IDragAndDropData {
 	if (data instanceof ElementsDragAndDropData) {
 		return new TreeElementsDragAndDropData(data);
 	}
@@ -262,13 +262,11 @@ function asListOptions<T, TFilterData, TRef>(
 			dnd: options.dnd && disposableStore.add(new TreeNodeListDragAndDrop(modelProvider, options.dnd)),
 			multipleSelectionController: options.multipleSelectionController && {
 				isSelectionSingleChangeEvent(e) {
-					// eslint-disable-next-line local/code-no-dangerous-type-assertions
 					return options.multipleSelectionController!.isSelectionSingleChangeEvent({ ...e, element: e.element } as
 						| IListMouseEvent<T>
 						| IListTouchEvent<T>);
 				},
 				isSelectionRangeChangeEvent(e) {
-					// eslint-disable-next-line local/code-no-dangerous-type-assertions
 					return options.multipleSelectionController!.isSelectionRangeChangeEvent({ ...e, element: e.element } as
 						| IListMouseEvent<T>
 						| IListTouchEvent<T>);
@@ -2104,7 +2102,7 @@ class StickyScrollWidget<T, TFilterData, TRef> implements IDisposable {
 		const ariaLabel = this.accessibilityProvider.getAriaLabel(element);
 		const observable = ariaLabel && typeof ariaLabel !== 'string' ? ariaLabel : constObservable(ariaLabel);
 		const result = autorun(reader => {
-			const value = reader.readObservable(observable);
+			const value = reader.readObservable(observable as any) as string | undefined;
 
 			if (value) {
 				container.setAttribute('aria-label', value);

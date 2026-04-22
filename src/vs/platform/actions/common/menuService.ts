@@ -103,7 +103,7 @@ class PersistedMenuHideState {
 		try {
 			const raw = _storageService.get(PersistedMenuHideState._key, StorageScope.PROFILE, '{}');
 			this._data = JSON.parse(raw);
-		} catch (err) {
+		} catch (_err) {
 			this._data = Object.create(null);
 		}
 
@@ -277,7 +277,8 @@ class MenuInfoSnapshot {
 			// keep toggled keys for event if applicable
 			if (item.command.toggled) {
 				const toggledExpression: ContextKeyExpression =
-					(item.command.toggled as { condition: ContextKeyExpression }).condition || item.command.toggled;
+					(item.command.toggled as { condition: ContextKeyExpression }).condition ||
+					(item.command.toggled as ContextKeyExpression);
 				MenuInfoSnapshot._fillInKbExprKeys(toggledExpression, this._toggledContextKeys);
 			}
 		} else if (this._collectContextKeysForSubmenus) {
@@ -500,7 +501,7 @@ class MenuImpl implements IMenu {
 				})
 			);
 			lazyListener.add(
-				hiddenStates.onDidChange(e => {
+				hiddenStates.onDidChange(_e => {
 					this._onDidChange.fire({
 						menu: this,
 						isStructuralChange: true,

@@ -407,7 +407,7 @@ export function registerTerminalActions() {
 		id: TerminalCommandId.CreateTerminalEditorSameGroup,
 		title: localize2('workbench.action.terminal.createTerminalEditor', 'Create New Terminal in Editor Area'),
 		f1: false,
-		run: async (c, accessor, args) => {
+		run: async (c, accessor, _args) => {
 			// Force the editor into the same editor group if it's locked. This command is only ever
 			// called when a terminal is the active editor
 			const editorGroupsService = accessor.get(IEditorGroupsService);
@@ -1625,8 +1625,8 @@ function getSelectedViewInstances2(accessor: ServicesAccessor, args?: unknown): 
 
 function getSelectedViewInstances(
 	accessor: ServicesAccessor,
-	args?: unknown,
-	args2?: unknown
+	_args?: unknown,
+	_args2?: unknown
 ): ITerminalInstance[] | undefined {
 	const listService = accessor.get(IListService);
 	const terminalGroupService = accessor.get(ITerminalGroupService);
@@ -1789,7 +1789,7 @@ export function refreshTerminalActions(detectedProfiles: ITerminalProfile[]): ID
 					event = eventOrOptionsOrProfile;
 					options = profile ? { config: profile } : undefined;
 				} else {
-					options = convertOptionsOrProfileToOptions(eventOrOptionsOrProfile);
+					options = convertOptionsOrProfileToOptions(eventOrOptionsOrProfile as any);
 				}
 
 				// split terminal

@@ -7,7 +7,7 @@ import { IMarkerData } from '../../../platform/markers/common/markers.js';
 import { URI, UriComponents } from '../../../base/common/uri.js';
 import type * as vscode from 'vscode';
 import { MainContext, MainThreadDiagnosticsShape, ExtHostDiagnosticsShape, IMainContext } from './extHost.protocol.js';
-import { DiagnosticSeverity } from './extHostTypes.js';
+
 import * as converter from './extHostTypeConverters.js';
 import { Event, Emitter, DebounceEmitter } from '../../../base/common/event.js';
 import { ILogService } from '../../../platform/log/common/log.js';

@@ -79,7 +79,7 @@ export class InlineEditsWordInsertView extends Disposable implements IInlineEdit
 								{
 									style: {
 										position: 'absolute',
-										...rectToProps(reader => layout.read(reader).lowerBackground),
+										...rectToProps(reader => (layout.read(reader) as any).lowerBackground),
 										borderRadius: `${INLINE_EDITS_BORDER_RADIUS}px`,
 										background: 'var(--vscode-editor-background)'
 									}
@@ -90,7 +90,7 @@ export class InlineEditsWordInsertView extends Disposable implements IInlineEdit
 								{
 									style: {
 										position: 'absolute',
-										...rectToProps(reader => layout.read(reader).modified),
+										...rectToProps(reader => (layout.read(reader) as any).modified),
 										borderRadius: `${INLINE_EDITS_BORDER_RADIUS}px`,
 										padding: '0px',
 										textAlign: 'center',
@@ -106,7 +106,7 @@ export class InlineEditsWordInsertView extends Disposable implements IInlineEdit
 								{
 									style: {
 										position: 'absolute',
-										...rectToProps(reader => layout.read(reader).background),
+										...rectToProps(reader => (layout.read(reader) as any).background),
 										borderRadius: `${INLINE_EDITS_BORDER_RADIUS}px`,
 										border: `1px solid ${modifiedBorderColor}`,
 										//background: 'rgba(122, 122, 122, 0.12)', looks better
@@ -123,8 +123,8 @@ export class InlineEditsWordInsertView extends Disposable implements IInlineEdit
 									fill: 'none',
 									style: {
 										position: 'absolute',
-										left: derived(this, reader => layout.read(reader).center.x - 9),
-										top: derived(this, reader => layout.read(reader).center.y + 4),
+										left: derived(this, reader => (layout.read(reader) as any).center.x - 9),
+										top: derived(this, reader => (layout.read(reader) as any).center.y + 4),
 										transform: 'scale(1.4, 1.4)'
 									}
 								},

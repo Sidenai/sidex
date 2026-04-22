@@ -1393,7 +1393,7 @@ export class ListView<T> implements IListView<T> {
 		this.dnd.onDragStart?.(this.currentDragData, event);
 	}
 
-	private onPotentialSelectionStart(e: MouseEvent) {
+	private onPotentialSelectionStart(_e: MouseEvent) {
 		this.currentSelectionDisposable.dispose();
 		const doc = getDocument(this.domNode);
 

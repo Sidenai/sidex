@@ -233,13 +233,14 @@ export class WorkspaceEdit implements vscode.WorkspaceEdit {
 				} else {
 					edit = editOrTuple;
 				}
-				if (NotebookEdit.isNotebookCellEdit(edit)) {
-					if (edit.newCellMetadata) {
-						this.replaceNotebookCellMetadata(uri, edit.range.start, edit.newCellMetadata, metadata);
-					} else if (edit.newNotebookMetadata) {
-						this.replaceNotebookMetadata(uri, edit.newNotebookMetadata, metadata);
+				if ((NotebookEdit as any).isNotebookCellEdit(edit)) {
+					const nbEdit = edit as any;
+					if (nbEdit.newCellMetadata) {
+						this.replaceNotebookCellMetadata(uri, nbEdit.range.start as number, nbEdit.newCellMetadata, metadata);
+					} else if (nbEdit.newNotebookMetadata) {
+						this.replaceNotebookMetadata(uri, nbEdit.newNotebookMetadata, metadata);
 					} else {
-						this.replaceNotebookCells(uri, edit.range, edit.newCells, metadata);
+						this.replaceNotebookCells(uri, nbEdit.range as any, nbEdit.newCells, metadata);
 					}
 				} else if (SnippetTextEdit.isSnippetTextEdit(edit)) {
 					this._edits.push({
@@ -251,7 +252,7 @@ export class WorkspaceEdit implements vscode.WorkspaceEdit {
 						keepWhitespace: edit.keepWhitespace
 					});
 				} else {
-					this._edits.push({ _type: FileEditType.Text, uri, edit, metadata });
+					this._edits.push({ _type: FileEditType.Text, uri, edit: edit as TextEdit, metadata });
 				}
 			}
 		}

@@ -518,7 +518,7 @@ export class UserDataSyncResourceProviderService implements IUserDataSyncResourc
 
 	private getProfilesAssociatedResources(
 		uri: URI,
-		profile: IUserDataProfile | undefined
+		_profile: IUserDataProfile | undefined
 	): { resource: URI; comparableResource: URI }[] {
 		const resource = this.extUri.joinPath(uri, 'profiles.json');
 		const comparableResource = this.toUri({
@@ -541,7 +541,7 @@ export class UserDataSyncResourceProviderService implements IUserDataSyncResourc
 		return null;
 	}
 
-	private async resolveLatestProfilesContent(profile: IUserDataProfile): Promise<string | null> {
+	private async resolveLatestProfilesContent(_profile: IUserDataProfile): Promise<string | null> {
 		return stringifyLocalProfiles(
 			this.userDataProfilesService.profiles.filter(p => !p.isDefault && !p.isTransient),
 			true

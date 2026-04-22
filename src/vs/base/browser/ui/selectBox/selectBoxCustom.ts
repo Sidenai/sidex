@@ -263,7 +263,7 @@ export class SelectBoxList extends Disposable implements ISelectBoxDelegate, ILi
 		// Use the following helper variable, otherwise the list flickers.
 		let listIsVisibleOnTouchStart: boolean;
 		this._register(
-			dom.addDisposableListener(this.selectElement, 'touchstart', e => {
+			dom.addDisposableListener(this.selectElement, 'touchstart', _e => {
 				listIsVisibleOnTouchStart = this._isVisible;
 			})
 		);

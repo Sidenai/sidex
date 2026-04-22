@@ -225,7 +225,7 @@ export class MainThreadTextEditor {
 		this._onPropertiesChanged = new Emitter<IEditorPropertiesChangeData>();
 
 		this._modelListeners.add(
-			this._model.onDidChangeOptions(e => {
+			this._model.onDidChangeOptions(_e => {
 				this._updatePropertiesNow(null);
 			})
 		);
@@ -344,7 +344,7 @@ export class MainThreadTextEditor {
 				})
 			);
 			this._codeEditorListeners.add(
-				this._codeEditor.onDidChangeConfiguration(e => {
+				this._codeEditor.onDidChangeConfiguration(_e => {
 					// options
 					if (!isValidCodeEditor()) {
 						return;

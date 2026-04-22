@@ -106,7 +106,7 @@ class TerminalLinkContribution extends DisposableStore implements ITerminalContr
 		);
 	}
 
-	async showLinkQuickpick(extended?: boolean): Promise<void> {
+	async showLinkQuickpick(_extended?: boolean): Promise<void> {
 		if (!this._terminalLinkQuickpick) {
 			this._terminalLinkQuickpick = this.add(this._instantiationService.createInstance(TerminalLinkQuickpick));
 			this.add(

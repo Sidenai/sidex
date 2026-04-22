@@ -61,7 +61,7 @@ export class DebugStatusContribution implements IWorkbenchContribution {
 			})
 		);
 		this.toDispose.push(
-			this.debugService.getConfigurationManager().onDidSelectConfiguration(e => {
+			this.debugService.getConfigurationManager().onDidSelectConfiguration(_e => {
 				this.entryAccessor?.update(this.entry);
 			})
 		);

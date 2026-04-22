@@ -102,15 +102,15 @@ class NullContext extends Context {
 		super(-1, null);
 	}
 
-	public override setValue(key: string, value: any): boolean {
+	public override setValue(_key: string, _value: any): boolean {
 		return false;
 	}
 
-	public override removeValue(key: string): boolean {
+	public override removeValue(_key: string): boolean {
 		return false;
 	}
 
-	public override getValue<T>(key: string): T | undefined {
+	public override getValue<T>(_key: string): T | undefined {
 		return undefined;
 	}
 
@@ -312,7 +312,7 @@ export abstract class AbstractContextKeyService extends Disposable implements IC
 		return new ContextKey(this, key, defaultValue);
 	}
 
-	bufferChangeEvents(callback: Function): void {
+	bufferChangeEvents(callback: (...args: any[]) => any): void {
 		this._onDidChangeContext.pause();
 		try {
 			callback();
@@ -621,7 +621,7 @@ class OverlayContextKeyService implements IContextKeyService {
 		this.overlay = new Map(overlay);
 	}
 
-	bufferChangeEvents(callback: Function): void {
+	bufferChangeEvents(callback: (...args: any[]) => any): void {
 		this.parent.bufferChangeEvents(callback);
 	}
 

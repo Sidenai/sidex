@@ -1027,7 +1027,7 @@ export class TextModel extends Disposable implements model.ITextModel, IDecorati
 		return this._buffer.getEOL() === '\n' ? model.EndOfLineSequence.LF : model.EndOfLineSequence.CRLF;
 	}
 
-	public getLineMinColumn(lineNumber: number): number {
+	public getLineMinColumn(_lineNumber: number): number {
 		this._assertNotDisposed();
 		return 1;
 	}
@@ -1553,7 +1553,7 @@ export class TextModel extends Disposable implements model.ITextModel, IDecorati
 		return result;
 	}
 
-	public edit(edit: TextEdit, options?: { reason?: TextModelEditSource }): void {
+	public edit(edit: TextEdit, _options?: { reason?: TextModelEditSource }): void {
 		this.pushEditOperations(
 			null,
 			edit.replacements.map(r => ({ range: r.range, text: r.text })),
@@ -2552,7 +2552,7 @@ export class TextModel extends Disposable implements model.ITextModel, IDecorati
 	}
 
 	//#endregion
-	normalizePosition(position: Position, affinity: model.PositionAffinity): Position {
+	normalizePosition(position: Position, _affinity: model.PositionAffinity): Position {
 		return position;
 	}
 

@@ -845,7 +845,7 @@ class OutputContribution extends Disposable implements IWorkbenchContribution {
 								viewId: OUTPUT_VIEW_ID
 							});
 						}
-						async runInView(serviceAccessor: ServicesAccessor, view: OutputViewPane): Promise<void> {
+						async runInView(serviceAccessor: ServicesAccessor, _view: OutputViewPane): Promise<void> {
 							this.toggleLogLevelFilter(serviceAccessor.get(IOutputService), logLevel);
 						}
 						private toggleLogLevelFilter(outputService: IOutputService, logLevel: LogLevel): void {

@@ -176,7 +176,7 @@ export interface IEditorResolverService {
 	/**
 	 * Given a callback, run the callback pausing the registration emitter
 	 */
-	bufferChangeEvents(callback: Function): void;
+	bufferChangeEvents(callback: (...args: any[]) => any): void;
 
 	/**
 	 * Registers a specific editor. Editors with the same glob pattern and ID will be grouped together by the resolver.

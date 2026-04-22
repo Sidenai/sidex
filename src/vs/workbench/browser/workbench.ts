@@ -332,7 +332,7 @@ export class Workbench extends Layout {
 				if (Array.isArray(storedFontInfo)) {
 					FontMeasurements.restoreFontInfo(mainWindow, storedFontInfo);
 				}
-			} catch (err) {
+			} catch (_err) {
 				/* ignore */
 			}
 		}

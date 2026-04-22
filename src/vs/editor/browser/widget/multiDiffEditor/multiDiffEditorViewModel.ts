@@ -74,13 +74,15 @@ export class MultiDiffEditorViewModel extends Disposable {
 		this._documentsArr = derived(this, reader => {
 			const result = this._documents.read(reader);
 			if (result === 'loading') {
-				return [];
+				return [] as readonly RefCounted<IDocumentDiffItem>[];
 			}
 			return result;
 		});
 		this.isLoading = derived(this, reader => this._documents.read(reader) === 'loading');
-		this.items = mapObservableArrayCached(this, this._documentsArr, (d, store) =>
-			store.add(this._instantiationService.createInstance(DocumentDiffItemViewModel, d, this))
+		this.items = mapObservableArrayCached<RefCounted<IDocumentDiffItem>, DocumentDiffItemViewModel>(
+			this,
+			this._documentsArr,
+			(d, store) => store.add(this._instantiationService.createInstance(DocumentDiffItemViewModel, d, this))
 		).recomputeInitiallyAndOnChange(this._store);
 		this.focusedDiffItem = derived(this, reader => this.items.read(reader).find(i => i.isFocused.read(reader)));
 		this.activeDiffItem = derivedObservableWithWritableCache<DocumentDiffItemViewModel | undefined>(

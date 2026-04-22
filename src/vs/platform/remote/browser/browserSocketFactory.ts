@@ -22,7 +22,7 @@ export interface IWebSocket {
 		type: SocketDiagnosticsEventType,
 		data?: VSBuffer | Uint8Array | ArrayBuffer | ArrayBufferView | unknown
 	): void;
-	send(data: ArrayBuffer | ArrayBufferView<ArrayBuffer>): void;
+	send(data: ArrayBuffer | ArrayBufferView): void;
 	close(): void;
 }
 

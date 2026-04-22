@@ -509,7 +509,7 @@ export class OutlineModelService implements IOutlineModelService {
 	getCachedModels(): Iterable<OutlineModel> {
 		return Iterable.filter<OutlineModel | undefined, OutlineModel>(
 			Iterable.map(this._cache.values(), entry => entry.model),
-			model => model !== undefined
+			(model): model is OutlineModel => model !== undefined
 		);
 	}
 }

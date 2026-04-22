@@ -911,7 +911,7 @@ export class Minimap extends ViewPart implements IMinimapModel {
 
 		// Initialize token change debouncer (100ms delay to batch rapid token changes)
 		this._onTokensChangedScheduler = new RunOnceScheduler(() => {
-			this._actual.render();
+			this.setShouldRender();
 		}, 100);
 		this._register(this._onTokensChangedScheduler);
 	}
@@ -938,7 +938,7 @@ export class Minimap extends ViewPart implements IMinimapModel {
 
 	// ---- begin view event handlers
 
-	public override onConfigurationChanged(e: viewEvents.ViewConfigurationChangedEvent): boolean {
+	public override onConfigurationChanged(_e: viewEvents.ViewConfigurationChangedEvent): boolean {
 		return this._onOptionsMaybeChanged();
 	}
 	public override onCursorStateChanged(e: viewEvents.ViewCursorStateChangedEvent): boolean {
@@ -952,7 +952,7 @@ export class Minimap extends ViewPart implements IMinimapModel {
 		}
 		return false;
 	}
-	public override onFlushed(e: viewEvents.ViewFlushedEvent): boolean {
+	public override onFlushed(_e: viewEvents.ViewFlushedEvent): boolean {
 		if (this._samplingState) {
 			this._shouldCheckSampling = true;
 		}
@@ -997,7 +997,7 @@ export class Minimap extends ViewPart implements IMinimapModel {
 	public override onScrollChanged(e: viewEvents.ViewScrollChangedEvent): boolean {
 		return this._actual.onScrollChanged(e);
 	}
-	public override onThemeChanged(e: viewEvents.ViewThemeChangedEvent): boolean {
+	public override onThemeChanged(_e: viewEvents.ViewThemeChangedEvent): boolean {
 		this._actual.onThemeChanged();
 		this._onOptionsMaybeChanged();
 		return true;
@@ -1029,17 +1029,17 @@ export class Minimap extends ViewPart implements IMinimapModel {
 			return result;
 		}
 	}
-	public override onTokensColorsChanged(e: viewEvents.ViewTokensColorsChangedEvent): boolean {
+	public override onTokensColorsChanged(_e: viewEvents.ViewTokensColorsChangedEvent): boolean {
 		this._onOptionsMaybeChanged();
 		return this._actual.onTokensColorsChanged();
 	}
-	public override onZonesChanged(e: viewEvents.ViewZonesChangedEvent): boolean {
+	public override onZonesChanged(_e: viewEvents.ViewZonesChangedEvent): boolean {
 		return this._actual.onZonesChanged();
 	}
 
 	// --- end event handlers
 
-	public prepareRender(ctx: RenderingContext): void {
+	public prepareRender(_ctx: RenderingContext): void {
 		if (this._shouldCheckSampling) {
 			this._shouldCheckSampling = false;
 			this._recreateLineSampling();

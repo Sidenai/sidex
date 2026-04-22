@@ -244,7 +244,7 @@ export class ViewLines extends ViewPart implements IViewLines {
 
 		return false;
 	}
-	public override onCursorStateChanged(e: viewEvents.ViewCursorStateChangedEvent): boolean {
+	public override onCursorStateChanged(_e: viewEvents.ViewCursorStateChangedEvent): boolean {
 		const rendStartLineNumber = this._visibleLines.getStartLineNumber();
 		const rendEndLineNumber = this._visibleLines.getEndLineNumber();
 		let r = false;
@@ -253,7 +253,7 @@ export class ViewLines extends ViewPart implements IViewLines {
 		}
 		return r;
 	}
-	public override onDecorationsChanged(e: viewEvents.ViewDecorationsChangedEvent): boolean {
+	public override onDecorationsChanged(_e: viewEvents.ViewDecorationsChangedEvent): boolean {
 		const rendStartLineNumber = this._visibleLines.getStartLineNumber();
 		const rendEndLineNumber = this._visibleLines.getEndLineNumber();
 		for (let lineNumber = rendStartLineNumber; lineNumber <= rendEndLineNumber; lineNumber++) {
@@ -356,7 +356,7 @@ export class ViewLines extends ViewPart implements IViewLines {
 		this._context.viewModel.viewLayout.setMaxLineWidth(this._maxLineWidth);
 		return this._visibleLines.onZonesChanged(e);
 	}
-	public override onThemeChanged(e: viewEvents.ViewThemeChangedEvent): boolean {
+	public override onThemeChanged(_e: viewEvents.ViewThemeChangedEvent): boolean {
 		return this._onOptionsMaybeChanged();
 	}
 

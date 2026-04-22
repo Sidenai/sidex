@@ -726,7 +726,7 @@ export class MarkersView extends FilterViewPane implements IMarkersView {
 				}
 			})
 		);
-		disposables.push(this.filterWidget.onDidChangeFilterText(e => this.updateFilter()));
+		disposables.push(this.filterWidget.onDidChangeFilterText(_e => this.updateFilter()));
 		disposables.push(
 			toDisposable(() => {
 				this.cachedFilterStats = undefined;

@@ -136,7 +136,7 @@ export class SuggestWidgetAdaptor extends Disposable {
 			};
 
 			this._register(
-				Event.once(suggestController.model.onDidTrigger)(e => {
+				Event.once(suggestController.model.onDidTrigger)(_e => {
 					bindToSuggestWidget();
 				})
 			);

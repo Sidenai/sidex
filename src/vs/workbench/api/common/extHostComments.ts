@@ -255,7 +255,7 @@ export function createExtHostComments(
 						fileComments: rangesResult.enableFileComments || false
 					};
 				} else {
-					ranges = rangesResult ?? undefined;
+					ranges = (rangesResult as any) ?? undefined;
 				}
 				return ranges;
 			}).then(ranges => {
@@ -567,7 +567,7 @@ export function createExtHostComments(
 				dispose: () => {
 					that.dispose();
 				}
-			};
+			} as any;
 		}
 
 		private updateIsTemplate() {
@@ -663,10 +663,10 @@ export function createExtHostComments(
 			commentToReveal ??= this._commentsMap.get(this._comments[0])!;
 			let preserveFocus: boolean = true;
 			let focusReply: boolean = false;
-			if (options?.focus === types.CommentThreadFocus.Reply) {
+			if ((options as any)?.focus === types.CommentThreadFocus.Reply) {
 				focusReply = true;
 				preserveFocus = false;
-			} else if (options?.focus === types.CommentThreadFocus.Comment) {
+			} else if ((options as any)?.focus === types.CommentThreadFocus.Comment) {
 				preserveFocus = false;
 			}
 			return proxy.$revealCommentThread(this._commentControllerHandle, this.handle, commentToReveal, {
@@ -711,10 +711,10 @@ export function createExtHostComments(
 
 		set commentingRangeProvider(provider: vscode.CommentingRangeProvider | undefined) {
 			this._commentingRangeProvider = provider;
-			if (provider?.resourceHints) {
+			if ((provider as any)?.resourceHints) {
 				checkProposedApiEnabled(this._extension, 'commentingRangeHint');
 			}
-			proxy.$updateCommentingRanges(this.handle, provider?.resourceHints);
+			proxy.$updateCommentingRanges(this.handle, (provider as any)?.resourceHints);
 		}
 
 		private _reactionHandler?: ReactionHandler;
@@ -921,7 +921,7 @@ export function createExtHostComments(
 			commentsMap.set(vscodeComment, commentUniqueId);
 		}
 
-		if (vscodeComment.state !== undefined) {
+		if ((vscodeComment as any).state !== undefined) {
 			checkProposedApiEnabled(extension, 'commentsDraftState');
 		}
 
@@ -943,7 +943,7 @@ export function createExtHostComments(
 			commentReactions: vscodeComment.reactions
 				? vscodeComment.reactions.map(reaction => convertToReaction(reaction))
 				: undefined,
-			state: vscodeComment.state,
+			state: (vscodeComment as any).state,
 			timestamp: vscodeComment.timestamp?.toJSON()
 		};
 	}
@@ -955,7 +955,7 @@ export function createExtHostComments(
 			count: reaction.count,
 			hasReacted: reaction.authorHasReacted,
 			reactors: (reaction.reactors && reaction.reactors.length > 0 && typeof reaction.reactors[0] !== 'string'
-				? (reaction.reactors as languages.CommentAuthorInformation[]).map(reactor => reactor.name)
+				? (reaction.reactors as unknown as languages.CommentAuthorInformation[]).map(reactor => reactor.name)
 				: reaction.reactors) as string[]
 		};
 	}
@@ -966,7 +966,7 @@ export function createExtHostComments(
 			count: reaction.count || 0,
 			iconPath: reaction.iconPath ? URI.revive(reaction.iconPath) : '',
 			authorHasReacted: reaction.hasReacted || false,
-			reactors: reaction.reactors?.map(reactor => ({ name: reactor }))
+			reactors: reaction.reactors?.map(reactor => ({ name: reactor })) as any
 		};
 	}
 

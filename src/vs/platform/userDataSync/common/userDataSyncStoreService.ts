@@ -245,7 +245,7 @@ export class UserDataSyncStoreClient extends Disposable {
 	) {
 		super();
 		this.updateUserDataSyncStoreUrl(userDataSyncStoreUrl);
-		this.commonHeadersPromise = getServiceMachineId(environmentService, fileService, storageService).then(uuid => {
+		this.commonHeadersPromise = getServiceMachineId(environmentService, fileService, storageService).then(_uuid => {
 			const headers: IHeaders = {
 				'X-Client-Name': `${productService.applicationName}${isWeb ? '-web' : ''}`,
 				'X-Client-Version': productService.version
@@ -314,7 +314,7 @@ export class UserDataSyncStoreClient extends Disposable {
 						this.setDonotMakeRequestsUntil(undefined)
 					)
 				);
-				this.resetDonotMakeRequestsUntilPromise.then(null, e => null /* ignore error */);
+				this.resetDonotMakeRequestsUntilPromise.then(null, _e => null /* ignore error */);
 			} else {
 				this.storageService.remove(DONOT_MAKE_REQUESTS_UNTIL_KEY, StorageScope.APPLICATION);
 			}

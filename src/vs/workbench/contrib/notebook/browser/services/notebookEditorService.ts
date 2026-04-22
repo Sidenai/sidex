@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { createDecorator } from '../../../../../platform/instantiation/common/instantiation.js';
-import { Event, Emitter } from '../../../../../base/common/event.js';
+import { Event, Emitter as _Emitter } from '../../../../../base/common/event.js';
 import type { NotebookEditorWidget } from '../notebookEditorWidget.js';
 import { URI } from '../../../../../base/common/uri.js';
 

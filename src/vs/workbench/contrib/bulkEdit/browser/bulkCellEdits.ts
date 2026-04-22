@@ -25,7 +25,7 @@ import {
 import { INotebookEditorModelResolverService } from '../../notebook/common/notebookEditorModelResolverService.js';
 import { IEditorService } from '../../../services/editor/common/editorService.js';
 
-export class ResourceNotebookCellEdit extends ResourceEdit implements IWorkspaceNotebookCellEdit {
+export class ResourceNotebookCellEdit extends ResourceEdit {
 	static is(candidate: unknown): candidate is IWorkspaceNotebookCellEdit {
 		if (candidate instanceof ResourceNotebookCellEdit) {
 			return true;
@@ -40,7 +40,12 @@ export class ResourceNotebookCellEdit extends ResourceEdit implements IWorkspace
 		if (edit instanceof ResourceNotebookCellEdit) {
 			return edit;
 		}
-		return new ResourceNotebookCellEdit(edit.resource, edit.cellEdit, edit.notebookVersionId, edit.metadata);
+		return new ResourceNotebookCellEdit(
+			edit.resource,
+			edit.cellEdit as any,
+			edit.notebookVersionId,
+			edit.metadata as any
+		);
 	}
 
 	constructor(
@@ -64,7 +69,7 @@ export class BulkCellEdits {
 		@INotebookEditorModelResolverService private readonly _notebookModelService: INotebookEditorModelResolverService
 	) {
 		this._edits = this._edits.map(e => {
-			if (e.resource.scheme === CellUri.scheme) {
+			if (e.resource.scheme === (CellUri as any).scheme) {
 				const uri = CellUri.parse(e.resource)?.notebook;
 				if (!uri) {
 					throw new Error(`Invalid notebook URI: ${e.resource}`);

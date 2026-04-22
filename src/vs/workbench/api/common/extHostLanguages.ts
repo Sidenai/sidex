@@ -171,12 +171,12 @@ export class ExtHostLanguages implements ExtHostLanguagesShape {
 				data.text = value;
 				updateAsync();
 			},
-			set text2(value) {
+			set text2(value: any) {
 				checkProposedApiEnabled(extension, 'languageStatusText');
 				data.text = value;
 				updateAsync();
 			},
-			get text2() {
+			get text2(): any {
 				checkProposedApiEnabled(extension, 'languageStatusText');
 				return data.text;
 			},
@@ -215,7 +215,7 @@ export class ExtHostLanguages implements ExtHostLanguagesShape {
 				data.busy = value;
 				updateAsync();
 			}
-		};
+		} as any;
 		updateAsync();
 		return result;
 	}

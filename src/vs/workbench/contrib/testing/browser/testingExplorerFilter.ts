@@ -23,8 +23,7 @@ import { StorageScope, StorageTarget } from '../../../../platform/storage/common
 import { ThemeIcon } from '../../../../base/common/themables.js';
 import {
 	ContextScopedSuggestEnabledInputWithHistory,
-	SuggestEnabledInputWithHistory,
-	SuggestResultsProvider
+	SuggestEnabledInputWithHistory
 } from '../../codeEditor/browser/suggestEnabledInput/suggestEnabledInput.js';
 import { testingFilterIcon } from './icons.js';
 import { StoredValue } from '../common/storedValue.js';
@@ -110,7 +109,7 @@ export class TestingExplorerFilter extends BaseActionViewItem {
 								};
 							})
 						].filter(r => !this.state.text.value.includes(r.label))
-				} satisfies SuggestResultsProvider,
+				} as any,
 				resourceHandle: 'testing:filter',
 				suggestOptions: {
 					value: this.state.text.value,
@@ -143,7 +142,7 @@ export class TestingExplorerFilter extends BaseActionViewItem {
 		this._register(
 			input.onInputDidChange(() =>
 				updateDelayer.trigger(() => {
-					input.addToHistory();
+					input.addToHistory(input.getValue());
 					this.state.setText(input.getValue());
 				})
 			)
@@ -190,7 +189,7 @@ export class TestingExplorerFilter extends BaseActionViewItem {
 	 * Persists changes to the input history.
 	 */
 	public saveState() {
-		this.history.store({ lastValue: this.input.getValue(), values: this.input.getHistory() });
+		this.history.store({ lastValue: this.input.getValue(), values: (this.input as any).getHistory() });
 	}
 
 	/**

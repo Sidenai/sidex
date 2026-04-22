@@ -375,7 +375,7 @@ export class CommonFindController extends Disposable implements IEditorContribut
 		this._state.change({ searchString: searchString }, false);
 	}
 
-	public highlightFindOptions(ignoreWhenVisible: boolean = false): void {
+	public highlightFindOptions(_ignoreWhenVisible: boolean = false): void {
 		// overwritten in subclass
 	}
 
@@ -668,7 +668,7 @@ export const StartFindAction = registerMultiEditorAction(
 
 StartFindAction.addImplementation(
 	0,
-	(accessor: ServicesAccessor, editor: ICodeEditor, args: any): boolean | Promise<void> => {
+	(accessor: ServicesAccessor, editor: ICodeEditor, _args: any): boolean | Promise<void> => {
 		const controller = CommonFindController.get(editor);
 		if (!controller) {
 			return false;
@@ -908,7 +908,7 @@ export const NextMatchFindAction = registerMultiEditorAction(
 
 NextMatchFindAction.addImplementation(
 	0,
-	async (accessor: ServicesAccessor, editor: ICodeEditor, args: any): Promise<void> => {
+	async (accessor: ServicesAccessor, editor: ICodeEditor, _args: any): Promise<void> => {
 		return matchFindAction(editor, true);
 	}
 );
@@ -936,7 +936,7 @@ export const PreviousMatchFindAction = registerMultiEditorAction(
 
 PreviousMatchFindAction.addImplementation(
 	0,
-	async (accessor: ServicesAccessor, editor: ICodeEditor, args: any): Promise<void> => {
+	async (accessor: ServicesAccessor, editor: ICodeEditor, _args: any): Promise<void> => {
 		return matchFindAction(editor, false);
 	}
 );
@@ -1164,7 +1164,7 @@ export const StartFindReplaceAction = registerMultiEditorAction(
 
 StartFindReplaceAction.addImplementation(
 	0,
-	(accessor: ServicesAccessor, editor: ICodeEditor, args: any): boolean | Promise<void> => {
+	(accessor: ServicesAccessor, editor: ICodeEditor, _args: any): boolean | Promise<void> => {
 		if (!editor.hasModel() || editor.getOption(EditorOption.readOnly)) {
 			return false;
 		}

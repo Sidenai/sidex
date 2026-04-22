@@ -151,7 +151,7 @@ export class FullFileRenderStrategy extends BaseRenderStrategy {
 		return true;
 	}
 
-	public override onDecorationsChanged(e: ViewDecorationsChangedEvent): boolean {
+	public override onDecorationsChanged(_e: ViewDecorationsChangedEvent): boolean {
 		this._invalidateAllLines();
 		return true;
 	}
@@ -193,15 +193,11 @@ export class FullFileRenderStrategy extends BaseRenderStrategy {
 		const dpr = getActiveWindow().devicePixelRatio;
 		this._scrollOffsetValueBuffer[0] = (e?.scrollLeft ?? this._context.viewLayout.getCurrentScrollLeft()) * dpr;
 		this._scrollOffsetValueBuffer[1] = (e?.scrollTop ?? this._context.viewLayout.getCurrentScrollTop()) * dpr;
-		this._device.queue.writeBuffer(
-			this._scrollOffsetBindBuffer,
-			0,
-			this._scrollOffsetValueBuffer as Float32Array<ArrayBuffer>
-		);
+		this._device.queue.writeBuffer(this._scrollOffsetBindBuffer, 0, this._scrollOffsetValueBuffer as Float32Array);
 		return true;
 	}
 
-	public override onThemeChanged(e: ViewThemeChangedEvent): boolean {
+	public override onThemeChanged(_e: ViewThemeChangedEvent): boolean {
 		this._invalidateAllLines();
 		return true;
 	}

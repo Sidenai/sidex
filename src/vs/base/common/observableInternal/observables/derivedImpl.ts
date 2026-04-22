@@ -338,7 +338,6 @@ export class Derived<T, TChangeSummary = any, TChange = void>
 							{
 								changedObservable: observable,
 								change,
-								// eslint-disable-next-line local/code-no-any-casts
 								didChange: (o): this is any => o === (observable as any)
 							},
 							this._changeSummary!
@@ -442,7 +441,6 @@ export class Derived<T, TChangeSummary = any, TChange = void>
 	}
 
 	public debugSetValue(newValue: unknown) {
-		// eslint-disable-next-line local/code-no-any-casts
 		this._value = newValue as any;
 	}
 

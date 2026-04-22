@@ -30,7 +30,7 @@ export interface IRPCProtocol {
 	dispose(): void;
 }
 
-export class ProxyIdentifier<T> {
+export class ProxyIdentifier<_T> {
 	public static count = 0;
 	_proxyIdentifierBrand: void = undefined;
 
@@ -60,7 +60,7 @@ export type Dto<T> = T extends { toJSON(): infer U }
 	? T
 	: T extends CancellationToken // CancellationToken is understood by rpc-logic
 	? T
-	: T extends Function // functions are dropped during JSON-stringify
+	: T extends ((...args: any[]) => any) // functions are dropped during JSON-stringify
 	? never
 	: T extends object // recurse
 	? { [k in keyof T]: Dto<T[k]>; }

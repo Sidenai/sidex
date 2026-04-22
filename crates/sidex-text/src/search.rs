@@ -481,7 +481,7 @@ pub fn find_matches(buffer: &Buffer, opts: &FindMatchesOptions) -> Vec<FindMatch
     let scopes: Vec<Range> = match &opts.search_scope {
         Some(ranges) if !ranges.is_empty() => {
             let mut sorted = ranges.clone();
-            sorted.sort_by(|a, b| a.start.cmp(&b.start));
+            sorted.sort_by_key(|r| r.start);
             sorted
         }
         _ => vec![buffer.get_full_model_range()],

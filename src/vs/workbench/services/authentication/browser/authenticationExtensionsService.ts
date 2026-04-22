@@ -527,7 +527,7 @@ export class AuthenticationExtensionsService extends Disposable implements IAuth
 
 		const accessCommand = CommandsRegistry.registerCommand({
 			id: `${providerId}${extensionId}Access`,
-			handler: async accessor => {
+			handler: async _accessor => {
 				this.completeSessionAccessRequest(provider, extensionId, extensionName, scopeListOrRequest);
 			}
 		});

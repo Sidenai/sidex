@@ -23,7 +23,7 @@ export class WebviewFindAccessibilityHelp implements IAccessibleViewImplementati
 	readonly type = AccessibleViewType.Help;
 	readonly when = KEYBINDING_CONTEXT_WEBVIEW_FIND_WIDGET_FOCUSED;
 
-	getProvider(accessor: ServicesAccessor): AccessibleContentProvider | undefined {
+	getProvider(_accessor: ServicesAccessor): AccessibleContentProvider | undefined {
 		return new WebviewFindAccessibilityHelpProvider();
 	}
 }

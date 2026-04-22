@@ -409,7 +409,7 @@ export class TestingExplorerView extends ViewPane {
 	private getTestConfigGroupActions(group: TestRunProfileBitset) {
 		const profileActions: IAction[] = [];
 
-		let participatingGroups = 0;
+		let _participatingGroups = 0;
 		let participatingProfiles = 0;
 		let hasConfigurable = false;
 		const defaults = this.testProfileService.getGroupDefaultProfiles(group);
@@ -423,7 +423,7 @@ export class TestingExplorerView extends ViewPane {
 
 				if (!hasAdded) {
 					hasAdded = true;
-					participatingGroups++;
+					_participatingGroups++;
 					profileActions.push(
 						toAction({
 							id: `${controller.id}.$root`,

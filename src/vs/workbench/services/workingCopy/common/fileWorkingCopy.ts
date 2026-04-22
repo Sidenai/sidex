@@ -121,7 +121,7 @@ export interface IFileWorkingCopy<M extends IFileWorkingCopyModel> extends IWork
 	/**
 	 * Whether we have a resolved model or not.
 	 */
-	isResolved(): this is IResolvedFileWorkingCopy<M>;
+	isResolved(): boolean;
 }
 
 export interface IResolvedFileWorkingCopy<M extends IFileWorkingCopyModel> extends IFileWorkingCopy<M> {

@@ -494,7 +494,6 @@ export class ListSettingWidget<TListDataItem extends IListDataItem> extends Abst
 	}
 
 	protected getEmptyItem(): TListDataItem {
-		// eslint-disable-next-line local/code-no-dangerous-type-assertions
 		return {
 			value: {
 				type: 'string',
@@ -586,13 +585,13 @@ export class ListSettingWidget<TListDataItem extends IListDataItem> extends Abst
 		);
 		let counter = 0;
 		this.listDisposables.add(
-			DOM.addDisposableListener(rowElement, DOM.EventType.DRAG_ENTER, ev => {
+			DOM.addDisposableListener(rowElement, DOM.EventType.DRAG_ENTER, _ev => {
 				counter++;
 				rowElement.classList.add('drag-hover');
 			})
 		);
 		this.listDisposables.add(
-			DOM.addDisposableListener(rowElement, DOM.EventType.DRAG_LEAVE, ev => {
+			DOM.addDisposableListener(rowElement, DOM.EventType.DRAG_LEAVE, _ev => {
 				counter--;
 				if (!counter) {
 					rowElement.classList.remove('drag-hover');
@@ -667,7 +666,6 @@ export class ListSettingWidget<TListDataItem extends IListDataItem> extends Abst
 
 		const updatedInputBoxItem = (): TListDataItem => {
 			const inputBox = valueInput as InputBox;
-			// eslint-disable-next-line local/code-no-dangerous-type-assertions
 			return {
 				value: {
 					type: 'string',
@@ -677,7 +675,6 @@ export class ListSettingWidget<TListDataItem extends IListDataItem> extends Abst
 			} as TListDataItem;
 		};
 		const updatedSelectBoxItem = (selectedValue: string): TListDataItem => {
-			// eslint-disable-next-line local/code-no-dangerous-type-assertions
 			return {
 				value: {
 					type: 'enum',
@@ -824,7 +821,7 @@ export class ExcludeSettingWidget extends ListSettingWidget<IIncludeExcludeDataI
 		return ['setting-list-include-exclude-widget'];
 	}
 
-	protected override addDragAndDrop(rowElement: HTMLElement, item: IIncludeExcludeDataItem, idx: number) {
+	protected override addDragAndDrop(_rowElement: HTMLElement, _item: IIncludeExcludeDataItem, _idx: number) {
 		return;
 	}
 
@@ -865,7 +862,7 @@ export class IncludeSettingWidget extends ListSettingWidget<IIncludeExcludeDataI
 		return ['setting-list-include-exclude-widget'];
 	}
 
-	protected override addDragAndDrop(rowElement: HTMLElement, item: IIncludeExcludeDataItem, idx: number) {
+	protected override addDragAndDrop(_rowElement: HTMLElement, _item: IIncludeExcludeDataItem, _idx: number) {
 		return;
 	}
 
@@ -1079,7 +1076,7 @@ export class ObjectSettingDropdownWidget extends AbstractListSettingWidget<IObje
 		return header;
 	}
 
-	protected renderItem(item: IObjectDataItem, idx: number): RowElementGroup {
+	protected renderItem(item: IObjectDataItem, _idx: number): RowElementGroup {
 		const rowElement = $('.setting-list-row');
 		rowElement.classList.add('setting-list-object-row');
 
@@ -1425,7 +1422,7 @@ export class ObjectSettingCheckboxWidget extends AbstractListSettingWidget<IBool
 		return ['setting-list-object-widget'];
 	}
 
-	protected getActionsForItem(item: IBoolObjectDataItem, idx: number): IAction[] {
+	protected getActionsForItem(_item: IBoolObjectDataItem, _idx: number): IAction[] {
 		return [];
 	}
 
@@ -1440,14 +1437,14 @@ export class ObjectSettingCheckboxWidget extends AbstractListSettingWidget<IBool
 	protected override renderDataOrEditItem(
 		item: IListViewItem<IBoolObjectDataItem>,
 		idx: number,
-		listFocused: boolean
+		_listFocused: boolean
 	): HTMLElement {
 		const rowElement = this.renderEdit(item, idx);
 		rowElement.setAttribute('role', 'listitem');
 		return rowElement;
 	}
 
-	protected renderItem(item: IBoolObjectDataItem, idx: number): RowElementGroup {
+	protected renderItem(_item: IBoolObjectDataItem, _idx: number): RowElementGroup {
 		// Return just the containers, since we always render in edit mode anyway
 		const rowElement = $('.blank-row');
 		const keyElement = $('.blank-row-key');

@@ -143,8 +143,8 @@ export abstract class EditorPane<MementoType extends object = object>
 	async setInput(
 		input: EditorInput,
 		options: IEditorOptions | undefined,
-		context: IEditorOpenContext,
-		token: CancellationToken
+		_context: IEditorOpenContext,
+		_token: CancellationToken
 	): Promise<void> {
 		this._input = input;
 		this._options = options;
@@ -189,7 +189,7 @@ export abstract class EditorPane<MementoType extends object = object>
 	 *
 	 * @param visible the state of visibility of this editor
 	 */
-	protected setEditorVisible(visible: boolean): void {
+	protected setEditorVisible(_visible: boolean): void {
 		// Subclasses can implement
 	}
 

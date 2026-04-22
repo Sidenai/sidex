@@ -21,10 +21,7 @@ export namespace MarkedKatexExtension {
 
 	const blockRule = /^(\${1,2})\n((?:\\[^]|[^\\])+?)\n\1(?:\n|$)/;
 
-	export function extension(
-		katex: typeof import('katex').default,
-		options: MarkedKatexOptions = {}
-	): marked.MarkedExtension {
+	export function extension(katex: typeof import('katex'), options: MarkedKatexOptions = {}): marked.MarkedExtension {
 		return {
 			extensions: [
 				inlineKatex(options, createRenderer(katex, options, false)),
@@ -34,7 +31,7 @@ export namespace MarkedKatexExtension {
 	}
 
 	function createRenderer(
-		katex: typeof import('katex').default,
+		katex: typeof import('katex'),
 		options: MarkedKatexOptions,
 		isBlock: boolean
 	): marked.RendererExtensionFunction {
@@ -85,7 +82,7 @@ export namespace MarkedKatexExtension {
 				}
 				return;
 			},
-			tokenizer(src: string, tokens: marked.Token[]) {
+			tokenizer(src: string, _tokens: marked.Token[]) {
 				const match = src.match(ruleReg);
 				if (match) {
 					return {
@@ -111,7 +108,7 @@ export namespace MarkedKatexExtension {
 			start(src: string) {
 				return src.match(new RegExp(blockRule.source, 'm'))?.index;
 			},
-			tokenizer(src: string, tokens: marked.Token[]) {
+			tokenizer(src: string, _tokens: marked.Token[]) {
 				const match = src.match(blockRule);
 				if (match) {
 					return {

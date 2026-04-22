@@ -41,9 +41,7 @@ export function derived<T, TChange = void>(
 		);
 	}
 	return new Derived(
-		// eslint-disable-next-line local/code-no-any-casts
 		new DebugNameData(undefined, undefined, computeFnOrOwner as any),
-		// eslint-disable-next-line local/code-no-any-casts
 		computeFnOrOwner as any,
 		undefined,
 		undefined,
@@ -139,17 +137,14 @@ export function derivedWithStore<T>(
 	let computeFn: (reader: IReader, store: DisposableStore) => T;
 	let owner: DebugOwner;
 	if (computeFnOrUndefined === undefined) {
-		// eslint-disable-next-line local/code-no-any-casts
 		computeFn = computeFnOrOwner as any;
 		owner = undefined;
 	} else {
 		owner = computeFnOrOwner;
-		// eslint-disable-next-line local/code-no-any-casts
 		computeFn = computeFnOrUndefined as any;
 	}
 
 	// Intentionally re-assigned in case an inactive observable is re-used later
-	// eslint-disable-next-line local/code-no-potentially-unsafe-disposables
 	let store = new DisposableStore();
 
 	return new Derived(
@@ -182,12 +177,10 @@ export function derivedDisposable<T extends IDisposable | undefined>(
 	let computeFn: (reader: IReader) => T;
 	let owner: DebugOwner;
 	if (computeFnOrUndefined === undefined) {
-		// eslint-disable-next-line local/code-no-any-casts
 		computeFn = computeFnOrOwner as any;
 		owner = undefined;
 	} else {
 		owner = computeFnOrOwner;
-		// eslint-disable-next-line local/code-no-any-casts
 		computeFn = computeFnOrUndefined as any;
 	}
 

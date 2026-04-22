@@ -27,7 +27,7 @@ export function registerSingleton<T, Services extends BrandedService[]>(
 	ctor: new (...services: Services) => T,
 	supportsDelayedInstantiation: InstantiationType
 ): void;
-export function registerSingleton<T, Services extends BrandedService[]>(
+export function registerSingleton<T, _Services extends BrandedService[]>(
 	id: ServiceIdentifier<T>,
 	descriptor: SyncDescriptor<any>
 ): void;

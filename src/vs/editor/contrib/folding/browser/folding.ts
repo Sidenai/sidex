@@ -20,9 +20,9 @@ import { StableEditorScrollState } from '../../../browser/stableEditorScroll.js'
 import { ICodeEditor, IEditorMouseEvent, MouseTargetType } from '../../../browser/editorBrowser.js';
 import {
 	EditorAction,
-	EditorContributionInstantiation,
+	EditorContributionInstantiation as _EditorContributionInstantiation,
 	registerEditorAction,
-	registerEditorContribution,
+	registerEditorContribution as _registerEditorContribution,
 	registerInstantiatedEditorAction,
 	ServicesAccessor
 } from '../../../browser/editorExtensions.js';
@@ -1399,7 +1399,7 @@ CommandsRegistry.registerCommand('_executeFoldingRangeProvider', async function 
 		get limit() {
 			return configurationService.getValue<number>('editor.foldingMaximumRegions', { resource });
 		},
-		update: (computed: number, limited: number | false) => {}
+		update: (_computed: number, _limited: number | false) => {}
 	};
 
 	const indentRangeProvider = new IndentRangeProvider(model, languageConfigurationService, foldingLimitReporter);

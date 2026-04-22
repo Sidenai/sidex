@@ -32,7 +32,7 @@ export class RangeHighlightDecorations implements IDisposable {
 		this._decorationId = null;
 	}
 
-	highlightRange(resource: URI | ITextModel, range: Range, ownerId: number = 0): void {
+	highlightRange(resource: URI | ITextModel, range: Range, _ownerId: number = 0): void {
 		let model: ITextModel | null;
 		if (URI.isUri(resource)) {
 			model = this._modelService.getModel(resource);
@@ -58,7 +58,7 @@ export class RangeHighlightDecorations implements IDisposable {
 			this.clearModelListeners();
 			this._model = model;
 			this._modelDisposables.add(
-				this._model.onDidChangeDecorations(e => {
+				this._model.onDidChangeDecorations(_e => {
 					this.clearModelListeners();
 					this.removeHighlightRange();
 					this._model = null;

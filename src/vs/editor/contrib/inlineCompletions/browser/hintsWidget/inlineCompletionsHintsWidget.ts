@@ -303,7 +303,7 @@ export class InlineSuggestionHintsContentWidget extends Disposable implements IC
 				{
 					menuOptions: { renderShortTitle: true },
 					toolbarOptions: { primaryGroup: g => g.startsWith('primary') },
-					actionViewItemProvider: (action, options) => {
+					actionViewItemProvider: (action, _options) => {
 						if (action instanceof MenuItemAction) {
 							return instantiationService.createInstance(StatusBarViewItem, action, undefined);
 						}
@@ -371,7 +371,7 @@ export class InlineSuggestionHintsContentWidget extends Disposable implements IC
 					enabled: true,
 					tooltip: c.command.tooltip || '',
 					label: c.command.title,
-					run: event => {
+					run: _event => {
 						return this._commandService.executeCommand(c.command.id);
 					}
 				}));

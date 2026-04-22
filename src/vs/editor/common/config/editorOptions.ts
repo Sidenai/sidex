@@ -1188,7 +1188,7 @@ abstract class ComputedEditorOption<K extends EditorOption, V> implements IEdito
 		return applyUpdate(value, update);
 	}
 
-	public validate(input: unknown): V {
+	public validate(_input: unknown): V {
 		return this.defaultValue;
 	}
 
@@ -2136,7 +2136,7 @@ export class EditorFontVariations extends BaseEditorOption<EditorOption.fontVari
 		return EditorFontVariations.OFF;
 	}
 
-	public override compute(env: IEnvironmentalOptions, options: IComputedEditorOptions, value: string): string {
+	public override compute(env: IEnvironmentalOptions, _options: IComputedEditorOptions, _value: string): string {
 		// The value is computed from the fontWeight if it is true.
 		// So take the result from env.fontInfo
 		return env.fontInfo.fontVariationSettings;
@@ -2175,7 +2175,7 @@ class EditorFontInfo extends ComputedEditorOption<EditorOption.fontInfo, FontInf
 		);
 	}
 
-	public compute(env: IEnvironmentalOptions, options: IComputedEditorOptions, _: FontInfo): FontInfo {
+	public compute(env: IEnvironmentalOptions, _options: IComputedEditorOptions, _: FontInfo): FontInfo {
 		return env.fontInfo;
 	}
 }
@@ -2255,7 +2255,7 @@ class EditorFontSize extends SimpleEditorOption<EditorOption.fontSize, number> {
 		}
 		return EditorFloatOption.clamp(r, 6, 100);
 	}
-	public override compute(env: IEnvironmentalOptions, options: IComputedEditorOptions, value: number): number {
+	public override compute(env: IEnvironmentalOptions, _options: IComputedEditorOptions, _value: number): number {
 		// The final fontSize respects the editor zoom level.
 		// So take the result from env.fontInfo
 		return env.fontInfo.fontSize;
@@ -3737,7 +3737,7 @@ class EditorLineHeight extends EditorFloatOption<EditorOption.lineHeight> {
 		);
 	}
 
-	public override compute(env: IEnvironmentalOptions, options: IComputedEditorOptions, value: number): number {
+	public override compute(env: IEnvironmentalOptions, _options: IComputedEditorOptions, _value: number): number {
 		// The lineHeight is computed from the fontSize if it is 0.
 		// Moreover, the final lineHeight respects the editor zoom level.
 		// So take the result from env.fontInfo
@@ -4171,7 +4171,7 @@ class EditorPixelRatio extends ComputedEditorOption<EditorOption.pixelRatio, num
 		super(EditorOption.pixelRatio, 1);
 	}
 
-	public compute(env: IEnvironmentalOptions, options: IComputedEditorOptions, _: number): number {
+	public compute(env: IEnvironmentalOptions, _options: IComputedEditorOptions, _: number): number {
 		return env.pixelRatio;
 	}
 }
@@ -4221,7 +4221,7 @@ class EditorQuickSuggestions extends BaseEditorOption<
 	boolean | QuickSuggestionsValue | IQuickSuggestionsOptions,
 	InternalQuickSuggestionsOptions
 > {
-	public override readonly defaultValue: InternalQuickSuggestionsOptions;
+	declare public readonly defaultValue: InternalQuickSuggestionsOptions;
 
 	constructor() {
 		const defaults: InternalQuickSuggestionsOptions = {

@@ -3,10 +3,12 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-function createDecorator(mapFn: (fn: Function, key: string) => Function): MethodDecorator {
+function createDecorator(
+	mapFn: (fn: (...args: any[]) => any, key: string) => (...args: any[]) => any
+): MethodDecorator {
 	return (_target: object, key: string | symbol, descriptor: TypedPropertyDescriptor<any>) => {
 		let fnKey: 'value' | 'get' | null = null;
-		let fn: Function | null = null;
+		let fn: ((...args: any[]) => any) | null = null;
 
 		if (typeof descriptor.value === 'function') {
 			fnKey = 'value';
@@ -26,7 +28,7 @@ function createDecorator(mapFn: (fn: Function, key: string) => Function): Method
 
 export function memoize(_target: object, key: string, descriptor: PropertyDescriptor) {
 	let fnKey: 'value' | 'get' | null = null;
-	let fn: Function | null = null;
+	let fn: ((...args: any[]) => any) | null = null;
 
 	if (typeof descriptor.value === 'function') {
 		fnKey = 'value';

@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { bufferToStream, streamToBuffer, VSBuffer } from '../../../base/common/buffer.js';
+import { bufferToStream, VSBuffer } from '../../../base/common/buffer.js';
 import { CancellationToken } from '../../../base/common/cancellation.js';
 import { Event } from '../../../base/common/event.js';
 import { IChannel } from '../../../base/parts/ipc/common/ipc.js';

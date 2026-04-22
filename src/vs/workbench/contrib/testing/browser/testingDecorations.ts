@@ -252,31 +252,29 @@ export class TestingDecorationService extends Disposable implements ITestingDeco
 			})
 		);
 
-		this._register(
-			GutterActionsRegistry.registerGutterActionsGenerator((context, result) => {
-				const model = context.editor.getModel();
-				const testingDecorations = TestingDecorations.get(context.editor);
-				if (!model || !testingDecorations?.currentUri) {
-					return;
-				}
+		GutterActionsRegistry.registerGutterActionsGenerator((context, result) => {
+			const model = context.editor.getModel();
+			const testingDecorations = TestingDecorations.get(context.editor);
+			if (!model || !testingDecorations?.currentUri) {
+				return;
+			}
 
-				const currentDecorations = this.syncDecorations(testingDecorations.currentUri);
-				if (!currentDecorations.size) {
-					return;
-				}
+			const currentDecorations = this.syncDecorations(testingDecorations.currentUri);
+			if (!currentDecorations.size) {
+				return;
+			}
 
-				const modelDecorations = model.getLinesDecorations(context.lineNumber, context.lineNumber);
-				for (const { id } of modelDecorations) {
-					const decoration = currentDecorations.getById(id);
-					if (decoration) {
-						const { object: actions } = decoration.getContextMenuActions();
-						for (const action of actions) {
-							result.push(action, '1_testing');
-						}
+			const modelDecorations = model.getLinesDecorations(context.lineNumber, context.lineNumber);
+			for (const { id } of modelDecorations) {
+				const decoration = currentDecorations.getById(id);
+				if (decoration) {
+					const { object: actions } = decoration.getContextMenuActions();
+					for (const action of actions) {
+						result.push(action, '1_testing');
 					}
 				}
-			})
-		);
+			}
+		});
 	}
 
 	/** @inheritdoc */
@@ -1188,7 +1186,7 @@ abstract class RunTestDecoration {
 
 	private showContextMenu(e: IEditorMouseEvent) {
 		const editor = this.codeEditorService.listCodeEditors().find(e => e.getModel() === this.model);
-		editor?.getContribution<EditorLineNumberContextMenu>(EditorLineNumberContextMenu.ID)?.show(e);
+		editor?.getContribution<any>(EditorLineNumberContextMenu.id)?.show(e);
 	}
 
 	private getGutterLabel() {

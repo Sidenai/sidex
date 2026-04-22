@@ -138,7 +138,7 @@ export class ObservableElementSizeObserver extends Disposable {
 		this._height = observableValue(this, this.elementSizeObserver.getHeight());
 
 		this._register(
-			this.elementSizeObserver.onDidChange(e =>
+			this.elementSizeObserver.onDidChange(_e =>
 				transaction(tx => {
 					/** @description Set width/height from elementSizeObserver */
 					this._width.set(this.elementSizeObserver.getWidth(), tx);
@@ -226,7 +226,6 @@ function easeOutExpo(t: number, b: number, c: number, d: number): number {
 }
 
 export function deepMerge<T extends {}>(source1: T, source2: Partial<T>): T {
-	// eslint-disable-next-line local/code-no-any-casts
 	const result = {} as any as T;
 	for (const key in source1) {
 		result[key] = source1[key];
@@ -236,7 +235,6 @@ export function deepMerge<T extends {}>(source1: T, source2: Partial<T>): T {
 		if (typeof result[key] === 'object' && source2Value && typeof source2Value === 'object') {
 			result[key] = deepMerge<any>(result[key], source2Value);
 		} else {
-			// eslint-disable-next-line local/code-no-any-casts
 			result[key] = source2Value as any;
 		}
 	}
@@ -346,14 +344,12 @@ export function applyStyle(
 		/** @description applyStyle */
 		for (let [key, val] of Object.entries(style)) {
 			if (val && typeof val === 'object' && 'read' in val) {
-				// eslint-disable-next-line local/code-no-any-casts
 				val = val.read(reader) as any;
 			}
 			if (typeof val === 'number') {
 				val = `${val}px`;
 			}
 			key = key.replace(/[A-Z]/g, m => '-' + m.toLowerCase());
-			// eslint-disable-next-line local/code-no-any-casts
 			domNode.style[key as any] = val as any;
 		}
 	});

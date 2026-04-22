@@ -232,8 +232,8 @@ class DropOverlay extends Themable {
 					}
 				},
 
-				onDragLeave: e => this.dispose(),
-				onDragEnd: e => this.dispose(),
+				onDragLeave: _e => this.dispose(),
+				onDragEnd: _e => this.dispose(),
 
 				onDrop: e => {
 					EventHelper.stop(e, true);

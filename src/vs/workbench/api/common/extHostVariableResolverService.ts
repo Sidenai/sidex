@@ -158,7 +158,7 @@ export class ExtHostVariableResolverProviderService extends Disposable implement
 
 		const dynamic: DynamicContext = { folders };
 		this._register(
-			this.workspaceService.onDidChangeWorkspace(async e => {
+			this.workspaceService.onDidChangeWorkspace(async _e => {
 				dynamic.folders = (await this.workspaceService.getWorkspaceFolders2()) || [];
 			})
 		);

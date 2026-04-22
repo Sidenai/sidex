@@ -356,7 +356,7 @@ export class Parser {
 						let regexp: RegExp | null;
 						try {
 							regexp = new RegExp(regexLexeme.substring(1, closingSlashIndex), flags);
-						} catch (e) {
+						} catch (_e) {
 							throw this._errExpectedButGot(`REGEX`, expr);
 						}
 						return ContextKeyRegexExpr.create(key, regexp);
@@ -418,7 +418,7 @@ export class Parser {
 							let regexp: RegExp | null;
 							try {
 								regexp = new RegExp(regexLexeme.substring(1, closingSlashIndex), flags);
-							} catch (e) {
+							} catch (_e) {
 								throw this._errExpectedButGot(`REGEX`, expr);
 							}
 							return ContextKeyExpr.regex(key, regexp);
@@ -752,7 +752,7 @@ export class ContextKeyFalseExpr implements IContextKeyExpression {
 		return this;
 	}
 
-	public evaluate(context: IContext): boolean {
+	public evaluate(_context: IContext): boolean {
 		return false;
 	}
 
@@ -764,7 +764,7 @@ export class ContextKeyFalseExpr implements IContextKeyExpression {
 		return [];
 	}
 
-	public map(mapFnc: IContextKeyExprMapper): ContextKeyExpression {
+	public map(_mapFnc: IContextKeyExprMapper): ContextKeyExpression {
 		return this;
 	}
 
@@ -792,7 +792,7 @@ export class ContextKeyTrueExpr implements IContextKeyExpression {
 		return this;
 	}
 
-	public evaluate(context: IContext): boolean {
+	public evaluate(_context: IContext): boolean {
 		return true;
 	}
 
@@ -804,7 +804,7 @@ export class ContextKeyTrueExpr implements IContextKeyExpression {
 		return [];
 	}
 
-	public map(mapFnc: IContextKeyExprMapper): ContextKeyExpression {
+	public map(_mapFnc: IContextKeyExprMapper): ContextKeyExpression {
 		return this;
 	}
 
@@ -982,7 +982,6 @@ export class ContextKeyInExpr implements IContextKeyExpression {
 		const item = context.getValue(this.key);
 
 		if (Array.isArray(source)) {
-			// eslint-disable-next-line local/code-no-any-casts
 			if (source.includes(item as any)) {
 				return true;
 			}
@@ -2133,7 +2132,7 @@ export interface IContextKeyService {
 	readonly _serviceBrand: undefined;
 
 	readonly onDidChangeContext: Event<IContextKeyChangeEvent>;
-	bufferChangeEvents(callback: Function): void;
+	bufferChangeEvents(callback: (...args: any[]) => any): void;
 
 	createKey<T extends ContextKeyValue>(key: string, defaultValue: T | undefined): IContextKey<T>;
 	contextMatchesRules(rules: ContextKeyExpression | undefined): boolean;

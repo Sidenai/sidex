@@ -316,7 +316,11 @@ class MainThreadSCMHistoryProvider implements ISCMHistoryProvider {
 	}
 
 	async resolveHistoryItemChatContext(historyItemId: string, token?: CancellationToken): Promise<string | undefined> {
-		return this.proxy.$resolveHistoryItemChatContext(this.handle, historyItemId, token ?? CancellationToken.None);
+		return (this.proxy as any).$resolveHistoryItemChatContext(
+			this.handle,
+			historyItemId,
+			token ?? CancellationToken.None
+		);
 	}
 
 	async resolveHistoryItemChangeRangeChatContext(
@@ -325,7 +329,7 @@ class MainThreadSCMHistoryProvider implements ISCMHistoryProvider {
 		path: string,
 		token?: CancellationToken
 	): Promise<string | undefined> {
-		return this.proxy.$resolveHistoryItemChangeRangeChatContext(
+		return (this.proxy as any).$resolveHistoryItemChangeRangeChatContext(
 			this.handle,
 			historyItemId,
 			historyItemParentId,

@@ -129,9 +129,9 @@ export class MainThreadEditorTabs implements MainThreadEditorTabsShape {
 		if (editor instanceof MergeEditorInput) {
 			return {
 				kind: TabInputKind.TextMergeInput,
-				base: editor.base,
-				input1: editor.input1.uri,
-				input2: editor.input2.uri,
+				base: (editor as any).base,
+				input1: (editor as any).input1.uri,
+				input2: (editor as any).input2.uri,
 				result: editor.resource
 			};
 		}
@@ -165,7 +165,7 @@ export class MainThreadEditorTabs implements MainThreadEditorTabsShape {
 		if (editor instanceof NotebookEditorInput) {
 			return {
 				kind: TabInputKind.NotebookInput,
-				notebookType: editor.viewType,
+				notebookType: (editor as any).viewType,
 				uri: editor.resource
 			};
 		}
@@ -173,7 +173,7 @@ export class MainThreadEditorTabs implements MainThreadEditorTabsShape {
 		if (editor instanceof CustomEditorInput) {
 			return {
 				kind: TabInputKind.CustomEditorInput,
-				viewType: editor.viewType,
+				viewType: (editor as any).viewType,
 				uri: editor.resource
 			};
 		}
@@ -205,7 +205,7 @@ export class MainThreadEditorTabs implements MainThreadEditorTabsShape {
 			if (editor.modified instanceof NotebookEditorInput && editor.original instanceof NotebookEditorInput) {
 				return {
 					kind: TabInputKind.NotebookDiffInput,
-					notebookType: editor.original.viewType,
+					notebookType: (editor.original as any).viewType,
 					modified: editor.modified.resource,
 					original: editor.original.resource
 				};
@@ -216,13 +216,13 @@ export class MainThreadEditorTabs implements MainThreadEditorTabsShape {
 			return {
 				kind: TabInputKind.InteractiveEditorInput,
 				uri: editor.resource,
-				inputBoxUri: editor.inputResource
+				inputBoxUri: (editor as any).inputResource
 			};
 		}
 
 		if (editor instanceof MultiDiffEditorInput) {
 			const diffEditors: TextDiffInputDto[] = [];
-			for (const resource of editor?.resources.get() ?? []) {
+			for (const resource of (editor as any)?.resources.get() ?? []) {
 				if (resource.originalUri && resource.modifiedUri) {
 					diffEditors.push({
 						kind: TabInputKind.TextDiffInput,
@@ -324,7 +324,7 @@ export class MainThreadEditorTabs implements MainThreadEditorTabsShape {
 		if (editorInput instanceof MultiDiffEditorInput) {
 			this._multiDiffEditorInputListeners.set(
 				editorInput,
-				Event.fromObservableLight(editorInput.resources)(() => {
+				Event.fromObservableLight((editorInput as any).resources)(() => {
 					const tabInfo = this._tabInfoLookup.get(tabId);
 					if (!tabInfo) {
 						return;
@@ -485,7 +485,7 @@ export class MainThreadEditorTabs implements MainThreadEditorTabsShape {
 		});
 	}
 
-	private _onDidTabMove(groupId: number, editorIndex: number, oldEditorIndex: number, editor: EditorInput) {
+	private _onDidTabMove(groupId: number, editorIndex: number, oldEditorIndex: number, _editor: EditorInput) {
 		const tabs = this._groupLookup.get(groupId)?.tabs;
 		// Something wrong with the model state so we rebuild
 		if (!tabs) {
@@ -709,7 +709,7 @@ export class MainThreadEditorTabs implements MainThreadEditorTabsShape {
 		return results.every(result => result);
 	}
 
-	async $closeGroup(groupIds: number[], preserveFocus?: boolean): Promise<boolean> {
+	async $closeGroup(groupIds: number[], _preserveFocus?: boolean): Promise<boolean> {
 		const groupCloseResults: boolean[] = [];
 		for (const groupId of groupIds) {
 			const group = this._editorGroupsService.getGroup(groupId);

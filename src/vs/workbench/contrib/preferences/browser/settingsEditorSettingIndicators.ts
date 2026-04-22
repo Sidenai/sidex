@@ -178,7 +178,7 @@ export class SettingsTreeIndicatorsLabel implements IDisposable {
 						{
 							label: localize('manageWorkspaceTrust', 'Manage Workspace Trust'),
 							commandId: 'workbench.trust.manage',
-							run: (target: HTMLElement) => {
+							run: (_target: HTMLElement) => {
 								this.commandService.executeCommand('workbench.trust.manage');
 							}
 						}

@@ -131,12 +131,12 @@ export class InlineEditsSideBySideView extends Disposable implements IInlineEdit
 				{
 					class: ['editorContainer'],
 					style: { position: 'absolute', overflow: 'hidden', cursor: 'pointer' },
-					onmousedown: e => {
+					onmousedown: ((e: any) => {
 						e.preventDefault(); // This prevents that the editor loses focus
-					},
-					onclick: e => {
+					}) as any,
+					onclick: ((e: any) => {
 						this._onDidClick.fire(InlineEditClickEvent.create(e));
-					}
+					}) as any
 				},
 				[n.div({ class: 'preview', style: { pointerEvents: 'none' }, ref: this.previewRef })]
 			)
@@ -503,9 +503,9 @@ export class InlineEditsSideBySideView extends Disposable implements IInlineEdit
 					);
 					const borderStylingSeparator = `${BORDER_WIDTH + separatorWidth}px solid ${editorBackground}`;
 
-					const hasBorderLeft = layoutInfoObs.read(reader).codeScrollLeft !== 0;
+					const hasBorderLeft = (layoutInfoObs.read(reader) as any).codeScrollLeft !== 0;
 					const isModifiedLower = layoutInfoObs.map(
-						layoutInfo => layoutInfo.codeRect.bottom < layoutInfo.editRect.bottom
+						layoutInfo => (layoutInfo as any).codeRect.bottom < (layoutInfo as any).editRect.bottom
 					);
 					const transitionRectSize = BORDER_RADIUS * 2 + BORDER_WIDTH * 2;
 
@@ -514,17 +514,17 @@ export class InlineEditsSideBySideView extends Disposable implements IInlineEdit
 					const overlayHider = layoutInfoObs
 						.map(layoutInfo =>
 							Rect.fromLeftTopRightBottom(
-								layoutInfo.contentLeft - BORDER_RADIUS - BORDER_WIDTH,
-								layoutInfo.codeRect.top,
-								layoutInfo.contentLeft,
-								layoutInfo.codeRect.bottom + transitionRectSize
+								(layoutInfo as any).contentLeft - BORDER_RADIUS - BORDER_WIDTH,
+								(layoutInfo as any).codeRect.top,
+								(layoutInfo as any).contentLeft,
+								(layoutInfo as any).codeRect.bottom + transitionRectSize
 							)
 						)
 						.read(reader);
 
 					const intersectionLine = new OffsetRange(overlayHider.left, Number.MAX_SAFE_INTEGER);
 					const overlayRect = layoutInfoObs.map(layoutInfo =>
-						layoutInfo.codeRect.intersectHorizontal(intersectionLine)
+						(layoutInfo as any).codeRect.intersectHorizontal(intersectionLine)
 					);
 					const separatorRect = overlayRect.map(overlayRect =>
 						overlayRect
@@ -630,7 +630,7 @@ export class InlineEditsSideBySideView extends Disposable implements IInlineEdit
 					}
 
 					const isModifiedLower = layoutInfoObs.map(
-						layoutInfo => layoutInfo.codeRect.bottom < layoutInfo.editRect.bottom
+						layoutInfo => (layoutInfo as any).codeRect.bottom < (layoutInfo as any).editRect.bottom
 					);
 					const editorBackground = this._editorBackgroundColor.read(reader);
 
@@ -643,7 +643,7 @@ export class InlineEditsSideBySideView extends Disposable implements IInlineEdit
 					);
 					const borderStylingSeparator = `${BORDER_WIDTH + separatorWidth}px solid ${editorBackground}`;
 
-					const overlayRect = layoutInfoObs.map(layoutInfo => layoutInfo.editRect.withMargin(0, BORDER_WIDTH));
+					const overlayRect = layoutInfoObs.map(layoutInfo => (layoutInfo as any).editRect.withMargin(0, BORDER_WIDTH));
 					const separatorRect = overlayRect.map(overlayRect =>
 						overlayRect.withMargin(separatorWidth, separatorWidth, separatorWidth, 0)
 					);
@@ -651,10 +651,10 @@ export class InlineEditsSideBySideView extends Disposable implements IInlineEdit
 					const insertionRect = derived(this, reader => {
 						const overlay = overlayRect.read(reader);
 						const layoutinfo = layoutInfoObs.read(reader);
-						if (!layoutinfo.isInsertion || layoutinfo.contentLeft >= overlay.left) {
+						if (!(layoutinfo as any).isInsertion || (layoutinfo as any).contentLeft >= overlay.left) {
 							return Rect.fromLeftTopWidthHeight(overlay.left, overlay.top, 0, 0);
 						}
-						return new Rect(layoutinfo.contentLeft, overlay.top, overlay.left, overlay.top + BORDER_WIDTH * 2);
+						return new Rect((layoutinfo as any).contentLeft, overlay.top, overlay.left, overlay.top + BORDER_WIDTH * 2);
 					});
 
 					return [

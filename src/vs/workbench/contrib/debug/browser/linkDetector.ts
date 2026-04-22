@@ -189,7 +189,7 @@ export class LinkDetector implements ILinkDetector {
 				}
 
 				container.append(...this.applyHighlights(node, part.index, part.value.length, highlights));
-			} catch (e) {
+			} catch (_e) {
 				container.appendChild(document.createTextNode(part.value));
 			}
 		}

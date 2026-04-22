@@ -54,7 +54,7 @@ export class ManagedHoverWidget implements IDisposable {
 
 		let resolvedContent: string | HTMLElement | IMarkdownString | undefined;
 		if (isString(content) || isHTMLElement(content) || content === undefined) {
-			resolvedContent = content;
+			resolvedContent = content as string | HTMLElement | undefined;
 		} else {
 			// compute the content, potentially long-running
 

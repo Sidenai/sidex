@@ -139,7 +139,7 @@ export abstract class AbstractEditorNavigationQuickAccessProvider implements IQu
 	/**
 	 * Subclasses to implement if they can operate on the text editor.
 	 */
-	protected canProvideWithTextEditor(editor: IEditor): boolean {
+	protected canProvideWithTextEditor(_editor: IEditor): boolean {
 		return true;
 	}
 

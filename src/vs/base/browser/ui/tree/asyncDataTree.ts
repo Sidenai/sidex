@@ -288,7 +288,7 @@ class AsyncDataTreeElementsDragAndDropData<TInput, T, TContext> extends Elements
 	}
 }
 
-function asAsyncDataTreeDragAndDropData<TInput, T>(data: IDragAndDropData): IDragAndDropData {
+function asAsyncDataTreeDragAndDropData<_TInput, _T>(data: IDragAndDropData): IDragAndDropData {
 	if (data instanceof ElementsDragAndDropData) {
 		return new AsyncDataTreeElementsDragAndDropData(data);
 	}
@@ -324,7 +324,7 @@ class AsyncDataTreeNodeListDragAndDrop<TInput, T> implements IListDragAndDrop<IA
 		targetIndex: number | undefined,
 		targetSector: ListViewTargetSector | undefined,
 		originalEvent: DragEvent,
-		raw = true
+		_raw = true
 	): boolean | IListDragOverReaction {
 		return this.dnd.onDragOver(
 			asAsyncDataTreeDragAndDropData(data),
@@ -582,13 +582,11 @@ function asObjectTreeOptions<TInput, T, TFilterData>(
 			dnd: options.dnd && new AsyncDataTreeNodeListDragAndDrop(options.dnd),
 			multipleSelectionController: options.multipleSelectionController && {
 				isSelectionSingleChangeEvent(e) {
-					// eslint-disable-next-line local/code-no-dangerous-type-assertions
 					return options.multipleSelectionController!.isSelectionSingleChangeEvent({ ...e, element: e.element } as
 						| IListMouseEvent<T>
 						| IListTouchEvent<T>);
 				},
 				isSelectionRangeChangeEvent(e) {
-					// eslint-disable-next-line local/code-no-dangerous-type-assertions
 					return options.multipleSelectionController!.isSelectionRangeChangeEvent({ ...e, element: e.element } as
 						| IListMouseEvent<T>
 						| IListTouchEvent<T>);
@@ -943,7 +941,7 @@ export class AsyncDataTree<TInput, T, TFilterData = void> implements IDisposable
 	}
 
 	get options(): IAsyncDataTreeOptions<T, TFilterData> {
-		return this.tree.options as IAsyncDataTreeOptions<T, TFilterData>;
+		return this.tree.options as unknown as IAsyncDataTreeOptions<T, TFilterData>;
 	}
 
 	// Widget

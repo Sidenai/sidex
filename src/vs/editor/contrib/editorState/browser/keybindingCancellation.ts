@@ -49,7 +49,7 @@ registerSingleton(
 				this._tokens.set(editor, data);
 			}
 
-			let removeFn: Function | undefined;
+			let removeFn: ((...args: any[]) => any) | undefined;
 
 			data.key.set(true);
 			removeFn = data.tokens.push(cts);
@@ -81,7 +81,7 @@ registerSingleton(
 );
 
 export class EditorKeybindingCancellationTokenSource extends CancellationTokenSource {
-	private readonly _unregister: Function;
+	private readonly _unregister: (...args: any[]) => any;
 
 	constructor(
 		readonly editor: ICodeEditor,

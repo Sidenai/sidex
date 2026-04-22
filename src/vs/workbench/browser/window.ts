@@ -144,7 +144,7 @@ export abstract class BaseWindow extends Disposable {
 			const timeoutHandle = BaseWindow.TIMEOUT_HANDLES++;
 			BaseWindow.TIMEOUT_DISPOSABLES.set(timeoutHandle, timeoutDisposables);
 
-			const handlerFn = createSingleCallFunction(handler, () => {
+			const handlerFn = createSingleCallFunction(handler as unknown as (...args: any[]) => any, () => {
 				dispose(timeoutDisposables);
 				BaseWindow.TIMEOUT_DISPOSABLES.delete(timeoutHandle);
 			});

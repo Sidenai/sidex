@@ -2330,7 +2330,7 @@ export abstract class AbstractExtensionGalleryService implements IExtensionGalle
 				},
 				CancellationToken.None
 			);
-		} catch (error) {
+		} catch (_error) {
 			/* Ignore */
 		}
 	}
@@ -2558,7 +2558,7 @@ export abstract class AbstractExtensionGalleryService implements IExtensionGalle
 					) {
 						versions.push(version);
 					}
-				} catch (error) {
+				} catch (_error) {
 					/* Ignore error and skip version */
 				}
 			})

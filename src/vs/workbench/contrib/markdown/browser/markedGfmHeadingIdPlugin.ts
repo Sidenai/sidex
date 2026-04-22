@@ -36,7 +36,10 @@ function unescape(html: string) {
 	});
 }
 
-export function markedGfmHeadingIdPlugin({ prefix = '', globalSlugs = false } = {}): marked.MarkedExtension {
+export function markedGfmHeadingIdPlugin({
+	prefix = '',
+	globalSlugs: _globalSlugs = false
+} = {}): marked.MarkedExtension {
 	return {
 		// hooks: {
 		// 	preprocess(src: string) {

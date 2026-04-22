@@ -163,7 +163,7 @@ export class CompositeBarActionViewItem extends BaseActionViewItem {
 	protected container!: HTMLElement;
 	protected label!: HTMLElement;
 	protected badge!: HTMLElement;
-	protected override readonly options: ICompositeBarActionViewItemOptions;
+	declare protected readonly options: ICompositeBarActionViewItemOptions;
 
 	private badgeContent: HTMLElement | undefined;
 	private readonly badgeDisposable = this._register(new MutableDisposable<DisposableStore>());
@@ -311,7 +311,7 @@ export class CompositeBarActionViewItem extends BaseActionViewItem {
 		this.updateTitle();
 	}
 
-	private onThemeChange(theme: IColorTheme): void {
+	private onThemeChange(_theme: IColorTheme): void {
 		this.updateStyles();
 	}
 

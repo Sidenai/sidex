@@ -74,7 +74,7 @@ class InPlaceReplaceController implements IEditorContribution {
 			return Promise.resolve(undefined);
 		}
 
-		this.currentRequest = createCancelablePromise(token =>
+		this.currentRequest = createCancelablePromise(_token =>
 			this.editorWorkerService.navigateValueSet(modelURI, selection, up)
 		);
 

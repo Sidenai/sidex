@@ -679,7 +679,7 @@ export abstract class AbstractExtensionsScannerService extends Disposable implem
 		try {
 			const content = await this.fileService.readFile(this.extensionsControlLocation);
 			return JSON.parse(content.value.toString());
-		} catch (error) {
+		} catch (_error) {
 			return {};
 		}
 	}
@@ -727,7 +727,7 @@ export abstract class AbstractExtensionsScannerService extends Disposable implem
 			if (typeof stat.mtime === 'number') {
 				return stat.mtime;
 			}
-		} catch (err) {
+		} catch (_err) {
 			// That's ok...
 		}
 		return undefined;
@@ -1136,7 +1136,7 @@ class ExtensionsScanner extends Disposable {
 				}
 				const localized = localizedMessages.values || Object.create(null);
 				return localizeManifest(this.logService, extensionManifest, localized, defaults);
-			} catch (error) {
+			} catch (_error) {
 				/*Ignore Error*/
 			}
 		}
@@ -1192,7 +1192,7 @@ class ExtensionsScanner extends Disposable {
 					const values = translationBundle.contents ? translationBundle.contents.package : undefined;
 					return { values: values, default: defaultPackageNLS };
 				}
-			} catch (error) {
+			} catch (_error) {
 				return { values: undefined, default: defaultPackageNLS };
 			}
 		} else {
@@ -1203,7 +1203,7 @@ class ExtensionsScanner extends Disposable {
 			let messageBundle;
 			try {
 				messageBundle = await this.findMessageBundles(extensionLocation, nlsConfiguration);
-			} catch (error) {
+			} catch (_error) {
 				return undefined;
 			}
 			if (!messageBundle.localized) {
@@ -1221,7 +1221,7 @@ class ExtensionsScanner extends Disposable {
 					return { values: undefined, default: messageBundle.original };
 				}
 				return { values: messages, default: messageBundle.original };
-			} catch (error) {
+			} catch (_error) {
 				return { values: undefined, default: messageBundle.original };
 			}
 		}
@@ -1238,7 +1238,7 @@ class ExtensionsScanner extends Disposable {
 			try {
 				const originalBundleContent = (await this.fileService.readFile(originalMessageBundle)).value.toString();
 				return parse(originalBundleContent, errors);
-			} catch (error) {
+			} catch (_error) {
 				/* Ignore Error */
 			}
 		}
@@ -1253,7 +1253,7 @@ class ExtensionsScanner extends Disposable {
 		extensionLocation: URI,
 		nlsConfiguration: NlsConfiguration
 	): Promise<{ localized: URI; original: URI | null }> {
-		return new Promise<{ localized: URI; original: URI | null }>((c, e) => {
+		return new Promise<{ localized: URI; original: URI | null }>((c, _e) => {
 			const loop = (locale: string): void => {
 				const toCheck = joinPath(extensionLocation, `package.nls.${locale}.json`);
 				this.fileService.exists(toCheck).then(exists => {
@@ -1471,7 +1471,7 @@ export class NativeExtensionsScannerService
 				try {
 					const content = await this.fileService.readFile(URI.file(platform.translationsConfigFile));
 					return JSON.parse(content.value.toString());
-				} catch (err) {
+				} catch (_err) {
 					/* Ignore Error */
 				}
 			}
@@ -1479,7 +1479,7 @@ export class NativeExtensionsScannerService
 		})();
 	}
 
-	protected getTranslations(language: string): Promise<Translations> {
+	protected getTranslations(_language: string): Promise<Translations> {
 		return this.translationsPromise;
 	}
 }

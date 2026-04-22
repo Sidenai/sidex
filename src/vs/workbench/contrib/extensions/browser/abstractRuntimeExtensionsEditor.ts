@@ -211,10 +211,10 @@ export abstract class AbstractRuntimeExtensionsEditor extends EditorPane {
 		const TEMPLATE_ID = 'runtimeExtensionElementTemplate';
 
 		const delegate = new class implements IListVirtualDelegate<IRuntimeExtension> {
-			getHeight(element: IRuntimeExtension): number {
+			getHeight(_element: IRuntimeExtension): number {
 				return 70;
 			}
-			getTemplateId(element: IRuntimeExtension): string {
+			getTemplateId(_element: IRuntimeExtension): string {
 				return TEMPLATE_ID;
 			}
 		};

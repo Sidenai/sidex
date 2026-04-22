@@ -306,7 +306,7 @@ export class InlayHintsController implements IEditorContribution {
 		this._scheduler.schedule(0);
 
 		this._sessionDisposables.add(
-			this._editor.onDidScrollChange(e => {
+			this._editor.onDidScrollChange(_e => {
 				// Pause inlay hint updates during active scrolling for better performance
 				this._isScrolling = true;
 				this._scrollEndScheduler.schedule();
@@ -316,7 +316,7 @@ export class InlayHintsController implements IEditorContribution {
 
 		const cursor = this._sessionDisposables.add(new MutableDisposable());
 		this._sessionDisposables.add(
-			this._editor.onDidChangeModelContent(e => {
+			this._editor.onDidChangeModelContent(_e => {
 				cts?.cancel();
 
 				// mark current cursor position and time after which the whole can be updated/redrawn
@@ -419,7 +419,7 @@ export class InlayHintsController implements IEditorContribution {
 		return Array.from(lineHints);
 	}
 
-	private _installDblClickGesture(updateInlayHints: Function): IDisposable {
+	private _installDblClickGesture(updateInlayHints: (...args: any[]) => any): IDisposable {
 		return this._editor.onMouseUp(async e => {
 			if (e.event.detail !== 2) {
 				return;
@@ -569,9 +569,9 @@ export class InlayHintsController implements IEditorContribution {
 					lastItem = targetItem;
 				} else if (lastItem && fixedLength) {
 					// still lengths but no more item. give it all to the last
-					let len = itemFixedLengths.get(lastItem)!;
-					len += fixedLength;
-					len += fixedLengths.reduce((p, c) => p + c, 0);
+					let _len = itemFixedLengths.get(lastItem)!;
+					_len += fixedLength;
+					_len += fixedLengths.reduce((p, c) => p + c, 0);
 					fixedLengths.length = 0;
 					break; // DONE
 				}

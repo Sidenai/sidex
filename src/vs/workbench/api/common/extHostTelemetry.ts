@@ -29,7 +29,7 @@ export class ExtHostTelemetry extends Disposable implements ExtHostTelemetryShap
 		return false;
 	}
 	getTelemetryDetails(): vscode.TelemetryConfiguration {
-		return { isCrashEnabled: false, isErrorsEnabled: false, isUsageEnabled: false };
+		return { isCrashEnabled: false, isErrorsEnabled: false, isUsageEnabled: false } as any;
 	}
 	onExtensionError(_extension: ExtensionIdentifier, _error: Error): boolean {
 		return false;

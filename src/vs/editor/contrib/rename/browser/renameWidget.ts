@@ -392,7 +392,7 @@ export class RenameWidget implements IRenameWidget, IContentWidget, IDisposable 
 		this._currentAcceptInput?.(wantsPreview);
 	}
 
-	cancelInput(focusEditor: boolean, caller: string): void {
+	cancelInput(focusEditor: boolean, _caller: string): void {
 		// this._trace(`invoking cancelInput, caller: ${caller}, _currentCancelInput: ${this._currentAcceptInput ? 'not undefined' : 'undefined'}`);
 		this._currentCancelInput?.(focusEditor);
 	}
@@ -764,7 +764,7 @@ class RenameCandidateListView {
 		);
 
 		this._disposables.add(
-			this._listWidget.onDidBlur(e => {
+			this._listWidget.onDidBlur(_e => {
 				// @ulugbekna: because list widget otherwise remembers last focused element and returns it as focused element
 				this._listWidget.setFocus([]);
 			})
@@ -917,11 +917,11 @@ class RenameCandidateListView {
 
 	private static _createListWidget(container: HTMLElement, candidateViewHeight: number, fontInfo: FontInfo) {
 		const virtualDelegate = new (class implements IListVirtualDelegate<NewSymbolName> {
-			getTemplateId(element: NewSymbolName): string {
+			getTemplateId(_element: NewSymbolName): string {
 				return 'candidate';
 			}
 
-			getHeight(element: NewSymbolName): number {
+			getHeight(_element: NewSymbolName): number {
 				return candidateViewHeight;
 			}
 		})();

@@ -24,8 +24,8 @@ export namespace TunnelDtoConverter {
 		return {
 			remoteAddress: tunnel.remoteAddress,
 			localAddress: tunnel.localAddress,
-			public: !!tunnel.public,
-			privacy: tunnel.privacy ?? (tunnel.public ? TunnelPrivacyId.Public : TunnelPrivacyId.Private),
+			public: !!(tunnel as any).public,
+			privacy: tunnel.privacy ?? ((tunnel as any).public ? TunnelPrivacyId.Public : TunnelPrivacyId.Private),
 			protocol: tunnel.protocol
 		};
 	}

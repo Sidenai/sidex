@@ -22,6 +22,7 @@ import {
 } from './textfiles.js';
 import { IRevertOptions, SaveReason, SaveSourceRegistry } from '../../../common/editor.js';
 import { BaseTextEditorModel } from '../../../common/editor/textEditorModel.js';
+import { IResolvedTextEditorModel } from '../../../../editor/common/services/resolverService.js';
 import { IWorkingCopyBackupService, IResolvedWorkingCopyBackup } from '../../workingCopy/common/workingCopyBackup.js';
 import {
 	IFileService,
@@ -256,7 +257,7 @@ export class TextFileEditorModel extends BaseTextEditorModel implements ITextFil
 
 	//#region Backup
 
-	async backup(token: CancellationToken): Promise<IWorkingCopyBackup> {
+	async backup(_token: CancellationToken): Promise<IWorkingCopyBackup> {
 		// Fill in metadata if we are resolved
 		let meta: IBackupMetaData | undefined = undefined;
 		if (this.lastResolvedFileStat) {
@@ -354,7 +355,7 @@ export class TextFileEditorModel extends BaseTextEditorModel implements ITextFil
 		}
 
 		// Second, check if we have a backup to resolve from (only for new models)
-		const isNewModel = !this.isResolved();
+		const isNewModel = !(this.isResolved() as boolean);
 		if (isNewModel) {
 			const resolvedFromBackup = await this.resolveFromBackup(options);
 			if (resolvedFromBackup) {
@@ -431,7 +432,7 @@ export class TextFileEditorModel extends BaseTextEditorModel implements ITextFil
 		}
 
 		// Abort if someone else managed to resolve the model by now
-		const isNewModel = !this.isResolved();
+		const isNewModel = !(this.isResolved() as boolean);
 		if (!isNewModel) {
 			this.trace('resolveFromBackup() - exit - without resolving because previously new model got created meanwhile');
 
@@ -732,7 +733,7 @@ export class TextFileEditorModel extends BaseTextEditorModel implements ITextFil
 
 	//#region Dirty
 
-	isDirty(): this is IResolvedTextFileEditorModel {
+	isDirty(): boolean {
 		return this.dirty;
 	}
 
@@ -1155,7 +1156,7 @@ export class TextFileEditorModel extends BaseTextEditorModel implements ITextFil
 		}
 	}
 
-	async joinState(state: TextFileEditorModelState.PENDING_SAVE): Promise<void> {
+	async joinState(_state: TextFileEditorModelState.PENDING_SAVE): Promise<void> {
 		return this.saveSequentializer.running;
 	}
 
@@ -1299,7 +1300,7 @@ export class TextFileEditorModel extends BaseTextEditorModel implements ITextFil
 		this.logService.trace(`[text file model] ${msg}`, this.resource.toString());
 	}
 
-	override isResolved(): this is IResolvedTextFileEditorModel {
+	override isResolved(): this is IResolvedTextEditorModel {
 		return !!this.textEditorModel;
 	}
 

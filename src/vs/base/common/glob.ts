@@ -444,7 +444,7 @@ function trimForExclusions(pattern: string, options: IGlobOptions): string {
 
 // common pattern: **/*.txt just need endsWith check
 function trivia1(base: string, pattern: string, options: IGlobOptionsInternal): ParsedStringPattern {
-	return function (path: string, basename?: string) {
+	return function (path: string, _basename?: string) {
 		return typeof path === 'string' && options.endsWith(path, base) ? pattern : null;
 	};
 }
@@ -536,7 +536,7 @@ function trivia4and5(
 
 	let parsedPattern: ParsedStringPattern;
 	if (matchPathEnds) {
-		parsedPattern = function (path: string, basename?: string) {
+		parsedPattern = function (path: string, _basename?: string) {
 			return typeof path === 'string' &&
 				(options.equals(path, nativePath) ||
 					options.endsWith(path, nativePathEnd) ||
@@ -545,7 +545,7 @@ function trivia4and5(
 				: null;
 		};
 	} else {
-		parsedPattern = function (path: string, basename?: string) {
+		parsedPattern = function (path: string, _basename?: string) {
 			return typeof path === 'string' &&
 				(options.equals(path, nativePath) || (!usingPosixSep && options.equals(path, targetPath)))
 				? pattern

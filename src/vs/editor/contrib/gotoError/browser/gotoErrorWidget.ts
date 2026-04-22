@@ -327,7 +327,7 @@ export class MarkerNavigationWidget extends PeekViewWidget {
 	protected override _fillHead(container: HTMLElement): void {
 		super._fillHead(container);
 
-		this._disposables.add(this._actionbarWidget!.actionRunner.onWillRun(e => this.editor.focus()));
+		this._disposables.add(this._actionbarWidget!.actionRunner.onWillRun(_e => this.editor.focus()));
 
 		const menu = this._menuService.getMenuActions(MarkerNavigationWidget.TitleMenu, this._contextKeyService);
 		const actions = getFlatActionBarActions(menu);

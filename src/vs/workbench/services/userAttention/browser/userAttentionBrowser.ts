@@ -14,7 +14,6 @@ import {
 	observableFromEvent,
 	observableValue
 } from '../../../../base/common/observable.js';
-// eslint-disable-next-line local/code-no-deep-import-of-internal
 import {
 	TotalTrueTimeObservable,
 	wasTrueRecently

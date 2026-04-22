@@ -12,6 +12,7 @@ import { createDecorator } from '../../../../platform/instantiation/common/insta
 // Inline interface to avoid importing heavy userDataSync module
 export interface IWorkspaceStateFolder {
 	resourceUri: string;
+	workspaceFolderIdentity?: string;
 }
 import {
 	EditSessionIdentityMatch,
@@ -158,7 +159,7 @@ export class WorkspaceIdentityService implements IWorkspaceIdentityService {
 				}
 			} else {
 				// walk object
-				for (const key in obj) {
+				for (const key in obj as Record<string, unknown>) {
 					if (Object.hasOwnProperty.call(obj, key)) {
 						(obj as Record<string, unknown>)[key] = uriReplacer((obj as Record<string, unknown>)[key], depth + 1);
 					}

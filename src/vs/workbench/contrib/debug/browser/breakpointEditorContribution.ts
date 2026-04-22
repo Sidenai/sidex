@@ -1013,7 +1013,7 @@ class InlineBreakpointWidget implements IContentWidget, IDisposable {
 			this.domNode.classList.add(...cssClass.split(' '));
 		}
 		this.toDispose.push(
-			dom.addDisposableListener(this.domNode, dom.EventType.CLICK, async e => {
+			dom.addDisposableListener(this.domNode, dom.EventType.CLICK, async _e => {
 				switch (this.breakpoint?.enabled) {
 					case undefined:
 						await this.debugService.addBreakpoints(this.editor.getModel().uri, [

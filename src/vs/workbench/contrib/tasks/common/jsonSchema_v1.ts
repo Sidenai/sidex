@@ -112,7 +112,7 @@ ProblemMatcherRegistry.onReady().then(() => {
 		const matcherIds = ProblemMatcherRegistry.keys().map(key => '$' + key);
 		definitions.problemMatcherType1.oneOf![0].enum = matcherIds;
 		(definitions.problemMatcherType1.oneOf![2].items as IJSONSchema).anyOf![1].enum = matcherIds;
-	} catch (err) {
+	} catch (_err) {
 		console.log('Installing problem matcher ids failed');
 	}
 });

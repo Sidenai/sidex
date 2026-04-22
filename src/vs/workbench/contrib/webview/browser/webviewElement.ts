@@ -330,7 +330,7 @@ export class WebviewElement extends Disposable implements IWebviewElement, Webvi
 						query: entry.query ? decodeURIComponent(entry.query) : entry.query
 					});
 					this.loadResource(entry.id, uri, entry.ifNoneMatch);
-				} catch (e) {
+				} catch (_e) {
 					this._send('did-load-resource', {
 						id: entry.id,
 						status: 404,

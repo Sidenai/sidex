@@ -511,7 +511,7 @@ const apiMenus: IAPIMenu[] = [
 		id: MenuId.ChatTextEditorMenu,
 		description: localize('menus.chatTextEditor', 'The Chat submenu in the text editor context menu.'),
 		supportsSubmenus: false,
-		proposed: 'chatParticipantPrivate'
+		proposed: 'chatParticipantPrivate' as any
 	},
 	{
 		key: 'chat/input/editing/sessionToolbar',
@@ -579,20 +579,20 @@ const apiMenus: IAPIMenu[] = [
 			'The create button in the Chat Customizations management editor.'
 		),
 		supportsSubmenus: false,
-		proposed: 'chatSessionCustomizationProvider'
+		proposed: 'chatSessionCustomizationProvider' as any
 	},
 	{
 		key: 'chat/editor/inlineGutter',
 		id: MenuId.ChatEditorInlineMenu,
 		description: localize('menus.chatEditorInlineGutter', 'The inline gutter menu in the chat editor.'),
 		supportsSubmenus: false,
-		proposed: 'contribChatEditorInlineGutterMenu'
+		proposed: 'contribChatEditorInlineGutterMenu' as any
 	},
 	{
 		key: 'chat/contextUsage/actions',
 		id: MenuId.ChatContextUsageActions,
 		description: localize('menus.chatContextUsageActions', 'Actions in the chat context usage details popup.'),
-		proposed: 'chatParticipantAdditions'
+		proposed: 'chatParticipantAdditions' as any
 	},
 	{
 		key: 'chat/newSession',

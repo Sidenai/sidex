@@ -167,7 +167,7 @@ export class ActionWidgetDropdown extends BaseDropdown {
 		const auxiliaryActionIds = new Set(actionBarActions.map(action => action.id));
 
 		const actionWidgetDelegate: IActionListDelegate<IActionWidgetDropdownAction> = {
-			onSelect: (action, preview) => {
+			onSelect: (action, _preview) => {
 				if (!auxiliaryActionIds.has(action.id)) {
 					selectedOption = action;
 				}

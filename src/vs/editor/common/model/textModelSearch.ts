@@ -52,7 +52,7 @@ export class SearchParams {
 				global: true,
 				unicode: true
 			});
-		} catch (err) {
+		} catch (_err) {
 			return null;
 		}
 

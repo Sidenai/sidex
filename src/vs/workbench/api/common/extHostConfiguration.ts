@@ -118,7 +118,7 @@ export class ExtHostConfigProvider {
 
 	getConfiguration(
 		section?: string,
-		scope?: vscode.ConfigurationScope | null,
+		_scope?: vscode.ConfigurationScope | null,
 		_extensionDescription?: IExtensionDescription
 	): vscode.WorkspaceConfiguration {
 		const overrides: IConfigurationOverrides = {};

@@ -63,7 +63,10 @@ import './searchActionsTopBar.js';
 import './searchActionsTextQuickAccess.js';
 import { TEXT_SEARCH_QUICK_ACCESS_PREFIX, TextSearchQuickAccess } from './quickTextSearch/textSearchQuickAccess.js';
 import { Extensions, IConfigurationMigrationRegistry } from '../../../common/configuration.js';
-import { registerWorkbenchContribution2, WorkbenchPhase } from '../../../common/contributions.js';
+import {
+	registerWorkbenchContribution2 as _registerWorkbenchContribution2,
+	WorkbenchPhase as _WorkbenchPhase
+} from '../../../common/contributions.js';
 import { AccessibleViewRegistry } from '../../../../platform/accessibility/browser/accessibleViewRegistry.js';
 import { SearchAccessibilityHelp } from './searchAccessibilityHelp.js';
 

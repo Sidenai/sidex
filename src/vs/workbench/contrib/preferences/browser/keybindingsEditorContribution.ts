@@ -61,7 +61,7 @@ class DefineKeybindingEditorContribution extends Disposable implements IDefineKe
 		this._defineWidget = this._register(
 			this._instantiationService.createInstance(DefineKeybindingOverlayWidget, this._editor)
 		);
-		this._register(this._editor.onDidChangeModel(e => this._update()));
+		this._register(this._editor.onDidChangeModel(_e => this._update()));
 		this._update();
 	}
 

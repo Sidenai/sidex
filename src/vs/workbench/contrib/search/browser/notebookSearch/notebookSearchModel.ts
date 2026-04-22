@@ -180,7 +180,7 @@ export class CellMatch implements ICellMatch {
 			// todo: get closed notebook results in search editor
 			return;
 		}
-		this.cell.resolveTextModel().then(textModel => {
+		(this.cell as any).resolveTextModel().then((textModel: any) => {
 			const textResultsWithContext = getTextSearchMatchWithModelContext(
 				textSearchMatches,
 				textModel,
@@ -307,11 +307,11 @@ export class NotebookCompatibleFileMatch extends FileMatchImpl implements INoteb
 		if (match.webviewIndex !== undefined) {
 			const index = this._notebookEditorWidget.getCellIndex(match.cell);
 			if (index !== undefined) {
-				this._notebookEditorWidget.revealCellOffsetInCenter(match.cell, outputOffset ?? 0);
+				(this._notebookEditorWidget as any).revealCellOffsetInCenter(match.cell, outputOffset ?? 0);
 			}
 		} else {
-			match.cell.updateEditState(match.cell.getEditState(), 'focusNotebookCell');
-			this._notebookEditorWidget.setCellEditorSelection(match.cell, match.range());
+			(match.cell as any).updateEditState((match.cell as any).getEditState(), 'focusNotebookCell');
+			(this._notebookEditorWidget as any).setCellEditorSelection(match.cell, match.range());
 			this._notebookEditorWidget.revealRangeInCenterIfOutsideViewportAsync(match.cell, match.range());
 		}
 	}
@@ -365,7 +365,7 @@ export class NotebookCompatibleFileMatch extends FileMatchImpl implements INoteb
 		if (!this._notebookEditorWidget) {
 			return;
 		}
-		this._findMatchDecorationModel?.stopWebviewFind();
+		(this._findMatchDecorationModel as any)?.stopWebviewFind();
 		this._findMatchDecorationModel?.dispose();
 		this._findMatchDecorationModel = new FindMatchDecorationModel(this._notebookEditorWidget, this.searchInstanceID);
 		if (this._selectedMatch instanceof MatchInNotebook) {
@@ -375,7 +375,7 @@ export class NotebookCompatibleFileMatch extends FileMatchImpl implements INoteb
 
 	private _removeNotebookHighlights(): void {
 		if (this._findMatchDecorationModel) {
-			this._findMatchDecorationModel?.stopWebviewFind();
+			(this._findMatchDecorationModel as any)?.stopWebviewFind();
 			this._findMatchDecorationModel?.dispose();
 			this._findMatchDecorationModel = undefined;
 		}
@@ -443,7 +443,7 @@ export class NotebookCompatibleFileMatch extends FileMatchImpl implements INoteb
 		);
 		try {
 			this._findMatchDecorationModel.setAllFindMatchesDecorations(cellFindMatch);
-		} catch (e) {
+		} catch (_e) {
 			// no op, might happen due to bugs related to cell output regex search
 		}
 	}
@@ -455,7 +455,7 @@ export class NotebookCompatibleFileMatch extends FileMatchImpl implements INoteb
 		this._textMatches = new Map<string, ISearchTreeMatch>();
 
 		const wordSeparators = this._query.isWordMatch && this._query.wordSeparators ? this._query.wordSeparators : null;
-		const allMatches = await this._notebookEditorWidget.find(
+		const allMatches = await (this._notebookEditorWidget as any).find(
 			this._query.pattern,
 			{
 				regex: this._query.isRegExp,
@@ -488,9 +488,12 @@ export class NotebookCompatibleFileMatch extends FileMatchImpl implements INoteb
 			return null;
 		}
 		if (match.webviewIndex === undefined) {
-			return this._findMatchDecorationModel.highlightCurrentFindMatchDecorationInCell(match.cell, match.range());
+			return (this._findMatchDecorationModel as any).highlightCurrentFindMatchDecorationInCell(
+				match.cell,
+				match.range()
+			);
 		} else {
-			return this._findMatchDecorationModel.highlightCurrentFindMatchDecorationInWebview(
+			return (this._findMatchDecorationModel as any).highlightCurrentFindMatchDecorationInWebview(
 				match.cell,
 				match.webviewIndex
 			);

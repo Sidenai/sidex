@@ -792,7 +792,7 @@ export class UserDataSyncService extends Disposable implements IUserDataSyncServ
 				this.instantiationService.createInstance(ProfileSynchronizer, profile, syncProfile?.collection)
 			);
 			disposables.add(profileSynchronizer.onDidChangeStatus(e => this.setStatus(e)));
-			disposables.add(profileSynchronizer.onDidChangeConflicts(conflicts => this.updateConflicts()));
+			disposables.add(profileSynchronizer.onDidChangeConflicts(_conflicts => this.updateConflicts()));
 			disposables.add(profileSynchronizer.onDidChangeLocal(e => this._onDidChangeLocal.fire(e)));
 			this.activeProfileSynchronizers.set(profile.id, (activeProfileSynchronizer = [profileSynchronizer, disposables]));
 		}

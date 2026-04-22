@@ -5,7 +5,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { invoke } from '@tauri-apps/api/core';
-import { Disposable, DisposableStore, toDisposable } from '../../../../base/common/lifecycle.js';
+import { Disposable, DisposableStore as _DisposableStore, toDisposable as _toDisposable } from '../../../../base/common/lifecycle.js';
 import { Emitter } from '../../../../base/common/event.js';
 import * as languages from '../../../../editor/common/languages.js';
 import { LanguageSelector } from '../../../../editor/common/languageSelector.js';

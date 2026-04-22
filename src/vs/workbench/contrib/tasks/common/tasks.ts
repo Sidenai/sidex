@@ -431,11 +431,11 @@ export const enum TaskScope {
 }
 
 export namespace TaskSourceKind {
-	export const Workspace: 'workspace' = 'workspace';
-	export const Extension: 'extension' = 'extension';
-	export const InMemory: 'inMemory' = 'inMemory';
-	export const WorkspaceFile: 'workspaceFile' = 'workspaceFile';
-	export const User: 'user' = 'user';
+	export const Workspace = 'workspace' as const;
+	export const Extension = 'extension' as const;
+	export const InMemory = 'inMemory' as const;
+	export const WorkspaceFile = 'workspaceFile' as const;
+	export const User = 'user' as const;
 
 	export function toConfigurationTarget(kind: string): ConfigurationTarget {
 		switch (kind) {
@@ -677,7 +677,7 @@ export abstract class CommonTask {
 		this._source = source;
 	}
 
-	public getDefinition(useSource?: boolean): KeyedTaskIdentifier | undefined {
+	public getDefinition(_useSource?: boolean): KeyedTaskIdentifier | undefined {
 		return undefined;
 	}
 
@@ -775,7 +775,7 @@ export class CustomTask extends CommonTask {
 	/**
 	 * Indicated the source of the task (e.g. tasks.json or extension)
 	 */
-	override _source: FileBasedTaskSource;
+	declare _source: FileBasedTaskSource;
 
 	hasDefinedMatchers: boolean;
 
@@ -942,7 +942,7 @@ export class ConfiguringTask extends CommonTask {
 	/**
 	 * Indicated the source of the task (e.g. tasks.json or extension)
 	 */
-	override _source: FileBasedTaskSource;
+	declare _source: FileBasedTaskSource;
 
 	configures: KeyedTaskIdentifier;
 
@@ -1134,7 +1134,7 @@ export class InMemoryTask extends CommonTask {
 	/**
 	 * Indicated the source of the task (e.g. tasks.json or extension)
 	 */
-	override _source: IInMemoryTaskSource;
+	declare _source: IInMemoryTaskSource;
 
 	instance: number | undefined;
 
@@ -1462,7 +1462,7 @@ export namespace TaskEvent {
 	export function problemMatcherEnded(
 		task: Task,
 		hasErrors: boolean,
-		terminalId?: number
+		_terminalId?: number
 	): ITaskProblemMatcherEndedEvent {
 		return {
 			...common(task),

@@ -27,7 +27,7 @@ export class LogsDataCleaner extends Disposable {
 			if (stat.children) {
 				const currentLog = basename(this.environmentService.logsHome);
 				const allSessions = stat.children.filter(stat => stat.isDirectory && /^\d{8}T\d{6}$/.test(stat.name));
-				const oldSessions = allSessions.sort().filter((d, i) => d.name !== currentLog);
+				const oldSessions = allSessions.sort().filter((d, _i) => d.name !== currentLog);
 				const toDelete = oldSessions.slice(0, Math.max(0, oldSessions.length - 49));
 				Promises.settled(toDelete.map(stat => this.fileService.del(stat.resource, { recursive: true })));
 			}

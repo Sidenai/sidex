@@ -111,17 +111,17 @@ export class SettingsFileSystemProvider extends Disposable implements IFileSyste
 
 	readonly onDidChangeCapabilities = Event.None;
 
-	watch(resource: URI, opts: IWatchOptions): IDisposable {
+	watch(_resource: URI, _opts: IWatchOptions): IDisposable {
 		return Disposable.None;
 	}
 
-	async mkdir(resource: URI): Promise<void> {}
-	async readdir(resource: URI): Promise<[string, FileType][]> {
+	async mkdir(_resource: URI): Promise<void> {}
+	async readdir(_resource: URI): Promise<[string, FileType][]> {
 		return [];
 	}
 
-	async rename(from: URI, to: URI, opts: IFileOverwriteOptions): Promise<void> {}
-	async delete(resource: URI, opts: IFileDeleteOptions): Promise<void> {}
+	async rename(_from: URI, _to: URI, _opts: IFileOverwriteOptions): Promise<void> {}
+	async delete(_resource: URI, _opts: IFileDeleteOptions): Promise<void> {}
 
 	async writeFile() {
 		throw new NotSupportedError();

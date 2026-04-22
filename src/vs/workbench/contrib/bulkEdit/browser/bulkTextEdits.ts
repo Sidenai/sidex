@@ -304,7 +304,7 @@ export class BulkTextEdits {
 			const resources: URI[] = [];
 			const validation = this._validateTasks(tasks);
 			if (!validation.canApply) {
-				throw new Error(`${validation.reason.toString()} has changed in the meantime`);
+				throw new Error(`${(validation as any).reason?.toString()} has changed in the meantime`);
 			}
 			if (tasks.length === 1) {
 				// This edit touches a single model => keep things simple

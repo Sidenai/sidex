@@ -342,7 +342,7 @@ export class VisibleLinesCollection<T extends IVisibleLine> {
 		return this._linesCollection.onTokensChanged(e.ranges);
 	}
 
-	public onZonesChanged(e: viewEvents.ViewZonesChangedEvent): boolean {
+	public onZonesChanged(_e: viewEvents.ViewZonesChangedEvent): boolean {
 		return true;
 	}
 
@@ -497,8 +497,8 @@ class ViewLayerRenderer<T extends IVisibleLine> {
 		ctx: IRendererContext<T>,
 		fromLineNumber: number,
 		toLineNumber: number,
-		deltaTop: number[],
-		deltaLN: number
+		_deltaTop: number[],
+		_deltaLN: number
 	): void {
 		const newLines: T[] = [];
 		let newLinesLen = 0;
@@ -520,8 +520,8 @@ class ViewLayerRenderer<T extends IVisibleLine> {
 		ctx: IRendererContext<T>,
 		fromLineNumber: number,
 		toLineNumber: number,
-		deltaTop: number[],
-		deltaLN: number
+		_deltaTop: number[],
+		_deltaLN: number
 	): void {
 		const newLines: T[] = [];
 		let newLinesLen = 0;

@@ -229,7 +229,7 @@ export abstract class PeekViewWidget extends ZoneWidget {
 		}
 	}
 
-	protected _fillTitleIcon(container: HTMLElement): void {}
+	protected _fillTitleIcon(_container: HTMLElement): void {}
 
 	protected _getActionBarOptions(): IActionBarOptions {
 		return {
@@ -238,7 +238,7 @@ export abstract class PeekViewWidget extends ZoneWidget {
 		};
 	}
 
-	protected _onTitleClick(event: IMouseEvent): void {
+	protected _onTitleClick(_event: IMouseEvent): void {
 		// implement me if supportOnTitleClick option is set
 	}
 
@@ -281,14 +281,14 @@ export abstract class PeekViewWidget extends ZoneWidget {
 		this._doLayoutBody(bodyHeight, widthInPixel);
 	}
 
-	protected _doLayoutHead(heightInPixel: number, widthInPixel: number): void {
+	protected _doLayoutHead(heightInPixel: number, _widthInPixel: number): void {
 		if (this._headElement) {
 			this._headElement.style.height = `${heightInPixel}px`;
 			this._headElement.style.lineHeight = this._headElement.style.height;
 		}
 	}
 
-	protected _doLayoutBody(heightInPixel: number, widthInPixel: number): void {
+	protected _doLayoutBody(heightInPixel: number, _widthInPixel: number): void {
 		if (this._bodyElement) {
 			this._bodyElement.style.height = `${heightInPixel}px`;
 		}

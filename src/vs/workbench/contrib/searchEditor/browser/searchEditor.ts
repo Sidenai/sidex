@@ -720,7 +720,7 @@ export class SearchEditor extends AbstractTextCodeEditor<SearchEditorViewState> 
 				folderResources.map(folder => folder.uri),
 				options
 			);
-		} catch (err) {
+		} catch (_err) {
 			return;
 		}
 

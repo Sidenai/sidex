@@ -573,7 +573,7 @@ export class MultiCursorSelectionController extends Disposable implements IEdito
 			findController.getState().change(newState, false);
 
 			this._sessionDispose.add(
-				this._editor.onDidChangeCursorSelection(e => {
+				this._editor.onDidChangeCursorSelection(_e => {
 					if (this._ignoreSelectionChange) {
 						return;
 					}
@@ -635,7 +635,7 @@ export class MultiCursorSelectionController extends Disposable implements IEdito
 		}
 	}
 
-	public getSession(findController: CommonFindController): MultiCursorSession | null {
+	public getSession(_findController: CommonFindController): MultiCursorSession | null {
 		return this._session;
 	}
 
@@ -980,7 +980,7 @@ export class SelectionHighlighter extends Disposable implements IEditorContribut
 		this.state = null;
 
 		this._register(
-			editor.onDidChangeConfiguration(e => {
+			editor.onDidChangeConfiguration(_e => {
 				this._isEnabled = editor.getOption(EditorOption.selectionHighlight);
 				this._isEnabledMultiline = editor.getOption(EditorOption.selectionHighlightMultiline);
 				this._maxLength = editor.getOption(EditorOption.selectionHighlightMaxLength);
@@ -1010,12 +1010,12 @@ export class SelectionHighlighter extends Disposable implements IEditorContribut
 			})
 		);
 		this._register(
-			editor.onDidChangeModel(e => {
+			editor.onDidChangeModel(_e => {
 				this._setState(null);
 			})
 		);
 		this._register(
-			editor.onDidChangeModelContent(e => {
+			editor.onDidChangeModelContent(_e => {
 				if (this._isEnabled) {
 					this.updateSoon.schedule();
 				}
@@ -1024,7 +1024,7 @@ export class SelectionHighlighter extends Disposable implements IEditorContribut
 		const findController = CommonFindController.get(editor);
 		if (findController) {
 			this._register(
-				findController.getState().onFindReplaceStateChange(e => {
+				findController.getState().onFindReplaceStateChange(_e => {
 					this._update();
 				})
 			);

@@ -166,7 +166,6 @@ export const openNewSearchEditor = async (
 		const name = entry[0];
 		const value = entry[1];
 		if (value !== undefined) {
-			// eslint-disable-next-line local/code-no-any-casts
 			(args as any)[name as any] =
 				typeof value === 'string'
 					? await configurationResolverService.resolveAsync(lastActiveWorkspaceRoot, value)

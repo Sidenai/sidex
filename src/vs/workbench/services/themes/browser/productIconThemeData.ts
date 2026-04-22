@@ -155,7 +155,6 @@ export class ProductIconThemeData implements IWorkbenchProductIconTheme {
 					case 'settingsId':
 					case 'styleSheetContent':
 					case 'watch':
-						// eslint-disable-next-line local/code-no-any-casts
 						(theme as any)[key] = data[key];
 						break;
 					case 'location':
@@ -188,7 +187,7 @@ export class ProductIconThemeData implements IWorkbenchProductIconTheme {
 				theme.iconThemeDocument = { iconDefinitions: restoredIconDefinitions };
 			}
 			return theme;
-		} catch (e) {
+		} catch (_e) {
 			return undefined;
 		}
 	}

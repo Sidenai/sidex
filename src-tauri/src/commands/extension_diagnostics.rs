@@ -469,7 +469,7 @@ pub async fn extension_runtime_status(
         .values()
         .map(ExtRuntimeState::to_record)
         .collect();
-    records.sort_by(|a, b| a.id.cmp(&b.id));
+    records.sort_by_key(|a| a.id.clone());
     Ok(records)
 }
 
@@ -502,7 +502,7 @@ pub async fn extension_slow_extensions(
         .filter(|e| e.is_slow())
         .map(ExtRuntimeState::to_profile)
         .collect();
-    records.sort_by(|a, b| b.activation_time_ms.cmp(&a.activation_time_ms));
+    records.sort_by_key(|a| std::cmp::Reverse(a.activation_time_ms));
     Ok(records)
 }
 

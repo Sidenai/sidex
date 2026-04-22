@@ -86,7 +86,7 @@ export class WorkspaceRecommendations extends ExtensionRecommendations {
 					}
 					workspaceExtensions.push(extension.resource);
 				}
-			} catch (error) {
+			} catch (_error) {
 				// ignore
 			}
 		}

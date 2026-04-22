@@ -121,7 +121,7 @@ export class TextAreaState {
 	public static deduceInput(
 		previousState: TextAreaState,
 		currentState: TextAreaState,
-		couldBeEmojiInput: boolean
+		_couldBeEmojiInput: boolean
 	): ITypeData {
 		if (!previousState) {
 			// This is the EMPTY state

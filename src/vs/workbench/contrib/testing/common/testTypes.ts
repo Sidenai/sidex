@@ -410,7 +410,6 @@ export namespace ITestItem {
 		label: item.label,
 		tags: item.tags,
 		busy: item.busy,
-		children: undefined,
 		uri: item.uri?.toJSON(),
 		range: item.range?.toJSON() || null,
 		description: item.description,
@@ -423,7 +422,6 @@ export namespace ITestItem {
 		label: serialized.label,
 		tags: serialized.tags,
 		busy: serialized.busy,
-		children: undefined,
 		uri: serialized.uri ? uriIdentity.asCanonicalUri(URI.revive(serialized.uri)) : undefined,
 		range: serialized.range ? Range.lift(serialized.range) : null,
 		description: serialized.description,
@@ -1088,7 +1086,7 @@ export abstract class AbstractIncrementalTestCollection<T extends IncrementalTes
 	/**
 	 * Called when the extension signals a test result should be retired.
 	 */
-	protected retireTest(testId: string) {
+	protected retireTest(_testId: string) {
 		// no-op
 	}
 

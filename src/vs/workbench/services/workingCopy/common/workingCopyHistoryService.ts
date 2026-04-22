@@ -179,7 +179,7 @@ export class WorkingCopyHistoryModel {
 		source: SaveSource,
 		sourceDescription: string | undefined = undefined,
 		timestamp: number,
-		token: CancellationToken
+		_token: CancellationToken
 	): Promise<IWorkingCopyHistoryEntry> {
 		const workingCopyResource = assertReturnsDefined(this.workingCopyResource);
 		const workingCopyName = assertReturnsDefined(this.workingCopyName);
@@ -215,7 +215,7 @@ export class WorkingCopyHistoryModel {
 		source: SaveSource,
 		sourceDescription: string | undefined = undefined,
 		timestamp: number,
-		token: CancellationToken
+		_token: CancellationToken
 	): Promise<IWorkingCopyHistoryEntry> {
 		const workingCopyResource = assertReturnsDefined(this.workingCopyResource);
 
@@ -853,7 +853,7 @@ export abstract class WorkingCopyHistoryService extends Disposable implements IW
 								if (serializedModel.entries.length > 0) {
 									all.set(URI.parse(serializedModel.resource), true);
 								}
-							} catch (error) {
+							} catch (_error) {
 								// ignore - model might be missing or corrupt, but we need it
 							}
 						})
@@ -862,7 +862,7 @@ export abstract class WorkingCopyHistoryService extends Disposable implements IW
 
 				await Promise.all(promises);
 			}
-		} catch (error) {
+		} catch (_error) {
 			// ignore - history might be entirely empty
 		}
 

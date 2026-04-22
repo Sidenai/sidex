@@ -94,7 +94,7 @@ export class DebugStorage extends Disposable {
 					);
 				}
 			);
-		} catch (e) {}
+		} catch (_e) {}
 
 		return result || [];
 	}
@@ -107,7 +107,7 @@ export class DebugStorage extends Disposable {
 					return new FunctionBreakpoint(fb, fb.id);
 				}
 			);
-		} catch (e) {}
+		} catch (_e) {}
 
 		return result || [];
 	}
@@ -120,7 +120,7 @@ export class DebugStorage extends Disposable {
 					return new ExceptionBreakpoint(exBreakpoint, exBreakpoint.id);
 				}
 			);
-		} catch (e) {}
+		} catch (_e) {}
 
 		return result || [];
 	}
@@ -133,7 +133,7 @@ export class DebugStorage extends Disposable {
 					return new DataBreakpoint(dbp, dbp.id);
 				}
 			);
-		} catch (e) {}
+		} catch (_e) {}
 
 		return result || [];
 	}
@@ -146,7 +146,7 @@ export class DebugStorage extends Disposable {
 					return new Expression(watchStoredData.name, watchStoredData.id);
 				}
 			);
-		} catch (e) {}
+		} catch (_e) {}
 
 		return result || [];
 	}

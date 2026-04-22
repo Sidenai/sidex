@@ -32,14 +32,12 @@ async function getClient(
 	addInternalFlag?: boolean,
 	xhrOverride?: IXHROverride
 ): Promise<IAppInsightsCore> {
-	// eslint-disable-next-line local/code-amd-node-module
 	const oneDs = isWeb
 		? await importAMDNodeModule<typeof import('@microsoft/1ds-core-js')>(
 				'@microsoft/1ds-core-js',
 				'bundle/ms.core.min.js'
 			)
 		: await import('@microsoft/1ds-core-js');
-	// eslint-disable-next-line local/code-amd-node-module
 	const postPlugin = isWeb
 		? await importAMDNodeModule<typeof import('@microsoft/1ds-post-js')>(
 				'@microsoft/1ds-post-js',

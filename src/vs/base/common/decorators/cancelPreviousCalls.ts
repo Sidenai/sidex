@@ -14,7 +14,7 @@ import { CancellationTokenSource, CancellationToken } from '../cancellation.js';
  * @typeparam `TFunction` - Type of the function arguments list of which will be extended
  * 							with an optional {@linkcode CancellationToken} argument.
  */
-type TWithOptionalCancellationToken<TFunction extends Function> = TFunction extends (
+type TWithOptionalCancellationToken<TFunction extends (...args: any[]) => any> = TFunction extends (
 	...args: infer TArgs
 ) => infer TReturn
 	? (...args: [...TArgs, cancellatioNToken?: CancellationToken]) => TReturn

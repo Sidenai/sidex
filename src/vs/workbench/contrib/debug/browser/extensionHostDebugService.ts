@@ -172,7 +172,7 @@ class BrowserExtensionHostDebugService extends ExtensionHostDebugChannelClient i
 					} else if (serializedWorkspace.folderUri) {
 						debugWorkspace = { folderUri: URI.revive(serializedWorkspace.folderUri) };
 					}
-				} catch (error) {
+				} catch (_error) {
 					// ignore
 				}
 			}

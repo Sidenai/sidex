@@ -49,7 +49,7 @@ export class DefaultConfiguration extends Disposable {
 		return this.configurationModel;
 	}
 
-	protected onDidUpdateConfiguration(properties: string[], defaultsOverrides?: boolean): void {
+	protected onDidUpdateConfiguration(properties: string[], _defaultsOverrides?: boolean): void {
 		this.updateConfigurationModel(
 			properties,
 			Registry.as<IConfigurationRegistry>(Extensions.Configuration).getConfigurationProperties()

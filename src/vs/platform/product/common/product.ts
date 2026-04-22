@@ -55,7 +55,6 @@ else if (globalThis._VSCODE_PRODUCT_JSON && globalThis._VSCODE_PACKAGE_JSON) {
 // Web environment or unknown
 else {
 	// Built time configuration (do NOT modify)
-	// eslint-disable-next-line local/code-no-dangerous-type-assertions
 	product = {
 		/*BUILD->INSERT_PRODUCT_CONFIGURATION*/
 	} as unknown as IProductConfiguration;

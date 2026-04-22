@@ -512,7 +512,7 @@ export class View extends ViewEventHandler {
 		super.handleEvents(events);
 		this._scheduleRender();
 	}
-	public override onConfigurationChanged(e: viewEvents.ViewConfigurationChangedEvent): boolean {
+	public override onConfigurationChanged(_e: viewEvents.ViewConfigurationChangedEvent): boolean {
 		this.domNode.setClassName(this._getEditorClassName());
 		this._updateEditContext();
 		this._applyLayout();
@@ -528,7 +528,7 @@ export class View extends ViewEventHandler {
 		}
 		return false;
 	}
-	public override onFocusChanged(e: viewEvents.ViewFocusChangedEvent): boolean {
+	public override onFocusChanged(_e: viewEvents.ViewFocusChangedEvent): boolean {
 		this.domNode.setClassName(this._getEditorClassName());
 		return false;
 	}

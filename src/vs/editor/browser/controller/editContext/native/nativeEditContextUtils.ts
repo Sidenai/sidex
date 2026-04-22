@@ -87,11 +87,9 @@ export function editContextAddDisposableListener<K extends keyof EditContextEven
 	listener: (this: GlobalEventHandlers, ev: EditContextEventHandlersEventMap[K]) => void,
 	options?: boolean | AddEventListenerOptions
 ): IDisposable {
-	// eslint-disable-next-line local/code-no-any-casts
 	target.addEventListener(type, listener as any, options);
 	return {
 		dispose() {
-			// eslint-disable-next-line local/code-no-any-casts
 			target.removeEventListener(type, listener as any);
 		}
 	};

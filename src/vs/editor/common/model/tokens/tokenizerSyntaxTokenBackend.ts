@@ -86,7 +86,7 @@ export class TokenizerSyntaxTokenBackend extends AbstractSyntaxTokenBackend {
 					const visibleRanges = state.visibleLineRanges;
 					if (visibleRanges.length > 0) {
 						const lastRange = visibleRanges[visibleRanges.length - 1];
-						this._defaultBackgroundTokenizer?.setViewportEndLine(lastRange.endLineNumber);
+						this._defaultBackgroundTokenizer?.setViewportEndLine(lastRange.endLineNumberExclusive);
 					}
 				} else {
 					this._attachedViewStates.deleteAndDispose(view);

@@ -685,7 +685,7 @@ export class CursorsController extends Disposable {
 		return AutoClosedAction.getAllAutoClosedCharacters(this._autoClosedActions);
 	}
 
-	public startComposition(eventsCollector: ViewModelEventsCollector): void {
+	public startComposition(_eventsCollector: ViewModelEventsCollector): void {
 		this._compositionState = new CompositionState(this._model, this.getSelections());
 	}
 

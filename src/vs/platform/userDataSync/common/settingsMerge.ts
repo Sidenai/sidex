@@ -661,10 +661,10 @@ function parseSettings(content: string): INode[] {
 	let key: string;
 
 	const visitor: JSONVisitor = {
-		onObjectBegin: (offset: number) => {
+		onObjectBegin: (_offset: number) => {
 			hierarchyLevel++;
 		},
-		onObjectProperty: (name: string, offset: number, length: number) => {
+		onObjectProperty: (name: string, offset: number, _length: number) => {
 			if (hierarchyLevel === 0) {
 				// this is setting key
 				startOffset = offset;
@@ -685,7 +685,7 @@ function parseSettings(content: string): INode[] {
 				});
 			}
 		},
-		onArrayBegin: (offset: number, length: number) => {
+		onArrayBegin: (_offset: number, _length: number) => {
 			hierarchyLevel++;
 		},
 		onArrayEnd: (offset: number, length: number) => {
@@ -715,7 +715,7 @@ function parseSettings(content: string): INode[] {
 				});
 			}
 		},
-		onSeparator: (sep: string, offset: number, length: number) => {
+		onSeparator: (sep: string, offset: number, _length: number) => {
 			if (hierarchyLevel === 0) {
 				if (sep === ',') {
 					let index = nodes.length - 1;

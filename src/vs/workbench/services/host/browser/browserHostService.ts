@@ -652,13 +652,13 @@ export class BrowserHostService extends Disposable implements IHostService {
 			if (!targetWindow.document.fullscreen) {
 				try {
 					return await target.requestFullscreen();
-				} catch (error) {
+				} catch (_error) {
 					this.logService.warn('toggleFullScreen(): requestFullscreen failed'); // https://developer.mozilla.org/en-US/docs/Web/API/Element/requestFullscreen
 				}
 			} else {
 				try {
 					return await targetWindow.document.exitFullscreen();
-				} catch (error) {
+				} catch (_error) {
 					this.logService.warn('toggleFullScreen(): exitFullscreen failed');
 				}
 			}
@@ -691,7 +691,7 @@ export class BrowserHostService extends Disposable implements IHostService {
 		}
 	}
 
-	async moveTop(targetWindow: Window): Promise<void> {
+	async moveTop(_targetWindow: Window): Promise<void> {
 		// There seems to be no API to bring a window to front in browsers
 	}
 
@@ -828,7 +828,7 @@ export class BrowserHostService extends Disposable implements IHostService {
 				throw new Error('Failed to create blob from canvas');
 			}
 
-			const buf = await blob.bytes();
+			const buf = new Uint8Array(await blob.arrayBuffer());
 			return VSBuffer.wrap(buf);
 		} catch (error) {
 			console.error('Error taking screenshot:', error);

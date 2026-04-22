@@ -610,7 +610,6 @@ export class FindModelBoundToEditorModel {
 
 		if (replacePattern.hasReplacementPatterns || preserveCase) {
 			resultText = modelText.replace(searchRegex, function () {
-				// eslint-disable-next-line local/code-no-any-casts
 				return replacePattern.buildReplaceString(<string[]>(<any>arguments), preserveCase);
 			});
 		} else {

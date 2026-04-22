@@ -93,7 +93,7 @@ function analyzeTextShape(text: string): TextShape {
 	}
 
 	// Analyze whitespace patterns
-	const whitespaceMatches = text.match(/[ \t]+/g) || [];
+	const whitespaceMatches: string[] = text.match(/[ \t]+/g) || [];
 	const isMultipleWhitespace = whitespaceMatches.some(ws => ws.length > 1);
 	const hasDuplicatedWhitespace = whitespaceMatches.some(ws => ws.includes('  ') || ws.includes('\t\t'));
 

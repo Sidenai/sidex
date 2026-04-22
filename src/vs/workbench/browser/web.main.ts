@@ -540,12 +540,7 @@ export class BrowserMain extends Disposable {
 
 		const encryptionService = new EncryptionService();
 		serviceCollection.set(IEncryptionService, encryptionService);
-		const secretStorageService = new BrowserSecretStorageService(
-			storageService,
-			encryptionService,
-			environmentService,
-			logService
-		);
+		const secretStorageService = new BrowserSecretStorageService(storageService, encryptionService, logService);
 		serviceCollection.set(ISecretStorageService, secretStorageService);
 
 		// Userdata Initialize Service
@@ -638,7 +633,7 @@ export class BrowserMain extends Disposable {
 		fileService.registerProvider(Schemas.tmp, new InMemoryFileSystemProvider());
 	}
 
-	private registerDeveloperActions(provider: InMemoryFileSystemProvider): void {
+	private registerDeveloperActions(_provider: InMemoryFileSystemProvider): void {
 		this._register(
 			registerAction2(
 				class ResetUserDataAction extends Action2 {
@@ -728,7 +723,7 @@ export class BrowserMain extends Disposable {
 					VSBuffer.fromString(JSON.stringify(emptyWorkspace, null, '\t')),
 					{ overwrite: false }
 				);
-			} catch (error) {
+			} catch (_error) {
 				// ignore if workspace file already exists
 			}
 		}

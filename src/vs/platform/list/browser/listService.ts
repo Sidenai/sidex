@@ -925,7 +925,7 @@ abstract class ResourceNavigator<T> extends Disposable {
 }
 
 class ListResourceNavigator<T> extends ResourceNavigator<T> {
-	protected override readonly widget: List<T> | PagedList<T>;
+	declare protected readonly widget: List<T> | PagedList<T>;
 
 	constructor(widget: List<T> | PagedList<T>, options: IResourceNavigatorOptions) {
 		super(widget, options);
@@ -1030,7 +1030,6 @@ export class WorkbenchObjectTree<T extends NonNullable<any>, TFilterData = void>
 		@IListService listService: IListService,
 		@IConfigurationService configurationService: IConfigurationService
 	) {
-		// eslint-disable-next-line local/code-no-any-casts
 		const {
 			options: treeOptions,
 			getTypeNavigationMode,
@@ -1095,7 +1094,6 @@ export class WorkbenchCompressibleObjectTree<
 		@IListService listService: IListService,
 		@IConfigurationService configurationService: IConfigurationService
 	) {
-		// eslint-disable-next-line local/code-no-any-casts
 		const {
 			options: treeOptions,
 			getTypeNavigationMode,
@@ -1160,7 +1158,6 @@ export class WorkbenchDataTree<TInput, T, TFilterData = void> extends DataTree<T
 		@IListService listService: IListService,
 		@IConfigurationService configurationService: IConfigurationService
 	) {
-		// eslint-disable-next-line local/code-no-any-casts
 		const {
 			options: treeOptions,
 			getTypeNavigationMode,
@@ -1225,7 +1222,6 @@ export class WorkbenchAsyncDataTree<TInput, T, TFilterData = void> extends Async
 		@IListService listService: IListService,
 		@IConfigurationService configurationService: IConfigurationService
 	) {
-		// eslint-disable-next-line local/code-no-any-casts
 		const {
 			options: treeOptions,
 			getTypeNavigationMode,
@@ -1294,7 +1290,6 @@ export class WorkbenchCompressibleAsyncDataTree<TInput, T, TFilterData = void> e
 		@IListService listService: IListService,
 		@IConfigurationService configurationService: IConfigurationService
 	) {
-		// eslint-disable-next-line local/code-no-any-casts
 		const {
 			options: treeOptions,
 			getTypeNavigationMode,
@@ -1413,7 +1408,6 @@ function workbenchTreeDataPreamble<
 	return {
 		getTypeNavigationMode,
 		disposable,
-		// eslint-disable-next-line local/code-no-dangerous-type-assertions
 		options: {
 			// ...options, // TODO@Joao why is this not splatted here?
 			keyboardSupport: false,

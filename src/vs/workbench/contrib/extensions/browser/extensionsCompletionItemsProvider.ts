@@ -25,7 +25,7 @@ export class ExtensionsCompletionItemsProvider extends Disposable implements IWo
 
 		this._register(languageFeaturesService.completionProvider.register({ language: 'jsonc', pattern: '**/settings.json' }, {
 			_debugDisplayName: 'extensionsCompletionProvider',
-			provideCompletionItems: async (model: ITextModel, position: Position, _context: CompletionContext, token: CancellationToken): Promise<CompletionList> => {
+			provideCompletionItems: async (model: ITextModel, position: Position, _context: CompletionContext, _token: CancellationToken): Promise<CompletionList> => {
 				const getWordRangeAtPosition = (model: ITextModel, position: Position): Range | null => {
 					const wordAtPosition = model.getWordAtPosition(position);
 					return wordAtPosition ? new Range(position.lineNumber, wordAtPosition.startColumn, position.lineNumber, wordAtPosition.endColumn) : null;
@@ -39,7 +39,7 @@ export class ExtensionsCompletionItemsProvider extends Disposable implements IWo
 					let alreadyConfigured: string[] = [];
 					try {
 						alreadyConfigured = Object.keys(parse(model.getValue())['extensions.supportUntrustedWorkspaces']);
-					} catch (e) {/* ignore error */ }
+					} catch (_e) {/* ignore error */ }
 
 					return { suggestions: await this.provideSupportUntrustedWorkspacesExtensionProposals(alreadyConfigured, range) };
 				}

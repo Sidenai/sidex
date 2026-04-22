@@ -3,7 +3,10 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { EditorContributionInstantiation, registerEditorContribution } from '../../../browser/editorExtensions.js';
+import {
+	EditorContributionInstantiation as _EditorContributionInstantiation,
+	registerEditorContribution as _registerEditorContribution
+} from '../../../browser/editorExtensions.js';
 import {
 	ToggleStickyScroll,
 	FocusStickyScroll,
@@ -12,7 +15,7 @@ import {
 	SelectNextStickyScrollLine,
 	GoToStickyScrollLine
 } from './stickyScrollActions.js';
-import { StickyScrollController } from './stickyScrollController.js';
+import { StickyScrollController as _StickyScrollController } from './stickyScrollController.js';
 import { registerAction2 } from '../../../../platform/actions/common/actions.js';
 
 // registerEditorContribution(StickyScrollController.ID, StickyScrollController, EditorContributionInstantiation.AfterFirstRender); // DISABLED for performance

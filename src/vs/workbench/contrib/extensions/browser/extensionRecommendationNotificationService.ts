@@ -340,8 +340,8 @@ export class ExtensionRecommendationNotificationService extends Disposable imple
 		const installedExtensions: string[] = [];
 		const disposables = new DisposableStore();
 		return createCancelablePromise(async token => {
-			disposables.add(token.onCancellationRequested(e => disposables.dispose()));
-			return new Promise<RecommendationsNotificationResult.Accepted>((c, e) => {
+			disposables.add(token.onCancellationRequested(_e => disposables.dispose()));
+			return new Promise<RecommendationsNotificationResult.Accepted>((c, _e) => {
 				disposables.add(this.extensionManagementService.onInstallExtension(e => {
 					installedExtensions.push(e.identifier.id.toLowerCase());
 					if (extensions.every(e => installedExtensions.includes(e.identifier.id.toLowerCase()))) {

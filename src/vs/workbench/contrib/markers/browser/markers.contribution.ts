@@ -20,8 +20,8 @@ import {
 	IWorkbenchContributionsRegistry,
 	Extensions as WorkbenchExtensions,
 	IWorkbenchContribution,
-	registerWorkbenchContribution2,
-	WorkbenchPhase
+	registerWorkbenchContribution2 as _registerWorkbenchContribution2,
+	WorkbenchPhase as _WorkbenchPhase
 } from '../../../common/contributions.js';
 import { IMarkersView } from './markers.js';
 import { LifecyclePhase } from '../../../services/lifecycle/common/lifecycle.js';
@@ -65,7 +65,7 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 		primary: KeyCode.Enter,
 		secondary: [KeyMod.CtrlCmd | KeyCode.DownArrow]
 	},
-	handler: (accessor, args: any) => {
+	handler: (accessor, _args: any) => {
 		const markersView = accessor.get(IViewsService).getActiveViewWithId<MarkersView>(Markers.MARKERS_VIEW_ID)!;
 		markersView.openFileAtElement(markersView.getFocusElement(), false, false, true);
 	}
@@ -79,7 +79,7 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 	mac: {
 		primary: KeyMod.WinCtrl | KeyCode.Enter
 	},
-	handler: (accessor, args: any) => {
+	handler: (accessor, _args: any) => {
 		const markersView = accessor.get(IViewsService).getActiveViewWithId<MarkersView>(Markers.MARKERS_VIEW_ID)!;
 		markersView.openFileAtElement(markersView.getFocusElement(), false, true, true);
 	}
@@ -90,7 +90,7 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 	weight: KeybindingWeight.WorkbenchContrib,
 	when: undefined,
 	primary: undefined,
-	handler: async (accessor, args: any) => {
+	handler: async (accessor, _args: any) => {
 		await accessor.get(IViewsService).openView(Markers.MARKERS_VIEW_ID);
 	}
 });
@@ -100,7 +100,7 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 	weight: KeybindingWeight.WorkbenchContrib,
 	when: MarkersContextKeys.MarkerFocusContextKey,
 	primary: KeyMod.CtrlCmd | KeyCode.Period,
-	handler: (accessor, args: any) => {
+	handler: (accessor, _args: any) => {
 		const markersView = accessor.get(IViewsService).getActiveViewWithId<MarkersView>(Markers.MARKERS_VIEW_ID)!;
 		const focusedElement = markersView.getFocusElement();
 		if (focusedElement instanceof Marker) {

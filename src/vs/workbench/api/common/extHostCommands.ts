@@ -40,7 +40,7 @@ import { generateUuid } from '../../../base/common/uuid.js';
 import { isCancellationError } from '../../../base/common/errors.js';
 
 interface CommandHandler {
-	callback: Function;
+	callback: (...args: any[]) => any;
 	thisArg: any;
 	metadata?: ICommandMetadata;
 	extension?: IExtensionDescription;
@@ -209,7 +209,7 @@ export class ExtHostCommands implements ExtHostCommandsShape {
 					return extHostTypeConverter.Range.from(value);
 				} else if (value instanceof extHostTypes.Location) {
 					return extHostTypeConverter.location.from(value);
-				} else if (extHostTypes.NotebookRange.isNotebookRange(value)) {
+				} else if ((extHostTypes.NotebookRange as any).isNotebookRange?.(value)) {
 					return extHostTypeConverter.NotebookRange.from(value);
 				} else if (value instanceof ArrayBuffer) {
 					hasBuffers = true;
@@ -260,7 +260,7 @@ export class ExtHostCommands implements ExtHostCommandsShape {
 			for (let i = 0; i < metadata.args.length; i++) {
 				try {
 					validateConstraint(args[i], metadata.args[i].constraint);
-				} catch (err) {
+				} catch (_err) {
 					throw new Error(
 						`Running the contributed command: '${id}' failed. Illegal argument '${metadata.args[i].name}' - ${metadata.args[i].description}`
 					);

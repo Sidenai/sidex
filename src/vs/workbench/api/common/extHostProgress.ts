@@ -92,8 +92,8 @@ export class ExtHostProgress implements ExtHostProgressShape {
 		}
 
 		p.then(
-			result => progressEnd(handle),
-			err => progressEnd(handle)
+			_result => progressEnd(handle),
+			_err => progressEnd(handle)
 		);
 		return p;
 	}

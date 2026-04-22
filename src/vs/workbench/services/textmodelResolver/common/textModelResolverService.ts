@@ -150,7 +150,7 @@ class ResourceModelCollection extends ReferenceCollection<Promise<IResolvedTextE
 
 				// Finally we can dispose the model
 				model.dispose();
-			} catch (error) {
+			} catch (_error) {
 				// ignore
 			} finally {
 				this.modelsToDispose.delete(key); // Untrack as being disposed

@@ -11,8 +11,7 @@ import {
 	IStorageService,
 	IStorageValueChangeEvent,
 	StorageScope,
-	StorageTarget,
-	isProfileUsingDefaultStorage
+	StorageTarget
 } from '../../storage/common/storage.js';
 import { Event } from '../../../base/common/event.js';
 import { IUserDataProfile } from './userDataProfile.js';

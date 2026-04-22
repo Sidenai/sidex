@@ -93,7 +93,7 @@ function replaceNLStrings(
 			}
 		} else if (Array.isArray(value)) {
 			for (let i = 0; i < (value as Array<unknown>).length; i++) {
-				processEntry(value, i, command);
+				processEntry(value as unknown as Record<string, unknown>, i, command);
 			}
 		}
 	};

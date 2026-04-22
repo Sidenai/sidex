@@ -567,7 +567,7 @@ export class DropdownWithDefaultActionViewItem extends BaseActionViewItem {
 		);
 		this._defaultAction.actionRunner = this._defaultActionDisposables.add(
 			new (class extends ActionRunner {
-				protected override async runAction(action: IAction, context?: unknown): Promise<void> {
+				protected override async runAction(action: IAction, _context?: unknown): Promise<void> {
 					await action.run(undefined);
 				}
 			})()

@@ -106,7 +106,7 @@ export class ScrollbarArrow extends Widget {
 			e.target,
 			e.pointerId,
 			e.buttons,
-			pointerMoveData => {
+			_pointerMoveData => {
 				/* Intentional empty */
 			},
 			() => {

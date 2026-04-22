@@ -112,7 +112,7 @@ export class RichScreenReaderContent extends Disposable implements IScreenReader
 
 	// --- private methods
 
-	private _setIgnoreSelectionChangeTime(reason: string): void {
+	private _setIgnoreSelectionChangeTime(_reason: string): void {
 		this._ignoreSelectionChangeTime = Date.now();
 	}
 
@@ -371,7 +371,7 @@ class RichScreenReaderState {
 			getLineMaxColumn: () => 1,
 			getValueInRange: () => '',
 			getValueLengthInRange: () => 0,
-			modifyPosition: (position, offset) => position
+			modifyPosition: (position, _offset) => position
 		};
 		return new RichScreenReaderState(nullModel, []);
 	}

@@ -94,6 +94,6 @@ KeybindingsRegistry.registerCommandAndKeybindingRule({
 	when: WorkbenchIconSelectBoxFocusContextKey,
 	primary: KeyCode.Enter,
 	handler: () => {
-		WorkbenchIconSelectBox.getFocusedWidget()?.selectFocused();
+		(WorkbenchIconSelectBox.getFocusedWidget() as any)?.selectFocused();
 	}
 });

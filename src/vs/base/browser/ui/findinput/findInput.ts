@@ -266,12 +266,12 @@ export class FindInput extends Widget {
 		parent?.appendChild(this.domNode);
 
 		this._register(
-			dom.addDisposableListener(this.inputBox.inputElement, 'compositionstart', (e: CompositionEvent) => {
+			dom.addDisposableListener(this.inputBox.inputElement, 'compositionstart', (_e: CompositionEvent) => {
 				this.imeSessionInProgress = true;
 			})
 		);
 		this._register(
-			dom.addDisposableListener(this.inputBox.inputElement, 'compositionend', (e: CompositionEvent) => {
+			dom.addDisposableListener(this.inputBox.inputElement, 'compositionend', (_e: CompositionEvent) => {
 				this.imeSessionInProgress = false;
 				this._onInput.fire();
 			})
@@ -279,7 +279,7 @@ export class FindInput extends Widget {
 
 		this.onkeydown(this.inputBox.inputElement, e => this._onKeyDown.fire(e));
 		this.onkeyup(this.inputBox.inputElement, e => this._onKeyUp.fire(e));
-		this.oninput(this.inputBox.inputElement, e => this._onInput.fire());
+		this.oninput(this.inputBox.inputElement, _e => this._onInput.fire());
 		this.onmousedown(this.inputBox.inputElement, e => this._onMouseDown.fire(e));
 	}
 

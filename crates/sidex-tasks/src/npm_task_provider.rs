@@ -56,7 +56,7 @@ pub fn parse_package_json(json: &str) -> Result<Vec<Task>> {
         });
     }
 
-    tasks.sort_by(|a, b| a.name.cmp(&b.name));
+    tasks.sort_by_key(|a| a.name.clone());
     Ok(tasks)
 }
 

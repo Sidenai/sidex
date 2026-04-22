@@ -546,7 +546,7 @@ export class MainThreadCommentController extends Disposable implements ICommentC
 		};
 	}
 
-	async getNotebookComments(resource: URI, token: CancellationToken) {
+	async getNotebookComments(resource: URI, _token: CancellationToken) {
 		if (resource.scheme !== Schemas.vscodeNotebookCell) {
 			return {
 				uniqueOwner: this._uniqueId,
@@ -577,7 +577,7 @@ export class MainThreadCommentController extends Disposable implements ICommentC
 		thread: languages.CommentThread,
 		comment: languages.Comment,
 		reaction: languages.CommentReaction,
-		token: CancellationToken
+		_token: CancellationToken
 	): Promise<void> {
 		return this._proxy.$toggleReaction(this._handle, thread.commentThreadHandle, uri, comment, reaction);
 	}
@@ -674,13 +674,13 @@ export class MainThreadComments extends Disposable implements MainThreadComments
 		this._commentControllers.set(handle, provider);
 
 		this._register(
-			this._commentService.onResourceHasCommentingRanges(e => {
+			this._commentService.onResourceHasCommentingRanges(_e => {
 				this.registerView();
 			})
 		);
 
 		this._register(
-			this._commentService.onDidUpdateCommentThreads(e => {
+			this._commentService.onDidUpdateCommentThreads(_e => {
 				this.registerView();
 			})
 		);

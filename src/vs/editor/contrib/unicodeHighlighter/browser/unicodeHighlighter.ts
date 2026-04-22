@@ -97,7 +97,7 @@ export class UnicodeHighlighter extends Disposable implements IEditorContributio
 		this._options = _editor.getOption(EditorOption.unicodeHighlighting);
 
 		this._register(
-			_workspaceTrustService.onDidChangeTrust(e => {
+			_workspaceTrustService.onDidChangeTrust(_e => {
 				this._updateHighlighter();
 			})
 		);
@@ -655,7 +655,7 @@ export class DisableHighlightingInCommentsAction extends EditorAction implements
 		});
 	}
 
-	public async run(accessor: ServicesAccessor, editor: ICodeEditor): Promise<void> {
+	public async run(accessor: ServicesAccessor, _editor: ICodeEditor): Promise<void> {
 		const configurationService = accessor.get(IConfigurationService);
 		if (configurationService) {
 			this.runAction(configurationService);
@@ -684,7 +684,7 @@ export class DisableHighlightingInStringsAction extends EditorAction implements 
 		});
 	}
 
-	public async run(accessor: ServicesAccessor, editor: ICodeEditor): Promise<void> {
+	public async run(accessor: ServicesAccessor, _editor: ICodeEditor): Promise<void> {
 		const configurationService = accessor.get(IConfigurationService);
 		if (configurationService) {
 			this.runAction(configurationService);
@@ -714,7 +714,7 @@ export class DisableHighlightingOfAmbiguousCharactersAction extends Action2 impl
 		});
 	}
 
-	public async run(accessor: ServicesAccessor, editor: ICodeEditor): Promise<void> {
+	public async run(accessor: ServicesAccessor, _editor: ICodeEditor): Promise<void> {
 		const configurationService = accessor.get(IConfigurationService);
 		if (configurationService) {
 			this.runAction(configurationService);
@@ -748,7 +748,7 @@ export class DisableHighlightingOfInvisibleCharactersAction extends Action2 impl
 		});
 	}
 
-	public async run(accessor: ServicesAccessor, editor: ICodeEditor): Promise<void> {
+	public async run(accessor: ServicesAccessor, _editor: ICodeEditor): Promise<void> {
 		const configurationService = accessor.get(IConfigurationService);
 		if (configurationService) {
 			this.runAction(configurationService);
@@ -785,7 +785,7 @@ export class DisableHighlightingOfNonBasicAsciiCharactersAction
 		});
 	}
 
-	public async run(accessor: ServicesAccessor, editor: ICodeEditor): Promise<void> {
+	public async run(accessor: ServicesAccessor, _editor: ICodeEditor): Promise<void> {
 		const configurationService = accessor.get(IConfigurationService);
 		if (configurationService) {
 			this.runAction(configurationService);
@@ -902,7 +902,6 @@ async function excludeCharFromBeingHighlighted(configurationService: IConfigurat
 
 	let value: Record<string, boolean>;
 	if (typeof existingValue === 'object' && existingValue) {
-		// eslint-disable-next-line local/code-no-any-casts
 		value = existingValue as any;
 	} else {
 		value = {};
@@ -921,7 +920,6 @@ async function excludeLocaleFromBeingHighlighted(configurationService: IConfigur
 	let value: Record<string, boolean>;
 	if (typeof existingValue === 'object' && existingValue) {
 		// Copy value, as the existing value is read only
-		// eslint-disable-next-line local/code-no-any-casts
 		value = Object.assign({}, existingValue as any);
 	} else {
 		value = {};

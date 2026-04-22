@@ -195,7 +195,7 @@ export class MultiDiffEditorWidgetImpl extends Disposable {
 				const viewModel = this._viewModel.read(reader);
 				if (viewModel && viewModel.contextKeys) {
 					for (const [key, value] of Object.entries(viewModel.contextKeys)) {
-						const contextKey = this._contextKeyService.createKey<ContextKeyValue>(key, undefined);
+						const contextKey = this._contextKeyService.createKey(key, undefined as ContextKeyValue);
 						contextKey.set(value);
 						store.add(toDisposable(() => contextKey.reset()));
 					}
@@ -261,10 +261,13 @@ export class MultiDiffEditorWidgetImpl extends Disposable {
 				const viewItems = this._viewItems.read(reader);
 				const max = findFirstMax(
 					viewItems,
-					compareBy(i => i.maxScroll.read(reader).maxScroll, numberComparator)
+					compareBy(
+						i => ((i as any).maxScroll.read(reader) as { maxScroll: number; scrollWidth: number }).maxScroll,
+						numberComparator
+					)
 				);
 				if (max) {
-					const maxScroll = max.maxScroll.read(reader);
+					const maxScroll = (max as any).maxScroll.read(reader) as { maxScroll: number; scrollWidth: number };
 					scrollWidth = width + maxScroll.maxScroll;
 				}
 
@@ -316,7 +319,7 @@ export class MultiDiffEditorWidgetImpl extends Disposable {
 			this._register(
 				autorun(reader => {
 					/** @description Render all */
-					globalTransaction(tx => {
+					globalTransaction(_tx => {
 						this.render(reader);
 					});
 				})

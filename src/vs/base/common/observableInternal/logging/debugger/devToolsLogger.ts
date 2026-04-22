@@ -63,7 +63,7 @@ export class DevToolsLogger implements IObservableLogger {
 	private readonly _channel = registerDebugChannel<ObsDebuggerApi>('observableDevTools', () => {
 		return {
 			notifications: {
-				setDeclarationIdFilter: declarationIds => {},
+				setDeclarationIdFilter: _declarationIds => {},
 				logObservableValue: observableId => {
 					console.log('logObservableValue', observableId);
 				},
@@ -281,7 +281,7 @@ export class DevToolsLogger implements IObservableLogger {
 
 	private _formatObserver(obs: IObserver): { name: string; instanceId: ObsInstanceId } | undefined {
 		if (obs instanceof Derived) {
-			return { name: obs.toString(), instanceId: this._getObservableInfo(obs)?.instanceId! };
+			return { name: obs.toString(), instanceId: this._getObservableInfo(obs)!.instanceId };
 		}
 		const autorunInfo = this._getAutorunInfo(obs as AutorunObserver);
 		if (autorunInfo) {
@@ -438,7 +438,7 @@ export class DevToolsLogger implements IObservableLogger {
 		this._instanceInfos.delete(autorun);
 		this._aliveInstances.delete(info.instanceId);
 	}
-	handleAutorunDependencyChanged(autorun: AutorunObserver, observable: IObservable<any>, change: unknown): void {
+	handleAutorunDependencyChanged(autorun: AutorunObserver, observable: IObservable<any>, _change: unknown): void {
 		const info = this._getAutorunInfo(autorun);
 		if (!info) {
 			return;
@@ -446,7 +446,7 @@ export class DevToolsLogger implements IObservableLogger {
 
 		info.changedObservables.add(observable);
 	}
-	handleAutorunStarted(autorun: AutorunObserver): void {}
+	handleAutorunStarted(_autorun: AutorunObserver): void {}
 	handleAutorunFinished(autorun: AutorunObserver): void {
 		const info = this._getAutorunInfo(autorun);
 		if (!info) {
@@ -460,7 +460,7 @@ export class DevToolsLogger implements IObservableLogger {
 		});
 	}
 
-	handleDerivedDependencyChanged(derived: Derived<any>, observable: IObservable<any>, change: unknown): void {
+	handleDerivedDependencyChanged(derived: Derived<any>, observable: IObservable<any>, _change: unknown): void {
 		const info = this._getObservableInfo(derived);
 		if (info) {
 			info.changedObservables.add(observable);

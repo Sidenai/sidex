@@ -96,7 +96,7 @@ export class UserDataProfilesManifestSynchroniser extends AbstractSynchroniser i
 	protected async generateSyncPreview(
 		remoteUserData: IRemoteUserData,
 		lastSyncUserData: IRemoteUserData | null,
-		isRemoteDataFromCurrentMachine: boolean
+		_isRemoteDataFromCurrentMachine: boolean
 	): Promise<IUserDataProfilesManifestResourcePreview[]> {
 		const remoteProfiles: ISyncUserDataProfile[] | null = remoteUserData.syncData
 			? parseUserDataProfilesManifest(remoteUserData.syncData)
@@ -146,7 +146,7 @@ export class UserDataProfilesManifestSynchroniser extends AbstractSynchroniser i
 
 	protected async getMergeResult(
 		resourcePreview: IUserDataProfilesManifestResourcePreview,
-		token: CancellationToken
+		_token: CancellationToken
 	): Promise<IMergeResult> {
 		return { ...resourcePreview.previewResult, hasConflicts: false };
 	}
@@ -154,8 +154,8 @@ export class UserDataProfilesManifestSynchroniser extends AbstractSynchroniser i
 	protected async getAcceptResult(
 		resourcePreview: IUserDataProfilesManifestResourcePreview,
 		resource: URI,
-		content: string | null | undefined,
-		token: CancellationToken
+		_content: string | null | undefined,
+		_token: CancellationToken
 	): Promise<IAcceptResult> {
 		/* Accept local resource */
 		if (this.extUri.isEqual(resource, this.localResource)) {

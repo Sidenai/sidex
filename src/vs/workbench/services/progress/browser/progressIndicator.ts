@@ -89,7 +89,7 @@ export class EditorProgressIndicator extends Disposable implements IProgressIndi
 		if (this.group.isEmpty) {
 			try {
 				await promise;
-			} catch (error) {
+			} catch (_error) {
 				// ignore
 			}
 		}
@@ -102,7 +102,7 @@ export class EditorProgressIndicator extends Disposable implements IProgressIndi
 			this.progressBar.infinite().show(delay);
 
 			await promise;
-		} catch (error) {
+		} catch (_error) {
 			// ignore
 		} finally {
 			this.progressBar.stop().hide();
@@ -305,7 +305,7 @@ export class ScopedProgressIndicator extends Disposable implements IProgressIndi
 			this.doShowWhile(delay);
 
 			await promise;
-		} catch (error) {
+		} catch (_error) {
 			// ignore
 		} finally {
 			// If this is not the last promise in the list of joined promises, skip this

@@ -861,7 +861,7 @@ export class EditorGroupView extends Themable implements IEditorGroupView {
 		}
 	}
 
-	private onDidOpenEditor(editor: EditorInput, editorIndex: number): void {
+	private onDidOpenEditor(editor: EditorInput, _editorIndex: number): void {
 		/* __GDPR__
 			"editorOpened" : {
 				"owner": "isidorn",

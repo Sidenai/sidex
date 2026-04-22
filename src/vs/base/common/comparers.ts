@@ -37,7 +37,7 @@ const intlFileNameCollatorNumericCaseInsensitive: Lazy<{ collator: Intl.Collator
 });
 
 /** Compares filenames without distinguishing the name from the extension. Disambiguates by unicode comparison. */
-export function compareFileNames(one: string | null, other: string | null, caseSensitive = false): number {
+export function compareFileNames(one: string | null, other: string | null, _caseSensitive = false): number {
 	const a = one || '';
 	const b = other || '';
 	const result = intlFileNameCollatorBaseNumeric.value.collator.compare(a, b);

@@ -93,7 +93,7 @@ export class EditorWorkerService extends Disposable implements IEditorWorkerServ
 			languageFeaturesService.linkProvider.register(
 				{ language: '*', hasAccessToAllModels: true },
 				{
-					provideLinks: async (model, token) => {
+					provideLinks: async (model, _token) => {
 						if (!canSyncModel(this._modelService, model.uri)) {
 							return Promise.resolve({ links: [] }); // File too large
 						}
@@ -510,11 +510,11 @@ class SynchronousWorkerClient<T extends IDisposable> implements IWebWorkerClient
 		this._instance.dispose();
 	}
 
-	public setChannel<T extends object>(channel: string, handler: T): void {
+	public setChannel<T extends object>(_channel: string, _handler: T): void {
 		throw new Error(`Not supported`);
 	}
 
-	public getChannel<T extends object>(channel: string): Proxied<T> {
+	public getChannel<T extends object>(_channel: string): Proxied<T> {
 		throw new Error(`Not supported`);
 	}
 }
@@ -546,7 +546,7 @@ export class EditorWorkerClient extends Disposable implements IEditorWorkerClien
 	}
 
 	// foreign host request
-	public fhr(method: string, args: unknown[]): Promise<unknown> {
+	public fhr(_method: string, _args: unknown[]): Promise<unknown> {
 		throw new Error(`Not implemented!`);
 	}
 

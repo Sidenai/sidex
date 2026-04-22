@@ -26,7 +26,7 @@ export class IndentRangeProvider implements RangeProvider {
 
 	dispose() {}
 
-	compute(cancelationToken: CancellationToken): Promise<FoldingRegions> {
+	compute(_cancelationToken: CancellationToken): Promise<FoldingRegions> {
 		const foldingRules = this.languageConfigurationService.getLanguageConfiguration(
 			this.editorModel.getLanguageId()
 		).foldingRules;

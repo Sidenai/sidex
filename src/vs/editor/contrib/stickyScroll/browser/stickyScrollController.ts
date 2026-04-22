@@ -160,7 +160,7 @@ export class StickyScrollController extends Disposable implements IEditorContrib
 		this._registerMouseListeners();
 		// Suppose that mouse down on the sticky scroll, then do not focus on the sticky scroll because this will be followed by the revealing of a position
 		this._register(
-			dom.addDisposableListener(stickyScrollDomNode, dom.EventType.MOUSE_DOWN, e => {
+			dom.addDisposableListener(stickyScrollDomNode, dom.EventType.MOUSE_DOWN, _e => {
 				this._onMouseDown = true;
 			})
 		);

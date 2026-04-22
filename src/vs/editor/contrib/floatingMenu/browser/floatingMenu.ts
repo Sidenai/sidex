@@ -33,8 +33,8 @@ export class FloatingEditorToolbar extends Disposable implements IEditorContribu
 	constructor(
 		editor: ICodeEditor,
 		@IInstantiationService instantiationService: IInstantiationService,
-		@IKeybindingService keybindingService: IKeybindingService,
-		@IMenuService menuService: IMenuService
+		@IKeybindingService _keybindingService: IKeybindingService,
+		@IMenuService _menuService: IMenuService
 	) {
 		super();
 

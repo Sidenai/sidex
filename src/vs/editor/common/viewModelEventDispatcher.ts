@@ -497,7 +497,7 @@ export class ModelDecorationsChangedEvent {
 		return false;
 	}
 
-	public attemptToMerge(other: OutgoingViewModelEvent): OutgoingViewModelEvent | null {
+	public attemptToMerge(_other: OutgoingViewModelEvent): OutgoingViewModelEvent | null {
 		return null;
 	}
 }
@@ -511,7 +511,7 @@ export class ModelLanguageChangedEvent {
 		return false;
 	}
 
-	public attemptToMerge(other: OutgoingViewModelEvent): OutgoingViewModelEvent | null {
+	public attemptToMerge(_other: OutgoingViewModelEvent): OutgoingViewModelEvent | null {
 		return null;
 	}
 }
@@ -525,7 +525,7 @@ export class ModelLanguageConfigurationChangedEvent {
 		return false;
 	}
 
-	public attemptToMerge(other: OutgoingViewModelEvent): OutgoingViewModelEvent | null {
+	public attemptToMerge(_other: OutgoingViewModelEvent): OutgoingViewModelEvent | null {
 		return null;
 	}
 }
@@ -539,7 +539,7 @@ export class ModelContentChangedEvent {
 		return false;
 	}
 
-	public attemptToMerge(other: OutgoingViewModelEvent): OutgoingViewModelEvent | null {
+	public attemptToMerge(_other: OutgoingViewModelEvent): OutgoingViewModelEvent | null {
 		return null;
 	}
 }
@@ -553,7 +553,7 @@ export class ModelOptionsChangedEvent {
 		return false;
 	}
 
-	public attemptToMerge(other: OutgoingViewModelEvent): OutgoingViewModelEvent | null {
+	public attemptToMerge(_other: OutgoingViewModelEvent): OutgoingViewModelEvent | null {
 		return null;
 	}
 }
@@ -567,7 +567,7 @@ export class ModelTokensChangedEvent {
 		return false;
 	}
 
-	public attemptToMerge(other: OutgoingViewModelEvent): OutgoingViewModelEvent | null {
+	public attemptToMerge(_other: OutgoingViewModelEvent): OutgoingViewModelEvent | null {
 		return null;
 	}
 }
@@ -581,7 +581,7 @@ export class ModelLineHeightChangedEvent {
 		return false;
 	}
 
-	public attemptToMerge(other: OutgoingViewModelEvent): OutgoingViewModelEvent | null {
+	public attemptToMerge(_other: OutgoingViewModelEvent): OutgoingViewModelEvent | null {
 		return null;
 	}
 }
@@ -595,7 +595,7 @@ export class ModelFontChangedEvent {
 		return false;
 	}
 
-	public attemptToMerge(other: OutgoingViewModelEvent): OutgoingViewModelEvent | null {
+	public attemptToMerge(_other: OutgoingViewModelEvent): OutgoingViewModelEvent | null {
 		return null;
 	}
 }

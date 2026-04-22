@@ -582,7 +582,7 @@ export abstract class AbstractSynchroniser extends Disposable implements IUserDa
 			return;
 		}
 
-		this.syncPreviewPromise = createCancelablePromise(async token => {
+		this.syncPreviewPromise = createCancelablePromise(async _token => {
 			const resourcePreviews = [...preview.resourcePreviews];
 			resourcePreviews[index] = await updateResourcePreview(resourcePreviews[index]);
 			return {
@@ -637,7 +637,7 @@ export abstract class AbstractSynchroniser extends Disposable implements IUserDa
 	private async clearPreviewFolder(): Promise<void> {
 		try {
 			await this.fileService.del(this.syncPreviewFolder, { recursive: true });
-		} catch (error) {
+		} catch (_error) {
 			/* Ignore */
 		}
 	}
@@ -1062,7 +1062,7 @@ export abstract class AbstractFileSynchroniser extends AbstractSynchroniser {
 	protected async getLocalFileContent(): Promise<IFileContent | null> {
 		try {
 			return await this.fileService.readFile(this.file);
-		} catch (error) {
+		} catch (_error) {
 			return null;
 		}
 	}

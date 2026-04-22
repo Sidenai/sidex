@@ -1309,7 +1309,7 @@ export interface ICodeEditor extends editorCommon.IEditor {
 	 * Check if the current instance has a model attached.
 	 * @internal
 	 */
-	hasModel(): this is IActiveCodeEditor;
+	hasModel(): boolean;
 
 	setBanner(bannerDomNode: HTMLElement | null, height: number): void;
 

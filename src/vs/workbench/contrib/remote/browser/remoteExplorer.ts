@@ -9,7 +9,7 @@
 import './media/remoteExplorer.css';
 
 import { localize } from '../../../../nls.js';
-import { Disposable } from '../../../../base/common/lifecycle.js';
+import { Disposable as _Disposable } from '../../../../base/common/lifecycle.js';
 import { IViewPaneOptions, ViewPane } from '../../../browser/parts/views/viewPane.js';
 import { IKeybindingService } from '../../../../platform/keybinding/common/keybinding.js';
 import { IContextMenuService } from '../../../../platform/contextview/browser/contextView.js';

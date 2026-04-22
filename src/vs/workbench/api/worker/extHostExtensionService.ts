@@ -90,9 +90,9 @@ export class ExtHostExtensionService extends AbstractExtHostExtensionService {
 		// can be adjusted for the extra wrapping function.
 		const sourceURL = `${module.toString(true)}#vscode-extension`;
 		const fullSource = `${source}\n//# sourceURL=${sourceURL}`;
-		let initFn: Function;
+		let initFn: (...args: any[]) => any;
 		try {
-			initFn = new Function('module', 'exports', 'require', fullSource); // CodeQL [SM01632] js/eval-call there is no alternative until we move to ESM
+			initFn = new Function('module', 'exports', 'require', fullSource) as unknown as (...args: any[]) => any; // CodeQL [SM01632] js/eval-call there is no alternative until we move to ESM
 		} catch (err) {
 			if (extensionId) {
 				console.error(`Loading code for extension ${extensionId} failed: ${err.message}`);
@@ -137,9 +137,9 @@ export class ExtHostExtensionService extends AbstractExtHostExtensionService {
 	}
 
 	protected override _loadESMModule<T>(
-		extension: IExtensionDescription | null,
-		module: URI,
-		activationTimesBuilder: ExtensionActivationTimesBuilder
+		_extension: IExtensionDescription | null,
+		_module: URI,
+		_activationTimesBuilder: ExtensionActivationTimesBuilder
 	): Promise<T> {
 		throw new Error('ESM modules are not supported in the web worker extension host');
 	}

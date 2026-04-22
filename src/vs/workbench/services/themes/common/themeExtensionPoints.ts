@@ -248,7 +248,7 @@ export class ThemeRegistry<T extends IThemeData> implements IDisposable {
 	}
 
 	private initialize() {
-		this.themesExtPoint.setHandler((extensions, delta) => {
+		this.themesExtPoint.setHandler((extensions, _delta) => {
 			const previousIds: { [key: string]: T } = {};
 
 			const added: T[] = [];

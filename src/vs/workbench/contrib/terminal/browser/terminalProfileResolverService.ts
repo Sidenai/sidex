@@ -405,7 +405,7 @@ export abstract class BaseTerminalProfileResolverService extends Disposable impl
 		}
 	}
 
-	private _isValidAutomationProfile(profile: unknown, os: OperatingSystem): profile is ITerminalProfile {
+	private _isValidAutomationProfile(profile: unknown, _os: OperatingSystem): profile is ITerminalProfile {
 		if (profile === null || profile === undefined || typeof profile !== 'object') {
 			return false;
 		}

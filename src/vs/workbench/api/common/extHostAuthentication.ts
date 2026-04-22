@@ -217,8 +217,8 @@ export class ExtHostAuthentication implements ExtHostAuthenticationShape {
 				id,
 				label,
 				supportsMultipleAccounts: options?.supportsMultipleAccounts ?? false,
-				supportedAuthorizationServers: options?.supportedAuthorizationServers,
-				supportsChallenges: options?.supportsChallenges
+				supportedAuthorizationServers: (options as any)?.supportedAuthorizationServers,
+				supportsChallenges: (options as any)?.supportsChallenges
 			});
 		});
 
@@ -280,17 +280,16 @@ export class ExtHostAuthentication implements ExtHostAuthenticationShape {
 
 	$getSessionsFromChallenges(
 		providerId: string,
-		constraint: vscode.AuthenticationConstraint,
-		options: vscode.AuthenticationProviderSessionOptions
+		constraint: any,
+		options: any
 	): Promise<ReadonlyArray<vscode.AuthenticationSession>> {
 		return this._providerOperations.queue(providerId, async () => {
 			const providerData = this._authenticationProviders.get(providerId);
 			if (providerData) {
 				const provider = providerData.provider;
-				// Check if provider supports challenges
-				if (typeof provider.getSessionsFromChallenges === 'function') {
+				if (typeof (provider as any).getSessionsFromChallenges === 'function') {
 					options.authorizationServer = URI.revive(options.authorizationServer);
-					return await provider.getSessionsFromChallenges(constraint, options);
+					return await (provider as any).getSessionsFromChallenges(constraint, options);
 				}
 				throw new Error(
 					`Authentication provider with handle: ${providerId} does not support getSessionsFromChallenges`
@@ -303,17 +302,16 @@ export class ExtHostAuthentication implements ExtHostAuthenticationShape {
 
 	$createSessionFromChallenges(
 		providerId: string,
-		constraint: vscode.AuthenticationConstraint,
-		options: vscode.AuthenticationProviderSessionOptions
+		constraint: any,
+		options: any
 	): Promise<vscode.AuthenticationSession> {
 		return this._providerOperations.queue(providerId, async () => {
 			const providerData = this._authenticationProviders.get(providerId);
 			if (providerData) {
 				const provider = providerData.provider;
-				// Check if provider supports challenges
-				if (typeof provider.createSessionFromChallenges === 'function') {
+				if (typeof (provider as any).createSessionFromChallenges === 'function') {
 					options.authorizationServer = URI.revive(options.authorizationServer);
-					return await provider.createSessionFromChallenges(constraint, options);
+					return await (provider as any).createSessionFromChallenges(constraint, options);
 				}
 				throw new Error(
 					`Authentication provider with handle: ${providerId} does not support createSessionFromChallenges`
@@ -945,7 +943,7 @@ export class DynamicAuthProvider implements vscode.AuthenticationProvider {
 				}
 
 				this._onDidChangeClientId.fire();
-			} catch (promptErr) {
+			} catch (_promptErr) {
 				this._logger.error(`Failed to fetch new client ID and user did not provide one: ${err}`);
 				throw new Error(`Failed to fetch new client ID and user did not provide one: ${err}`);
 			}
@@ -1082,14 +1080,14 @@ class TokenStore implements Disposable {
 		if (token.id_token) {
 			try {
 				claims = getClaimsFromJWT(token.id_token);
-			} catch (e) {
+			} catch (_e) {
 				// log
 			}
 		}
 		if (!claims) {
 			try {
 				claims = getClaimsFromJWT(token.access_token);
-			} catch (e) {
+			} catch (_e) {
 				// log
 			}
 		}

@@ -850,7 +850,7 @@ export class ExtensionsViewPaneContainer extends ViewPaneContainer<IExtensionsVi
 		super.saveState();
 	}
 
-	private doSearch(refresh?: boolean): Promise<void> {
+	private doSearch(_refresh?: boolean): Promise<void> {
 		const value = this.normalizedQuery();
 		this.contextKeyService.bufferChangeEvents(() => {
 			const isRecommendedExtensionsQuery = ExtensionsListView.isRecommendedExtensionsQuery(value);

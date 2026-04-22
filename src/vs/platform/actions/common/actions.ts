@@ -264,6 +264,21 @@ export class MenuId {
 	static readonly BrowserNavigationToolbar = new MenuId('BrowserNavigationToolbar');
 	static readonly BrowserActionsToolbar = new MenuId('BrowserActionsToolbar');
 	static readonly MarkerHoverStatusBar = new MenuId('MarkerHoverParticipant.StatusBar');
+	static readonly ChatAttachmentsContext = new MenuId('ChatAttachmentsContext');
+	static readonly ChatContextUsageActions = new MenuId('ChatContextUsageActions');
+	static readonly ChatEditingSessionApplySubmenu = new MenuId('ChatEditingSessionApplySubmenu');
+	static readonly ChatEditingSessionChangeToolbar = new MenuId('ChatEditingSessionChangeToolbar');
+	static readonly ChatEditingSessionChangesToolbar = new MenuId('ChatEditingSessionChangesToolbar');
+	static readonly ChatEditingSessionTitleToolbar = new MenuId('ChatEditingSessionTitleToolbar');
+	static readonly ChatEditorInlineMenu = new MenuId('ChatEditorInlineMenu');
+	static readonly ChatInlineResourceAnchorContext = new MenuId('ChatInlineResourceAnchorContext');
+	static readonly ChatInputResourceAttachmentContext = new MenuId('ChatInputResourceAttachmentContext');
+	static readonly ChatMultiDiffContext = new MenuId('ChatMultiDiffContext');
+	static readonly ChatNewMenu = new MenuId('ChatNewMenu');
+	static readonly ChatTextEditorMenu = new MenuId('ChatTextEditorMenu');
+	static readonly InlineChatEditorAffordance = new MenuId('InlineChatEditorAffordance');
+	static readonly AgentSessionsContext = new MenuId('AgentSessionsContext');
+	static readonly AgentSessionsCreateSubMenu = new MenuId('AgentSessionsCreateSubMenu');
 
 	/**
 	 * Create or reuse a `MenuId` with the given identifier

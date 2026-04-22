@@ -348,7 +348,7 @@ export class TerminalUrlLinkOpener implements ITerminalLinkOpener {
 					await this.open(link);
 					return;
 			}
-		} catch (error) {
+		} catch (_error) {
 			this._logService.warn('Open file via native file explorer');
 		}
 		this._openerService.open(link.text, {

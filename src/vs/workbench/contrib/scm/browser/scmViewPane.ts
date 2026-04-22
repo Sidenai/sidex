@@ -307,7 +307,7 @@ class SCMTreeDragAndDrop implements ITreeDragAndDrop<TreeElement> {
 		}
 	}
 
-	getDragLabel(elements: TreeElement[], originalEvent: DragEvent): string | undefined {
+	getDragLabel(elements: TreeElement[], _originalEvent: DragEvent): string | undefined {
 		if (elements.length === 1) {
 			const element = elements[0];
 			if (isSCMResource(element)) {
@@ -319,21 +319,21 @@ class SCMTreeDragAndDrop implements ITreeDragAndDrop<TreeElement> {
 	}
 
 	onDragOver(
-		data: IDragAndDropData,
-		targetElement: TreeElement | undefined,
-		targetIndex: number | undefined,
-		targetSector: ListViewTargetSector | undefined,
-		originalEvent: DragEvent
+		_data: IDragAndDropData,
+		_targetElement: TreeElement | undefined,
+		_targetIndex: number | undefined,
+		_targetSector: ListViewTargetSector | undefined,
+		_originalEvent: DragEvent
 	): boolean | ITreeDragOverReaction {
 		return true;
 	}
 
 	drop(
-		data: IDragAndDropData,
-		targetElement: TreeElement | undefined,
-		targetIndex: number | undefined,
-		targetSector: ListViewTargetSector | undefined,
-		originalEvent: DragEvent
+		_data: IDragAndDropData,
+		_targetElement: TreeElement | undefined,
+		_targetIndex: number | undefined,
+		_targetSector: ListViewTargetSector | undefined,
+		_originalEvent: DragEvent
 	): void {}
 
 	private static getResourcesFromDragAndDropData(data: ElementsDragAndDropData<TreeElement, TreeElement[]>): URI[] {
@@ -558,7 +558,7 @@ class ResourceGroupRenderer implements ICompressibleTreeRenderer<ISCMResourceGro
 		template.actionBar.context = group;
 	}
 
-	renderCompressedElements(node: ITreeNode<ICompressedTreeNode<ISCMResourceGroup>, FuzzyScore>): void {
+	renderCompressedElements(_node: ITreeNode<ICompressedTreeNode<ISCMResourceGroup>, FuzzyScore>): void {
 		throw new Error('Should never happen since node is incompressible');
 	}
 
@@ -1732,7 +1732,7 @@ export class SCMViewPane extends ViewPane {
 		);
 
 		this.storageService.onWillSaveState(
-			e => {
+			_e => {
 				this.viewMode = this.getViewMode();
 				this.viewSortKey = this.getViewSortKey();
 
@@ -1873,7 +1873,7 @@ export class SCMViewPane extends ViewPane {
 		this.updateIndentStyles(this.themeService.getFileIconTheme());
 	}
 
-	private createTree(container: HTMLElement, viewState?: IAsyncDataTreeViewState): void {
+	private createTree(container: HTMLElement, _viewState?: IAsyncDataTreeViewState): void {
 		const overflowWidgetsDomNode = $('.scm-overflow-widgets-container.monaco-editor');
 
 		this.inputRenderer = this.instantiationService.createInstance(
@@ -2033,7 +2033,7 @@ export class SCMViewPane extends ViewPane {
 				if (isPointerEvent(e.browserEvent) && e.browserEvent.button === 1) {
 					const resourceGroup = e.element.resourceGroup;
 					const title = `${resourceGroup.provider.label}: ${resourceGroup.label}`;
-					await OpenScmGroupAction.openMultiFileDiffEditor(
+					await (OpenScmGroupAction as any).openMultiFileDiffEditor(
 						this.editorService,
 						title,
 						resourceGroup.provider.rootUri,

@@ -459,7 +459,7 @@ interface IScopeTemplateData {
 }
 
 class VariablesDelegate implements IListVirtualDelegate<IExpression | IScope> {
-	getHeight(element: IExpression | IScope): number {
+	getHeight(_element: IExpression | IScope): number {
 		return 22;
 	}
 
@@ -822,7 +822,7 @@ CommandsRegistry.registerCommand({
 	handler: async (
 		accessor: ServicesAccessor,
 		arg: Variable | Expression | IVariablesContext | undefined,
-		ctx?: (Variable | Expression)[]
+		_ctx?: (Variable | Expression)[]
 	) => {
 		const debugService = accessor.get(IDebugService);
 		const clipboardService = accessor.get(IClipboardService);
@@ -870,7 +870,7 @@ CommandsRegistry.registerCommand({
 			if (result.length) {
 				clipboardService.writeText(result.join('\n'));
 			}
-		} catch (e) {
+		} catch (_e) {
 			const result = elements.map(element => element.value);
 			clipboardService.writeText(result.join('\n'));
 		}
@@ -887,7 +887,7 @@ CommandsRegistry.registerCommand({
 	handler: async (
 		accessor: ServicesAccessor,
 		arg: IVariablesContext | IExpression,
-		ctx?: (Variable | Expression)[]
+		_ctx?: (Variable | Expression)[]
 	) => {
 		const debugService = accessor.get(IDebugService);
 		let sessionId: string;

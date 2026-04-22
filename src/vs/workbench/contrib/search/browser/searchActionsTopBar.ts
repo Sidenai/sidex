@@ -116,7 +116,7 @@ registerAction2(
 				]
 			});
 		}
-		run(accessor: ServicesAccessor, ...args: unknown[]) {
+		run(accessor: ServicesAccessor, ..._args: unknown[]) {
 			return refreshSearch(accessor);
 		}
 	}
@@ -151,7 +151,7 @@ registerAction2(
 				]
 			});
 		}
-		run(accessor: ServicesAccessor, ...args: unknown[]) {
+		run(accessor: ServicesAccessor, ..._args: unknown[]) {
 			return collapseDeepestExpandedLevel(accessor);
 		}
 	}
@@ -184,7 +184,7 @@ registerAction2(
 				]
 			});
 		}
-		async run(accessor: ServicesAccessor, ...args: unknown[]) {
+		async run(accessor: ServicesAccessor, ..._args: unknown[]) {
 			return expandAll(accessor);
 		}
 	}
@@ -215,7 +215,7 @@ registerAction2(
 				]
 			});
 		}
-		run(accessor: ServicesAccessor, ...args: unknown[]) {
+		run(accessor: ServicesAccessor, ..._args: unknown[]) {
 			return clearSearchResults(accessor);
 		}
 	}
@@ -247,7 +247,7 @@ registerAction2(
 				]
 			});
 		}
-		async run(accessor: ServicesAccessor, ...args: unknown[]) {
+		async run(accessor: ServicesAccessor, ..._args: unknown[]) {
 			const searchView = getSearchView(accessor.get(IViewsService));
 			if (searchView) {
 				await searchView.setTreeView(true);
@@ -279,7 +279,7 @@ registerAction2(
 				]
 			});
 		}
-		async run(accessor: ServicesAccessor, ...args: unknown[]) {
+		async run(accessor: ServicesAccessor, ..._args: unknown[]) {
 			const searchView = getSearchView(accessor.get(IViewsService));
 			if (searchView) {
 				await searchView.setTreeView(false);
@@ -308,7 +308,7 @@ registerAction2(
 			});
 		}
 
-		async run(accessor: ServicesAccessor, ...args: unknown[]) {
+		async run(accessor: ServicesAccessor, ..._args: unknown[]) {
 			const searchView = getSearchView(accessor.get(IViewsService));
 			if (searchView) {
 				searchView.requestAIResults();

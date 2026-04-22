@@ -135,10 +135,10 @@ function toRegExp(pattern: string): RegExp {
 		// but deprecates some patterns such as [\s-9]
 		// Ref https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Regular_expressions/Character_class#description
 		return new RegExp(pattern, 'u');
-	} catch (e) {
+	} catch (_e) {
 		try {
 			return new RegExp(pattern);
-		} catch (e) {
+		} catch (_e) {
 			// If the pattern can't be parsed even without the 'u' flag,
 			// just log the error to avoid rendering the entire Settings editor blank.
 			// Ref https://github.com/microsoft/vscode/issues/195054

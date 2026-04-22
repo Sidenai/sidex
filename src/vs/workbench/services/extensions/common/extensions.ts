@@ -320,7 +320,7 @@ function extensionDescriptionArrayToMap(extensions: IExtensionDescription[]): Ex
 	return result;
 }
 
-export function isProposedApiEnabled(extension: IExtensionDescription, proposal: ApiProposalName): boolean {
+export function isProposedApiEnabled(extension: IExtensionDescription, _proposal: ApiProposalName): boolean {
 	if (!extension.enabledApiProposals) {
 		return false;
 	}
@@ -602,7 +602,7 @@ export class NullExtensionService implements IExtensionService {
 	readonly onWillStop: Event<WillStopExtensionHostsEvent> = Event.None;
 	readonly extensions = [];
 	activateByEvent(_activationEvent: string): Promise<void> { return Promise.resolve(undefined); }
-	activateById(extensionId: ExtensionIdentifier, reason: ExtensionActivationReason): Promise<void> { return Promise.resolve(undefined); }
+	activateById(_extensionId: ExtensionIdentifier, _reason: ExtensionActivationReason): Promise<void> { return Promise.resolve(undefined); }
 	activationEventIsDone(_activationEvent: string): boolean { return false; }
 	whenInstalledExtensionsRegistered(): Promise<boolean> { return Promise.resolve(true); }
 	getExtension() { return Promise.resolve(undefined); }

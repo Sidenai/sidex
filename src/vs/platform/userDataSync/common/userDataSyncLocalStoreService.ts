@@ -143,7 +143,7 @@ export class UserDataSyncLocalStoreService extends Disposable implements IUserDa
 				if (!(await this.fileService.exists(folder))) {
 					return;
 				}
-			} catch (e) {
+			} catch (_e) {
 				return;
 			}
 			const stat = await this.fileService.resolve(folder);

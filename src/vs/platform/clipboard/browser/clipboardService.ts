@@ -276,7 +276,7 @@ export class BrowserClipboardService extends Disposable implements IClipboardSer
 
 				// Continue to write to the in-memory clipboard as well.
 				// This is needed because some browsers allow the paste but then can't read the custom resources.
-			} catch (error) {
+			} catch (_error) {
 				// Noop
 			}
 		}
@@ -303,7 +303,7 @@ export class BrowserClipboardService extends Disposable implements IClipboardSer
 						return resources;
 					}
 				}
-			} catch (error) {
+			} catch (_error) {
 				// Noop
 			}
 		}
@@ -346,7 +346,7 @@ export class BrowserClipboardService extends Disposable implements IClipboardSer
 						return true;
 					}
 				}
-			} catch (error) {
+			} catch (_error) {
 				// Noop
 			}
 		}

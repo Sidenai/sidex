@@ -317,7 +317,7 @@ export class TerminalAccessibilityHelpContribution extends Disposable {
 			AccessibilityHelpAction.addImplementation(
 				105,
 				'terminal',
-				async accessor => {
+				async (accessor: any) => {
 					const instantiationService = accessor.get(IInstantiationService);
 					const terminalService = accessor.get(ITerminalService);
 					const accessibleViewService = accessor.get(IAccessibleViewService);
@@ -368,7 +368,7 @@ class FocusAccessibleBufferAction extends Action2 {
 			]
 		});
 	}
-	override async run(accessor: ServicesAccessor, ...args: unknown[]): Promise<void> {
+	override async run(accessor: ServicesAccessor, ..._args: unknown[]): Promise<void> {
 		const terminalService = accessor.get(ITerminalService);
 		const terminal = await terminalService.getActiveOrCreateInstance();
 		if (!terminal?.xterm) {

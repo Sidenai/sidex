@@ -44,7 +44,18 @@ export const enum TerminalContribCommandId {
 // removing the dependency. These are explicitly defined here to avoid an eslint line override.
 export const enum TerminalContribSettingId {
 	StickyScrollEnabled = TerminalStickyScrollSettingId.Enabled,
-	SuggestEnabled = TerminalSuggestSettingId.Enabled
+	SuggestEnabled = TerminalSuggestSettingId.Enabled,
+	AgentSandboxNetworkAllowedDomains = 'terminal.integrated.agentSandbox.networkAllowedDomains',
+	AgentSandboxNetworkDeniedDomains = 'terminal.integrated.agentSandbox.networkDeniedDomains',
+	DeprecatedTerminalSandboxNetworkAllowedDomains = 'terminal.integrated.sandbox.networkAllowedDomains',
+	DeprecatedTerminalSandboxNetworkDeniedDomains = 'terminal.integrated.sandbox.networkDeniedDomains',
+	AgentSandboxEnabled = 'terminal.integrated.agentSandbox.enabled',
+	DeprecatedTerminalSandboxEnabled = 'terminal.integrated.sandbox.enabled',
+	DeprecatedTerminalSandboxNetwork = 'terminal.integrated.sandbox.network',
+	AgentSandboxLinuxFileSystem = 'terminal.integrated.agentSandbox.linuxFileSystem',
+	DeprecatedTerminalSandboxLinuxFileSystem = 'terminal.integrated.sandbox.linuxFileSystem',
+	AgentSandboxMacFileSystem = 'terminal.integrated.agentSandbox.macFileSystem',
+	DeprecatedTerminalSandboxMacFileSystem = 'terminal.integrated.sandbox.macFileSystem'
 }
 
 // Export configuration schemes from terminalContrib - this is an exception to the eslint rule since

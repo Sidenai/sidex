@@ -336,7 +336,7 @@ export class ReplVariablesRenderer extends AbstractExpressionsRenderer<IExpressi
 		}
 	}
 
-	protected getInputBoxOptions(expression: IExpression): IInputBoxOptions | undefined {
+	protected getInputBoxOptions(_expression: IExpression): IInputBoxOptions | undefined {
 		return undefined;
 	}
 }

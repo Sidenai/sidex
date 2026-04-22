@@ -1197,7 +1197,7 @@ export class FindWidget extends Widget implements IOverlayWidget, IVerticalSashL
 			})
 		);
 		this._register(
-			this._findInput.inputBox.onDidHeightChange(e => {
+			this._findInput.inputBox.onDidHeightChange(_e => {
 				if (this._tryUpdateHeight()) {
 					this._showViewZone();
 				}
@@ -1359,7 +1359,7 @@ export class FindWidget extends Widget implements IOverlayWidget, IVerticalSashL
 			})
 		);
 		this._register(
-			this._replaceInput.inputBox.onDidHeightChange(e => {
+			this._replaceInput.inputBox.onDidHeightChange(_e => {
 				if (this._isReplaceVisible && this._tryUpdateHeight()) {
 					this._showViewZone();
 				}

@@ -95,9 +95,9 @@ export class BinaryFileEditor extends BaseBinaryResourceEditor {
 			await this.group.replaceEditors([
 				{
 					editor: activeEditor,
-					replacement: resolvedEditor?.editor ?? input,
+					replacement: (resolvedEditor as any)?.editor ?? input,
 					options: {
-						...(resolvedEditor?.options ?? options)
+						...((resolvedEditor as any)?.options ?? options)
 					}
 				}
 			]);

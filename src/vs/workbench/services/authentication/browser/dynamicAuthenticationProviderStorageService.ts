@@ -42,7 +42,7 @@ export class DynamicAuthenticationProviderStorageService
 				let payload: { isDynamicAuthProvider: boolean; authProviderId: string; clientId: string } | undefined;
 				try {
 					payload = JSON.parse(key);
-				} catch (error) {
+				} catch (_error) {
 					// Ignore errors... must not be a dynamic auth provider
 				}
 				if (payload?.isDynamicAuthProvider) {

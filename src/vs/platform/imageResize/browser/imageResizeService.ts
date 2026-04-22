@@ -29,7 +29,7 @@ export class ImageResizeService implements IImageResizeService {
 		}
 
 		return new Promise((resolve, reject) => {
-			const blob = new Blob([data as Uint8Array<ArrayBuffer>], { type: mimeType });
+			const blob = new Blob([data as Uint8Array], { type: mimeType });
 			const img = new Image();
 			const url = URL.createObjectURL(blob);
 			img.src = url;

@@ -77,7 +77,7 @@ export class HoverColorPickerParticipant implements IEditorHoverParticipant<Colo
 	public computeSync(
 		_anchor: HoverAnchor,
 		_lineDecorations: IModelDecoration[],
-		source: HoverStartSource
+		_source: HoverStartSource
 	): ColorHover[] {
 		return [];
 	}
@@ -86,7 +86,7 @@ export class HoverColorPickerParticipant implements IEditorHoverParticipant<Colo
 		anchor: HoverAnchor,
 		lineDecorations: IModelDecoration[],
 		source: HoverStartSource,
-		token: CancellationToken
+		_token: CancellationToken
 	): AsyncIterableProducer<ColorHover> {
 		return AsyncIterableProducer.fromPromise(this._computeAsync(anchor, lineDecorations, source));
 	}
@@ -181,7 +181,7 @@ export class HoverColorPickerParticipant implements IEditorHoverParticipant<Colo
 			})
 		);
 		disposables.add(
-			editor.onDidChangeModelContent(e => {
+			editor.onDidChangeModelContent(_e => {
 				if (editorUpdatedByColorPicker) {
 					editorUpdatedByColorPicker = false;
 				} else {
@@ -200,7 +200,7 @@ export class HoverColorPickerParticipant implements IEditorHoverParticipant<Colo
 		return new RenderedHoverParts([renderedHoverPart]);
 	}
 
-	public getAccessibleContent(hoverPart: ColorHover): string {
+	public getAccessibleContent(_hoverPart: ColorHover): string {
 		return nls.localize('hoverAccessibilityColorParticipant', 'There is a color picker here.');
 	}
 

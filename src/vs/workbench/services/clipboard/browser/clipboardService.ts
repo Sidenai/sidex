@@ -70,7 +70,7 @@ export class BrowserClipboardService extends BaseBrowserClipboardService {
 			const readText = await getActiveWindow().navigator.clipboard.readText();
 			this.logService.trace('BrowserClipboardService#readText with readText.length:', readText.length);
 			return readText;
-		} catch (error) {
+		} catch (_error) {
 			if (this.isTauriDesktop) {
 				this.logService.debug('BrowserClipboardService#readText falling back for tauri protocol');
 				return super.readText(type);

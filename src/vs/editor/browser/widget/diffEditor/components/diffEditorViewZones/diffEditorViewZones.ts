@@ -216,7 +216,7 @@ export class DiffEditorViewZones extends Disposable {
 				getLineContent: (lineNumber: number): string => {
 					return this._editors.original.getModel()!.getLineContent(lineNumber);
 				},
-				getLineInjectedText: (lineNumber: number) => {
+				getLineInjectedText: (_lineNumber: number) => {
 					return null;
 				}
 			};

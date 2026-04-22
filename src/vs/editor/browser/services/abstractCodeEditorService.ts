@@ -441,7 +441,7 @@ class DecorationSubTypeOptionsProvider implements IModelDecorationOptionsProvide
 		);
 	}
 
-	public getOptions(codeEditorService: AbstractCodeEditorService, writable: boolean): IModelDecorationOptions {
+	public getOptions(codeEditorService: AbstractCodeEditorService, _writable: boolean): IModelDecorationOptions {
 		const options = codeEditorService.resolveDecorationOptions(this._parentTypeKey, true);
 		if (this._beforeContentRules) {
 			options.beforeContentClassName = this._beforeContentRules.className;
@@ -686,7 +686,7 @@ class DecorationCSSRules {
 		this._buildCSS();
 
 		if (this._usesThemeColors) {
-			this._themeListener = themeService.onDidColorThemeChange(theme => {
+			this._themeListener = themeService.onDidColorThemeChange(_theme => {
 				this._theme = themeService.getColorTheme();
 				this._removeCSS();
 				this._buildCSS();

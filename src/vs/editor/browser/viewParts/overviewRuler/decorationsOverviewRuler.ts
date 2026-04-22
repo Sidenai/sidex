@@ -312,7 +312,7 @@ export class DecorationsOverviewRuler extends ViewPart {
 		return true;
 	}
 
-	public override onConfigurationChanged(e: viewEvents.ViewConfigurationChangedEvent): boolean {
+	public override onConfigurationChanged(_e: viewEvents.ViewConfigurationChangedEvent): boolean {
 		return this._updateSettings(false) ? this._markRenderingIsNeeded() : false;
 	}
 	public override onCursorStateChanged(e: viewEvents.ViewCursorStateChangedEvent): boolean {
@@ -333,16 +333,16 @@ export class DecorationsOverviewRuler extends ViewPart {
 		}
 		return false;
 	}
-	public override onFlushed(e: viewEvents.ViewFlushedEvent): boolean {
+	public override onFlushed(_e: viewEvents.ViewFlushedEvent): boolean {
 		return this._markRenderingIsNeeded();
 	}
 	public override onScrollChanged(e: viewEvents.ViewScrollChangedEvent): boolean {
 		return e.scrollHeightChanged ? this._markRenderingIsNeeded() : false;
 	}
-	public override onZonesChanged(e: viewEvents.ViewZonesChangedEvent): boolean {
+	public override onZonesChanged(_e: viewEvents.ViewZonesChangedEvent): boolean {
 		return this._markRenderingIsNeeded();
 	}
-	public override onThemeChanged(e: viewEvents.ViewThemeChangedEvent): boolean {
+	public override onThemeChanged(_e: viewEvents.ViewThemeChangedEvent): boolean {
 		return this._updateSettings(false) ? this._markRenderingIsNeeded() : false;
 	}
 
@@ -352,11 +352,11 @@ export class DecorationsOverviewRuler extends ViewPart {
 		return this._domNode.domNode;
 	}
 
-	public prepareRender(ctx: RenderingContext): void {
+	public prepareRender(_ctx: RenderingContext): void {
 		// Nothing to read
 	}
 
-	public render(editorCtx: RestrictedRenderingContext): void {
+	public render(_editorCtx: RestrictedRenderingContext): void {
 		this._render();
 		this._actualShouldRender = ShouldRenderValue.NotNeeded;
 	}

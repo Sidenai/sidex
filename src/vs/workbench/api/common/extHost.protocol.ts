@@ -285,6 +285,7 @@ export interface AuthenticationGetSessionOptions {
 	forceNewSession?: boolean | AuthenticationInteractiveOptions;
 	silent?: boolean;
 	account?: AuthenticationSessionAccount;
+	authorizationServer?: UriComponents;
 }
 export interface IRegisterAuthenticationProviderDetails {
 	id: string;
@@ -2541,9 +2542,7 @@ export class IdObject {
 	_id?: number;
 	private static _n = 0;
 	static mixin<T extends object>(object: T): T & IdObject {
-		// eslint-disable-next-line local/code-no-any-casts
 		(<any>object)._id = IdObject._n++;
-		// eslint-disable-next-line local/code-no-any-casts
 		return <any>object;
 	}
 }

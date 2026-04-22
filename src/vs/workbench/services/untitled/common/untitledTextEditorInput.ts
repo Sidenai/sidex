@@ -146,7 +146,7 @@ export class UntitledTextEditorInput
 		return this.model.getEncoding();
 	}
 
-	setEncoding(encoding: string, mode: EncodingMode /* ignored, we only have Encode */): Promise<void> {
+	setEncoding(encoding: string, _mode: EncodingMode /* ignored, we only have Encode */): Promise<void> {
 		return this.model.setEncoding(encoding);
 	}
 

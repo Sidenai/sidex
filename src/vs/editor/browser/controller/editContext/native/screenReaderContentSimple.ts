@@ -104,7 +104,7 @@ export class SimpleScreenReaderContent extends Disposable implements IScreenRead
 
 	// --- private methods
 
-	public _setIgnoreSelectionChangeTime(reason: string): void {
+	public _setIgnoreSelectionChangeTime(_reason: string): void {
 		this._ignoreSelectionChangeTime = Date.now();
 	}
 

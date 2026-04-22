@@ -712,11 +712,11 @@ export class LoadedScriptsView extends ViewPane {
 }
 
 class LoadedScriptsDelegate implements IListVirtualDelegate<LoadedScriptsItem> {
-	getHeight(element: LoadedScriptsItem): number {
+	getHeight(_element: LoadedScriptsItem): number {
 		return 22;
 	}
 
-	getTemplateId(element: LoadedScriptsItem): string {
+	getTemplateId(_element: LoadedScriptsItem): string {
 		return LoadedScriptsRenderer.ID;
 	}
 }
@@ -834,7 +834,7 @@ class LoadedScriptsFilter implements ITreeFilter<BaseTreeItem, FuzzyScore> {
 		this.filterText = filterText;
 	}
 
-	filter(element: BaseTreeItem, parentVisibility: TreeVisibility): TreeFilterResult<FuzzyScore> {
+	filter(element: BaseTreeItem, _parentVisibility: TreeVisibility): TreeFilterResult<FuzzyScore> {
 		if (!this.filterText) {
 			return TreeVisibility.Visible;
 		}

@@ -31,7 +31,7 @@ function getParentWindowIfSameOrigin(w: Window): Window | null {
 		if (location.origin !== 'null' && parentLocation.origin !== 'null' && location.origin !== parentLocation.origin) {
 			return null;
 		}
-	} catch (e) {
+	} catch (_e) {
 		return null;
 	}
 

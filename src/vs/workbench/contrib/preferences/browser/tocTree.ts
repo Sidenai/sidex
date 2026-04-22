@@ -154,11 +154,11 @@ export class TOCRenderer implements ITreeRenderer<SettingsTreeGroupElement, neve
 }
 
 class TOCTreeDelegate implements IListVirtualDelegate<SettingsTreeElement> {
-	getTemplateId(element: SettingsTreeElement): string {
+	getTemplateId(_element: SettingsTreeElement): string {
 		return TOC_ENTRY_TEMPLATE_ID;
 	}
 
-	getHeight(element: SettingsTreeElement): number {
+	getHeight(_element: SettingsTreeElement): number {
 		return 22;
 	}
 }

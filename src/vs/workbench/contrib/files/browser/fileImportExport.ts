@@ -39,7 +39,7 @@ import { IWorkspaceContextService } from '../../../../platform/workspace/common/
 import { extractEditorsAndFilesDropData } from '../../../../platform/dnd/browser/dnd.js';
 import { IWorkspaceEditingService } from '../../../services/workspaces/common/workspaceEditing.js';
 import { isWeb } from '../../../../base/common/platform.js';
-import { getActiveWindow, isDragEvent, triggerDownload } from '../../../../base/browser/dom.js';
+import { getActiveWindow as _getActiveWindow, isDragEvent, triggerDownload } from '../../../../base/browser/dom.js';
 import { ILogService } from '../../../../platform/log/common/log.js';
 import { FileAccess, Schemas } from '../../../../base/common/network.js';
 import { listenStream } from '../../../../base/common/stream.js';
@@ -774,7 +774,7 @@ export class FileDownload {
 				bufferOrUri = (
 					await this.fileService.readFile(stat.resource, { limits: { size: maxBlobDownloadSize } }, cts.token)
 				).value.buffer;
-			} catch (error) {
+			} catch (_error) {
 				bufferOrUri = FileAccess.uriToBrowserUri(stat.resource);
 			}
 
@@ -813,7 +813,7 @@ export class FileDownload {
 				sourceStream,
 				{
 					onData: data => {
-						target.write(data.buffer as Uint8Array<ArrayBuffer>);
+						target.write(data.buffer as Uint8Array);
 						this.reportProgress(contents.name, contents.size, data.byteLength, operation);
 					},
 					onError: error => {
@@ -838,7 +838,7 @@ export class FileDownload {
 	): Promise<void> {
 		const contents = await this.fileService.readFile(resource, undefined, token);
 		if (!token.isCancellationRequested) {
-			target.write(contents.value.buffer as Uint8Array<ArrayBuffer>);
+			target.write(contents.value.buffer as Uint8Array);
 			this.reportProgress(contents.name, contents.size, contents.value.byteLength, operation);
 		}
 

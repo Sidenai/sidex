@@ -31,7 +31,7 @@ class WorkbenchOpenerContribution extends Disposable implements IOpener {
 		this._register(openerService.registerOpener(this));
 	}
 
-	async open(link: URI | string, options?: OpenInternalOptions | OpenExternalOptions): Promise<boolean> {
+	async open(link: URI | string, _options?: OpenInternalOptions | OpenExternalOptions): Promise<boolean> {
 		try {
 			const uri = typeof link === 'string' ? URI.parse(link) : link;
 			if (this.workspaceContextService.isInsideWorkspace(uri)) {

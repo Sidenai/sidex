@@ -112,7 +112,7 @@ export function renderLines(
 export class LineSource {
 	constructor(
 		public readonly lineTokens: LineTokens[],
-		public readonly lineBreakData: (ModelLineProjectionData | null)[] = lineTokens.map(t => null),
+		public readonly lineBreakData: (ModelLineProjectionData | null)[] = lineTokens.map(_t => null),
 		public readonly mightContainNonBasicASCII: boolean = true,
 		public readonly mightContainRTL: boolean = true
 	) {}

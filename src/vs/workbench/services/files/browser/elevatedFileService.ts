@@ -12,7 +12,7 @@ import { IElevatedFileService } from '../common/elevatedFileService.js';
 export class BrowserElevatedFileService implements IElevatedFileService {
 	readonly _serviceBrand: undefined;
 
-	isSupported(resource: URI): boolean {
+	isSupported(_resource: URI): boolean {
 		// Saving elevated is currently not supported in web for as
 		// long as we have no generic support from the file service
 		// (https://github.com/microsoft/vscode/issues/48659)
@@ -20,9 +20,9 @@ export class BrowserElevatedFileService implements IElevatedFileService {
 	}
 
 	async writeFileElevated(
-		resource: URI,
-		value: VSBuffer | VSBufferReadable | VSBufferReadableStream,
-		options?: IWriteFileOptions
+		_resource: URI,
+		_value: VSBuffer | VSBufferReadable | VSBufferReadableStream,
+		_options?: IWriteFileOptions
 	): Promise<IFileStatWithMetadata> {
 		throw new Error('Unsupported');
 	}

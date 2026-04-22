@@ -321,7 +321,7 @@ abstract class EditorOrNativeTextInputCommand {
 		});
 
 		// 2. handle case when focus is in some other `input` / `textarea`.
-		target.addImplementation(1000, 'generic-dom-input-textarea', (accessor: ServicesAccessor, args: unknown) => {
+		target.addImplementation(1000, 'generic-dom-input-textarea', (_accessor: ServicesAccessor, _args: unknown) => {
 			// Only if focused on an element that allows for entering text
 			const activeElement = getActiveElement();
 			if (activeElement && isEditableElement(activeElement)) {
@@ -546,7 +546,7 @@ export namespace CoreNavigationCommands {
 				viewModel: IViewModel,
 				primary: CursorState,
 				prevColumnSelectData: IColumnSelectData,
-				args: Partial<BaseCommandOptions>
+				_args: Partial<BaseCommandOptions>
 			): IColumnSelectResult {
 				return ColumnSelection.columnSelectLeft(viewModel.cursorConfig, viewModel, prevColumnSelectData);
 			}
@@ -572,7 +572,7 @@ export namespace CoreNavigationCommands {
 				viewModel: IViewModel,
 				primary: CursorState,
 				prevColumnSelectData: IColumnSelectData,
-				args: Partial<BaseCommandOptions>
+				_args: Partial<BaseCommandOptions>
 			): IColumnSelectResult {
 				return ColumnSelection.columnSelectRight(viewModel.cursorConfig, viewModel, prevColumnSelectData);
 			}
@@ -591,7 +591,7 @@ export namespace CoreNavigationCommands {
 			viewModel: IViewModel,
 			primary: CursorState,
 			prevColumnSelectData: IColumnSelectData,
-			args: Partial<BaseCommandOptions>
+			_args: Partial<BaseCommandOptions>
 		): IColumnSelectResult {
 			return ColumnSelection.columnSelectUp(viewModel.cursorConfig, viewModel, prevColumnSelectData, this._isPaged);
 		}
@@ -637,7 +637,7 @@ export namespace CoreNavigationCommands {
 			viewModel: IViewModel,
 			primary: CursorState,
 			prevColumnSelectData: IColumnSelectData,
-			args: Partial<BaseCommandOptions>
+			_args: Partial<BaseCommandOptions>
 		): IColumnSelectResult {
 			return ColumnSelection.columnSelectDown(viewModel.cursorConfig, viewModel, prevColumnSelectData, this._isPaged);
 		}
@@ -2095,7 +2095,7 @@ export namespace CoreNavigationCommands {
 			}
 			this.runCoreEditorCommand(viewModel, args);
 		}
-		public runCoreEditorCommand(viewModel: IViewModel, args: unknown): void {
+		public runCoreEditorCommand(viewModel: IViewModel, _args: unknown): void {
 			viewModel.model.pushStackElement();
 			viewModel.setCursorStates('keyboard', CursorChangeReason.Explicit, [
 				CursorMoveCommands.selectAll(viewModel, viewModel.getPrimaryCursorState())
@@ -2183,7 +2183,7 @@ export namespace CoreEditingCommands {
 				});
 			}
 
-			public runCoreEditingCommand(editor: ICodeEditor, viewModel: IViewModel, args: unknown): void {
+			public runCoreEditingCommand(editor: ICodeEditor, viewModel: IViewModel, _args: unknown): void {
 				editor.pushUndoStop();
 				editor.executeCommands(
 					this.id,
@@ -2211,7 +2211,7 @@ export namespace CoreEditingCommands {
 				});
 			}
 
-			public runCoreEditingCommand(editor: ICodeEditor, viewModel: IViewModel, args: unknown): void {
+			public runCoreEditingCommand(editor: ICodeEditor, viewModel: IViewModel, _args: unknown): void {
 				editor.pushUndoStop();
 				editor.executeCommands(
 					this.id,
@@ -2240,7 +2240,7 @@ export namespace CoreEditingCommands {
 				});
 			}
 
-			public runCoreEditingCommand(editor: ICodeEditor, viewModel: IViewModel, args: unknown): void {
+			public runCoreEditingCommand(editor: ICodeEditor, viewModel: IViewModel, _args: unknown): void {
 				editor.pushUndoStop();
 				editor.executeCommands(
 					this.id,
@@ -2278,7 +2278,7 @@ export namespace CoreEditingCommands {
 				});
 			}
 
-			public runCoreEditingCommand(editor: ICodeEditor, viewModel: IViewModel, args: unknown): void {
+			public runCoreEditingCommand(editor: ICodeEditor, viewModel: IViewModel, _args: unknown): void {
 				const [shouldPushStackElementBefore, commands] = DeleteOperations.deleteLeft(
 					viewModel.getPrevEditOperationType(),
 					viewModel.cursorConfig,
@@ -2313,7 +2313,7 @@ export namespace CoreEditingCommands {
 				});
 			}
 
-			public runCoreEditingCommand(editor: ICodeEditor, viewModel: IViewModel, args: unknown): void {
+			public runCoreEditingCommand(editor: ICodeEditor, viewModel: IViewModel, _args: unknown): void {
 				const [shouldPushStackElementBefore, commands] = DeleteOperations.deleteRight(
 					viewModel.getPrevEditOperationType(),
 					viewModel.cursorConfig,
@@ -2336,7 +2336,7 @@ export namespace CoreEditingCommands {
 		public runDOMCommand(activeElement: Element): void {
 			activeElement.ownerDocument.execCommand('undo');
 		}
-		public runEditorCommand(accessor: ServicesAccessor, editor: ICodeEditor, args: unknown): void | Promise<void> {
+		public runEditorCommand(accessor: ServicesAccessor, editor: ICodeEditor, _args: unknown): void | Promise<void> {
 			if (!editor.hasModel() || editor.getOption(EditorOption.readOnly) === true) {
 				return;
 			}
@@ -2351,7 +2351,7 @@ export namespace CoreEditingCommands {
 		public runDOMCommand(activeElement: Element): void {
 			activeElement.ownerDocument.execCommand('redo');
 		}
-		public runEditorCommand(accessor: ServicesAccessor, editor: ICodeEditor, args: unknown): void | Promise<void> {
+		public runEditorCommand(accessor: ServicesAccessor, editor: ICodeEditor, _args: unknown): void | Promise<void> {
 			if (!editor.hasModel() || editor.getOption(EditorOption.readOnly) === true) {
 				return;
 			}

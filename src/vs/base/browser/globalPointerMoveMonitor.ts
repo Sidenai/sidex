@@ -66,7 +66,7 @@ export class GlobalPointerMoveMonitor implements IDisposable {
 				toDisposable(() => {
 					try {
 						initialElement.releasePointerCapture(pointerId);
-					} catch (err) {
+					} catch (_err) {
 						// See https://github.com/microsoft/vscode/issues/161731
 						//
 						// `releasePointerCapture` sometimes fails when being invoked with the exception:
@@ -77,7 +77,7 @@ export class GlobalPointerMoveMonitor implements IDisposable {
 					}
 				})
 			);
-		} catch (err) {
+		} catch (_err) {
 			// See https://github.com/microsoft/vscode/issues/144584
 			// See https://github.com/microsoft/vscode/issues/146947
 			// `setPointerCapture` sometimes fails when being invoked
@@ -103,7 +103,7 @@ export class GlobalPointerMoveMonitor implements IDisposable {
 		);
 
 		this._hooks.add(
-			dom.addDisposableListener(eventSource, dom.EventType.POINTER_UP, (e: PointerEvent) => this.stopMonitoring(true))
+			dom.addDisposableListener(eventSource, dom.EventType.POINTER_UP, (_e: PointerEvent) => this.stopMonitoring(true))
 		);
 	}
 }

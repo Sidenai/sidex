@@ -749,17 +749,23 @@ export class ExtHostWorkspace implements ExtHostWorkspaceShape, IExtHostWorkspac
 			}
 			const parsedInclude = include ? parseSearchExcludeInclude(GlobPattern.from(include)) : undefined;
 
-			const excludePatterns = options.exclude ? globsToISearchPatternBuilder(options.exclude) : undefined;
+			const excludePatterns = options.exclude ? globsToISearchPatternBuilder(options.exclude as any) : undefined;
 
 			return {
 				options: {
 					ignoreSymlinks: typeof options.followSymlinks === 'boolean' ? !options.followSymlinks : undefined,
 					disregardIgnoreFiles:
-						typeof options.useIgnoreFiles?.local === 'boolean' ? !options.useIgnoreFiles?.local : undefined,
+						typeof (options.useIgnoreFiles as any)?.local === 'boolean'
+							? !(options.useIgnoreFiles as any)?.local
+							: undefined,
 					disregardGlobalIgnoreFiles:
-						typeof options.useIgnoreFiles?.global === 'boolean' ? !options.useIgnoreFiles?.global : undefined,
+						typeof (options.useIgnoreFiles as any)?.global === 'boolean'
+							? !(options.useIgnoreFiles as any)?.global
+							: undefined,
 					disregardParentIgnoreFiles:
-						typeof options.useIgnoreFiles?.parent === 'boolean' ? !options.useIgnoreFiles?.parent : undefined,
+						typeof (options.useIgnoreFiles as any)?.parent === 'boolean'
+							? !(options.useIgnoreFiles as any)?.parent
+							: undefined,
 					disregardExcludeSettings:
 						options.useExcludeSettings !== undefined && options.useExcludeSettings === ExcludeSettingOptions.None,
 					disregardSearchExcludeSettings:
@@ -767,10 +773,10 @@ export class ExtHostWorkspace implements ExtHostWorkspaceShape, IExtHostWorkspac
 						options.useExcludeSettings !== ExcludeSettingOptions.SearchAndFilesExclude,
 					fileEncoding: options.encoding,
 					maxResults: options.maxResults,
-					ignoreGlobCase: options.caseInsensitive,
+					ignoreGlobCase: (options as any).caseInsensitive,
 					previewOptions: options.previewOptions
 						? {
-								matchLines: options.previewOptions?.numMatchLines ?? 100,
+								matchLines: (options.previewOptions as any)?.numMatchLines ?? 100,
 								charsPerLine: options.previewOptions?.charsPerLine ?? 10000
 							}
 						: undefined,
@@ -783,8 +789,8 @@ export class ExtHostWorkspace implements ExtHostWorkspaceShape, IExtHostWorkspac
 			} satisfies QueryOptions<ITextQueryBuilderOptions>;
 		};
 
-		const queryOptionsRaw: (QueryOptions<ITextQueryBuilderOptions> | undefined)[] = options?.include?.map(include =>
-			getOptions(include)
+		const queryOptionsRaw: (QueryOptions<ITextQueryBuilderOptions> | undefined)[] = (options?.include as any)?.map(
+			(include: any) => getOptions(include)
 		) ?? [getOptions(undefined)];
 
 		const queryOptions = queryOptionsRaw.filter(
@@ -823,10 +829,10 @@ export class ExtHostWorkspace implements ExtHostWorkspaceShape, IExtHostWorkspac
 									)
 								})),
 								result.previewText
-							)
+							) as any
 						);
 					} else {
-						emitter.emitOne(new TextSearchContext2(uri, result.text, result.lineNumber));
+						emitter.emitOne(new TextSearchContext2(uri, result.text, result.lineNumber) as any);
 					}
 				})
 			);
@@ -834,14 +840,14 @@ export class ExtHostWorkspace implements ExtHostWorkspaceShape, IExtHostWorkspac
 		});
 
 		return {
-			results: asyncIterable,
+			results: asyncIterable as any,
 			complete: complete.then(e => {
 				disposables.dispose();
 				return {
 					limitHit: e?.limitHit ?? false
 				};
 			})
-		};
+		} as any;
 	}
 
 	async findTextInFilesBase(
@@ -881,12 +887,12 @@ export class ExtHostWorkspace implements ExtHostWorkspaceShape, IExtHostWorkspac
 			);
 			delete this._activeSearchCallbacks[requestId];
 			return (
-				result.reduce((acc, val) => {
+				result.reduce((acc: any, val: any) => {
 					return {
 						limitHit: acc?.limitHit || (val?.limitHit ?? false),
 						message: [acc?.message ?? [], val?.message ?? []].flat()
 					};
-				}, {}) ?? { limitHit: false }
+				}, {} as any) ?? { limitHit: false }
 			);
 		} catch (err) {
 			delete this._activeSearchCallbacks[requestId];
@@ -956,13 +962,13 @@ export class ExtHostWorkspace implements ExtHostWorkspaceShape, IExtHostWorkspac
 						result.rangeLocations,
 						r => new Range(r.source.startLineNumber, r.source.startColumn, r.source.endLineNumber, r.source.endColumn)
 					)
-				} satisfies vscode.TextSearchMatch);
+				} as any);
 			} else {
 				callback({
 					uri,
 					text: result.text,
 					lineNumber: result.lineNumber
-				} satisfies vscode.TextSearchContext);
+				} as any);
 			}
 		};
 

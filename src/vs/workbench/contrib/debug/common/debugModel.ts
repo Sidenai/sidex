@@ -121,7 +121,7 @@ export class ExpressionContainer implements IExpressionContainer {
 		this.adoptLazyResponse(dummyVar);
 	}
 
-	protected adoptLazyResponse(response: DebugProtocol.Variable): void {}
+	protected adoptLazyResponse(_response: DebugProtocol.Variable): void {}
 
 	getChildren(): Promise<IExpression[]> {
 		if (!this.children) {
@@ -1770,8 +1770,8 @@ export class DebugModel extends Disposable implements IDebugModel {
 		let index = -1;
 		if (session.parentSession) {
 			// Make sure that child sessions are placed after the parent session
-			index = this.sessions.findLastIndex(
-				s => s.parentSession === session.parentSession || s === session.parentSession
+			index = (this.sessions as any).findLastIndex(
+				(s: any) => s.parentSession === session.parentSession || s === session.parentSession
 			);
 		}
 		if (index >= 0) {

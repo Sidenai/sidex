@@ -470,7 +470,7 @@ export class QuickDiffModel extends Disposable {
 							);
 
 							return quickDiff;
-						} catch (error) {
+						} catch (_error) {
 							return []; // possibly invalid reference
 						}
 					})

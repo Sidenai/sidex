@@ -31,7 +31,6 @@ import {
 	runOnChange,
 	transaction
 } from '../../../../../base/common/observable.js';
-// eslint-disable-next-line local/code-no-deep-import-of-internal
 import { observableReducerSettable } from '../../../../../base/common/observableInternal/experimental/reducer.js';
 import { isDefined } from '../../../../../base/common/types.js';
 import { IConfigurationService } from '../../../../../platform/configuration/common/configuration.js';
@@ -359,7 +358,7 @@ export class InlineCompletionsSource extends Disposable {
 							!i.showInlineEditMenu &&
 							context.triggerKind === InlineCompletionTriggerKind.Automatic
 						) {
-							if (i.isVisible(this._textModel, this._cursorPosition.get())) {
+							if ((i as any).isVisible?.(this._textModel, this._cursorPosition.get())) {
 								shouldStopEarly = true;
 							}
 						}
@@ -608,7 +607,7 @@ export class InlineCompletionsSource extends Disposable {
 		s.suggestWidgetInlineCompletions.dispose();
 	}
 
-	public clearSuggestWidgetInlineCompletions(tx: ITransaction): void {
+	public clearSuggestWidgetInlineCompletions(_tx: ITransaction): void {
 		if (this._updateOperation.value?.request.context.selectedSuggestionInfo) {
 			this._updateOperation.clear();
 		}
@@ -749,7 +748,7 @@ export class InlineCompletionsState extends Disposable {
 			? // itemToPreserve has precedence
 				!itemToPreserve.isInlineEdit
 			: // Otherwise: prefer inline completion if there is a visible one
-				updatedSuggestions.some(i => !i.isInlineEdit && i.isVisible(textModel, cursorPosition));
+				updatedSuggestions.some(i => !i.isInlineEdit && (i as any).isVisible?.(textModel, cursorPosition));
 
 		let updatedItems: InlineSuggestionItem[] = [];
 		for (const i of updatedSuggestions) {

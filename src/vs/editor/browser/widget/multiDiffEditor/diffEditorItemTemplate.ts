@@ -99,10 +99,8 @@ export class DiffEditorItemTemplate extends Disposable implements IPooledObject<
 				h('div.header-content', [
 					h('div.collapse-button@collapseButton'),
 					h('div.file-path', [
-						// eslint-disable-next-line local/code-no-any-casts
 						h('div.title.modified.show-file-icons@primaryPath', [] as any),
 						h('div.status.deleted@status', ['R']),
-						// eslint-disable-next-line local/code-no-any-casts
 						h('div.title.original.show-file-icons@secondaryPath', [] as any)
 					]),
 					h('div.actions@actions')
@@ -157,14 +155,14 @@ export class DiffEditorItemTemplate extends Disposable implements IPooledObject<
 		);
 
 		this._register(
-			this.editor.getModifiedEditor().onDidLayoutChange(e => {
+			this.editor.getModifiedEditor().onDidLayoutChange(_e => {
 				const width = this.editor.getModifiedEditor().getLayoutInfo().contentWidth;
 				this._modifiedWidth.set(width, undefined);
 			})
 		);
 
 		this._register(
-			this.editor.getOriginalEditor().onDidLayoutChange(e => {
+			this.editor.getOriginalEditor().onDidLayoutChange(_e => {
 				const width = this.editor.getOriginalEditor().getLayoutInfo().contentWidth;
 				this._originalWidth.set(width, undefined);
 			})
@@ -346,7 +344,7 @@ export class DiffEditorItemTemplate extends Disposable implements IPooledObject<
 		const delta = Math.max(0, Math.min(viewPort.start - verticalRange.start, maxDelta));
 		this._elements.header.style.transform = `translateY(${delta}px)`;
 
-		globalTransaction(tx => {
+		globalTransaction(_tx => {
 			this.editor.layout({
 				width: width - 2 * 8 - 2 * 1,
 				height: verticalRange.length - this._outerEditorHeight

@@ -229,7 +229,7 @@ export class CharacterMapping {
 	private readonly _data: Uint32Array;
 	private readonly _horizontalOffset: Uint32Array;
 
-	constructor(length: number, partCount: number) {
+	constructor(length: number, _partCount: number) {
 		this.length = length;
 		this._data = new Uint32Array(this.length);
 		this._horizontalOffset = new Uint32Array(this.length);

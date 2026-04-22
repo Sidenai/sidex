@@ -105,7 +105,7 @@ export class SetLogLevelAction extends Action {
 		entries.push({ type: 'separator', label: nls.localize('loggers', 'Logs') });
 		entries.push(...logs.sort((a, b) => a.label.localeCompare(b.label)));
 
-		return new Promise((resolve, reject) => {
+		return new Promise((resolve, _reject) => {
 			const disposables = new DisposableStore();
 			const quickPick = disposables.add(this.quickInputService.createQuickPick({ useSeparators: true }));
 			quickPick.placeholder = nls.localize('selectlog', 'Set Log Level');
@@ -118,7 +118,7 @@ export class SetLogLevelAction extends Action {
 				})
 			);
 			disposables.add(
-				quickPick.onDidAccept(e => {
+				quickPick.onDidAccept(_e => {
 					selectedItem = quickPick.selectedItems[0];
 					quickPick.hide();
 				})
@@ -147,7 +147,7 @@ export class SetLogLevelAction extends Action {
 			!!logChannel.channel.extensionId
 		);
 
-		return new Promise((resolve, reject) => {
+		return new Promise((resolve, _reject) => {
 			const disposables = new DisposableStore();
 			const quickPick = disposables.add(this.quickInputService.createQuickPick());
 			quickPick.placeholder = logChannel
@@ -166,7 +166,7 @@ export class SetLogLevelAction extends Action {
 				})
 			);
 			disposables.add(
-				quickPick.onDidAccept(e => {
+				quickPick.onDidAccept(_e => {
 					selectedItem = quickPick.selectedItems[0] as LogLevelQuickPickItem;
 					quickPick.hide();
 				})

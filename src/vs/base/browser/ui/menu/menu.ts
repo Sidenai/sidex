@@ -481,7 +481,7 @@ interface IMenuItemOptions extends IActionViewItemOptions {
 class BaseMenuActionViewItem extends BaseActionViewItem {
 	public container: HTMLElement | undefined;
 
-	protected override options: IMenuItemOptions;
+	declare protected options: IMenuItemOptions;
 	protected item: HTMLElement | undefined;
 
 	private runOnceToEnableMouseUp: RunOnceScheduler;
@@ -856,7 +856,7 @@ class SubmenuMenuActionViewItem extends BaseMenuActionViewItem {
 		);
 
 		this._register(
-			addDisposableListener(this.element, EventType.MOUSE_OVER, e => {
+			addDisposableListener(this.element, EventType.MOUSE_OVER, _e => {
 				if (!this.mouseOver) {
 					this.mouseOver = true;
 
@@ -866,13 +866,13 @@ class SubmenuMenuActionViewItem extends BaseMenuActionViewItem {
 		);
 
 		this._register(
-			addDisposableListener(this.element, EventType.MOUSE_LEAVE, e => {
+			addDisposableListener(this.element, EventType.MOUSE_LEAVE, _e => {
 				this.mouseOver = false;
 			})
 		);
 
 		this._register(
-			addDisposableListener(this.element, EventType.FOCUS_OUT, e => {
+			addDisposableListener(this.element, EventType.FOCUS_OUT, _e => {
 				if (this.element && !isAncestor(getActiveElement(), this.element)) {
 					this.hideScheduler.schedule();
 				}

@@ -287,7 +287,6 @@ export class MainThreadQuickOpen implements MainThreadQuickOpenShape {
 				}
 
 				default:
-					// eslint-disable-next-line local/code-no-any-casts
 					(input as any)[param] = params[param];
 					break;
 			}

@@ -177,7 +177,7 @@ export async function getExperimentalExtensionToggleData(
 					// so instead of returning partial data we return undefined here
 					return undefined;
 				}
-			} catch (e) {
+			} catch (_e) {
 				// Network connection fail. Return nothing rather than partial data.
 				return undefined;
 			}

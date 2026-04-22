@@ -772,10 +772,10 @@ export const enum RevealPreference {
 }
 
 function applyOriginalEdits(
-	diff: IDocumentDiff,
-	textEdits: TextEditInfo[],
-	originalTextModel: ITextModel,
-	modifiedTextModel: ITextModel
+	_diff: IDocumentDiff,
+	_textEdits: TextEditInfo[],
+	_originalTextModel: ITextModel,
+	_modifiedTextModel: ITextModel
 ): IDocumentDiff | undefined {
 	return undefined;
 	/*
@@ -802,10 +802,10 @@ function flip(diff: IDocumentDiff): IDocumentDiff {
 }
 */
 function applyModifiedEdits(
-	diff: IDocumentDiff,
-	textEdits: TextEditInfo[],
-	originalTextModel: ITextModel,
-	modifiedTextModel: ITextModel
+	_diff: IDocumentDiff,
+	_textEdits: TextEditInfo[],
+	_originalTextModel: ITextModel,
+	_modifiedTextModel: ITextModel
 ): IDocumentDiff | undefined {
 	return undefined;
 	/*

@@ -49,7 +49,7 @@ export class HideUnchangedRegionsFeature extends Disposable {
 		(textModel: ITextModel, instantiationService: IInstantiationService) => IDiffEditorBreadcrumbsSource
 	>(this, () => ({
 		dispose() {},
-		getBreadcrumbItems(startRange, reader) {
+		getBreadcrumbItems(_startRange, _reader) {
 			return [];
 		},
 		getAt: () => []
@@ -485,7 +485,7 @@ class CollapsedCodeOverlayWidget extends ViewZoneOverlayWidget {
 					this._unchangedRegion.visibleLineCountTop.set(newVal, undefined);
 				});
 
-				const mouseUpListener = addDisposableListener(window, 'mouseup', e => {
+				const mouseUpListener = addDisposableListener(window, 'mouseup', _e => {
 					if (!didMove) {
 						this._unchangedRegion.showMoreAbove(this._options.hideUnchangedRegionsRevealLineCount.get(), undefined);
 					}
@@ -531,7 +531,7 @@ class CollapsedCodeOverlayWidget extends ViewZoneOverlayWidget {
 					editor.setScrollTop(editor.getScrollTop() + (top2 - top));
 				});
 
-				const mouseUpListener = addDisposableListener(window, 'mouseup', e => {
+				const mouseUpListener = addDisposableListener(window, 'mouseup', _e => {
 					this._unchangedRegion.isDragged.set(undefined, undefined);
 
 					if (!didMove) {

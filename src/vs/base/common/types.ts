@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { assert } from './assert.js';
+import { assert as _assert } from './assert.js';
 
 /**
  * @returns whether the provided parameter is a JavaScript String or not.
@@ -59,7 +59,6 @@ export function isNumber(obj: unknown): obj is number {
  * @returns whether the provided parameter is an Iterable, casting to the given generic
  */
 export function isIterable<T>(obj: unknown): obj is Iterable<T> {
-	// eslint-disable-next-line local/code-no-any-casts
 	return !!obj && typeof (obj as any)[Symbol.iterator] === 'function';
 }
 
@@ -67,7 +66,6 @@ export function isIterable<T>(obj: unknown): obj is Iterable<T> {
  * @returns whether the provided parameter is an Iterable, casting to the given generic
  */
 export function isAsyncIterable<T>(obj: unknown): obj is AsyncIterable<T> {
-	// eslint-disable-next-line local/code-no-any-casts
 	return !!obj && typeof (obj as any)[Symbol.asyncIterator] === 'function';
 }
 
@@ -242,7 +240,7 @@ export function isEmptyObject(obj: unknown): obj is object {
 /**
  * @returns whether the provided parameter is a JavaScript Function or not.
  */
-export function isFunction(obj: unknown): obj is Function {
+export function isFunction(obj: unknown): obj is (...args: any[]) => any {
 	return typeof obj === 'function';
 }
 
@@ -253,7 +251,7 @@ export function areFunctions(...objects: unknown[]): boolean {
 	return objects.length > 0 && objects.every(isFunction);
 }
 
-export type TypeConstraint = string | Function;
+export type TypeConstraint = string | ((...args: any[]) => any);
 
 export function validateConstraints(args: unknown[], constraints: Array<TypeConstraint | undefined>): void {
 	const len = Math.min(args.length, constraints.length);
@@ -275,7 +273,6 @@ export function validateConstraint(arg: unknown, constraint: TypeConstraint | un
 		} catch {
 			// ignore
 		}
-		// eslint-disable-next-line local/code-no-any-casts
 		if (!isUndefinedOrNull(arg) && (arg as any).constructor === constraint) {
 			return;
 		}
@@ -365,7 +362,11 @@ export type WithDefinedProps<T> = { [K in keyof Required<T>]: T[K] };
  * A type that recursively makes all properties of `T` required
  */
 export type DeepRequiredNonNullable<T> = {
-	[P in keyof T]-?: T[P] extends object ? DeepRequiredNonNullable<T[P]> : Required<NonNullable<T[P]>>;
+	[P in keyof T]-?: T[P] extends Set<any> | Map<any, any> | Date | RegExp | ((...args: any[]) => any)
+		? T[P]
+		: T[P] extends object
+			? DeepRequiredNonNullable<T[P]>
+			: Required<NonNullable<T[P]>>;
 };
 
 /**

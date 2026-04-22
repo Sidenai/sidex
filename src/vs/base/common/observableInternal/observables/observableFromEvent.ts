@@ -164,7 +164,6 @@ export class FromEventObservable<TArgs, T> extends BaseObservable<T> {
 	}
 
 	public debugSetValue(value: unknown): void {
-		// eslint-disable-next-line local/code-no-any-casts
 		this._value = value as any;
 	}
 

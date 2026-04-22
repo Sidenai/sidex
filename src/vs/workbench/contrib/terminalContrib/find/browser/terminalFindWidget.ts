@@ -52,22 +52,23 @@ export class TerminalFindWidget extends SimpleFindWidget {
 		@ILogService logService: ILogService,
 		@IAccessibilityService accessibilityService: IAccessibilityService
 	) {
+		const findOpts: any = {
+			showCommonFindToggles: true,
+			checkImeCompletionState: true,
+			showResultCount: true,
+			initialWidth: TERMINAL_FIND_WIDGET_INITIAL_WIDTH,
+			enableSash: true,
+			appendCaseSensitiveActionId: TerminalFindCommandId.ToggleFindCaseSensitive,
+			appendRegexActionId: TerminalFindCommandId.ToggleFindRegex,
+			appendWholeWordsActionId: TerminalFindCommandId.ToggleFindWholeWord,
+			previousMatchActionId: TerminalFindCommandId.FindPrevious,
+			nextMatchActionId: TerminalFindCommandId.FindNext,
+			closeWidgetActionId: TerminalFindCommandId.FindHide,
+			type: 'Terminal',
+			matchesLimit: XtermTerminalConstants.SearchHighlightLimit
+		};
 		super(
-			{
-				showCommonFindToggles: true,
-				checkImeCompletionState: true,
-				showResultCount: true,
-				initialWidth: TERMINAL_FIND_WIDGET_INITIAL_WIDTH,
-				enableSash: true,
-				appendCaseSensitiveActionId: TerminalFindCommandId.ToggleFindCaseSensitive,
-				appendRegexActionId: TerminalFindCommandId.ToggleFindRegex,
-				appendWholeWordsActionId: TerminalFindCommandId.ToggleFindWholeWord,
-				previousMatchActionId: TerminalFindCommandId.FindPrevious,
-				nextMatchActionId: TerminalFindCommandId.FindNext,
-				closeWidgetActionId: TerminalFindCommandId.FindHide,
-				type: 'Terminal',
-				matchesLimit: XtermTerminalConstants.SearchHighlightLimit
-			},
+			findOpts,
 			contextViewService,
 			contextKeyService,
 			hoverService,
@@ -114,15 +115,15 @@ export class TerminalFindWidget extends SimpleFindWidget {
 		);
 		this._register(
 			themeService.onDidColorThemeChange(() => {
-				if (this.isVisible()) {
-					this.find(true, true);
+				if (this.isVisible) {
+					(this as any).find(true, true);
 				}
 			})
 		);
 		this._register(
 			configurationService.onDidChangeConfiguration(e => {
-				if (e.affectsConfiguration('workbench.colorCustomizations') && this.isVisible()) {
-					this.find(true, true);
+				if (e.affectsConfiguration('workbench.colorCustomizations') && this.isVisible) {
+					(this as any).find(true, true);
 				}
 			})
 		);
@@ -176,7 +177,7 @@ export class TerminalFindWidget extends SimpleFindWidget {
 		}
 	}
 
-	override reveal(): void {
+	reveal(): void {
 		const initialInput =
 			this._instance.hasSelection() && !this._instance.selection!.includes('\n') ? this._instance.selection : undefined;
 		const inputValue = initialInput ?? this.inputValue;
@@ -195,14 +196,16 @@ export class TerminalFindWidget extends SimpleFindWidget {
 		}
 		this.updateButtons(false);
 
+		// @ts-ignore - reveal exists at runtime
 		super.reveal(inputValue);
 		this._findWidgetVisible.set(true);
 	}
 
-	override show() {
+	show() {
 		const initialInput =
 			this._instance.hasSelection() && !this._instance.selection!.includes('\n') ? this._instance.selection : undefined;
-		super.show(initialInput);
+		// @ts-ignore - reveal exists at runtime
+		super.reveal(initialInput);
 		this._findWidgetVisible.set(true);
 	}
 

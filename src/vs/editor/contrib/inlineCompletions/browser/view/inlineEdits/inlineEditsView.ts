@@ -277,7 +277,7 @@ export class InlineEditsView extends Disposable {
 				this._instantiationService.createInstance(
 					InlineEditsWordReplacementView,
 					this._editorObs,
-					viewData,
+					viewData as any,
 					this._tabAction
 				)
 			);
@@ -320,8 +320,8 @@ export class InlineEditsView extends Disposable {
 						this._customView.onDidClick
 					)(clickEvent => {
 						if (this._viewHasBeenShownLongerThan(350)) {
-							clickEvent.event.preventDefault();
-							model.accept(clickEvent.alternativeAction);
+							(clickEvent as any).event.preventDefault();
+							model.accept((clickEvent as any).alternativeAction);
 						}
 					})
 				);

@@ -132,7 +132,7 @@ sw.addEventListener('message', async event => {
 	}
 
 	/** @type {Client} */
-	const source = event.source;
+	const source = /** @type {Client} */ (event.source);
 	switch (event.data.channel) {
 		case 'version': {
 			perfMark('version/request');

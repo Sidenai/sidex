@@ -125,7 +125,7 @@ export class Storage extends Disposable implements IStorage {
 
 	private pendingClose: Promise<void> | undefined = undefined;
 
-	private readonly whenFlushedCallbacks: Function[] = [];
+	private readonly whenFlushedCallbacks: ((...args: any[]) => any)[] = [];
 
 	constructor(
 		protected readonly database: IStorageDatabase,

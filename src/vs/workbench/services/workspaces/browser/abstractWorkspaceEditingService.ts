@@ -358,7 +358,7 @@ export abstract class AbstractWorkspaceEditingService extends Disposable impleme
 		return this.enterWorkspace(workspaceUri);
 	}
 
-	async isValidTargetWorkspacePath(workspaceUri: URI): Promise<boolean> {
+	async isValidTargetWorkspacePath(_workspaceUri: URI): Promise<boolean> {
 		return true; // OK
 	}
 

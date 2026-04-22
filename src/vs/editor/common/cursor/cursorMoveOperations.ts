@@ -141,7 +141,7 @@ export class MoveOperations {
 		lineNumber: number,
 		column: number,
 		tabSize: number,
-		indentSize: number
+		_indentSize: number
 	): Position {
 		if (column < model.getLineIndentColumn(lineNumber)) {
 			const lineContent = model.getLineContent(lineNumber);

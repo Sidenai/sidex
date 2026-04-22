@@ -576,7 +576,7 @@ export class TextAreaInput extends Disposable {
 		// `selectionchange` events often come multiple times for a single logical change
 		// so throttle multiple `selectionchange` events that burst in a short period of time.
 		let previousSelectionChangeEventTime = 0;
-		return dom.addDisposableListener(this._textArea.ownerDocument, 'selectionchange', e => {
+		return dom.addDisposableListener(this._textArea.ownerDocument, 'selectionchange', _e => {
 			//todo
 			inputLatency.onSelectionChange();
 
@@ -788,7 +788,7 @@ export class TextAreaWrapper extends Disposable implements ICompleteTextAreaWrap
 		}
 	}
 
-	public setIgnoreSelectionChangeTime(reason: string): void {
+	public setIgnoreSelectionChangeTime(_reason: string): void {
 		this._ignoreSelectionChangeTime = Date.now();
 	}
 
@@ -869,7 +869,7 @@ export class TextAreaWrapper extends Disposable implements ICompleteTextAreaWrap
 			textArea.focus();
 			textArea.setSelectionRange(selectionStart, selectionEnd);
 			dom.restoreParentsScrollTop(textArea, scrollState);
-		} catch (e) {
+		} catch (_e) {
 			// Sometimes IE throws when setting selection (e.g. textarea is off-DOM)
 		}
 	}

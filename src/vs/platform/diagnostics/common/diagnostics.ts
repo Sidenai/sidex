@@ -111,15 +111,15 @@ export class NullDiagnosticsService implements IDiagnosticsService {
 	_serviceBrand: undefined;
 
 	async getPerformanceInfo(
-		mainProcessInfo: IMainProcessDiagnostics,
-		remoteInfo: (IRemoteDiagnosticInfo | IRemoteDiagnosticError)[]
+		_mainProcessInfo: IMainProcessDiagnostics,
+		_remoteInfo: (IRemoteDiagnosticInfo | IRemoteDiagnosticError)[]
 	): Promise<PerformanceInfo> {
 		return {};
 	}
 
 	async getSystemInfo(
-		mainProcessInfo: IMainProcessDiagnostics,
-		remoteInfo: (IRemoteDiagnosticInfo | IRemoteDiagnosticError)[]
+		_mainProcessInfo: IMainProcessDiagnostics,
+		_remoteInfo: (IRemoteDiagnosticInfo | IRemoteDiagnosticError)[]
 	): Promise<SystemInfo> {
 		return {
 			processArgs: 'nullProcessArgs',
@@ -133,17 +133,17 @@ export class NullDiagnosticsService implements IDiagnosticsService {
 	}
 
 	async getDiagnostics(
-		mainProcessInfo: IMainProcessDiagnostics,
-		remoteInfo: (IRemoteDiagnosticInfo | IRemoteDiagnosticError)[]
+		_mainProcessInfo: IMainProcessDiagnostics,
+		_remoteInfo: (IRemoteDiagnosticInfo | IRemoteDiagnosticError)[]
 	): Promise<string> {
 		return '';
 	}
 
-	async getWorkspaceFileExtensions(workspace: IWorkspace): Promise<{ extensions: string[] }> {
+	async getWorkspaceFileExtensions(_workspace: IWorkspace): Promise<{ extensions: string[] }> {
 		return { extensions: [] };
 	}
 
-	async reportWorkspaceStats(workspace: IWorkspaceInformation): Promise<void> {}
+	async reportWorkspaceStats(_workspace: IWorkspaceInformation): Promise<void> {}
 }
 
 export interface IWindowDiagnostics {

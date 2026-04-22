@@ -165,14 +165,14 @@ export abstract class EditorInput extends AbstractEditorInput {
 	/**
 	 * Returns the display description of this input.
 	 */
-	getDescription(verbosity?: Verbosity): string | undefined {
+	getDescription(_verbosity?: Verbosity): string | undefined {
 		return undefined;
 	}
 
 	/**
 	 * Returns the display title of this input.
 	 */
-	getTitle(verbosity?: Verbosity): string {
+	getTitle(_verbosity?: Verbosity): string {
 		return this.getName();
 	}
 
@@ -257,7 +257,7 @@ export abstract class EditorInput extends AbstractEditorInput {
 	 * this operation or `undefined` to indicate that the operation
 	 * failed or was canceled.
 	 */
-	async save(group: GroupIdentifier, options?: ISaveOptions): Promise<EditorInput | IUntypedEditorInput | undefined> {
+	async save(_group: GroupIdentifier, _options?: ISaveOptions): Promise<EditorInput | IUntypedEditorInput | undefined> {
 		return this;
 	}
 
@@ -270,14 +270,17 @@ export abstract class EditorInput extends AbstractEditorInput {
 	 * of this operation or `undefined` to indicate that the operation
 	 * failed or was canceled.
 	 */
-	async saveAs(group: GroupIdentifier, options?: ISaveOptions): Promise<EditorInput | IUntypedEditorInput | undefined> {
+	async saveAs(
+		_group: GroupIdentifier,
+		_options?: ISaveOptions
+	): Promise<EditorInput | IUntypedEditorInput | undefined> {
 		return this;
 	}
 
 	/**
 	 * Reverts this input from the provided group.
 	 */
-	async revert(group: GroupIdentifier, options?: IRevertOptions): Promise<void> {}
+	async revert(_group: GroupIdentifier, _options?: IRevertOptions): Promise<void> {}
 
 	/**
 	 * Called to determine how to handle a resource that is renamed that matches
@@ -287,7 +290,7 @@ export abstract class EditorInput extends AbstractEditorInput {
 	 * to participate. If an editor is returned though, it will replace the
 	 * current one with that editor and optional options.
 	 */
-	async rename(group: GroupIdentifier, target: URI): Promise<IMoveResult | undefined> {
+	async rename(_group: GroupIdentifier, _target: URI): Promise<IMoveResult | undefined> {
 		return undefined;
 	}
 
@@ -307,7 +310,7 @@ export abstract class EditorInput extends AbstractEditorInput {
 	 * a string with a message to show to the user if the editor cannot be
 	 * moved.
 	 */
-	canMove(sourceGroup: GroupIdentifier, targetGroup: GroupIdentifier): true | string {
+	canMove(_sourceGroup: GroupIdentifier, _targetGroup: GroupIdentifier): true | string {
 		return true;
 	}
 
@@ -359,7 +362,7 @@ export abstract class EditorInput extends AbstractEditorInput {
 	 *
 	 * May return `undefined` if an untyped representation is not supported.
 	 */
-	toUntyped(options?: IUntypedEditorOptions): IUntypedEditorInput | undefined {
+	toUntyped(_options?: IUntypedEditorOptions): IUntypedEditorInput | undefined {
 		return undefined;
 	}
 

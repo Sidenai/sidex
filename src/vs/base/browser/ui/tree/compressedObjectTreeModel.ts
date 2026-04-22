@@ -564,7 +564,7 @@ export class CompressibleObjectTreeModel<T, TFilterData = void> implements IObje
 		const result = this.model.getFirstElementChild(location);
 
 		if (result === null || typeof result === 'undefined') {
-			return result;
+			return result as any;
 		}
 
 		return this.elementMapper(result.elements);
@@ -574,7 +574,7 @@ export class CompressibleObjectTreeModel<T, TFilterData = void> implements IObje
 		const result = this.model.getLastElementAncestor(location);
 
 		if (result === null || typeof result === 'undefined') {
-			return result;
+			return result as any;
 		}
 
 		return this.elementMapper(result.elements);

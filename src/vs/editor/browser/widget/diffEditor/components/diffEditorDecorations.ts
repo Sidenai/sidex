@@ -31,7 +31,7 @@ export class DiffEditorDecorations extends Disposable {
 		private readonly _editors: DiffEditorEditors,
 		private readonly _diffModel: IObservable<DiffEditorViewModel | undefined>,
 		private readonly _options: DiffEditorOptions,
-		widget: DiffEditorWidget
+		_widget: DiffEditorWidget
 	) {
 		super();
 

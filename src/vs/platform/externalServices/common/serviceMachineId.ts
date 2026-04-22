@@ -24,7 +24,7 @@ export async function getServiceMachineId(
 		const contents = await fileService.readFile(environmentService.serviceMachineIdResource);
 		const value = contents.value.toString();
 		uuid = isUUID(value) ? value : null;
-	} catch (e) {
+	} catch (_e) {
 		uuid = null;
 	}
 
@@ -32,7 +32,7 @@ export async function getServiceMachineId(
 		uuid = generateUuid();
 		try {
 			await fileService.writeFile(environmentService.serviceMachineIdResource, VSBuffer.fromString(uuid));
-		} catch (error) {
+		} catch (_error) {
 			//noop
 		}
 	}

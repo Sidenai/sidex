@@ -113,7 +113,6 @@ export class DiffEditorEditors extends Disposable {
 			reader => this.isOriginalFocused.read(reader) || this.isModifiedFocused.read(reader)
 		);
 
-		// eslint-disable-next-line local/code-no-any-casts
 		this._argCodeEditorWidgetOptions = null as any;
 
 		this._register(

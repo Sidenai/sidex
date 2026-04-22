@@ -255,7 +255,7 @@ class ExtensionFeaturesManagementService extends Disposable implements IExtensio
 		const raw = this.storageService.get(FEATURES_STATE_KEY, StorageScope.PROFILE, '{}');
 		try {
 			data = JSON.parse(raw);
-		} catch (e) {
+		} catch (_e) {
 			// ignore
 		}
 		const result = new Map<string, Map<string, IExtensionFeatureState>>();

@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { safeIntl } from '../../../base/common/date.js';
-import type { GraphemeIterator } from '../../../base/common/strings.js';
+import type { GraphemeIterator as _GraphemeIterator } from '../../../base/common/strings.js';
 import type { ViewLineRenderingData } from '../../common/viewModel.js';
 import type { ViewLineOptions } from '../viewParts/viewLines/viewLineOptions.js';
 
@@ -37,7 +37,7 @@ class AsciiContentSegmenter implements IContentSegmenter {
 		return this._content[index];
 	}
 
-	getSegmentData(index: number): Intl.SegmentData | undefined {
+	getSegmentData(_index: number): Intl.SegmentData | undefined {
 		return undefined;
 	}
 }

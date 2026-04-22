@@ -866,7 +866,7 @@ export class TerminalService extends Disposable implements ITerminalService {
 		}
 	}
 
-	private async _onBeforeShutdownConfirmation(reason: ShutdownReason): Promise<boolean> {
+	private async _onBeforeShutdownConfirmation(_reason: ShutdownReason): Promise<boolean> {
 		// veto if configured to show confirmation and the user chose not to exit
 		const veto = await this._showTerminalCloseConfirmation();
 		if (!veto) {
@@ -1233,7 +1233,7 @@ export class TerminalService extends Disposable implements ITerminalService {
 		const shellLaunchConfig =
 			config && hasKey(config, { extensionIdentifier: true })
 				? {}
-				: this._terminalInstanceService.convertProfileToShellLaunchConfig(config || {});
+				: this._terminalInstanceService.convertProfileToShellLaunchConfig((config || {}) as any);
 
 		// Get the contributed profile if it was provided
 		const contributedProfile = options?.skipContributedProfileCheck
@@ -1463,7 +1463,7 @@ export class TerminalService extends Disposable implements ITerminalService {
 				return !this._activeInstance?.target ? TerminalLocation.Panel : this._activeInstance?.target;
 			}
 		}
-		return location;
+		return location as any;
 	}
 
 	private async _getSplitParent(location?: ITerminalLocationOptions): Promise<ITerminalInstance | undefined> {

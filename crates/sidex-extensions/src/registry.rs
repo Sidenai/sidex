@@ -129,7 +129,7 @@ impl ExtensionRegistry {
         }
 
         let mut values: Vec<_> = by_id.into_values().collect();
-        values.sort_by(|a, b| a.id.cmp(&b.id));
+        values.sort_by_key(|a| a.id.clone());
         values
     }
 

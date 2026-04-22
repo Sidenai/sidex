@@ -170,7 +170,7 @@ export class TerminalEditorInput extends EditorInput implements IEditorCloseHand
 		const instanceOnDidBlurListener = instance.onDidBlur(() => this._terminalEditorFocusContextKey.reset());
 
 		const disposeListeners = [
-			instance.onExit(e => {
+			instance.onExit(_e => {
 				if (!instance.waitOnExit) {
 					this.dispose();
 				}

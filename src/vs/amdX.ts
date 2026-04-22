@@ -161,7 +161,7 @@ class AMDModuleImporter {
 				scriptElement.removeEventListener('error', errorEventListener);
 			};
 
-			const loadEventListener = (e: any) => {
+			const loadEventListener = (_e: any) => {
 				unbind();
 				resolve(this._defineCalls.pop());
 			};

@@ -152,7 +152,6 @@ export function createApiFactoryAndRegisterActors(accessor: ServicesAccessor): I
 
 	// register addressable instances
 	rpcProtocol.set(ExtHostContext.ExtHostFileSystemInfo, extHostFileSystemInfo);
-	// eslint-disable-next-line local/code-no-any-casts
 	rpcProtocol.set(ExtHostContext.ExtHostLogLevelServiceShape, <ExtHostLogLevelServiceShape>(<any>extHostLoggerService));
 	rpcProtocol.set(ExtHostContext.ExtHostWorkspace, extHostWorkspace);
 	rpcProtocol.set(ExtHostContext.ExtHostConfiguration, extHostConfiguration);
@@ -167,7 +166,7 @@ export function createApiFactoryAndRegisterActors(accessor: ServicesAccessor): I
 	rpcProtocol.set(ExtHostContext.ExtHostEditorTabs, extHostEditorTabs);
 	rpcProtocol.set(ExtHostContext.ExtHostManagedSockets, extHostManagedSockets);
 	rpcProtocol.set(ExtHostContext.ExtHostProgress, extHostProgress);
-	rpcProtocol.set(ExtHostContext.ExtHostAuthentication, extHostAuthentication);
+	rpcProtocol.set(ExtHostContext.ExtHostAuthentication, extHostAuthentication as any);
 	rpcProtocol.set(ExtHostContext.ExtHostDataChannels, extHostDataChannels);
 	rpcProtocol.set(ExtHostContext.ExtHostMeteredConnection, extHostMeteredConnection);
 
@@ -376,7 +375,7 @@ export function createApiFactoryAndRegisterActors(accessor: ServicesAccessor): I
 			};
 		})();
 
-		const authentication: typeof vscode.authentication = {
+		const authentication: typeof vscode.authentication & Record<string, any> = {
 			getSession(
 				providerId: string,
 				scopesOrChallenge: readonly string[] | vscode.AuthenticationWwwAuthenticateRequest,
@@ -391,7 +390,6 @@ export function createApiFactoryAndRegisterActors(accessor: ServicesAccessor): I
 				if (options?.authorizationServer) {
 					checkProposedApiEnabled(extension, 'authIssuers');
 				}
-				// eslint-disable-next-line local/code-no-any-casts
 				return extHostAuthentication.getSession(extension, providerId, scopesOrChallenge, options as any);
 			},
 			getAccounts(providerId: string) {
@@ -400,7 +398,6 @@ export function createApiFactoryAndRegisterActors(accessor: ServicesAccessor): I
 			// TODO: remove this after GHPR and Codespaces move off of it
 			async hasSession(providerId: string, scopes: readonly string[]) {
 				checkProposedApiEnabled(extension, 'authSession');
-				// eslint-disable-next-line local/code-no-any-casts
 				return !!(await extHostAuthentication.getSession(extension, providerId, scopes, { silent: true } as any));
 			},
 			get onDidChangeSessions(): vscode.Event<vscode.AuthenticationSessionsChangeEvent> {
@@ -412,7 +409,7 @@ export function createApiFactoryAndRegisterActors(accessor: ServicesAccessor): I
 				provider: vscode.AuthenticationProvider,
 				options?: vscode.AuthenticationProviderOptions
 			): vscode.Disposable {
-				if (options?.supportedAuthorizationServers) {
+				if ((options as any)?.supportedAuthorizationServers) {
 					checkProposedApiEnabled(extension, 'authIssuers');
 				}
 				return extHostAuthentication.registerAuthenticationProvider(id, label, provider, options);
@@ -420,7 +417,7 @@ export function createApiFactoryAndRegisterActors(accessor: ServicesAccessor): I
 		};
 
 		// namespace: commands
-		const commands: typeof vscode.commands = {
+		const commands: typeof vscode.commands & Record<string, any> = {
 			registerCommand(
 				id: string,
 				command: <T>(...args: unknown[]) => T | Thenable<T>,
@@ -496,7 +493,7 @@ export function createApiFactoryAndRegisterActors(accessor: ServicesAccessor): I
 		};
 
 		// namespace: env
-		const env: typeof vscode.env = {
+		const env: typeof vscode.env & Record<string, any> = {
 			get machineId() {
 				return initData.telemetryInfo.machineId;
 			},
@@ -617,7 +614,7 @@ export function createApiFactoryAndRegisterActors(accessor: ServicesAccessor): I
 				checkProposedApiEnabled(extension, 'dataChannels');
 				return extHostDataChannels.createDataChannel(extension, channelId);
 			},
-			get power(): typeof vscode.env.power {
+			get power(): any {
 				checkProposedApiEnabled(extension, 'environmentPower');
 				return {
 					get onDidSuspend() {
@@ -656,9 +653,7 @@ export function createApiFactoryAndRegisterActors(accessor: ServicesAccessor): I
 					isOnBatteryPower() {
 						return extHostPower.isOnBatteryPower();
 					},
-					async startPowerSaveBlocker(
-						type: vscode.env.power.PowerSaveBlockerType
-					): Promise<vscode.env.power.PowerSaveBlocker> {
+					async startPowerSaveBlocker(type: any): Promise<any> {
 						const blocker = await extHostPower.startPowerSaveBlocker(type);
 						return {
 							id: blocker.id,
@@ -679,7 +674,7 @@ export function createApiFactoryAndRegisterActors(accessor: ServicesAccessor): I
 		}
 
 		// namespace: tests
-		const tests: typeof vscode.tests = {
+		const tests: typeof vscode.tests & Record<string, any> = {
 			createTestController(
 				provider,
 				label,
@@ -776,7 +771,7 @@ export function createApiFactoryAndRegisterActors(accessor: ServicesAccessor): I
 		};
 
 		// namespace: languages
-		const languages: typeof vscode.languages = {
+		const languages: typeof vscode.languages & Record<string, any> = {
 			createDiagnosticCollection(name?: string): vscode.DiagnosticCollection {
 				return extHostDiagnostics.createDiagnosticCollection(extension.identifier, name);
 			},
@@ -784,7 +779,6 @@ export function createApiFactoryAndRegisterActors(accessor: ServicesAccessor): I
 				return _asExtensionEvent(extHostDiagnostics.onDidChangeDiagnostics);
 			},
 			getDiagnostics: (resource?: vscode.Uri) => {
-				// eslint-disable-next-line local/code-no-any-casts
 				return <any>extHostDiagnostics.getDiagnostics(resource);
 			},
 			getLanguages(): Thenable<string[]> {
@@ -1049,7 +1043,7 @@ export function createApiFactoryAndRegisterActors(accessor: ServicesAccessor): I
 				checkProposedApiEnabled(extension, 'inlineCompletionsAdditions');
 				return undefined;
 			},
-			onDidChangeCompletionsUnificationState(listener: any, thisArg?: any, disposables?: any) {
+			onDidChangeCompletionsUnificationState(_listener: any, _thisArg?: any, _disposables?: any) {
 				checkProposedApiEnabled(extension, 'inlineCompletionsAdditions');
 				return { dispose() {} };
 			},
@@ -1311,9 +1305,9 @@ export function createApiFactoryAndRegisterActors(accessor: ServicesAccessor): I
 				return extHostProgress.withProgress(
 					extension,
 					{ location: extHostTypes.ProgressLocation.SourceControl },
-					(progress, token) =>
+					(_progress, _token) =>
 						task({
-							report(n: number) {
+							report(_n: number) {
 								/*noop*/
 							}
 						})
@@ -1363,7 +1357,7 @@ export function createApiFactoryAndRegisterActors(accessor: ServicesAccessor): I
 						console.error(
 							`[${extension.identifier.value}] \`titleTemplate\` was provided to window.createTerminal but is ignored because the \`terminalTitle\` proposed API is not enabled.`
 						);
-						options = { ...nameOrOptions, titleTemplate: undefined };
+						options = { ...nameOrOptions, titleTemplate: undefined } as any;
 					}
 					if ('pty' in options) {
 						return extHostTerminalService.createExtensionTerminal(options);
@@ -1497,7 +1491,7 @@ export function createApiFactoryAndRegisterActors(accessor: ServicesAccessor): I
 				checkProposedApiEnabled(extension, 'browser');
 				return extHostBrowsers.openBrowserTab(url, options);
 			}
-		};
+		} as any;
 
 		// namespace: workspace
 
@@ -1720,7 +1714,7 @@ export function createApiFactoryAndRegisterActors(accessor: ServicesAccessor): I
 			},
 			registerAITextSearchProvider: (scheme: string, provider: vscode.AITextSearchProvider) => {
 				// there are some dependencies on textSearchProvider, so we need to check for both
-				checkProposedApiEnabled(extension, 'aiTextSearchProvider');
+				checkProposedApiEnabled(extension, 'aiTextSearchProvider' as any);
 				checkProposedApiEnabled(extension, 'textSearchProvider2');
 				return extHostSearch.registerAITextSearchProvider(scheme, provider);
 			},
@@ -1875,7 +1869,7 @@ export function createApiFactoryAndRegisterActors(accessor: ServicesAccessor): I
 			encode(content: string, options?: { uri?: vscode.Uri; encoding?: string }) {
 				return extHostWorkspace.encode(content, options);
 			}
-		};
+		} as any;
 
 		// namespace: scm
 		const scm: typeof vscode.scm = {
@@ -1907,7 +1901,7 @@ export function createApiFactoryAndRegisterActors(accessor: ServicesAccessor): I
 		};
 
 		// namespace: debug
-		const debug: typeof vscode.debug = {
+		const debug: typeof vscode.debug & Record<string, any> = {
 			get activeDebugSession() {
 				return extHostDebugService.activeDebugSession;
 			},
@@ -1976,7 +1970,9 @@ export function createApiFactoryAndRegisterActors(accessor: ServicesAccessor): I
 					!parentSessionOrOptions ||
 					(typeof parentSessionOrOptions === 'object' && 'configuration' in parentSessionOrOptions)
 				) {
-					return extHostDebugService.startDebugging(folder, nameOrConfig, { parentSession: parentSessionOrOptions });
+					return extHostDebugService.startDebugging(folder, nameOrConfig, {
+						parentSession: parentSessionOrOptions as any
+					});
 				}
 				return extHostDebugService.startDebugging(folder, nameOrConfig, parentSessionOrOptions || {});
 			},
@@ -1994,7 +1990,7 @@ export function createApiFactoryAndRegisterActors(accessor: ServicesAccessor): I
 			}
 		};
 
-		const tasks: typeof vscode.tasks = {
+		const tasks: typeof vscode.tasks & Record<string, any> = {
 			registerTaskProvider: (type: string, provider: vscode.TaskProvider) => {
 				return extHostTask.registerTaskProvider(extension, type, provider);
 			},
@@ -2010,8 +2006,8 @@ export function createApiFactoryAndRegisterActors(accessor: ServicesAccessor): I
 			onDidStartTask: (listener: (e: vscode.TaskStartEvent) => any, thisArgs?: any, disposables?) => {
 				const wrappedListener = (event: vscode.TaskStartEvent) => {
 					if (!isProposedApiEnabled(extension, 'taskExecutionTerminal')) {
-						if (event?.execution?.terminal !== undefined) {
-							event.execution.terminal = undefined;
+						if ((event?.execution as any)?.terminal !== undefined) {
+							(event.execution as any).terminal = undefined;
 						}
 					}
 					const eventWithExecution = {
@@ -2077,8 +2073,7 @@ export function createApiFactoryAndRegisterActors(accessor: ServicesAccessor): I
 			}
 		};
 
-		// eslint-disable-next-line local/code-no-dangerous-type-assertions
-		return <typeof vscode>{
+		return <typeof vscode>(<unknown>{
 			version: initData.version,
 			// namespaces
 			authentication,
@@ -2296,6 +2291,6 @@ export function createApiFactoryAndRegisterActors(accessor: ServicesAccessor): I
 			TextSearchMatch2: TextSearchMatch2,
 			AISearchKeyword: AISearchKeyword,
 			TextSearchCompleteMessageTypeNew: TextSearchCompleteMessageType
-		};
+		});
 	};
 }

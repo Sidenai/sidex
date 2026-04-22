@@ -115,7 +115,7 @@ export class TokenizationTextModelPart extends TextModelPart implements ITokeniz
 			);
 
 			reader.store.add(
-				tokens.onDidChangeBackgroundTokenizationState(e => {
+				tokens.onDidChangeBackgroundTokenizationState(_e => {
 					this._bracketPairsTextModelPart.handleDidChangeBackgroundTokenizationState();
 				})
 			);

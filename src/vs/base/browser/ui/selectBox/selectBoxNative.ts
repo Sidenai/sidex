@@ -61,7 +61,7 @@ export class SelectBoxNative extends Disposable implements ISelectBoxDelegate {
 		this._register(Gesture.addTarget(this.selectElement));
 		[EventType.Tap].forEach(eventType => {
 			this._register(
-				dom.addDisposableListener(this.selectElement, eventType, e => {
+				dom.addDisposableListener(this.selectElement, eventType, _e => {
 					this.selectElement.focus();
 				})
 			);

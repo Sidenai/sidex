@@ -21,11 +21,11 @@ import { ILogService } from '../../../platform/log/common/log.js';
 import { IExtensionDescription } from '../../../platform/extensions/common/extensions.js';
 import { SerializableObjectWithBuffers } from '../../services/extensions/common/proxyIdentifier.js';
 
-type Listener = [Function, unknown, IExtensionDescription];
+type Listener = [(...args: any[]) => any, unknown, IExtensionDescription];
 
 export class ExtHostDocumentSaveParticipant implements ExtHostDocumentSaveParticipantShape {
 	private readonly _callbacks = new LinkedList<Listener>();
-	private readonly _badListeners = new WeakMap<Function, number>();
+	private readonly _badListeners = new WeakMap<(...args: any[]) => any, number>();
 
 	constructor(
 		private readonly _logService: ILogService,
@@ -117,7 +117,7 @@ export class ExtHostDocumentSaveParticipant implements ExtHostDocumentSavePartic
 
 	private _deliverEventAsync(
 		extension: IExtensionDescription,
-		listener: Function,
+		listener: (...args: any[]) => any,
 		thisArg: unknown,
 		stubEvent: Pick<vscode.TextDocumentWillSaveEvent, 'document' | 'reason'>
 	): Promise<boolean | undefined> {

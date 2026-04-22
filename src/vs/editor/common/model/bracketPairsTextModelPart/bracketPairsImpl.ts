@@ -67,12 +67,12 @@ export class BracketPairsTextModelPart extends Disposable implements IBracketPai
 		}
 	}
 
-	public handleDidChangeOptions(e: IModelOptionsChangedEvent): void {
+	public handleDidChangeOptions(_e: IModelOptionsChangedEvent): void {
 		this.bracketPairsTree.clear();
 		this.updateBracketPairsTree();
 	}
 
-	public handleDidChangeLanguage(e: IModelLanguageChangedEvent): void {
+	public handleDidChangeLanguage(_e: IModelLanguageChangedEvent): void {
 		this.bracketPairsTree.clear();
 		this.updateBracketPairsTree();
 	}

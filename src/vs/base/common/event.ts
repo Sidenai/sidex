@@ -846,8 +846,8 @@ export namespace Event {
 	}
 
 	export interface NodeEventEmitter {
-		on(event: string | symbol, listener: Function): unknown;
-		removeListener(event: string | symbol, listener: Function): unknown;
+		on(event: string | symbol, listener: (...args: any[]) => any): unknown;
+		removeListener(event: string | symbol, listener: (...args: any[]) => any): unknown;
 	}
 
 	/**
@@ -870,8 +870,8 @@ export namespace Event {
 	}
 
 	export interface DOMEventEmitter {
-		addEventListener(event: string | symbol, listener: Function): void;
-		removeEventListener(event: string | symbol, listener: Function): void;
+		addEventListener(event: string | symbol, listener: (...args: any[]) => any): void;
+		removeEventListener(event: string | symbol, listener: (...args: any[]) => any): void;
 	}
 
 	/**
@@ -1069,23 +1069,23 @@ export interface EmitterOptions {
 	/**
 	 * Optional function that's called *before* the very first listener is added
 	 */
-	onWillAddFirstListener?: Function;
+	onWillAddFirstListener?: (...args: any[]) => any;
 	/**
 	 * Optional function that's called *after* the very first listener is added
 	 */
-	onDidAddFirstListener?: Function;
+	onDidAddFirstListener?: (...args: any[]) => any;
 	/**
 	 * Optional function that's called after a listener is added
 	 */
-	onDidAddListener?: Function;
+	onDidAddListener?: (...args: any[]) => any;
 	/**
 	 * Optional function that's called *after* remove the very last listener
 	 */
-	onDidRemoveLastListener?: Function;
+	onDidRemoveLastListener?: (...args: any[]) => any;
 	/**
 	 * Optional function that's called *before* a listener is removed
 	 */
-	onWillRemoveListener?: Function;
+	onWillRemoveListener?: (...args: any[]) => any;
 	/**
 	 * Optional function that's called when a listener throws an error. Defaults to
 	 * {@link onUnexpectedError}
@@ -1424,7 +1424,7 @@ export class Emitter<T> {
 
 			const contained = new UniqueContainer(callback);
 
-			let removeMonitor: Function | undefined;
+			let removeMonitor: ((...args: any[]) => any) | undefined;
 			let stack: Stacktrace | undefined;
 			if (this._leakageMon && this._size >= Math.ceil(this._leakageMon.threshold * 0.2)) {
 				// check and record this emitter for potential leakage
@@ -1620,7 +1620,7 @@ export class AsyncEmitter<T extends IWaitUntil> extends Emitter<T> {
 	async fireAsync(
 		data: IWaitUntilData<T>,
 		token: CancellationToken,
-		promiseJoin?: (p: Promise<unknown>, listener: Function) => Promise<unknown>
+		promiseJoin?: (p: Promise<unknown>, listener: (...args: any[]) => any) => Promise<unknown>
 	): Promise<void> {
 		if (!this._listeners) {
 			return;
@@ -1636,7 +1636,6 @@ export class AsyncEmitter<T extends IWaitUntil> extends Emitter<T> {
 			const [listener, data] = this._asyncDeliveryQueue.shift()!;
 			const thenables: Promise<unknown>[] = [];
 
-			// eslint-disable-next-line local/code-no-dangerous-type-assertions
 			const event = <T>{
 				...data,
 				token,
@@ -1931,7 +1930,7 @@ export class DynamicListEventMultiplexer<TItem, TEventType> implements IDynamicL
  * ```
  */
 export class EventBufferer {
-	private data: { buffers: Function[] }[] = [];
+	private data: { buffers: ((...args: any[]) => any)[] }[] = [];
 
 	wrapEvent<T>(event: Event<T>): Event<T>;
 	wrapEvent<T>(event: Event<T>, reduce: (last: T | undefined, event: T) => T): Event<T>;
@@ -1994,7 +1993,7 @@ export class EventBufferer {
 	}
 
 	bufferEvents<R = void>(fn: () => R): R {
-		const data = { buffers: new Array<Function>() };
+		const data = { buffers: new Array<(...args: any[]) => any>() };
 		this.data.push(data);
 		const r = fn();
 		this.data.pop();

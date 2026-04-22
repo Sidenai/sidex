@@ -70,7 +70,7 @@ export class OverviewRuler extends ViewEventHandler implements IOverviewRuler {
 
 		return true;
 	}
-	public override onFlushed(e: viewEvents.ViewFlushedEvent): boolean {
+	public override onFlushed(_e: viewEvents.ViewFlushedEvent): boolean {
 		this._render();
 		return true;
 	}
@@ -81,7 +81,7 @@ export class OverviewRuler extends ViewEventHandler implements IOverviewRuler {
 		}
 		return true;
 	}
-	public override onZonesChanged(e: viewEvents.ViewZonesChangedEvent): boolean {
+	public override onZonesChanged(_e: viewEvents.ViewZonesChangedEvent): boolean {
 		this._render();
 		return true;
 	}

@@ -999,7 +999,7 @@ export class CustomMenubarControl extends MenubarControl {
 		return this.container;
 	}
 
-	layout(dimension: Dimension) {
+	layout(_dimension: Dimension) {
 		this.menubar?.update(this.getMenuBarOptions());
 	}
 

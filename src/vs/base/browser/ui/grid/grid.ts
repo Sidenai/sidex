@@ -19,7 +19,7 @@ import {
 	Sizing as GridViewSizing,
 	GridLocation
 } from './gridview.js';
-import type { SplitView, AutoSizing as SplitViewAutoSizing } from '../splitview/splitview.js';
+import type { SplitView as _SplitView, AutoSizing as SplitViewAutoSizing } from '../splitview/splitview.js';
 
 export type { IViewSize };
 export { LayoutPriority, Orientation, orthogonal } from './gridview.js';
@@ -76,7 +76,6 @@ export interface GridBranchNode<T extends IView> {
 export type GridNode<T extends IView> = GridLeafNode<T> | GridBranchNode<T>;
 
 export function isGridBranchNode<T extends IView>(node: GridNode<T>): node is GridBranchNode<T> {
-	// eslint-disable-next-line local/code-no-any-casts
 	return !!(node as any).children;
 }
 
@@ -923,7 +922,7 @@ export class SerializableGrid<T extends ISerializableView> extends Grid<T> {
 	}
 }
 
-export type GridLeafNodeDescriptor<T> = { size?: number; data?: any };
+export type GridLeafNodeDescriptor<_T> = { size?: number; data?: any };
 export type GridBranchNodeDescriptor<T> = { size?: number; groups: GridNodeDescriptor<T>[] };
 export type GridNodeDescriptor<T> = GridBranchNodeDescriptor<T> | GridLeafNodeDescriptor<T>;
 export type GridDescriptor<T> = { orientation: Orientation } & GridBranchNodeDescriptor<T>;
@@ -935,9 +934,7 @@ function isGridBranchNodeDescriptor<T>(
 }
 
 export function sanitizeGridNodeDescriptor<T>(nodeDescriptor: GridNodeDescriptor<T>, rootNode: boolean): void {
-	// eslint-disable-next-line local/code-no-any-casts
 	if (!rootNode && (nodeDescriptor as any).groups && (nodeDescriptor as any).groups.length <= 1) {
-		// eslint-disable-next-line local/code-no-any-casts
 		(nodeDescriptor as any).groups = undefined;
 	}
 

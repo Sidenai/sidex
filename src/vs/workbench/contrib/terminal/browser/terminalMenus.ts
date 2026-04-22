@@ -951,7 +951,7 @@ function isAiContributedProfile(profile: IExtensionTerminalProfile): boolean {
 	return isAiProfileName(profile.title);
 }
 
-function isAiProfileName(name: string): boolean {
+function isAiProfileName(_name: string): boolean {
 	return false;
 }
 

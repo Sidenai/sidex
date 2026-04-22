@@ -488,7 +488,7 @@ export class FileService extends Disposable implements IFileService {
 			const stat = await provider.stat(resource);
 
 			return !!stat;
-		} catch (error) {
+		} catch (_error) {
 			return false;
 		}
 	}
@@ -710,7 +710,7 @@ export class FileService extends Disposable implements IFileService {
 		let stat: IStat | undefined = undefined;
 		try {
 			stat = await provider.stat(resource);
-		} catch (error) {
+		} catch (_error) {
 			return Object.create(null); // file might not exist
 		}
 
@@ -764,7 +764,7 @@ export class FileService extends Disposable implements IFileService {
 					if (buffer.equals(value)) {
 						return { stat, buffer }; // allow writing since contents are identical
 					}
-				} catch (error) {
+				} catch (_error) {
 					// ignore, throw the FILE_MODIFIED_SINCE error
 				}
 			}
@@ -1495,7 +1495,7 @@ export class FileService extends Disposable implements IFileService {
 		let stat: IStat | undefined = undefined;
 		try {
 			stat = await provider.stat(resource);
-		} catch (error) {
+		} catch (_error) {
 			// Handled later
 		}
 

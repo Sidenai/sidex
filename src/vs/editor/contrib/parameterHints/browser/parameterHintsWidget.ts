@@ -126,7 +126,7 @@ export class ParameterHintsWidget extends Disposable implements IContentWidget {
 		this.hide();
 
 		this._register(
-			this.editor.onDidChangeCursorSelection(e => {
+			this.editor.onDidChangeCursorSelection(_e => {
 				if (this.visible) {
 					this.editor.layoutContentWidget(this);
 				}
@@ -153,11 +153,11 @@ export class ParameterHintsWidget extends Disposable implements IContentWidget {
 
 		this._register(
 			Event.chain(this.editor.onDidChangeConfiguration.bind(this.editor), $ =>
-				$.filter(e => e.hasChanged(EditorOption.fontInfo))
+				$.filter(e => (e as any).hasChanged(EditorOption.fontInfo))
 			)(updateFont)
 		);
 
-		this._register(this.editor.onDidLayoutChange(e => this.updateMaxHeight()));
+		this._register(this.editor.onDidLayoutChange(_e => this.updateMaxHeight()));
 		this.updateMaxHeight();
 	}
 

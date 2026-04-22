@@ -26,7 +26,7 @@ registerAction2(
 			});
 		}
 
-		override async run(accessor: ServicesAccessor, match: RenderableMatch | undefined): Promise<any> {
+		override async run(accessor: ServicesAccessor, _match: RenderableMatch | undefined): Promise<any> {
 			const quickInputService = accessor.get(IQuickInputService);
 			const searchText = getSearchText(accessor) ?? '';
 			quickInputService.quickAccess.show(TEXT_SEARCH_QUICK_ACCESS_PREFIX + searchText, { preserveValue: !!searchText });

@@ -83,7 +83,7 @@ export class MainThreadUriOpeners extends Disposable implements MainThreadUriOpe
 			},
 			openExternalUri: async (uri, ctx, token) => {
 				try {
-					await this.proxy.$openUri(id, { resolvedUri: uri, sourceUri: ctx.sourceUri }, token);
+					await this.proxy.$openUri(id, { resolvedUri: uri, sourceUri: (ctx as any).sourceUri }, token);
 				} catch (e) {
 					if (!isCancellationError(e)) {
 						const openDefaultAction = new Action(
@@ -119,7 +119,7 @@ export class MainThreadUriOpeners extends Disposable implements MainThreadUriOpe
 				}
 				return true;
 			}
-		};
+		} as any;
 	}
 
 	async $registerUriOpener(

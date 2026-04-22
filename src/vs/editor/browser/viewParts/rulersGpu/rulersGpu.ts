@@ -32,18 +32,18 @@ export class RulersGpu extends ViewPart {
 
 	// --- begin event handlers
 
-	public override onConfigurationChanged(e: viewEvents.ViewConfigurationChangedEvent): boolean {
+	public override onConfigurationChanged(_e: viewEvents.ViewConfigurationChangedEvent): boolean {
 		this._updateEntries(undefined);
 		return true;
 	}
 
 	// --- end event handlers
 
-	public prepareRender(ctx: RenderingContext): void {
+	public prepareRender(_ctx: RenderingContext): void {
 		// Nothing to read
 	}
 
-	public render(ctx: RestrictedRenderingContext): void {
+	public render(_ctx: RestrictedRenderingContext): void {
 		// Rendering is handled by RectangleRenderer
 	}
 

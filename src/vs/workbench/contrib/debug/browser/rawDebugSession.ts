@@ -657,7 +657,7 @@ export class RawDebugSession implements IDisposable {
 
 					// if there's an error, the DA is probably already gone, so give it a much shorter timeout.
 					await this.send('disconnect', args, undefined, error ? 200 : 2000);
-				} catch (e) {
+				} catch (_e) {
 					// Catch the potential 'disconnect' error - no need to show it to the user since the adapter is shutting down
 				} finally {
 					await this.stopAdapter(error);

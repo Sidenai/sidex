@@ -80,7 +80,7 @@ export function gitFastForwardPull(): ITerminalQuickFixInternalOptions {
 			length: 8
 		},
 		commandExitResult: 'success',
-		getQuickFixes: (matchResult: ITerminalCommandMatchResult) => {
+		getQuickFixes: (_matchResult: ITerminalCommandMatchResult) => {
 			return {
 				type: TerminalQuickFixType.TerminalCommand,
 				id: 'Git Fast Forward Pull',

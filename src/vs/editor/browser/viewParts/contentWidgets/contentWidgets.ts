@@ -63,33 +63,33 @@ export class ViewContentWidgets extends ViewPart {
 		}
 		return true;
 	}
-	public override onDecorationsChanged(e: viewEvents.ViewDecorationsChangedEvent): boolean {
+	public override onDecorationsChanged(_e: viewEvents.ViewDecorationsChangedEvent): boolean {
 		// true for inline decorations that can end up relayouting text
 		return true;
 	}
-	public override onFlushed(e: viewEvents.ViewFlushedEvent): boolean {
+	public override onFlushed(_e: viewEvents.ViewFlushedEvent): boolean {
 		return true;
 	}
-	public override onLineMappingChanged(e: viewEvents.ViewLineMappingChangedEvent): boolean {
+	public override onLineMappingChanged(_e: viewEvents.ViewLineMappingChangedEvent): boolean {
 		this._updateAnchorsViewPositions();
 		return true;
 	}
-	public override onLinesChanged(e: viewEvents.ViewLinesChangedEvent): boolean {
+	public override onLinesChanged(_e: viewEvents.ViewLinesChangedEvent): boolean {
 		this._updateAnchorsViewPositions();
 		return true;
 	}
-	public override onLinesDeleted(e: viewEvents.ViewLinesDeletedEvent): boolean {
+	public override onLinesDeleted(_e: viewEvents.ViewLinesDeletedEvent): boolean {
 		this._updateAnchorsViewPositions();
 		return true;
 	}
-	public override onLinesInserted(e: viewEvents.ViewLinesInsertedEvent): boolean {
+	public override onLinesInserted(_e: viewEvents.ViewLinesInsertedEvent): boolean {
 		this._updateAnchorsViewPositions();
 		return true;
 	}
-	public override onScrollChanged(e: viewEvents.ViewScrollChangedEvent): boolean {
+	public override onScrollChanged(_e: viewEvents.ViewScrollChangedEvent): boolean {
 		return true;
 	}
-	public override onZonesChanged(e: viewEvents.ViewZonesChangedEvent): boolean {
+	public override onZonesChanged(_e: viewEvents.ViewZonesChangedEvent): boolean {
 		return true;
 	}
 

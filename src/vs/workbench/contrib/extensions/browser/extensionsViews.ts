@@ -811,7 +811,7 @@ export class ExtensionsListView extends AbstractExtensionsListView<IExtension> {
 				}
 			}
 			if (extesionsToFetch.length) {
-				this.extensionsWorkbenchService.getExtensions(extesionsToFetch, CancellationToken.None).catch(e => null/*ignore error*/);
+				this.extensionsWorkbenchService.getExtensions(extesionsToFetch, CancellationToken.None).catch(_e => null/*ignore error*/);
 			}
 		}
 

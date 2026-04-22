@@ -182,7 +182,7 @@ export class TextSearchQuickAccess extends PickerQuickAccessProvider<ITextSearch
 		);
 
 		disposables.add(
-			Event.once(picker.onDidHide)(({ reason }) => {
+			Event.once(picker.onDidHide)(({ reason: _reason }) => {
 				this.searchModel.searchResult.toggleHighlights(false);
 			})
 		);

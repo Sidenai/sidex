@@ -127,11 +127,11 @@ export class ViewZones extends ViewPart {
 		return true;
 	}
 
-	public override onLineMappingChanged(e: viewEvents.ViewLineMappingChangedEvent): boolean {
+	public override onLineMappingChanged(_e: viewEvents.ViewLineMappingChangedEvent): boolean {
 		return this._recomputeWhitespacesProps();
 	}
 
-	public override onLinesDeleted(e: viewEvents.ViewLinesDeletedEvent): boolean {
+	public override onLinesDeleted(_e: viewEvents.ViewLinesDeletedEvent): boolean {
 		return true;
 	}
 
@@ -139,11 +139,11 @@ export class ViewZones extends ViewPart {
 		return e.scrollTopChanged || e.scrollWidthChanged;
 	}
 
-	public override onZonesChanged(e: viewEvents.ViewZonesChangedEvent): boolean {
+	public override onZonesChanged(_e: viewEvents.ViewZonesChangedEvent): boolean {
 		return true;
 	}
 
-	public override onLinesInserted(e: viewEvents.ViewLinesInsertedEvent): boolean {
+	public override onLinesInserted(_e: viewEvents.ViewLinesInsertedEvent): boolean {
 		return true;
 	}
 
@@ -373,7 +373,7 @@ export class ViewZones extends ViewPart {
 		}
 	}
 
-	public prepareRender(ctx: RenderingContext): void {
+	public prepareRender(_ctx: RenderingContext): void {
 		// Nothing to read
 	}
 
@@ -433,7 +433,7 @@ export class ViewZones extends ViewPart {
 	}
 }
 
-function safeInvoke1Arg(func: Function, arg1: unknown): unknown {
+function safeInvoke1Arg(func: (...args: any[]) => any, arg1: unknown): unknown {
 	try {
 		return func(arg1);
 	} catch (e) {

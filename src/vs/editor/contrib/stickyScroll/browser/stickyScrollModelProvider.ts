@@ -187,7 +187,7 @@ abstract class StickyModelCandidateProvider<T> extends Disposable implements ISt
 	 * @param model model returned by the provider
 	 * @returns boolean indicating whether the model is valid
 	 */
-	protected isModelValid(model: T): boolean {
+	protected isModelValid(_model: T): boolean {
 		return true;
 	}
 

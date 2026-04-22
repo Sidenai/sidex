@@ -13,12 +13,12 @@ import { IMarkdownString } from '../../../base/common/htmlContent.js';
  * and the modified version.
  */
 export class TextDiffEditorModel extends DiffEditorModel {
-	protected override readonly _originalModel: BaseTextEditorModel | undefined;
+	declare protected readonly _originalModel: BaseTextEditorModel | undefined;
 	override get originalModel(): BaseTextEditorModel | undefined {
 		return this._originalModel;
 	}
 
-	protected override readonly _modifiedModel: BaseTextEditorModel | undefined;
+	declare protected readonly _modifiedModel: BaseTextEditorModel | undefined;
 	override get modifiedModel(): BaseTextEditorModel | undefined {
 		return this._modifiedModel;
 	}

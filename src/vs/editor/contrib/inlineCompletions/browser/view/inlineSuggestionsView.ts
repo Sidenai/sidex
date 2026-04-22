@@ -94,8 +94,10 @@ export class InlineSuggestionsView extends Disposable {
 		this._stablizedGhostTexts = convertItemsToStableObservables(this._ghostTexts, this._store);
 		this._editorObs = observableCodeEditor(this._editor);
 
-		this._ghostTextWidgets = mapObservableArrayCached(this, this._stablizedGhostTexts, (ghostText, store) =>
-			store.add(this._createGhostText(ghostText))
+		this._ghostTextWidgets = mapObservableArrayCached(
+			this,
+			this._stablizedGhostTexts,
+			(ghostText: IObservable<GhostTextOrReplacement>, store) => store.add(this._createGhostText(ghostText))
 		).recomputeInitiallyAndOnChange(this._store);
 
 		this._inlineEditWidget.recomputeInitiallyAndOnChange(this._store);

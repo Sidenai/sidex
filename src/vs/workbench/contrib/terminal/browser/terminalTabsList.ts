@@ -189,7 +189,7 @@ export class TerminalTabList extends WorkbenchList<ITerminalInstance> {
 		// Dispose of instance listeners on shutdown to avoid extra work and so tabs don't disappear
 		// briefly
 		this.disposables.add(
-			lifecycleService.onWillShutdown(e => {
+			lifecycleService.onWillShutdown(_e => {
 				dispose(instanceDisposables);
 				instanceDisposables.length = 0;
 			})
@@ -258,7 +258,7 @@ export class TerminalTabList extends WorkbenchList<ITerminalInstance> {
 		this._terminalTabsSingleSelectedContextKey = TerminalContextKeys.tabsSingularSelection.bindTo(contextKeyService);
 		this._isSplitContextKey = TerminalContextKeys.splitTerminalTabFocused.bindTo(contextKeyService);
 
-		this.disposables.add(this.onDidChangeSelection(e => this._updateContextKey()));
+		this.disposables.add(this.onDidChangeSelection(_e => this._updateContextKey()));
 		this.disposables.add(this.onDidChangeFocus(() => this._updateContextKey()));
 
 		this.disposables.add(
@@ -585,7 +585,7 @@ class TerminalTabsRenderer implements IListRenderer<ITerminalInstance, ITerminal
 					done(false, true);
 				}
 			}),
-			DOM.addStandardDisposableListener(inputBox.inputElement, DOM.EventType.KEY_UP, (e: IKeyboardEvent) => {
+			DOM.addStandardDisposableListener(inputBox.inputElement, DOM.EventType.KEY_UP, (_e: IKeyboardEvent) => {
 				showInputBoxNotification();
 			}),
 			DOM.addDisposableListener(inputBox.inputElement, DOM.EventType.BLUR, () => {
@@ -635,7 +635,7 @@ class TerminalTabsRenderer implements IListRenderer<ITerminalInstance, ITerminal
 							action.icon ? ThemeIcon.asClassName(action.icon) : undefined,
 							true,
 							async () => {
-								this._runForSelectionOrInstance(instance, e =>
+								this._runForSelectionOrInstance(instance, _e =>
 									this._commandService.executeCommand(action.id, instance)
 								);
 							}
@@ -761,7 +761,7 @@ class TerminalTabsDragAndDrop extends Disposable implements IListDragAndDrop<ITe
 		return instance.resource.toString();
 	}
 
-	getDragLabel?(elements: ITerminalInstance[], originalEvent: DragEvent): string | undefined {
+	getDragLabel?(elements: ITerminalInstance[], _originalEvent: DragEvent): string | undefined {
 		return elements.length === 1 ? elements[0].title : undefined;
 	}
 

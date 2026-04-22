@@ -288,7 +288,7 @@ export class CallStackView extends ViewPane {
 						await expandTo(session, this.tree);
 						this.autoExpandedSessions.add(session);
 					}
-				} catch (e) {
+				} catch (_e) {
 					// Ignore tree expand errors if element no longer present
 				}
 				if (this.selectionNeedsUpdate) {
@@ -537,7 +537,7 @@ export class CallStackView extends ViewPane {
 				} else {
 					this.tree.reveal(element);
 				}
-			} catch (e) {
+			} catch (_e) {
 			} finally {
 				this.ignoreSelectionChangedEvent = false;
 			}
@@ -556,10 +556,10 @@ export class CallStackView extends ViewPane {
 			// Ignore errors from this expansions because we are not aware if we rendered the threads and sessions or we hide them to declutter the view
 			try {
 				await expandTo(thread.session, this.tree);
-			} catch (e) {}
+			} catch (_e) {}
 			try {
 				await this.tree.expand(thread);
-			} catch (e) {}
+			} catch (_e) {}
 
 			const toReveal = stackFrame || session;
 			if (toReveal) {
@@ -955,9 +955,9 @@ class StackFramesRenderer implements ICompressibleTreeRenderer<IStackFrame, Fuzz
 	}
 
 	renderCompressedElements(
-		node: ITreeNode<ICompressedTreeNode<IStackFrame>, FuzzyScore>,
-		index: number,
-		templateData: IStackFrameTemplateData
+		_node: ITreeNode<ICompressedTreeNode<IStackFrame>, FuzzyScore>,
+		_index: number,
+		_templateData: IStackFrameTemplateData
 	): void {
 		throw new Error('Method not implemented.');
 	}
@@ -998,14 +998,14 @@ class ErrorsRenderer implements ICompressibleTreeRenderer<string, FuzzyScore, IE
 	}
 
 	renderCompressedElements(
-		node: ITreeNode<ICompressedTreeNode<string>, FuzzyScore>,
-		index: number,
-		templateData: IErrorTemplateData
+		_node: ITreeNode<ICompressedTreeNode<string>, FuzzyScore>,
+		_index: number,
+		_templateData: IErrorTemplateData
 	): void {
 		throw new Error('Method not implemented.');
 	}
 
-	disposeTemplate(templateData: IErrorTemplateData): void {
+	disposeTemplate(_templateData: IErrorTemplateData): void {
 		// noop
 	}
 }
@@ -1031,14 +1031,14 @@ class LoadMoreRenderer implements ICompressibleTreeRenderer<ThreadAndSessionIds,
 	}
 
 	renderCompressedElements(
-		node: ITreeNode<ICompressedTreeNode<ThreadAndSessionIds>, FuzzyScore>,
-		index: number,
-		templateData: ILabelTemplateData
+		_node: ITreeNode<ICompressedTreeNode<ThreadAndSessionIds>, FuzzyScore>,
+		_index: number,
+		_templateData: ILabelTemplateData
 	): void {
 		throw new Error('Method not implemented.');
 	}
 
-	disposeTemplate(templateData: ILabelTemplateData): void {
+	disposeTemplate(_templateData: ILabelTemplateData): void {
 		// noop
 	}
 }
@@ -1075,14 +1075,14 @@ class ShowMoreRenderer implements ICompressibleTreeRenderer<IStackFrame[], Fuzzy
 	}
 
 	renderCompressedElements(
-		node: ITreeNode<ICompressedTreeNode<IStackFrame[]>, FuzzyScore>,
-		index: number,
-		templateData: ILabelTemplateData
+		_node: ITreeNode<ICompressedTreeNode<IStackFrame[]>, FuzzyScore>,
+		_index: number,
+		_templateData: ILabelTemplateData
 	): void {
 		throw new Error('Method not implemented.');
 	}
 
-	disposeTemplate(templateData: ILabelTemplateData): void {
+	disposeTemplate(_templateData: ILabelTemplateData): void {
 		// noop
 	}
 }

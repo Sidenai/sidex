@@ -209,7 +209,7 @@ export class ReplaceInput extends Widget {
 
 		this.onkeydown(this.inputBox.inputElement, e => this._onKeyDown.fire(e));
 		this.onkeyup(this.inputBox.inputElement, e => this._onKeyUp.fire(e));
-		this.oninput(this.inputBox.inputElement, e => this._onInput.fire());
+		this.oninput(this.inputBox.inputElement, _e => this._onInput.fire());
 		this.onmousedown(this.inputBox.inputElement, e => this._onMouseDown.fire(e));
 	}
 

@@ -390,7 +390,7 @@ export class TextAreaEditContext extends AbstractEditContext {
 		);
 
 		this._register(
-			this._textAreaInput.onCompositionStart(e => {
+			this._textAreaInput.onCompositionStart(_e => {
 				// The textarea might contain some content when composition starts.
 				//
 				// When we make the textarea visible, it always has a height of 1 line,
@@ -495,7 +495,7 @@ export class TextAreaEditContext extends AbstractEditContext {
 		);
 
 		this._register(
-			this._textAreaInput.onCompositionUpdate((e: ICompositionData) => {
+			this._textAreaInput.onCompositionUpdate((_e: ICompositionData) => {
 				if (!this._visibleTextArea) {
 					return;
 				}
@@ -698,20 +698,20 @@ export class TextAreaEditContext extends AbstractEditContext {
 		this._textAreaInput.writeNativeTextAreaContent('selection changed');
 		return true;
 	}
-	public override onDecorationsChanged(e: viewEvents.ViewDecorationsChangedEvent): boolean {
+	public override onDecorationsChanged(_e: viewEvents.ViewDecorationsChangedEvent): boolean {
 		// true for inline decorations that can end up relayouting text
 		return true;
 	}
-	public override onFlushed(e: viewEvents.ViewFlushedEvent): boolean {
+	public override onFlushed(_e: viewEvents.ViewFlushedEvent): boolean {
 		return true;
 	}
-	public override onLinesChanged(e: viewEvents.ViewLinesChangedEvent): boolean {
+	public override onLinesChanged(_e: viewEvents.ViewLinesChangedEvent): boolean {
 		return true;
 	}
-	public override onLinesDeleted(e: viewEvents.ViewLinesDeletedEvent): boolean {
+	public override onLinesDeleted(_e: viewEvents.ViewLinesDeletedEvent): boolean {
 		return true;
 	}
-	public override onLinesInserted(e: viewEvents.ViewLinesInsertedEvent): boolean {
+	public override onLinesInserted(_e: viewEvents.ViewLinesInsertedEvent): boolean {
 		return true;
 	}
 	public override onScrollChanged(e: viewEvents.ViewScrollChangedEvent): boolean {
@@ -719,7 +719,7 @@ export class TextAreaEditContext extends AbstractEditContext {
 		this._scrollTop = e.scrollTop;
 		return true;
 	}
-	public override onZonesChanged(e: viewEvents.ViewZonesChangedEvent): boolean {
+	public override onZonesChanged(_e: viewEvents.ViewZonesChangedEvent): boolean {
 		return true;
 	}
 
@@ -784,7 +784,7 @@ export class TextAreaEditContext extends AbstractEditContext {
 		this._visibleTextArea?.prepareRender(ctx);
 	}
 
-	public render(ctx: RestrictedRenderingContext): void {
+	public render(_ctx: RestrictedRenderingContext): void {
 		this._textAreaInput.writeNativeTextAreaContent('render');
 		this._render();
 	}

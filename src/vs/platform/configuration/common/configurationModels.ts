@@ -636,7 +636,7 @@ export class UserSettings extends Disposable {
 			const content = await this.fileService.readFile(this.userSettingsResource);
 			this.parser.parse(content.value.toString() || '{}', this.parseOptions);
 			return this.parser.configurationModel;
-		} catch (e) {
+		} catch (_e) {
 			return ConfigurationModel.createEmptyModel(this.logService);
 		}
 	}

@@ -651,7 +651,7 @@ export class InstallAction extends ExtensionAction {
 			return runningExtension;
 		}
 		if (this.runtimeExtensionService.canAddExtension(toExtensionDescription(extension))) {
-			return new Promise<IExtensionDescription | null>((c, e) => {
+			return new Promise<IExtensionDescription | null>((c, _e) => {
 				const disposable = this.runtimeExtensionService.onDidChangeExtensions(async () => {
 					const runningExtension = await this.runtimeExtensionService.getExtension(extension.identifier.id);
 					if (runningExtension) {
@@ -1066,7 +1066,7 @@ export class ToggleAutoUpdateForExtensionAction extends ExtensionAction {
 				this.update();
 			}
 		}));
-		this._register(allowedExtensionsService.onDidChangeAllowedExtensionsConfigValue(e => this.update()));
+		this._register(allowedExtensionsService.onDidChangeAllowedExtensionsConfigValue(_e => this.update()));
 		this.update();
 	}
 
@@ -1605,7 +1605,7 @@ export class InstallAnotherVersionAction extends ExtensionAction {
 			return;
 		}
 
-		const picks = allVersions.map((v, i) => {
+		const picks = allVersions.map((v, _i) => {
 			return {
 				id: v.version,
 				label: v.version,
@@ -2306,7 +2306,7 @@ export abstract class AbstractConfigureRecommendedExtensionsAction extends Actio
 	private getOrCreateExtensionsFile(extensionsFileResource: URI): Promise<{ created: boolean; extensionsFileResource: URI; content: string }> {
 		return Promise.resolve(this.fileService.readFile(extensionsFileResource)).then(content => {
 			return { created: false, extensionsFileResource, content: content.value.toString() };
-		}, err => {
+		}, _err => {
 			return this.textFileService.write(extensionsFileResource, ExtensionsConfigurationInitialContent).then(() => {
 				return { created: true, extensionsFileResource, content: ExtensionsConfigurationInitialContent };
 			});

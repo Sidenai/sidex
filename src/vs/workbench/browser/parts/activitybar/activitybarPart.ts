@@ -173,7 +173,7 @@ export class ActivitybarPart extends Part {
 				},
 				preventLoopNavigation: true,
 				recomputeSizes: false,
-				fillExtraContextMenuActions: (actions, e?: MouseEvent | GestureEvent) => {},
+				fillExtraContextMenuActions: (_actions, _e?: MouseEvent | GestureEvent) => {},
 				compositeSize: 52,
 				colors: (theme: IColorTheme) => ({
 					activeForegroundColor: theme.getColor(ACTIVITY_BAR_FOREGROUND),

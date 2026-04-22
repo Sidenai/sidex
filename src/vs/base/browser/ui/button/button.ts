@@ -208,7 +208,7 @@ export class Button extends Disposable implements IButton {
 		);
 
 		this._register(
-			addDisposableListener(this._element, EventType.MOUSE_OVER, e => {
+			addDisposableListener(this._element, EventType.MOUSE_OVER, _e => {
 				if (!this._element.classList.contains('disabled')) {
 					this.updateStyles(true);
 				}
@@ -216,7 +216,7 @@ export class Button extends Disposable implements IButton {
 		);
 
 		this._register(
-			addDisposableListener(this._element, EventType.MOUSE_OUT, e => {
+			addDisposableListener(this._element, EventType.MOUSE_OUT, _e => {
 				this.updateStyles(false); // restore standard styles
 			})
 		);
@@ -497,7 +497,7 @@ export class ButtonWithDropdown extends Disposable implements IButton {
 		this.dropdownButton.element.classList.add('monaco-dropdown-button');
 		this.dropdownButton.icon = Codicon.dropDownButton;
 		this._register(
-			this.dropdownButton.onDidClick(e => {
+			this.dropdownButton.onDidClick(_e => {
 				const actions = Array.isArray(options.actions)
 					? options.actions
 					: (options.actions as IActionProvider).getActions();

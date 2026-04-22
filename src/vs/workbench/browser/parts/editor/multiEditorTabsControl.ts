@@ -110,7 +110,7 @@ import {
 	prepareMoveCopyEditors
 } from './editor.js';
 import { CloseEditorTabAction, UnpinEditorAction } from './editorActions.js';
-import { assertReturnsAllDefined, assertReturnsDefined } from '../../../../base/common/types.js';
+import { assertReturnsDefined } from '../../../../base/common/types.js';
 import { IEditorService } from '../../../services/editor/common/editorService.js';
 import { basenameOrAuthority } from '../../../../base/common/resources.js';
 import { RunOnceScheduler } from '../../../../base/common/async.js';
@@ -632,7 +632,7 @@ export class MultiEditorTabsControl extends EditorTabsControl {
 		return changed;
 	}
 
-	openEditors(editors: EditorInput[]): boolean {
+	openEditors(_editors: EditorInput[]): boolean {
 		return this.handleOpenedEditors();
 	}
 
@@ -722,11 +722,11 @@ export class MultiEditorTabsControl extends EditorTabsControl {
 		}
 	}
 
-	closeEditor(editor: EditorInput): void {
+	closeEditor(_editor: EditorInput): void {
 		this.handleClosedEditors();
 	}
 
-	closeEditors(editors: EditorInput[]): void {
+	closeEditors(_editors: EditorInput[]): void {
 		this.handleClosedEditors();
 	}
 
@@ -735,7 +735,7 @@ export class MultiEditorTabsControl extends EditorTabsControl {
 		if (this.tabsModel.count) {
 			// Remove tabs that got closed
 			if (!this.tabsContainer) {
-				return false;
+				return;
 			}
 			const tabsContainer = this.tabsContainer;
 			while (tabsContainer.children.length > this.tabsModel.count) {
@@ -811,7 +811,7 @@ export class MultiEditorTabsControl extends EditorTabsControl {
 
 		// Sticky change has an impact on each tab's border because
 		// it potentially moves the border to the last pinned tab
-		this.forEachTab((editor, tabIndex, tabContainer, tabLabelWidget, tabLabel) => {
+		this.forEachTab((editor, tabIndex, tabContainer, _tabLabelWidget, _tabLabel) => {
 			this.redrawTabBorders(tabIndex, tabContainer);
 		});
 
@@ -843,7 +843,7 @@ export class MultiEditorTabsControl extends EditorTabsControl {
 
 	private updateEditorLabelScheduler = this._register(new RunOnceScheduler(() => this.doUpdateEditorLabels(), 0));
 
-	updateEditorLabel(editor: EditorInput): void {
+	updateEditorLabel(_editor: EditorInput): void {
 		// Update all labels to account for changes to tab labels
 		// Since this method may be called a lot of times from
 		// individual editors, we collect all those requests and

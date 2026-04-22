@@ -223,7 +223,7 @@ registerTerminalAction({
 			isHiddenByDefault: true
 		}))
 	],
-	run: async (c, accessor) => {
+	run: async (c, _accessor) => {
 		let activeInstance = c.service.activeInstance;
 		// If an instanec doesn't exist, create one and wait for shell type to be set
 		if (!activeInstance) {

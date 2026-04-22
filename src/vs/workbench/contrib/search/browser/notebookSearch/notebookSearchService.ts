@@ -216,10 +216,10 @@ export class NotebookSearchService implements INotebookSearchService {
 		>[] = [];
 
 		contributedNotebookTypes.forEach(notebook => {
-			if (notebook.selectors.length > 0) {
+			if ((notebook as any).selectors.length > 0) {
 				promises.push(
 					(async () => {
-						const includes = notebook.selectors.map(selector => {
+						const includes = (notebook as any).selectors.map((selector: any) => {
 							const globPattern =
 								(selector as INotebookExclusiveDocumentFilter).include || (selector as glob.IRelativePattern | string);
 							return globPattern.toString();
@@ -296,7 +296,7 @@ export class NotebookSearchService implements INotebookSearchService {
 				continue;
 			}
 
-			let matches = await widget.find(
+			let matches = await (widget as any).find(
 				query.contentPattern.pattern,
 				{
 					regex: query.contentPattern.isRegExp,
@@ -347,8 +347,6 @@ export class NotebookSearchService implements INotebookSearchService {
 
 	private getLocalNotebookWidgets(): Array<NotebookEditorWidget> {
 		const notebookWidgets = this.notebookEditorService.retrieveAllExistingWidgets();
-		return notebookWidgets
-			.map(widget => widget.value)
-			.filter((val): val is NotebookEditorWidget => !!val && val.hasModel());
+		return notebookWidgets.filter((val): val is NotebookEditorWidget => !!val && val.hasModel());
 	}
 }

@@ -139,7 +139,7 @@ export class QuickInputTreeRenderer<T extends IQuickTreeItem>
 			if (quickTreeItem.disabled) {
 				checkbox.disable();
 			}
-			store.add(checkbox.onChange(e => this._checkboxStateHandler.setCheckboxState(quickTreeItem, checkbox.checked)));
+			store.add(checkbox.onChange(_e => this._checkboxStateHandler.setCheckboxState(quickTreeItem, checkbox.checked)));
 		}
 
 		// Icon

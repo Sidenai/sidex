@@ -682,7 +682,7 @@ export class MixedTestItemController extends Error {
 export const createTestItemChildren = <T extends ITestItemLike>(
 	api: ITestItemApi<T>,
 	getApi: (item: T) => ITestItemApi<T>,
-	checkCtor: Function
+	checkCtor: (...args: any[]) => any
 ): ITestItemChildren<T> => {
 	let mapped = new Map<string, T>();
 

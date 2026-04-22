@@ -12,7 +12,6 @@ export interface IVisualizationEffect {
 }
 
 export function setVisualization(data: object, visualization: IVisualizationEffect): void {
-	// eslint-disable-next-line local/code-no-any-casts
 	(data as any)['$$visualization'] = visualization;
 }
 

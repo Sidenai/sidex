@@ -147,7 +147,6 @@ export class TMGrammarFactory extends Disposable {
 		try {
 			grammar = await this._grammarRegistry.loadGrammarWithConfiguration(scopeName, encodedLanguageId, {
 				embeddedLanguages,
-				// eslint-disable-next-line local/code-no-any-casts
 				tokenTypes: <any>grammarDefinition.tokenTypes,
 				balancedBracketSelectors: grammarDefinition.balancedBracketSelectors,
 				unbalancedBracketSelectors: grammarDefinition.unbalancedBracketSelectors

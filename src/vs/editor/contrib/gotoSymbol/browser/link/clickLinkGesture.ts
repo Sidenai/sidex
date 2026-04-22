@@ -197,7 +197,7 @@ export class ClickLinkGesture extends Disposable {
 		this._register(this._editor.onMouseDrag(() => this._resetHandler()));
 
 		this._register(this._editor.onDidChangeCursorSelection(e => this._onDidChangeCursorSelection(e)));
-		this._register(this._editor.onDidChangeModel(e => this._resetHandler()));
+		this._register(this._editor.onDidChangeModel(_e => this._resetHandler()));
 		this._register(this._editor.onDidChangeModelContent(() => this._resetHandler()));
 		this._register(
 			this._editor.onDidScrollChange(e => {

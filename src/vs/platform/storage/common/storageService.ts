@@ -183,7 +183,7 @@ export class RemoteStorageService extends AbstractStorageService {
 		this.switchData(oldItems, this.profileStorage, StorageScope.PROFILE);
 	}
 
-	protected async switchToWorkspace(toWorkspace: IAnyWorkspaceIdentifier, preserveData: boolean): Promise<void> {
+	protected async switchToWorkspace(toWorkspace: IAnyWorkspaceIdentifier, _preserveData: boolean): Promise<void> {
 		const oldWorkspaceStorage = this.workspaceStorage;
 		const oldItems = oldWorkspaceStorage?.items ?? new Map();
 

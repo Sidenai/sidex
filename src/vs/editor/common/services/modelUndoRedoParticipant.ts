@@ -49,7 +49,7 @@ export class ModelUndoRedoParticipant extends Disposable implements IUndoRedoDel
 			try {
 				const reference = await this._textModelService.createModelReference(uri);
 				return <IDisposable>reference;
-			} catch (err) {
+			} catch (_err) {
 				// This model could not be loaded, maybe it was deleted in the meantime?
 				return Disposable.None;
 			}

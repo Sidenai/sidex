@@ -98,15 +98,15 @@ export class BrowserRequestService extends AbstractRequestService implements IRe
 		};
 	}
 
-	async resolveProxy(url: string): Promise<string | undefined> {
+	async resolveProxy(_url: string): Promise<string | undefined> {
 		return undefined; // not implemented in the web
 	}
 
-	async lookupAuthorization(authInfo: AuthInfo): Promise<Credentials | undefined> {
+	async lookupAuthorization(_authInfo: AuthInfo): Promise<Credentials | undefined> {
 		return undefined; // not implemented in the web
 	}
 
-	async lookupKerberosAuthorization(url: string): Promise<string | undefined> {
+	async lookupKerberosAuthorization(_url: string): Promise<string | undefined> {
 		return undefined; // not implemented in the web
 	}
 

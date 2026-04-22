@@ -93,7 +93,7 @@ export class FileQueryCacheState {
 			(async () => {
 				try {
 					await this.loadPromise;
-				} catch (error) {
+				} catch (_error) {
 					// ignore
 				}
 

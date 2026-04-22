@@ -327,7 +327,7 @@ export abstract class AbstractExtHostExtensionService extends Disposable impleme
 			allPromises = activatedExtensions.map(extensionId => {
 				return this._deactivate(extensionId);
 			});
-		} catch (err) {
+		} catch (_err) {
 			// TODO: write to log once we have one
 		}
 		await Promise.all(allPromises);
@@ -414,7 +414,7 @@ export abstract class AbstractExtHostExtensionService extends Disposable impleme
 		} else {
 			try {
 				return this._activator.getActivatedExtension(extensionId).exports;
-			} catch (err) {
+			} catch (_err) {
 				return null;
 			}
 		}
@@ -674,7 +674,7 @@ export abstract class AbstractExtHostExtensionService extends Disposable impleme
 				? this._initData.messagePorts?.get(ExtensionIdentifier.toKey(extensionDescription.identifier))
 				: undefined;
 
-			return Object.freeze<vscode.ExtensionContext>({
+			return Object.freeze({
 				globalState,
 				workspaceState,
 				secrets,
@@ -721,7 +721,7 @@ export abstract class AbstractExtHostExtensionService extends Disposable impleme
 					}
 					return extension;
 				},
-				get extensionRuntime() {
+				get extensionRuntime(): any {
 					checkProposedApiEnabled(extensionDescription, 'extensionRuntime');
 					return that.extensionRuntime;
 				},
@@ -741,14 +741,13 @@ export abstract class AbstractExtHostExtensionService extends Disposable impleme
 						messagePort.start();
 						messagePassingProtocol = {
 							onDidReceiveMessage,
-							// eslint-disable-next-line local/code-no-any-casts
-							postMessage: messagePort.postMessage.bind(messagePort) as any
-						};
+							postMessage: messagePort.postMessage.bind(messagePort)
+						} as any;
 					}
 
 					return messagePassingProtocol;
 				}
-			});
+			} as vscode.ExtensionContext);
 		});
 	}
 
@@ -1062,7 +1061,7 @@ export abstract class AbstractExtHostExtensionService extends Disposable impleme
 
 	public async getRemoteExecServer(remoteAuthority: string): Promise<vscode.ExecServer | undefined> {
 		const { resolver } = await this._activateAndGetResolver(remoteAuthority);
-		return resolver?.resolveExecServer?.(remoteAuthority, { resolveAttempt: 0 });
+		return (resolver as any)?.resolveExecServer?.(remoteAuthority, { resolveAttempt: 0 });
 	}
 
 	// -- called by main thread
@@ -1253,12 +1252,11 @@ export abstract class AbstractExtHostExtensionService extends Disposable impleme
 
 		const uri = URI.revive(uriComponents);
 
-		if (typeof resolver.getCanonicalURI === 'undefined') {
-			// resolver cannot compute canonical URI
+		if (typeof (resolver as any).getCanonicalURI === 'undefined') {
 			return uri;
 		}
 
-		const result = await asPromise(() => resolver.getCanonicalURI!(uri));
+		const result = await asPromise(() => (resolver as any).getCanonicalURI!(uri));
 		if (!result) {
 			return uri;
 		}
@@ -1267,7 +1265,6 @@ export abstract class AbstractExtHostExtensionService extends Disposable impleme
 	}
 
 	public async $startExtensionHost(extensionsDelta: IExtensionDescriptionDelta): Promise<void> {
-		// eslint-disable-next-line local/code-no-any-casts
 		extensionsDelta.toAdd.forEach(
 			extension => ((<any>extension).extensionLocation = URI.revive(extension.extensionLocation))
 		);
@@ -1311,7 +1308,6 @@ export abstract class AbstractExtHostExtensionService extends Disposable impleme
 	}
 
 	public async $deltaExtensions(extensionsDelta: IExtensionDescriptionDelta): Promise<void> {
-		// eslint-disable-next-line local/code-no-any-casts
 		extensionsDelta.toAdd.forEach(
 			extension => ((<any>extension).extensionLocation = URI.revive(extension.extensionLocation))
 		);

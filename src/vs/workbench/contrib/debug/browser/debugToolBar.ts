@@ -286,7 +286,7 @@ export class DebugToolBar extends Themable implements IWorkbenchContribution {
 					);
 				});
 
-				const mouseUpListener = dom.addDisposableGenericMouseUpListener(activeWindow, (e: MouseEvent) => {
+				const mouseUpListener = dom.addDisposableGenericMouseUpListener(activeWindow, (_e: MouseEvent) => {
 					this.storePosition();
 					this.dragArea.classList.remove('dragged');
 

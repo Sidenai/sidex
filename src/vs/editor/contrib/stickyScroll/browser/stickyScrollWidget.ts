@@ -130,7 +130,7 @@ export class StickyScrollWidget extends Disposable implements IOverlayWidget {
 		updateScrollLeftPosition();
 
 		this._register(
-			this._editor.onDidLayoutChange(e => {
+			this._editor.onDidLayoutChange(_e => {
 				this._updateWidgetWidth();
 			})
 		);
@@ -521,7 +521,7 @@ class RenderedStickyLine {
 				lineRenderingData.minColumn,
 				lineRenderingData.maxColumn
 			);
-		} catch (err) {
+		} catch (_err) {
 			actualInlineDecorations = [];
 		}
 

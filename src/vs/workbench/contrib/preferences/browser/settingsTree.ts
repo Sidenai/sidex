@@ -73,7 +73,7 @@ import { IThemeService } from '../../../../platform/theme/common/themeService.js
 import { IUserDataProfilesService } from '../../../../platform/userDataProfile/common/userDataProfile.js';
 import { IUserDataSyncEnablementService } from '../../../../platform/userDataSync/common/nullUserDataSync.js';
 // Stub functions to avoid importing heavy userDataSync modules
-const getIgnoredSettings = (): string[] => [];
+const getIgnoredSettings = (..._args: any[]): string[] => [];
 const getDefaultIgnoredSettings = (): string[] => [];
 import { hasNativeContextMenu } from '../../../../platform/window/common/window.js';
 import {
@@ -1008,7 +1008,7 @@ export abstract class AbstractSettingRenderer
 
 		this.ignoredSettings = getIgnoredSettings(getDefaultIgnoredSettings(), this._configService);
 		this._register(
-			this._configService.onDidChangeConfiguration(e => {
+			this._configService.onDidChangeConfiguration(_e => {
 				this.ignoredSettings = getIgnoredSettings(getDefaultIgnoredSettings(), this._configService);
 				this._onDidChangeIgnoredSettings.fire();
 			})
@@ -1074,10 +1074,10 @@ export abstract class AbstractSettingRenderer
 		toDispose.add(DOM.addDisposableListener(controlElement, DOM.EventType.MOUSE_DOWN, e => e.stopPropagation()));
 
 		toDispose.add(
-			DOM.addDisposableListener(titleElement, DOM.EventType.MOUSE_ENTER, e => container.classList.add('mouseover'))
+			DOM.addDisposableListener(titleElement, DOM.EventType.MOUSE_ENTER, _e => container.classList.add('mouseover'))
 		);
 		toDispose.add(
-			DOM.addDisposableListener(titleElement, DOM.EventType.MOUSE_LEAVE, e => container.classList.remove('mouseover'))
+			DOM.addDisposableListener(titleElement, DOM.EventType.MOUSE_LEAVE, _e => container.classList.remove('mouseover'))
 		);
 
 		return template;
@@ -1411,7 +1411,7 @@ export class SettingComplexRenderer
 	protected renderValue(
 		dataElement: SettingsTreeSettingElement,
 		template: ISettingComplexItemTemplate,
-		onChange: (value: string) => void
+		_onChange: (value: string) => void
 	): void {
 		const plainKey = getLanguageTagSettingPlainKey(dataElement.setting.key);
 		const editLanguageSettingLabel = localize('editLanguageSettingLabel', 'Edit settings for {0}', plainKey);
@@ -1998,7 +1998,7 @@ abstract class SettingIncludeExcludeRenderer
 	protected renderValue(
 		dataElement: SettingsTreeSettingElement,
 		template: ISettingIncludeExcludeItemTemplate,
-		onChange: (value: string) => void
+		_onChange: (value: string) => void
 	): void {
 		const value = getIncludeExcludeDisplayValue(dataElement);
 		template.includeExcludeWidget.setValue(value, { isReadOnly: dataElement.hasPolicyValue });
@@ -2143,7 +2143,7 @@ class SettingMultilineTextRenderer
 		};
 		super.renderValue(dataElement, template, onChangeOverride);
 		template.elementDisposables.add(
-			template.inputBox.onDidHeightChange(e => {
+			template.inputBox.onDidHeightChange(_e => {
 				const height = template.containerElement.clientHeight;
 				// Don't fire event if height is reported as 0,
 				// which sometimes happens when clicking onto a new setting.
@@ -2441,10 +2441,10 @@ class SettingBoolRenderer
 		// Prevent clicks from being handled by list
 		toDispose.add(DOM.addDisposableListener(controlElement, 'mousedown', (e: IMouseEvent) => e.stopPropagation()));
 		toDispose.add(
-			DOM.addDisposableListener(titleElement, DOM.EventType.MOUSE_ENTER, e => container.classList.add('mouseover'))
+			DOM.addDisposableListener(titleElement, DOM.EventType.MOUSE_ENTER, _e => container.classList.add('mouseover'))
 		);
 		toDispose.add(
-			DOM.addDisposableListener(titleElement, DOM.EventType.MOUSE_LEAVE, e => container.classList.remove('mouseover'))
+			DOM.addDisposableListener(titleElement, DOM.EventType.MOUSE_LEAVE, _e => container.classList.remove('mouseover'))
 		);
 
 		return template;
@@ -2551,7 +2551,7 @@ class SettingsExtensionToggleRenderer
 	protected renderValue(
 		dataElement: SettingsTreeSettingElement,
 		template: ISettingExtensionToggleItemTemplate,
-		onChange: (_: undefined) => void
+		_onChange: (_: undefined) => void
 	): void {
 		template.elementDisposables.clear();
 
@@ -2838,7 +2838,7 @@ export class SettingsTreeFilter implements ITreeFilter<SettingsTreeElement> {
 		@IWorkbenchEnvironmentService private environmentService: IWorkbenchEnvironmentService
 	) {}
 
-	filter(element: SettingsTreeElement, parentVisibility: TreeVisibility): TreeFilterResult<void> {
+	filter(element: SettingsTreeElement, _parentVisibility: TreeVisibility): TreeFilterResult<void> {
 		// Filter during search
 		if (this.viewState.categoryFilter && element instanceof SettingsTreeSettingElement) {
 			if (!this.settingContainedInGroup(element.setting, this.viewState.categoryFilter)) {
@@ -3027,11 +3027,11 @@ class SettingsTreeDelegate extends CachedListVirtualDelegate<SettingsTreeGroupCh
 }
 
 export class NonCollapsibleObjectTreeModel<T> extends ObjectTreeModel<T> {
-	override isCollapsible(element: T): boolean {
+	override isCollapsible(_element: T): boolean {
 		return false;
 	}
 
-	override setCollapsed(element: T, collapsed?: boolean, recursive?: boolean): boolean {
+	override setCollapsed(_element: T, _collapsed?: boolean, _recursive?: boolean): boolean {
 		return false;
 	}
 }

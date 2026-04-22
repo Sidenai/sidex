@@ -5,7 +5,7 @@
 
 import { NewWorkerMessage, TerminateWorkerMessage } from '../common/polyfillNestedWorker.protocol.js';
 
-declare function postMessage(data: any, transferables?: Transferable[]): void;
+declare function _postMessage(data: any, transferables?: Transferable[]): void;
 
 declare type MessageEventHandler = ((ev: MessageEvent<any>) => any) | null;
 
@@ -44,7 +44,6 @@ const _bootstrapFnSource = (function _bootstrapFn(workerUrl: string) {
 		port.start();
 
 		// fake recursively nested worker
-		// eslint-disable-next-line local/code-no-any-casts
 		globalThis.Worker = <any>class { constructor() { throw new TypeError('Nested workers from within nested worker are NOT supported.'); } };
 
 		// load module

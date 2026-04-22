@@ -206,7 +206,7 @@ export class WebExtensionManagementService
 		return this.install(location, { profileLocation });
 	}
 
-	protected async deleteExtension(extension: ILocalExtension): Promise<void> {
+	protected async deleteExtension(_extension: ILocalExtension): Promise<void> {
 		// do nothing
 	}
 
@@ -391,10 +391,10 @@ export class WebExtensionManagementService
 		return new UninstallExtensionTask(extension, options, this.webExtensionsScannerService);
 	}
 
-	zip(extension: ILocalExtension): Promise<URI> {
+	zip(_extension: ILocalExtension): Promise<URI> {
 		throw new Error('unsupported');
 	}
-	getManifest(vsix: URI): Promise<IExtensionManifest> {
+	getManifest(_vsix: URI): Promise<IExtensionManifest> {
 		throw new Error('unsupported');
 	}
 	download(): Promise<URI> {
@@ -482,7 +482,7 @@ class InstallExtensionTask extends AbstractExtensionTask<ILocalExtension> implem
 		this.source = extension;
 	}
 
-	protected async doRun(token: CancellationToken): Promise<ILocalExtension> {
+	protected async doRun(_token: CancellationToken): Promise<ILocalExtension> {
 		const userExtensions = await this.webExtensionsScannerService.scanUserExtensions(this.options.profileLocation);
 		const existingExtension = userExtensions.find(e => areSameExtensions(e.identifier, this.identifier));
 		if (existingExtension) {
@@ -528,7 +528,7 @@ class UninstallExtensionTask extends AbstractExtensionTask<void> implements IUni
 		super();
 	}
 
-	protected doRun(token: CancellationToken): Promise<void> {
+	protected doRun(_token: CancellationToken): Promise<void> {
 		return this.webExtensionsScannerService.removeExtension(this.extension, this.options.profileLocation);
 	}
 }

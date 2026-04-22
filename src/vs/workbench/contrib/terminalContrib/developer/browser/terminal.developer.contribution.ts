@@ -209,7 +209,7 @@ registerTerminalAction({
 			);
 			let commandDetectedRegistered = false;
 			store.add(
-				Event.runAndSubscribe(instance.capabilities.onDidAddCapability, e => {
+				Event.runAndSubscribe(instance.capabilities.onDidAddCapability, _e => {
 					if (commandDetectedRegistered) {
 						return;
 					}
@@ -218,7 +218,7 @@ registerTerminalAction({
 						return;
 					}
 					store.add(
-						commandDetection.promptInputModel.onDidChangeInput(e => {
+						commandDetection.promptInputModel.onDidChangeInput(_e => {
 							events.push({
 								type: 'promptInputChange',
 								data: commandDetection.promptInputModel.getCombinedString()
@@ -387,9 +387,11 @@ class DevModeContribution extends Disposable implements ITerminalContribution {
 					return;
 				}
 				this._state = DevModeContributionState.WaitingForCapability;
-				this._activeDevModeDisposables.value = this._ctx.instance.capabilities.onDidAddCommandDetectionCapability(e => {
-					this._updateDevMode();
-				});
+				this._activeDevModeDisposables.value = this._ctx.instance.capabilities.onDidAddCommandDetectionCapability(
+					_e => {
+						this._updateDevMode();
+					}
+				);
 			}
 		} else {
 			if (this._state === DevModeContributionState.Off) {

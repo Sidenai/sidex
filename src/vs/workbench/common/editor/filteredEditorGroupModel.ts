@@ -114,7 +114,7 @@ export class StickyEditorGroupModel extends FilteredEditorGroupModel {
 		return super.getEditors(order, options);
 	}
 
-	override isSticky(editorOrIndex: number | EditorInput): boolean {
+	override isSticky(_editorOrIndex: number | EditorInput): boolean {
 		return true;
 	}
 
@@ -152,7 +152,7 @@ export class UnstickyEditorGroupModel extends FilteredEditorGroupModel {
 		return 0;
 	}
 
-	override isSticky(editorOrIndex: number | EditorInput): boolean {
+	override isSticky(_editorOrIndex: number | EditorInput): boolean {
 		return false;
 	}
 

@@ -62,7 +62,7 @@ export class TerminalLink extends Disposable implements ILink {
 		this._activateCallback(event, text);
 	}
 
-	hover(event: MouseEvent, text: string): void {
+	hover(event: MouseEvent, _text: string): void {
 		const w = dom.getWindow(event);
 		const d = w.document;
 		// Listen for modifier before handing it off to the hover to handle so it gets disposed correctly

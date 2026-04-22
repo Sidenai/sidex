@@ -67,10 +67,10 @@ export class BrowserLifecycleService extends AbstractLifecycleService {
 	}
 
 	withExpectedShutdown(reason: ShutdownReason): Promise<void>;
-	withExpectedShutdown(reason: { disableShutdownHandling: true }, callback: Function): void;
+	withExpectedShutdown(reason: { disableShutdownHandling: true }, callback: (...args: any[]) => any): void;
 	withExpectedShutdown(
 		reason: ShutdownReason | { disableShutdownHandling: true },
-		callback?: Function
+		callback?: (...args: any[]) => any
 	): Promise<void> | void {
 		// Standard shutdown
 		if (typeof reason === 'number') {

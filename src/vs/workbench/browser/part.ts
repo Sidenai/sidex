@@ -99,14 +99,14 @@ export abstract class Part<MementoType extends object = object>
 	/**
 	 * Subclasses override to provide a title area implementation.
 	 */
-	protected createTitleArea(parent: HTMLElement, options?: object): HTMLElement | undefined {
+	protected createTitleArea(_parent: HTMLElement, _options?: object): HTMLElement | undefined {
 		return undefined;
 	}
 
 	/**
 	 * Subclasses override to provide a content area implementation.
 	 */
-	protected createContentArea(parent: HTMLElement, options?: object): HTMLElement | undefined {
+	protected createContentArea(_parent: HTMLElement, _options?: object): HTMLElement | undefined {
 		return undefined;
 	}
 

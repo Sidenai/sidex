@@ -213,7 +213,7 @@ export class BrowserStorageService extends AbstractStorageService {
 		this.switchData(oldItems, assertReturnsDefined(this.profileStorage), StorageScope.PROFILE);
 	}
 
-	protected async switchToWorkspace(toWorkspace: IAnyWorkspaceIdentifier, preserveData: boolean): Promise<void> {
+	protected async switchToWorkspace(_toWorkspace: IAnyWorkspaceIdentifier, _preserveData: boolean): Promise<void> {
 		throw new Error('Migrating storage is currently unsupported in Web');
 	}
 

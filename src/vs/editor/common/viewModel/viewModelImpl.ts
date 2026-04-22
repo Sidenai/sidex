@@ -996,7 +996,7 @@ export class ViewModel extends Disposable implements IViewModel {
 	/**
 	 * Gives a hint that a lot of requests are about to come in for these line numbers.
 	 */
-	public setViewport(startLineNumber: number, endLineNumber: number, centeredLineNumber: number): void {
+	public setViewport(startLineNumber: number, _endLineNumber: number, _centeredLineNumber: number): void {
 		this._viewportStart.update(this, startLineNumber);
 	}
 

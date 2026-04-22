@@ -258,7 +258,7 @@ export class ContextMenuController implements IEditorContribution {
 				return this._keybindingFor(action);
 			},
 
-			onHide: (wasCancelled: boolean) => {
+			onHide: (_wasCancelled: boolean) => {
 				this._contextMenuIsBeingShownCount--;
 			}
 		});
@@ -405,7 +405,7 @@ export class ContextMenuController implements IEditorContribution {
 			domForShadowRoot: useShadowDOM ? this._editor.getDomNode() : undefined,
 			getAnchor: () => anchor,
 			getActions: () => actions,
-			onHide: (wasCancelled: boolean) => {
+			onHide: (_wasCancelled: boolean) => {
 				this._contextMenuIsBeingShownCount--;
 				this._editor.focus();
 			}

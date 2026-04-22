@@ -378,7 +378,7 @@ export class MainThreadWorkspace extends Disposable implements MainThreadWorkspa
 				if (result) {
 					return URI.revive(result);
 				}
-				return result;
+				return result as any;
 			}
 		});
 

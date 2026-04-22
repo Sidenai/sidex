@@ -44,7 +44,7 @@ export function combineTextEditInfos(
 	 */
 	function nextS0ToS1MapWithS1LengthOf(s1Length: Length | undefined): LengthMapping[] {
 		if (s1Length === undefined) {
-			const arr = s0ToS1Map.takeWhile(v => true) || [];
+			const arr = s0ToS1Map.takeWhile(_v => true) || [];
 			if (curItem) {
 				arr.unshift(curItem);
 			}

@@ -47,7 +47,7 @@ export abstract class MoveWordCommand extends EditorCommand {
 		this._wordNavigationType = opts.wordNavigationType;
 	}
 
-	public runEditorCommand(accessor: ServicesAccessor, editor: ICodeEditor, args: unknown): void {
+	public runEditorCommand(accessor: ServicesAccessor, editor: ICodeEditor, _args: unknown): void {
 		if (!editor.hasModel()) {
 			return;
 		}
@@ -113,7 +113,7 @@ export class WordRightCommand extends MoveWordCommand {
 		model: ITextModel,
 		position: Position,
 		wordNavigationType: WordNavigationType,
-		hasMulticursor: boolean
+		_hasMulticursor: boolean
 	): Position {
 		return WordOperations.moveWordRight(wordSeparators, model, position, wordNavigationType);
 	}
@@ -411,7 +411,7 @@ export abstract class DeleteWordCommand extends EditorCommand {
 		this._wordNavigationType = opts.wordNavigationType;
 	}
 
-	public runEditorCommand(accessor: ServicesAccessor, editor: ICodeEditor, args: unknown): void {
+	public runEditorCommand(accessor: ServicesAccessor, editor: ICodeEditor, _args: unknown): void {
 		const languageConfigurationService = accessor?.get(ILanguageConfigurationService);
 
 		if (!editor.hasModel() || !languageConfigurationService) {

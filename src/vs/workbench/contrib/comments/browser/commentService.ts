@@ -23,4 +23,9 @@ export interface ICommentService {
 	readonly onDidChangeCommentingEnabled: Event<boolean>;
 	registerCommentController(id: string, controller: ICommentController): void;
 	unregisterCommentController(id?: string): void;
+	updateComments(ownerId: string, event: any): void;
+	updateNotebookComments(ownerId: string, event: any): void;
+	updateCommentingRanges(...args: any[]): void;
+	setWorkspaceComments(...args: any[]): void;
+	onResourceHasCommentingRanges(...args: any[]): any;
 }

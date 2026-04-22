@@ -204,7 +204,6 @@ export class AutorunObserver<TChangeSummary = any> implements IObserver, IReader
 							{
 								changedObservable: observable,
 								change,
-								// eslint-disable-next-line local/code-no-any-casts
 								didChange: (o): this is any => o === (observable as any)
 							},
 							this._changeSummary!

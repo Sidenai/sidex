@@ -177,7 +177,7 @@ export interface IStoredFileWorkingCopy<M extends IStoredFileWorkingCopyModel>
 	/**
 	 * Whether we have a resolved model or not.
 	 */
-	isResolved(): this is IResolvedStoredFileWorkingCopy<M>;
+	isResolved(): boolean;
 
 	/**
 	 * Whether the stored file working copy is readonly or not.
@@ -405,7 +405,7 @@ export class StoredFileWorkingCopy<M extends IStoredFileWorkingCopyModel>
 	private dirty = false;
 	private savedVersionId: unknown;
 
-	isDirty(): this is IResolvedStoredFileWorkingCopy<M> {
+	isDirty(): boolean {
 		return this.dirty;
 	}
 
@@ -466,7 +466,7 @@ export class StoredFileWorkingCopy<M extends IStoredFileWorkingCopyModel>
 
 	lastResolvedFileStat: IFileStatWithMetadata | undefined; // !!! DO NOT MARK PRIVATE! USED IN TESTS !!!
 
-	isResolved(): this is IResolvedStoredFileWorkingCopy<M> {
+	isResolved(): boolean {
 		return !!this.model;
 	}
 
@@ -1478,7 +1478,7 @@ export class StoredFileWorkingCopy<M extends IStoredFileWorkingCopyModel>
 		}
 	}
 
-	async joinState(state: StoredFileWorkingCopyState.PENDING_SAVE): Promise<void> {
+	async joinState(_state: StoredFileWorkingCopyState.PENDING_SAVE): Promise<void> {
 		return this.saveSequentializer.running;
 	}
 

@@ -176,7 +176,7 @@ export class InlineEditsInsertionView extends Disposable implements IInlineEdits
 					}
 					return {
 						ghostText: ghostText,
-						handleInlineCompletionShown: data => {
+						handleInlineCompletionShown: _data => {
 							// This is a no-op for the insertion view, as it is handled by the InlineEditsView.
 						},
 						warning: undefined

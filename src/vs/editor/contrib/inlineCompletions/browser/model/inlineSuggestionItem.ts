@@ -577,7 +577,7 @@ export class InlineEditItem extends InlineSuggestionItemBase {
 		);
 	}
 
-	override canBeReused(model: ITextModel, position: Position): boolean {
+	override canBeReused(model: ITextModel, _position: Position): boolean {
 		// TODO@hediet I believe this can be simplified to `return true;`, as applying an edit should kick out this suggestion.
 		return this._lastChangePartOfInlineEdit && this.updatedEditModelVersion === model.getVersionId();
 	}

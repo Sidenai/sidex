@@ -71,7 +71,7 @@ export abstract class AbstractTextResourceEditorInput extends AbstractResourceEd
 	private async doSave(
 		options: ITextFileSaveOptions | undefined,
 		saveAs: boolean,
-		group: GroupIdentifier | undefined
+		_group: GroupIdentifier | undefined
 	): Promise<IUntypedEditorInput | undefined> {
 		// Save / Save As
 		let target: URI | undefined;

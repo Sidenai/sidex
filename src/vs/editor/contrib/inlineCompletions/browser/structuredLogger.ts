@@ -52,7 +52,6 @@ interface IFetchResult {
  * The sourceLabel must not contain '@'!
  */
 export function formatRecordableLogEntry<T extends IRecordableLogEntry>(entry: T): string {
-	// eslint-disable-next-line local/code-no-any-casts
 	return (
 		entry.sourceId +
 		' @@ ' +

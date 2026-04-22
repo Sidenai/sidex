@@ -38,7 +38,7 @@ export class TokenizationSupportWithLineLimit extends Disposable implements ITok
 		return this._actual.getInitialState();
 	}
 
-	tokenize(line: string, hasEOL: boolean, state: IState): TokenizationResult {
+	tokenize(_line: string, _hasEOL: boolean, _state: IState): TokenizationResult {
 		throw new Error('Not supported!');
 	}
 

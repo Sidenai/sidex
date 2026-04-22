@@ -113,7 +113,7 @@ export class DragAndDropCommand implements ICommand {
 		}
 	}
 
-	public computeCursorState(model: ITextModel, helper: ICursorStateComputerData): Selection {
+	public computeCursorState(_model: ITextModel, _helper: ICursorStateComputerData): Selection {
 		return this.targetSelection!;
 	}
 }

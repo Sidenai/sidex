@@ -1246,7 +1246,7 @@ declare namespace monaco.editor {
 		/**
 		 * An object that can be used by the web worker to make calls back to the main thread.
 		 */
-		host?: Record<string, Function>;
+		host?: Record<string, (...args: any[]) => any>;
 		/**
 		 * Keep idle models.
 		 * Defaults to false, which means that idle models will stop syncing after a while.

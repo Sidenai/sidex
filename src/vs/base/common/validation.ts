@@ -158,12 +158,10 @@ class ObjValidator<T extends Record<string, IValidator<unknown> | Optional<IVali
 			return { content: undefined, error: { message: 'Expected object' } };
 		}
 
-		// eslint-disable-next-line local/code-no-dangerous-type-assertions
 		const result: vObjType<T> = {} as vObjType<T>;
 
 		for (const key in this.properties) {
 			const prop = this.properties[key];
-			// eslint-disable-next-line local/code-no-any-casts
 			const fieldValue = (content as any)[key];
 
 			const isOptional = prop instanceof Optional;
@@ -179,7 +177,6 @@ class ObjValidator<T extends Record<string, IValidator<unknown> | Optional<IVali
 				return { content: undefined, error: { message: `Error in property '${key}': ${error.message}` } };
 			}
 
-			// eslint-disable-next-line local/code-no-any-casts
 			(result as any)[key] = value;
 		}
 
@@ -308,7 +305,6 @@ class UnionValidator<T extends IValidator<unknown>[]> extends ValidatorBase<Vali
 		for (const validator of this.validators) {
 			const { content: value, error } = validator.validate(content);
 			if (!error) {
-				// eslint-disable-next-line local/code-no-any-casts
 				return { content: value as any, error: undefined };
 			}
 

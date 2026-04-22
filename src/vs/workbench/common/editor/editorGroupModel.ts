@@ -825,7 +825,7 @@ export class EditorGroupModel extends Disposable implements IEditorGroupModel {
 		}
 	}
 
-	setIndex(index: number) {
+	setIndex(_index: number) {
 		// We do not really keep the `index` in our model because
 		// it has no special meaning to us here. But for consistency
 		// we emit a `onDidModelChange` event so that components can
@@ -833,7 +833,7 @@ export class EditorGroupModel extends Disposable implements IEditorGroupModel {
 		this._onDidModelChange.fire({ kind: GroupModelChangeKind.GROUP_INDEX });
 	}
 
-	setLabel(label: string) {
+	setLabel(_label: string) {
 		// We do not really keep the `label` in our model because
 		// it has no special meaning to us here. But for consistency
 		// we emit a `onDidModelChange` event so that components can

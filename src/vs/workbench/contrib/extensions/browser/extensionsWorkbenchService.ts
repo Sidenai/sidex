@@ -350,7 +350,7 @@ export class Extension implements IExtension {
 			if (this.outdatedTargetPlatform) {
 				return true;
 			}
-		} catch (error) {
+		} catch (_error) {
 			/* Ignore */
 		}
 		return false;
@@ -1050,7 +1050,7 @@ export class ExtensionsWorkbenchService extends Disposable implements IExtension
 				!extensionManagementServerService.remoteExtensionManagementServer
 			));
 			this._register(this.localExtensions.onChange(e => this.onDidChangeExtensions(e?.extension)));
-			this._register(this.localExtensions.onReset(e => this.reset()));
+			this._register(this.localExtensions.onReset(_e => this.reset()));
 			this.extensionsServers.push(this.localExtensions);
 		}
 		if (extensionManagementServerService.remoteExtensionManagementServer) {
@@ -1061,7 +1061,7 @@ export class ExtensionsWorkbenchService extends Disposable implements IExtension
 				true
 			));
 			this._register(this.remoteExtensions.onChange(e => this.onDidChangeExtensions(e?.extension)));
-			this._register(this.remoteExtensions.onReset(e => this.reset()));
+			this._register(this.remoteExtensions.onReset(_e => this.reset()));
 			this.extensionsServers.push(this.remoteExtensions);
 		}
 		if (extensionManagementServerService.webExtensionManagementServer) {
@@ -1072,7 +1072,7 @@ export class ExtensionsWorkbenchService extends Disposable implements IExtension
 				!(extensionManagementServerService.remoteExtensionManagementServer || extensionManagementServerService.localExtensionManagementServer)
 			));
 			this._register(this.webExtensions.onChange(e => this.onDidChangeExtensions(e?.extension)));
-			this._register(this.webExtensions.onReset(e => this.reset()));
+			this._register(this.webExtensions.onReset(_e => this.reset()));
 			this.extensionsServers.push(this.webExtensions);
 		}
 
@@ -1105,9 +1105,9 @@ export class ExtensionsWorkbenchService extends Disposable implements IExtension
 		this.initializeAutoUpdate();
 		this.updateExtensionsNotificaiton();
 		this.reportInstalledExtensionsTelemetry();
-		this._register(this.storageService.onDidChangeValue(StorageScope.PROFILE, EXTENSIONS_DISMISSED_NOTIFICATIONS_KEY, this._store)(e => this.onDidDismissedNotificationsValueChange()));
-		this._register(this.storageService.onDidChangeValue(StorageScope.APPLICATION, EXTENSIONS_AUTO_UPDATE_KEY, this._store)(e => this.onDidSelectedExtensionToAutoUpdateValueChange()));
-		this._register(this.storageService.onDidChangeValue(StorageScope.APPLICATION, EXTENSIONS_DONOT_AUTO_UPDATE_KEY, this._store)(e => this.onDidSelectedExtensionToAutoUpdateValueChange()));
+		this._register(this.storageService.onDidChangeValue(StorageScope.PROFILE, EXTENSIONS_DISMISSED_NOTIFICATIONS_KEY, this._store)(_e => this.onDidDismissedNotificationsValueChange()));
+		this._register(this.storageService.onDidChangeValue(StorageScope.APPLICATION, EXTENSIONS_AUTO_UPDATE_KEY, this._store)(_e => this.onDidSelectedExtensionToAutoUpdateValueChange()));
+		this._register(this.storageService.onDidChangeValue(StorageScope.APPLICATION, EXTENSIONS_DONOT_AUTO_UPDATE_KEY, this._store)(_e => this.onDidSelectedExtensionToAutoUpdateValueChange()));
 		this._register(Event.debounce(this.onChange, () => undefined, 100)(() => {
 			this.updateExtensionsNotificaiton();
 			this.reportProgressFromOtherSources();
@@ -1192,7 +1192,6 @@ export class ExtensionsWorkbenchService extends Disposable implements IExtension
 
 	getAutoUpdateValue(): AutoUpdateConfigurationValue {
 		const autoUpdate = this.configurationService.getValue<AutoUpdateConfigurationValue>(AutoUpdateConfigurationKey);
-		// eslint-disable-next-line local/code-no-any-casts
 		if (<any>autoUpdate === 'onlySelectedExtensions') {
 			return false;
 		}
@@ -2082,7 +2081,7 @@ export class ExtensionsWorkbenchService extends Disposable implements IExtension
 			return;
 		}
 
-		const picks = allVersions.map((v, i) => {
+		const picks = allVersions.map((v, _i) => {
 			return {
 				id: v.version,
 				label: v.version,
@@ -2134,7 +2133,7 @@ export class ExtensionsWorkbenchService extends Disposable implements IExtension
 				await this.checkForUpdates();
 			}
 			this.eventuallyCheckForUpdates();
-		}, immediate ? 0 : this.getUpdatesCheckInterval()).then(undefined, err => null);
+		}, immediate ? 0 : this.getUpdatesCheckInterval()).then(undefined, _err => null);
 	}
 
 	private getUpdatesCheckInterval(): number {
@@ -2146,7 +2145,7 @@ export class ExtensionsWorkbenchService extends Disposable implements IExtension
 
 	private eventuallyAutoUpdateExtensions(): void {
 		this.autoUpdateDelayer.trigger(() => this.autoUpdateExtensions())
-			.then(undefined, err => null);
+			.then(undefined, _err => null);
 	}
 
 	private async autoUpdateBuiltinExtensions(): Promise<void> {
@@ -2743,7 +2742,7 @@ export class ExtensionsWorkbenchService extends Disposable implements IExtension
 		}
 
 		const extensionsToUninstall: UninstallExtensionInfo[] = [{ extension: extension.local }];
-		if (!this.productService.defaultChatAgent?.extensionId || !areSameExtensions(extension.identifier, { id: this.productService.defaultChatAgent.extensionId })) {
+		if (!(this.productService as any).defaultChatAgent?.extensionId || !areSameExtensions(extension.identifier, { id: (this.productService as any).defaultChatAgent.extensionId })) {
 			for (const packExtension of this.getAllPackedExtensions(extension, this.local)) {
 				if (packExtension.local && !extensionsToUninstall.some(e => areSameExtensions(e.extension.identifier, packExtension.identifier))) {
 					extensionsToUninstall.push({ extension: packExtension.local });
@@ -2879,7 +2878,7 @@ export class ExtensionsWorkbenchService extends Disposable implements IExtension
 				await this.extensionsSyncManagementService.updateIgnoredExtensions(e.identifier.id, !isIgnored);
 			}
 		}
-		await this.userDataAutoSyncService.triggerSync(['IgnoredExtensionsUpdated']);
+		await (this.userDataAutoSyncService as any).triggerSync(['IgnoredExtensionsUpdated']);
 	}
 
 	async toggleApplyExtensionToAllProfiles(extension: IExtension): Promise<void> {
@@ -3167,7 +3166,7 @@ export class ExtensionsWorkbenchService extends Disposable implements IExtension
 		this.notificationService.error(err);
 	}
 
-	handleURL(uri: URI, options?: IOpenURLOptions): Promise<boolean> {
+	handleURL(uri: URI, _options?: IOpenURLOptions): Promise<boolean> {
 		if (!/^extension/.test(uri.path)) {
 			return Promise.resolve(false);
 		}
@@ -3207,7 +3206,7 @@ export class ExtensionsWorkbenchService extends Disposable implements IExtension
 			if (Array.isArray(parsedValue)) {
 				return parsedValue;
 			}
-		} catch (e) { /* Ignore */ }
+		} catch (_e) { /* Ignore */ }
 		return [];
 	}
 
@@ -3245,7 +3244,7 @@ export class ExtensionsWorkbenchService extends Disposable implements IExtension
 			if (Array.isArray(parsedValue)) {
 				return parsedValue;
 			}
-		} catch (e) { /* Ignore */ }
+		} catch (_e) { /* Ignore */ }
 		return [];
 	}
 
@@ -3283,7 +3282,7 @@ export class ExtensionsWorkbenchService extends Disposable implements IExtension
 			if (Array.isArray(parsedValue)) {
 				return parsedValue;
 			}
-		} catch (e) { /* Ignore */ }
+		} catch (_e) { /* Ignore */ }
 		return [];
 	}
 

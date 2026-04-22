@@ -81,7 +81,7 @@ export async function configureOpenerTrustedDomainsHandler(
 	quickInputService: IQuickInputService,
 	storageService: IStorageService,
 	editorService: IEditorService,
-	telemetryService: ITelemetryService
+	_telemetryService: ITelemetryService
 ) {
 	const parsedDomainToConfigure = URI.parse(domainToConfigure);
 	const toplevelDomainSegements = parsedDomainToConfigure.authority.split('.');
@@ -192,7 +192,7 @@ export function readStaticTrustedDomains(accessor: ServicesAccessor): IStaticTru
 		if (trustedDomainsSrc) {
 			trustedDomains = JSON.parse(trustedDomainsSrc);
 		}
-	} catch (err) {}
+	} catch (_err) {}
 
 	return {
 		defaultTrustedDomains,

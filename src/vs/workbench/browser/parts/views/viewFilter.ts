@@ -233,7 +233,7 @@ export class FilterWidget extends Widget {
 			inputBox.value = this.options.text;
 		}
 		this._register(
-			inputBox.onDidChange(filter => this.delayedFilterUpdate.trigger(() => this.onDidInputChange(inputBox)))
+			inputBox.onDidChange(_filter => this.delayedFilterUpdate.trigger(() => this.onDidInputChange(inputBox)))
 		);
 		this._register(
 			DOM.addStandardDisposableListener(inputBox.inputElement, DOM.EventType.KEY_DOWN, (e: StandardKeyboardEvent) =>

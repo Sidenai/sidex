@@ -79,7 +79,7 @@ export class TabCompletionController implements IEditorContribution {
 			if (!this._enabled) {
 				this._selectionListener?.dispose();
 			} else {
-				this._selectionListener = this._editor.onDidChangeCursorSelection(e => this._updateSnippets());
+				this._selectionListener = this._editor.onDidChangeCursorSelection(_e => this._updateSnippets());
 				if (this._editor.getModel()) {
 					this._updateSnippets();
 				}

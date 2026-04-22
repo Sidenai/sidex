@@ -125,7 +125,7 @@ export class JSONEditingService implements IJSONEditingService {
 		return parseErrors.length > 0;
 	}
 
-	private async resolveAndValidate(resource: URI, checkDirty: boolean): Promise<IReference<IResolvedTextEditorModel>> {
+	private async resolveAndValidate(resource: URI, _checkDirty: boolean): Promise<IReference<IResolvedTextEditorModel>> {
 		const reference = await this.resolveModelReference(resource);
 
 		const model = reference.object.textEditorModel;

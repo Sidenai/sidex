@@ -296,10 +296,10 @@ export class TextureAtlasSlabAllocator implements ITextureAtlasAllocator {
 		ctx.fillStyle = UsagePreviewColors.Unused;
 		ctx.fillRect(0, 0, w, h);
 
-		let slabEntryPixels = 0;
-		let usedPixels = 0;
-		let slabEdgePixels = 0;
-		let restrictedPixels = 0;
+		let _slabEntryPixels = 0;
+		let _usedPixels = 0;
+		let _slabEdgePixels = 0;
+		let _restrictedPixels = 0;
 		const slabW = 64 << (Math.floor(getActiveWindow().devicePixelRatio) - 1);
 		const slabH = slabW;
 
@@ -315,18 +315,18 @@ export class TextureAtlasSlabAllocator implements ITextureAtlasAllocator {
 				ctx.fillStyle = UsagePreviewColors.Wasted;
 				ctx.fillRect(slab.x + x, slab.y + y, slab.entryW, slab.entryH);
 
-				slabEntryPixels += slab.entryW * slab.entryH;
+				_slabEntryPixels += slab.entryW * slab.entryH;
 				x += slab.entryW;
 			}
 			const entriesPerRow = Math.floor(slabW / slab.entryW);
 			const entriesPerCol = Math.floor(slabH / slab.entryH);
 			const thisSlabPixels = slab.entryW * entriesPerRow * slab.entryH * entriesPerCol;
-			slabEdgePixels += slabW * slabH - thisSlabPixels;
+			_slabEdgePixels += slabW * slabH - thisSlabPixels;
 		}
 
 		// Draw glyphs
 		for (const g of this._allocatedGlyphs) {
-			usedPixels += g.w * g.h;
+			_usedPixels += g.w * g.h;
 			ctx.fillStyle = UsagePreviewColors.Used;
 			ctx.fillRect(g.x, g.y, g.w, g.h);
 		}
@@ -338,7 +338,7 @@ export class TextureAtlasSlabAllocator implements ITextureAtlasAllocator {
 		for (const r of unusedRegions) {
 			ctx.fillStyle = UsagePreviewColors.Restricted;
 			ctx.fillRect(r.x, r.y, r.w, r.h);
-			restrictedPixels += r.w * r.h;
+			_restrictedPixels += r.w * r.h;
 		}
 
 		// Overlay actual glyphs on top
@@ -365,11 +365,11 @@ export class TextureAtlasSlabAllocator implements ITextureAtlasAllocator {
 		// Draw wasted underneath glyphs first
 		for (const slab of this._slabs) {
 			let x = 0;
-			let y = 0;
+			let _y = 0;
 			for (let i = 0; i < slab.count; i++) {
 				if (x + slab.entryW > slabW) {
 					x = 0;
-					y += slab.entryH;
+					_y += slab.entryH;
 				}
 				slabEntryPixels += slab.entryW * slab.entryH;
 				x += slab.entryW;

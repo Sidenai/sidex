@@ -220,7 +220,7 @@ export class PieceTreeTextBuffer extends Disposable implements ITextBuffer {
 		return this._pieceTree.getLineLength(lineNumber);
 	}
 
-	public getLineMinColumn(lineNumber: number): number {
+	public getLineMinColumn(_lineNumber: number): number {
 		return 1;
 	}
 

@@ -271,7 +271,7 @@ export class AcceptInlineCompletion extends EditorAction {
 		});
 	}
 
-	public async run(accessor: ServicesAccessor, editor: ICodeEditor): Promise<void> {
+	public async run(accessor: ServicesAccessor, _editor: ICodeEditor): Promise<void> {
 		const controller = InlineCompletionsController.getInFocusedEditorOrParent(accessor);
 		if (controller) {
 			controller.model.get()?.accept(controller.editor);
@@ -308,7 +308,7 @@ export class AcceptInlineCompletionAlternativeAction extends EditorAction {
 		});
 	}
 
-	public async run(accessor: ServicesAccessor, editor: ICodeEditor): Promise<void> {
+	public async run(accessor: ServicesAccessor, _editor: ICodeEditor): Promise<void> {
 		const controller = InlineCompletionsController.getInFocusedEditorOrParent(accessor);
 		if (controller) {
 			controller.model.get()?.accept(controller.editor, true);
@@ -386,7 +386,7 @@ export class HideInlineCompletion extends EditorAction {
 		});
 	}
 
-	public async run(accessor: ServicesAccessor, editor: ICodeEditor): Promise<void> {
+	public async run(accessor: ServicesAccessor, _editor: ICodeEditor): Promise<void> {
 		const controller = InlineCompletionsController.getInFocusedEditorOrParent(accessor);
 		transaction(tx => {
 			controller?.model.get()?.stop('explicitCancel', tx);
@@ -406,7 +406,7 @@ export class ToggleInlineCompletionShowCollapsed extends EditorAction {
 		});
 	}
 
-	public async run(accessor: ServicesAccessor, editor: ICodeEditor): Promise<void> {
+	public async run(accessor: ServicesAccessor, _editor: ICodeEditor): Promise<void> {
 		const configurationService = accessor.get(IConfigurationService);
 		const showCollapsed = configurationService.getValue<boolean>('editor.inlineSuggest.edits.showCollapsed');
 		configurationService.updateValue('editor.inlineSuggest.edits.showCollapsed', !showCollapsed);

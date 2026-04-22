@@ -282,7 +282,7 @@ export class TokenClassificationExtensionPoints {
 							tokenClassificationRegistry.registerTokenStyleDefault(selector, {
 								scopesToProbe: tmScopes.map(s => s.split(' '))
 							});
-						} catch (e) {
+						} catch (_e) {
 							collector.error(
 								nls.localize(
 									'invalid.semanticTokenScopes.scopes.selector',
@@ -305,7 +305,7 @@ export class TokenClassificationExtensionPoints {
 							tokenClassificationRegistry.registerTokenStyleDefault(selector, {
 								scopesToProbe: tmScopes.map(s => s.split(' '))
 							});
-						} catch (e) {
+						} catch (_e) {
 							// invalid selector, ignore
 						}
 					}

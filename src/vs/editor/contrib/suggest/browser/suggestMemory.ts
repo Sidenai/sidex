@@ -55,7 +55,7 @@ export class NoMemory extends Memory {
 		super('first');
 	}
 
-	memorize(model: ITextModel, pos: IPosition, item: CompletionItem): void {
+	memorize(_model: ITextModel, _pos: IPosition, _item: CompletionItem): void {
 		// no-op
 	}
 
@@ -278,7 +278,7 @@ export class SuggestMemoryService implements ISuggestMemoryService {
 				if (raw) {
 					this._strategy.fromJSON(JSON.parse(raw));
 				}
-			} catch (e) {
+			} catch (_e) {
 				// things can go wrong with JSON...
 			}
 		}

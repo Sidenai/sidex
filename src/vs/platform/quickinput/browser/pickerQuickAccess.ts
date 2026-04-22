@@ -294,7 +294,7 @@ export abstract class PickerQuickAccessProvider<T extends IPickerQuickAccessItem
 
 								applyPicks({
 									items: [...picks, ...additionalPicks],
-									active: activePick || additionalActivePick || fallbackActivePick
+									active: (activePick || additionalActivePick || fallbackActivePick) as T
 								});
 							}
 						} finally {

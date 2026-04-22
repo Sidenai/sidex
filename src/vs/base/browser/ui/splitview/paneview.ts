@@ -440,7 +440,7 @@ class PaneDraggable extends Disposable {
 		this.context.draggable = this;
 	}
 
-	private onDragEnter(e: DragEvent): void {
+	private onDragEnter(_e: DragEvent): void {
 		if (!this.context.draggable || this.context.draggable === this) {
 			return;
 		}
@@ -453,7 +453,7 @@ class PaneDraggable extends Disposable {
 		this.render();
 	}
 
-	private onDragLeave(e: DragEvent): void {
+	private onDragLeave(_e: DragEvent): void {
 		if (!this.context.draggable || this.context.draggable === this) {
 			return;
 		}
@@ -469,7 +469,7 @@ class PaneDraggable extends Disposable {
 		}
 	}
 
-	private onDragEnd(e: DragEvent): void {
+	private onDragEnd(_e: DragEvent): void {
 		if (!this.context.draggable) {
 			return;
 		}
@@ -513,11 +513,11 @@ export interface IPaneDndController {
 }
 
 export class DefaultPaneDndController implements IPaneDndController {
-	canDrag(pane: Pane): boolean {
+	canDrag(_pane: Pane): boolean {
 		return true;
 	}
 
-	canDrop(pane: Pane, overPane: Pane): boolean {
+	canDrop(_pane: Pane, _overPane: Pane): boolean {
 		return true;
 	}
 }

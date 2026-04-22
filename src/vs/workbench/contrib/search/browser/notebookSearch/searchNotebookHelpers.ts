@@ -49,7 +49,7 @@ export function contentMatchesToTextSearchMatches(
 	contentMatches: FindMatch[],
 	cell: ICellViewModel
 ): ITextSearchMatch[] {
-	return genericCellMatchesToTextSearchMatches(contentMatches, cell.textBuffer);
+	return genericCellMatchesToTextSearchMatches(contentMatches, (cell as any).textBuffer);
 }
 
 export function webviewMatchesToTextSearchMatches(webviewMatches: CellWebviewFindMatch[]): ITextSearchMatch[] {

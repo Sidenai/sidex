@@ -480,7 +480,7 @@ class TrustedUriTableVirtualDelegate implements ITableVirtualDelegate<ITrustedUr
 	static readonly HEADER_ROW_HEIGHT = 30;
 	static readonly ROW_HEIGHT = 24;
 	readonly headerRowHeight = TrustedUriTableVirtualDelegate.HEADER_ROW_HEIGHT;
-	getHeight(item: ITrustedUriItem) {
+	getHeight(_item: ITrustedUriItem) {
 		return TrustedUriTableVirtualDelegate.ROW_HEIGHT;
 	}
 }
@@ -935,7 +935,7 @@ export class WorkspaceTrustEditor extends EditorPane {
 		return localize('untrustedHeader', 'You are in Restricted Mode');
 	}
 
-	private getHeaderTitleIconClassNames(trusted: boolean): string[] {
+	private getHeaderTitleIconClassNames(_trusted: boolean): string[] {
 		return ThemeIcon.asClassNameArray(shieldIcon);
 	}
 
@@ -1424,7 +1424,7 @@ export class WorkspaceTrustEditor extends EditorPane {
 	}
 
 	private layoutParticipants: { layout: () => void }[] = [];
-	layout(dimension: Dimension): void {
+	layout(_dimension: Dimension): void {
 		if (!this.isVisible()) {
 			return;
 		}

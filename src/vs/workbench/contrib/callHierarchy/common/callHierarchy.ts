@@ -22,3 +22,7 @@ export class CallHierarchyModel {
 		return undefined;
 	}
 }
+
+export const CallHierarchyProviderRegistry: any = {
+	register: () => ({ dispose: () => {} })
+};

@@ -129,7 +129,7 @@ function validateLink(value: string, allowedProtocols: AllowedLinksConfig): bool
 		}
 
 		return false;
-	} catch (e) {
+	} catch (_e) {
 		return false;
 	}
 }

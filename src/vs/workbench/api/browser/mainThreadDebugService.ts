@@ -589,7 +589,7 @@ class ExtensionHostDebugAdapter extends AbstractDebugAdapter {
 		this._onError.fire(err);
 	}
 
-	fireExit(handle: number, code: number, signal: string) {
+	fireExit(handle: number, code: number, _signal: string) {
 		this._onExit.fire(code);
 	}
 

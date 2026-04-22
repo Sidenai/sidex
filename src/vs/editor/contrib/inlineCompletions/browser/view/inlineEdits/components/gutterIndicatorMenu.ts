@@ -297,14 +297,14 @@ function option(props: {
 		n.div(
 			{
 				class: ['monaco-menu-option', props.isActive?.map(v => v && 'active')],
-				onmouseenter: () => props.onHoverChange?.(true),
-				onmouseleave: () => props.onHoverChange?.(false),
-				onclick: props.onAction,
-				onkeydown: e => {
+				onmouseenter: (() => props.onHoverChange?.(true)) as any,
+				onmouseleave: (() => props.onHoverChange?.(false)) as any,
+				onclick: props.onAction as any,
+				onkeydown: ((e: any) => {
 					if (e.key === 'Enter') {
 						props.onAction?.();
 					}
-				},
+				}) as any,
 				tabIndex: 0,
 				style: {
 					borderRadius: 3 // same as hover widget border radius

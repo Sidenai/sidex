@@ -614,7 +614,7 @@ class WatchExpressionsDragAndDrop implements ITreeDragAndDrop<IExpression> {
 		targetElement: IExpression | undefined,
 		targetIndex: number | undefined,
 		targetSector: ListViewTargetSector | undefined,
-		originalEvent: DragEvent
+		_originalEvent: DragEvent
 	): boolean | ITreeDragOverReaction {
 		if (!(data instanceof ElementsDragAndDropData)) {
 			return false;
@@ -675,7 +675,7 @@ class WatchExpressionsDragAndDrop implements ITreeDragAndDrop<IExpression> {
 		targetElement: IExpression,
 		targetIndex: number | undefined,
 		targetSector: ListViewTargetSector | undefined,
-		originalEvent: DragEvent
+		_originalEvent: DragEvent
 	): void {
 		if (!(data instanceof ElementsDragAndDropData)) {
 			return;

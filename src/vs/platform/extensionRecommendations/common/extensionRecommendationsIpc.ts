@@ -26,7 +26,7 @@ export class ExtensionRecommendationNotificationServiceChannelClient implements 
 		return this.channel.call('promptImportantExtensionsInstallNotification', [extensionRecommendations]);
 	}
 
-	promptWorkspaceRecommendations(recommendations: string[]): Promise<void> {
+	promptWorkspaceRecommendations(_recommendations: string[]): Promise<void> {
 		throw new Error('not supported');
 	}
 

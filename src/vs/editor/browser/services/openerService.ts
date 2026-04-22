@@ -78,20 +78,23 @@ class EditorOpener implements IOpener {
 	constructor(@ICodeEditorService private readonly _editorService: ICodeEditorService) {}
 
 	async open(target: URI | string, options: OpenOptions) {
+		let resolvedTarget: URI;
 		if (typeof target === 'string') {
-			target = URI.parse(target);
+			resolvedTarget = URI.parse(target);
+		} else {
+			resolvedTarget = target;
 		}
 
-		const { selection, uri } = extractSelection(target);
-		target = uri;
+		const { selection, uri } = extractSelection(resolvedTarget);
+		resolvedTarget = uri;
 
-		if (target.scheme === Schemas.file) {
-			target = normalizePath(target); // workaround for non-normalized paths (https://github.com/microsoft/vscode/issues/12954)
+		if (resolvedTarget.scheme === Schemas.file) {
+			resolvedTarget = normalizePath(resolvedTarget);
 		}
 
 		await this._editorService.openCodeEditor(
 			{
-				resource: target,
+				resource: resolvedTarget,
 				options: {
 					selection,
 					source: options?.fromUserGesture ? EditorOpenSource.USER : EditorOpenSource.API,

@@ -231,7 +231,7 @@ export class TextFileOperationError extends FileOperationError {
 		return obj instanceof Error && !isUndefinedOrNull((obj as TextFileOperationError).textFileOperationResult);
 	}
 
-	override readonly options?: IReadTextFileOptions & IWriteTextFileOptions;
+	declare readonly options?: IReadTextFileOptions & IWriteTextFileOptions;
 
 	constructor(
 		message: string,
@@ -582,11 +582,11 @@ export interface ITextFileEditorModel extends ITextEditorModel, IEncodingSupport
 
 	resolve(options?: ITextFileResolveOptions): Promise<void>;
 
-	isDirty(): this is IResolvedTextFileEditorModel;
+	isDirty(): boolean;
 
 	getLanguageId(): string | undefined;
 
-	isResolved(): this is IResolvedTextFileEditorModel;
+	isResolved(): boolean;
 }
 
 export function isTextFileEditorModel(model: ITextEditorModel): model is ITextFileEditorModel {

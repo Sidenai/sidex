@@ -386,7 +386,7 @@ class IdentityModelLineProjection implements IModelLineProjection {
 		return deltaLineNumber;
 	}
 
-	public normalizePosition(outputLineIndex: number, outputPosition: Position, affinity: PositionAffinity): Position {
+	public normalizePosition(outputLineIndex: number, outputPosition: Position, _affinity: PositionAffinity): Position {
 		return outputPosition;
 	}
 
@@ -472,7 +472,7 @@ class HiddenModelLineProjection implements IModelLineProjection {
 		throw new Error('Not supported');
 	}
 
-	public normalizePosition(outputLineIndex: number, outputPosition: Position, affinity: PositionAffinity): Position {
+	public normalizePosition(_outputLineIndex: number, _outputPosition: Position, _affinity: PositionAffinity): Position {
 		throw new Error('Not supported');
 	}
 

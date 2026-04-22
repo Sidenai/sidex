@@ -175,10 +175,10 @@ class ArtifactGroupRenderer implements ICompressibleTreeRenderer<
 	}
 
 	renderCompressedElements(
-		node: ITreeNode<ICompressedTreeNode<SCMArtifactGroupTreeElement>, FuzzyScore>,
-		index: number,
-		templateData: ArtifactGroupTemplate,
-		details?: ITreeElementRenderDetails
+		_node: ITreeNode<ICompressedTreeNode<SCMArtifactGroupTreeElement>, FuzzyScore>,
+		_index: number,
+		_templateData: ArtifactGroupTemplate,
+		_details?: ITreeElementRenderDetails
 	): void {
 		throw new Error('Should never happen since node is incompressible');
 	}
@@ -187,7 +187,7 @@ class ArtifactGroupRenderer implements ICompressibleTreeRenderer<
 		element: ITreeNode<SCMArtifactGroupTreeElement, FuzzyScore>,
 		index: number,
 		templateData: ArtifactGroupTemplate,
-		details?: ITreeElementRenderDetails
+		_details?: ITreeElementRenderDetails
 	): void {
 		templateData.elementDisposables.clear();
 	}
@@ -310,7 +310,7 @@ class ArtifactRenderer implements ICompressibleTreeRenderer<
 		>,
 		index: number,
 		templateData: ArtifactTemplate,
-		details?: ITreeElementRenderDetails
+		_details?: ITreeElementRenderDetails
 	): void {
 		const compressed = node.element;
 		const artifactOrFolder = compressed.elements[compressed.elements.length - 1];
@@ -376,7 +376,7 @@ class ArtifactRenderer implements ICompressibleTreeRenderer<
 		>,
 		index: number,
 		templateData: ArtifactTemplate,
-		details?: ITreeElementRenderDetails
+		_details?: ITreeElementRenderDetails
 	): void {
 		templateData.elementDisposables.clear();
 	}
@@ -810,7 +810,7 @@ export class SCMRepositoriesViewPane extends ViewPane {
 				}
 
 				reader.store.add(
-					artifactsProvider.onDidChangeArtifacts(async groups => {
+					artifactsProvider.onDidChangeArtifacts(async _groups => {
 						await this.updateRepository(repository);
 					})
 				);

@@ -87,7 +87,7 @@ export class UserDataSyncEnablementService extends Disposable implements IUserDa
 		}
 	}
 
-	getResourceSyncStateVersion(resource: SyncResource): string | undefined {
+	getResourceSyncStateVersion(_resource: SyncResource): string | undefined {
 		return undefined;
 	}
 

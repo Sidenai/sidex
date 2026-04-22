@@ -356,7 +356,6 @@ export class KeybindingsEditorModel extends EditorModel {
 				keybindingItem.extensionId ?? (keybindingItem.resolvedKeybinding ? undefined : menuCommand?.source?.id);
 			source = extensionId ? (extensions.get(extensionId) ?? SOURCE_EXTENSION) : SOURCE_SYSTEM;
 		}
-		// eslint-disable-next-line local/code-no-dangerous-type-assertions
 		return <IKeybindingItem>{
 			keybinding: keybindingItem.resolvedKeybinding,
 			keybindingItem,
@@ -432,7 +431,7 @@ class KeybindingItemMatches {
 				? this.matches(
 						searchValue,
 						keybindingItem.commandLabel,
-						(word, wordToMatchAgainst) => matchesWords(word, keybindingItem.commandLabel, true),
+						(word, _wordToMatchAgainst) => matchesWords(word, keybindingItem.commandLabel, true),
 						words
 					)
 				: null;
@@ -440,7 +439,7 @@ class KeybindingItemMatches {
 				? this.matches(
 						searchValue,
 						keybindingItem.commandDefaultLabel,
-						(word, wordToMatchAgainst) => matchesWords(word, keybindingItem.commandDefaultLabel, true),
+						(word, _wordToMatchAgainst) => matchesWords(word, keybindingItem.commandDefaultLabel, true),
 						words
 					)
 				: null;
@@ -451,7 +450,7 @@ class KeybindingItemMatches {
 				this.sourceMatches = this.matches(
 					searchValue,
 					keybindingItem.source,
-					(word, wordToMatchAgainst) => matchesWords(word, keybindingItem.source as string, true),
+					(word, _wordToMatchAgainst) => matchesWords(word, keybindingItem.source as string, true),
 					words
 				);
 			} else {
@@ -459,7 +458,7 @@ class KeybindingItemMatches {
 					? this.matches(
 							searchValue,
 							keybindingItem.source.displayName,
-							(word, wordToMatchAgainst) => matchesWords(word, keybindingItem.commandLabel, true),
+							(word, _wordToMatchAgainst) => matchesWords(word, keybindingItem.commandLabel, true),
 							words
 						)
 					: null;

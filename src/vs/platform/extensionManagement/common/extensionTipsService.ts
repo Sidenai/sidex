@@ -87,7 +87,7 @@ export class ExtensionTipsService extends Disposable implements IExtensionTipsSe
 						});
 					}
 				}
-			} catch (error) {
+			} catch (_error) {
 				/* Ignore */
 			}
 		}

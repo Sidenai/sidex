@@ -416,8 +416,8 @@ abstract class AbstractTreeView extends Disposable implements ITreeView {
 			})
 		);
 		this._register(
-			this.viewDescriptorService.onDidChangeLocation(({ views, from, to }) => {
-				if (views.some(v => v.id === this.id)) {
+			this.viewDescriptorService.onDidChangeLocation(e => {
+				if (e.views.some(v => v.id === this.id)) {
 					this.tree?.updateOptions({
 						overrideStyles: getLocationBasedViewColors(this.viewLocation).listOverrideStyles
 					});
@@ -1241,7 +1241,7 @@ abstract class AbstractTreeView extends Disposable implements ITreeView {
 			for (const element of itemOrItems) {
 				await tree.expand(element, false);
 			}
-		} catch (e) {
+		} catch (_e) {
 			// The extension could have changed the tree during the reveal.
 			// Because of that, we ignore errors.
 		}
@@ -1364,11 +1364,11 @@ class TreeViewIdentityProvider implements IIdentityProvider<ITreeItem> {
 }
 
 class TreeViewDelegate implements IListVirtualDelegate<ITreeItem> {
-	getHeight(element: ITreeItem): number {
+	getHeight(_element: ITreeItem): number {
 		return TreeRenderer.ITEM_HEIGHT;
 	}
 
-	getTemplateId(element: ITreeItem): string {
+	getTemplateId(_element: ITreeItem): string {
 		return TreeRenderer.TREE_TEMPLATE_ID;
 	}
 }
@@ -2377,7 +2377,7 @@ export class CustomTreeViewDragAndDrop implements ITreeDragAndDrop<ITreeItem> {
 		if (!dndController || !originalEvent.dataTransfer || dndController.dropMimeTypes.length === 0) {
 			return false;
 		}
-		const dragContainersSupportedType = Array.from(types).some((value, index) => {
+		const dragContainersSupportedType = Array.from(types).some((value, _index) => {
 			if (value === this.treeMimeType) {
 				return true;
 			} else {

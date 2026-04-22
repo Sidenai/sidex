@@ -43,7 +43,7 @@ export function parse(entry: IRemoteConsoleLog): { args: any[]; stack?: string }
 		}
 
 		args.push(...parsedArguments);
-	} catch (error) {
+	} catch (_error) {
 		args.push('Unable to log remote console arguments', entry.arguments);
 	}
 
@@ -131,11 +131,9 @@ export function log(entry: IRemoteConsoleLog, label: string): void {
 	}
 
 	// Log it
-	// eslint-disable-next-line local/code-no-any-casts
 	if (typeof (console as any)[entry.severity] !== 'function') {
 		throw new Error('Unknown console method');
 	}
-	// eslint-disable-next-line local/code-no-any-casts
 	(console as any)[entry.severity].apply(console, consoleArgs);
 }
 

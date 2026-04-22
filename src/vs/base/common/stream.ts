@@ -62,7 +62,7 @@ export interface ReadableStream<T> extends ReadableStreamEvents<T> {
 	/**
 	 * Allows to remove a listener that was previously added.
 	 */
-	removeListener(event: string, callback: Function): void;
+	removeListener(event: string, callback: (...args: any[]) => any): void;
 }
 
 /**
@@ -215,7 +215,7 @@ class WriteableStreamImpl<T> implements WriteableStream<T> {
 		end: [] as { (): void }[]
 	};
 
-	private readonly pendingWritePromises: Function[] = [];
+	private readonly pendingWritePromises: ((...args: any[]) => any)[] = [];
 
 	/**
 	 * @param reducer a function that reduces the buffered data into a single object;
@@ -371,7 +371,7 @@ class WriteableStreamImpl<T> implements WriteableStream<T> {
 		}
 	}
 
-	removeListener(event: string, callback: Function): void {
+	removeListener(event: string, callback: (...args: any[]) => any): void {
 		if (this.state.destroyed) {
 			return;
 		}

@@ -364,7 +364,7 @@ class WordHighlighter {
 			})
 		);
 		this.toUnhook.add(
-			editor.onDidFocusEditorText(e => {
+			editor.onDidFocusEditorText(_e => {
 				if (this.occurrencesHighlightEnablement === 'off') {
 					// Early exit if nothing needs to be done
 					return;
@@ -380,7 +380,7 @@ class WordHighlighter {
 			})
 		);
 		this.toUnhook.add(
-			editor.onDidChangeModelContent(e => {
+			editor.onDidChangeModelContent(_e => {
 				if (!matchesScheme(this.model.uri, 'output')) {
 					this._stopAll();
 				}
@@ -396,7 +396,7 @@ class WordHighlighter {
 			})
 		);
 		this.toUnhook.add(
-			editor.onDidChangeConfiguration(e => {
+			editor.onDidChangeConfiguration(_e => {
 				const newEnablement = this.editor.getOption(EditorOption.occurrencesHighlight);
 				if (this.occurrencesHighlightEnablement !== newEnablement) {
 					this.occurrencesHighlightEnablement = newEnablement;
@@ -832,7 +832,7 @@ class WordHighlighter {
 				this.workerRequest?.result.then(data => {
 					if (myRequestId === this.workerRequestTokenId) {
 						this.workerRequestCompleted = true;
-						this.workerRequestValue = data || [];
+						this.workerRequestValue = data || new ResourceMap<DocumentHighlight[]>();
 						this._beginRenderDecorations(delay ?? this.occurrencesHighlightDelay);
 					}
 				}, onUnexpectedError);
@@ -861,7 +861,7 @@ class WordHighlighter {
 				this.workerRequest?.result.then(data => {
 					if (myRequestId === this.workerRequestTokenId) {
 						this.workerRequestCompleted = true;
-						this.workerRequestValue = data || [];
+						this.workerRequestValue = data || new ResourceMap<DocumentHighlight[]>();
 						this._beginRenderDecorations(delay ?? this.occurrencesHighlightDelay);
 					}
 				}, onUnexpectedError);

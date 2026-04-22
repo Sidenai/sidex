@@ -92,7 +92,7 @@ if (typeof nodeProcess === 'object') {
 			_platformLocale = nlsConfig.osLocale;
 			_language = nlsConfig.resolvedLanguage || LANGUAGE_DEFAULT;
 			_translationsConfigFile = nlsConfig.languagePack?.translationsConfigFile;
-		} catch (e) {}
+		} catch (_e) {}
 	}
 	_isNative = true;
 }

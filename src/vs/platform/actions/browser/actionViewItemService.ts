@@ -41,15 +41,15 @@ export class NullActionViewItemService implements IActionViewItemService {
 	readonly onDidChange: Event<MenuId> = Event.None;
 
 	register(
-		menu: MenuId,
-		commandId: string | MenuId,
-		provider: IActionViewItemFactory,
-		event?: Event<unknown>
+		_menu: MenuId,
+		_commandId: string | MenuId,
+		_provider: IActionViewItemFactory,
+		_event?: Event<unknown>
 	): IDisposable {
 		return Disposable.None;
 	}
 
-	lookUp(menu: MenuId, commandId: string | MenuId): IActionViewItemFactory | undefined {
+	lookUp(_menu: MenuId, _commandId: string | MenuId): IActionViewItemFactory | undefined {
 		return undefined;
 	}
 }

@@ -264,7 +264,7 @@ export class GlobalStateSynchroniser extends AbstractSynchroniser implements IUs
 
 	protected async getMergeResult(
 		resourcePreview: IGlobalStateResourcePreview,
-		token: CancellationToken
+		_token: CancellationToken
 	): Promise<IMergeResult> {
 		return { ...resourcePreview.previewResult, hasConflicts: false };
 	}
@@ -272,8 +272,8 @@ export class GlobalStateSynchroniser extends AbstractSynchroniser implements IUs
 	protected async getAcceptResult(
 		resourcePreview: IGlobalStateResourcePreview,
 		resource: URI,
-		content: string | null | undefined,
-		token: CancellationToken
+		_content: string | null | undefined,
+		_token: CancellationToken
 	): Promise<IGlobalStateResourceMergeResult> {
 		/* Accept local resource */
 		if (this.extUri.isEqual(resource, this.localResource)) {
@@ -415,7 +415,7 @@ export class GlobalStateSynchroniser extends AbstractSynchroniser implements IUs
 			if (Object.keys(storage).length > 1 || storage[`${argvStoragePrefx}.locale`]?.value !== 'en') {
 				return true;
 			}
-		} catch (error) {
+		} catch (_error) {
 			/* ignore error */
 		}
 		return false;
@@ -596,7 +596,7 @@ export class GlobalStateInitializer extends AbstractInitializer {
 			try {
 				const fileContent = await this.fileService.readFile(this.environmentService.argvResource);
 				content = fileContent.value.toString();
-			} catch (error) {}
+			} catch (_error) {}
 			for (const argvProperty of Object.keys(argv)) {
 				content = edit(content, [argvProperty], argv[argvProperty], {});
 			}

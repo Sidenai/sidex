@@ -69,7 +69,7 @@ export class EmbeddedCodeEditorWidget extends CodeEditorWidget {
 		return this._parentEditor;
 	}
 
-	private _onParentConfigurationChanged(e: ConfigurationChangedEvent): void {
+	private _onParentConfigurationChanged(_e: ConfigurationChangedEvent): void {
 		super.updateOptions(this._parentEditor.getRawOptions());
 		super.updateOptions(this._overwriteOptions);
 	}

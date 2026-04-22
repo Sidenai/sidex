@@ -203,7 +203,7 @@ export class LabelService extends Disposable implements ILabelService {
 		@IPathService private readonly pathService: IPathService,
 		@IRemoteAgentService private readonly remoteAgentService: IRemoteAgentService,
 		@IStorageService storageService: IStorageService,
-		@ILifecycleService lifecycleService: ILifecycleService
+		@ILifecycleService _lifecycleService: ILifecycleService
 	) {
 		super();
 

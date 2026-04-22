@@ -609,7 +609,7 @@ abstract class ImmutableLeafAstNode extends BaseAstNode {
 	public get childrenLength(): number {
 		return 0;
 	}
-	public getChild(idx: number): AstNode | null {
+	public getChild(_idx: number): AstNode | null {
 		return null;
 	}
 	public get children(): readonly AstNode[] {
@@ -709,7 +709,7 @@ export class BracketAstNode extends ImmutableLeafAstNode {
 		return false;
 	}
 
-	public computeMinIndentation(offset: Length, textModel: ITextModel): number {
+	public computeMinIndentation(_offset: Length, _textModel: ITextModel): number {
 		return Number.MAX_SAFE_INTEGER;
 	}
 }
@@ -730,7 +730,7 @@ export class InvalidBracketAstNode extends ImmutableLeafAstNode {
 		return !openedBracketIds.intersects(this.missingOpeningBracketIds);
 	}
 
-	public computeMinIndentation(offset: Length, textModel: ITextModel): number {
+	public computeMinIndentation(_offset: Length, _textModel: ITextModel): number {
 		return Number.MAX_SAFE_INTEGER;
 	}
 }

@@ -196,7 +196,7 @@ export class ExtensionEnablementService extends Disposable implements IWorkbench
 		try {
 			this.throwErrorIfCannotChangeEnablement(extension);
 			return true;
-		} catch (error) {
+		} catch (_error) {
 			return false;
 		}
 	}
@@ -209,7 +209,7 @@ export class ExtensionEnablementService extends Disposable implements IWorkbench
 		try {
 			this.throwErrorIfCannotChangeWorkspaceEnablement(extension);
 			return true;
-		} catch (error) {
+		} catch (_error) {
 			return false;
 		}
 	}
@@ -230,7 +230,7 @@ export class ExtensionEnablementService extends Disposable implements IWorkbench
 			this.userDataSyncAccountService.account &&
 			isAuthenticationProviderExtension(extension.manifest) &&
 			extension.manifest.contributes!.authentication!.some(
-				a => a.id === this.userDataSyncAccountService.account!.authenticationProviderId
+				a => a.id === (this.userDataSyncAccountService.account as any)!.authenticationProviderId
 			)
 		) {
 			throw new Error(
@@ -455,7 +455,7 @@ export class ExtensionEnablementService extends Disposable implements IWorkbench
 						// Replace only if the enablement state can be changed
 						this.throwErrorIfEnablementStateCannotBeChanged(extension, enablementStateOfExtension, true);
 						extensionsToEnable.splice(index, 1, extension);
-					} catch (error) {
+					} catch (_error) {
 						/*Do not add*/
 					}
 				}

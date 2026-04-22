@@ -93,7 +93,7 @@ export class MiddleScrollController extends Disposable implements IEditorContrib
 						);
 
 						store.add(
-							this._editor.onMouseUp(e => {
+							this._editor.onMouseUp(_e => {
 								const session = scrollingSession.read(undefined);
 								if (session && session.didScroll) {
 									// Only cancel session on release if the user scrolled during it
@@ -103,7 +103,7 @@ export class MiddleScrollController extends Disposable implements IEditorContrib
 						);
 
 						store.add(
-							this._editor.onKeyDown(e => {
+							this._editor.onKeyDown(_e => {
 								scrollingSession.set(undefined, undefined);
 							})
 						);

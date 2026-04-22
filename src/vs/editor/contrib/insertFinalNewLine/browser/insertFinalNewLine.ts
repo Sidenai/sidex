@@ -20,7 +20,7 @@ export class InsertFinalNewLineAction extends EditorAction {
 		});
 	}
 
-	public run(_accessor: ServicesAccessor, editor: ICodeEditor, args: unknown): void {
+	public run(_accessor: ServicesAccessor, editor: ICodeEditor, _args: unknown): void {
 		const selection = editor.getSelection();
 		if (selection === null) {
 			return;

@@ -85,7 +85,7 @@ export class BuiltinExtensionsScannerService implements IBuiltinExtensionsScanne
 						try {
 							bundledExtensions = JSON.parse(builtinExtensionsElementAttribute);
 							this.logService.info(`[SideX-Builtin] parsed ${bundledExtensions.length} extensions from DOM`);
-						} catch (error) {
+						} catch (_error) {
 							/* ignore error*/
 						}
 					}

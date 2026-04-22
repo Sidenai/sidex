@@ -81,7 +81,7 @@ export class ViewOverlayWidgets extends ViewPart {
 
 	// ---- begin view event handlers
 
-	public override onConfigurationChanged(e: viewEvents.ViewConfigurationChangedEvent): boolean {
+	public override onConfigurationChanged(_e: viewEvents.ViewConfigurationChangedEvent): boolean {
 		const options = this._context.configuration.options;
 		const layoutInfo = options.get(EditorOption.layoutInfo);
 
@@ -219,11 +219,11 @@ export class ViewOverlayWidgets extends ViewPart {
 		}
 	}
 
-	public prepareRender(ctx: RenderingContext): void {
+	public prepareRender(_ctx: RenderingContext): void {
 		this._viewDomNodeRect = dom.getDomNodePagePosition(this._viewDomNode.domNode);
 	}
 
-	public render(ctx: RestrictedRenderingContext): void {
+	public render(_ctx: RestrictedRenderingContext): void {
 		this._domNode.setWidth(this._editorWidth);
 
 		const keys = Object.keys(this._widgets);

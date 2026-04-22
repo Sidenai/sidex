@@ -39,7 +39,7 @@ export class ToggleCollapseUnchangedRegions extends Action2 {
 		});
 	}
 
-	run(accessor: ServicesAccessor, ...args: unknown[]): void {
+	run(accessor: ServicesAccessor, ..._args: unknown[]): void {
 		const configurationService = accessor.get(IConfigurationService);
 		const newValue = !configurationService.getValue<boolean>('diffEditor.hideUnchangedRegions.enabled');
 		configurationService.updateValue('diffEditor.hideUnchangedRegions.enabled', newValue);
@@ -55,7 +55,7 @@ export class ToggleShowMovedCodeBlocks extends Action2 {
 		});
 	}
 
-	run(accessor: ServicesAccessor, ...args: unknown[]): void {
+	run(accessor: ServicesAccessor, ..._args: unknown[]): void {
 		const configurationService = accessor.get(IConfigurationService);
 		const newValue = !configurationService.getValue<boolean>('diffEditor.experimental.showMoves');
 		configurationService.updateValue('diffEditor.experimental.showMoves', newValue);
@@ -71,7 +71,7 @@ export class ToggleUseInlineViewWhenSpaceIsLimited extends Action2 {
 		});
 	}
 
-	run(accessor: ServicesAccessor, ...args: unknown[]): void {
+	run(accessor: ServicesAccessor, ..._args: unknown[]): void {
 		const configurationService = accessor.get(IConfigurationService);
 		const newValue = !configurationService.getValue<boolean>('diffEditor.useInlineViewWhenSpaceIsLimited');
 		configurationService.updateValue('diffEditor.useInlineViewWhenSpaceIsLimited', newValue);
@@ -120,7 +120,7 @@ export class ExitCompareMove extends EditorAction2 {
 		});
 	}
 
-	runEditorCommand(accessor: ServicesAccessor, editor: ICodeEditor, ...args: unknown[]): void {
+	runEditorCommand(accessor: ServicesAccessor, _editor: ICodeEditor, ..._args: unknown[]): void {
 		const diffEditor = findFocusedDiffEditor(accessor);
 		if (diffEditor instanceof DiffEditorWidget) {
 			diffEditor.exitCompareMove();
@@ -140,7 +140,7 @@ export class CollapseAllUnchangedRegions extends EditorAction2 {
 		});
 	}
 
-	runEditorCommand(accessor: ServicesAccessor, editor: ICodeEditor, ...args: unknown[]): void {
+	runEditorCommand(accessor: ServicesAccessor, _editor: ICodeEditor, ..._args: unknown[]): void {
 		const diffEditor = findFocusedDiffEditor(accessor);
 		if (diffEditor instanceof DiffEditorWidget) {
 			diffEditor.collapseAllUnchangedRegions();
@@ -160,7 +160,7 @@ export class ShowAllUnchangedRegions extends EditorAction2 {
 		});
 	}
 
-	runEditorCommand(accessor: ServicesAccessor, editor: ICodeEditor, ...args: unknown[]): void {
+	runEditorCommand(accessor: ServicesAccessor, _editor: ICodeEditor, ..._args: unknown[]): void {
 		const diffEditor = findFocusedDiffEditor(accessor);
 		if (diffEditor instanceof DiffEditorWidget) {
 			diffEditor.showAllUnchangedRegions();

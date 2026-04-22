@@ -58,7 +58,6 @@ export class TextModelEditSource {
 	}
 
 	public get props(): Record<ITextModelEditSourceMetadataKeys, string | undefined> {
-		// eslint-disable-next-line local/code-no-any-casts
 		return this.metadata as any;
 	}
 }
@@ -68,7 +67,6 @@ type TextModelEditSourceT<T> = TextModelEditSource & {
 };
 
 function createEditSource<T extends Record<string, any>>(metadata: T): TextModelEditSourceT<T> {
-	// eslint-disable-next-line local/code-no-any-casts
 	return new TextModelEditSource(metadata as any, privateSymbol) as any;
 }
 

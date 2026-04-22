@@ -1066,7 +1066,7 @@ export class ViewDescriptorService extends Disposable implements IViewDescriptor
 				viewContainerModel.onDidAddVisibleViewDescriptors,
 				viewContainerModel.onDidRemoveVisibleViewDescriptors,
 				viewContainerModel.onDidMoveVisibleViewDescriptors
-			)(e => {
+			)(_e => {
 				this.viewsVisibilityActionDisposables.deleteAndDispose(viewContainer);
 				this.viewsVisibilityActionDisposables.set(
 					viewContainer,

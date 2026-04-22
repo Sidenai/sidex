@@ -2345,7 +2345,7 @@ export class CodeEditorWidget extends Disposable implements editorBrowser.ICodeE
 		return this._telemetryData;
 	}
 
-	public hasModel(): this is editorBrowser.IActiveCodeEditor {
+	public hasModel(): boolean {
 		return this._modelData !== null;
 	}
 

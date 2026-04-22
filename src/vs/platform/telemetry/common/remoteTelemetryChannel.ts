@@ -53,7 +53,7 @@ export class ServerTelemetryChannel extends Disposable implements IServerChannel
 		throw new Error(`IPC Command ${command} not found`);
 	}
 
-	listen(_: any, event: string, arg: any): Event<any> {
+	listen(_: any, _event: string, _arg: any): Event<any> {
 		throw new Error('Not supported');
 	}
 

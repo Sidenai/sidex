@@ -933,7 +933,7 @@ export abstract class AbstractExtensionService extends Disposable implements IEx
 					}]
 				);
 			}
-		} catch (err) {
+		} catch (_err) {
 			// maybe this wasn't an extension host crash and it was a permanent disconnection
 		}
 	}
@@ -1142,7 +1142,7 @@ export abstract class AbstractExtensionService extends Disposable implements IEx
 	private _safeInvokeIsEnabled(extension: IExtension): boolean {
 		try {
 			return this._extensionEnablementService.isEnabled(extension);
-		} catch (err) {
+		} catch (_err) {
 			return false;
 		}
 	}

@@ -22,7 +22,7 @@ export function start<THost extends object, TClient extends object>(
 		const host = new Proxy(
 			{},
 			{
-				get(target, prop, receiver) {
+				get(target, prop, _receiver) {
 					if (prop === 'then') {
 						// Don't forward the call when the proxy is returned in an async function and the runtime tries to .then it.
 						return undefined;

@@ -66,7 +66,7 @@ export abstract class AbstractCommandsQuickAccessProvider
 
 	private readonly commandsHistory: CommandsHistory;
 
-	protected override readonly options: ICommandsQuickAccessOptions;
+	declare protected readonly options: ICommandsQuickAccessOptions;
 
 	constructor(
 		options: ICommandsQuickAccessOptions,
@@ -561,7 +561,7 @@ export class CommandsHistory extends Disposable {
 		return CommandsHistory.DEFAULT_COMMANDS_HISTORY_LENGTH;
 	}
 
-	static clearHistory(configurationService: IConfigurationService, storageService: IStorageService): void {
+	static clearHistory(configurationService: IConfigurationService, _storageService: IStorageService): void {
 		const commandHistoryLength = CommandsHistory.getConfiguredCommandHistoryLength(configurationService);
 		CommandsHistory.cache = new LRUCache<string, number>(commandHistoryLength);
 		CommandsHistory.counter = 1;

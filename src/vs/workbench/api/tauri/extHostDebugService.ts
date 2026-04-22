@@ -19,7 +19,7 @@ import { AbstractDebugAdapter } from '../../contrib/debug/common/abstractDebugAd
 import { TauriExecutableDebugAdapter, TauriSocketDebugAdapter } from '../../contrib/debug/tauri/tauriDebugAdapter.js';
 import { ExtensionDescriptionRegistry } from '../../services/extensions/common/extensionDescriptionRegistry.js';
 import { IExtHostCommands } from '../common/extHostCommands.js';
-import { ExtHostConfigProvider, IExtHostConfiguration } from '../common/extHostConfiguration.js';
+import { IExtHostConfiguration } from '../common/extHostConfiguration.js';
 import { ExtHostDebugServiceBase, ExtHostDebugSession } from '../common/extHostDebugService.js';
 import { IExtHostEditorTabs } from '../common/extHostEditorTabs.js';
 import { IExtHostExtensionService } from '../common/extHostExtensionService.js';
@@ -35,7 +35,7 @@ import {
 import { IExtHostVariableResolverProvider } from '../common/extHostVariableResolverService.js';
 import { IExtHostWorkspace } from '../common/extHostWorkspace.js';
 import { IExtHostTerminalShellIntegration } from '../common/extHostTerminalShellIntegration.js';
-import { IDebugAdapterExecutable, IDebugAdapterServer } from '../../contrib/debug/common/debug.js';
+import { IDebugAdapterExecutable } from '../../contrib/debug/common/debug.js';
 
 export class ExtHostDebugService extends ExtHostDebugServiceBase {
 	private _integratedTerminalInstances = new DebugTerminalCollection();

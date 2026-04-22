@@ -176,7 +176,7 @@ export class TaskQuickPick extends Disposable {
 
 	private _handleFolderTaskResult(result: Map<string, IWorkspaceFolderTaskResult>): (Task | ConfiguringTask)[] {
 		const tasks: (Task | ConfiguringTask)[] = [];
-		Array.from(result).forEach(([key, folderTasks]) => {
+		Array.from(result).forEach(([_key, folderTasks]) => {
 			if (folderTasks.set) {
 				tasks.push(...folderTasks.set.tasks);
 			}
@@ -327,7 +327,7 @@ export class TaskQuickPick extends Disposable {
 						let canOpenConfig: boolean = false;
 						try {
 							canOpenConfig = await this._taskService.openConfig(task);
-						} catch (e) {
+						} catch (_e) {
 							// do nothing.
 						}
 						if (!canOpenConfig) {
@@ -385,7 +385,7 @@ export class TaskQuickPick extends Disposable {
 				return this._toTask(firstLevelTask);
 			} else {
 				disposables.dispose();
-				return firstLevelTask;
+				return firstLevelTask as Task | undefined;
 			}
 		} while (1);
 		return;

@@ -25,7 +25,7 @@ export interface WebviewFindDelegate {
 
 export class WebviewFindWidget extends SimpleFindWidget {
 	protected async _getResultCount(
-		dataChanged?: boolean
+		_dataChanged?: boolean
 	): Promise<{ resultIndex: number; resultCount: number } | undefined> {
 		return undefined;
 	}
@@ -59,7 +59,6 @@ export class WebviewFindWidget extends SimpleFindWidget {
 		this._register(
 			_delegate.hasFindResult(hasResult => {
 				this.updateButtons(hasResult);
-				this.focusFindBox();
 			})
 		);
 

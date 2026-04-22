@@ -89,7 +89,7 @@ export class KeymapInfo {
 	static createKeyboardLayoutFromDebugInfo(
 		layout: IKeyboardLayoutInfo,
 		value: IRawMixedKeyboardMapping,
-		isUserKeyboardLayout?: boolean
+		_isUserKeyboardLayout?: boolean
 	): KeymapInfo {
 		const keyboardLayoutInfo = new KeymapInfo(layout, [], {}, true);
 		keyboardLayoutInfo.mapping = value;

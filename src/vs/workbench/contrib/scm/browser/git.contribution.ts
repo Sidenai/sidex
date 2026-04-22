@@ -955,7 +955,7 @@ const gitDecorationRenamedFg = registerColor(
 	{ dark: '#73C991', light: '#007100', hcDark: '#73C991', hcLight: '#007100' },
 	'Color for renamed git resources.'
 );
-const gitDecorationIgnoredFg = registerColor(
+const _gitDecorationIgnoredFg = registerColor(
 	'gitDecoration.ignoredResourceForeground',
 	{ dark: '#8C8C8C', light: '#8E8E90', hcDark: '#A7A8A9', hcLight: '#8e8e90' },
 	'Color for ignored git resources.'
@@ -975,7 +975,7 @@ const gitDecorationConflictingFg = registerColor(
 	{ dark: '#e4676b', light: '#ad0707', hcDark: '#c74e39', hcLight: '#ad0707' },
 	'Color for conflicting git resources.'
 );
-const gitDecorationSubmoduleFg = registerColor(
+const _gitDecorationSubmoduleFg = registerColor(
 	'gitDecoration.submoduleResourceForeground',
 	{ dark: '#8db9e2', light: '#1258a7', hcDark: '#8db9e2', hcLight: '#1258a7' },
 	'Color for submodule git resources.'
@@ -1179,7 +1179,7 @@ class TauriGitContribution extends Disposable implements IWorkbenchContribution 
 		});
 	}
 
-	private _registerDiffCommands(provider: TauriGitSCMProvider, rootPath: string): void {
+	private _registerDiffCommands(provider: TauriGitSCMProvider, _rootPath: string): void {
 		this._register(
 			CommandsRegistry.registerCommand('git.openDiff', async (_accessor, ...args: any[]) => {
 				try {

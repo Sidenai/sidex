@@ -71,7 +71,7 @@ export class TransactionImpl implements ITransaction {
 	private _updatingObservers: { observer: IObserver; observable: IObservable<any> }[] | null = [];
 
 	constructor(
-		public readonly _fn: Function,
+		public readonly _fn: (...args: any[]) => any,
 		private readonly _getDebugName?: () => string
 	) {
 		getLogger()?.handleBeginTransaction(this);

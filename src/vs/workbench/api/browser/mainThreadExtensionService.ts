@@ -79,7 +79,6 @@ export class MainThreadExtensionService implements MainThreadExtensionServiceSha
 		internalExtHostContext._setExtensionHostProxy(
 			new ExtensionHostProxy(extHostContext.getProxy(ExtHostContext.ExtHostExtensionService))
 		);
-		// eslint-disable-next-line local/code-no-any-casts
 		internalExtHostContext._setAllMainProxyIdentifiers(Object.keys(MainContext).map(key => (<any>MainContext)[key]));
 	}
 
@@ -260,7 +259,7 @@ export class MainThreadExtensionService implements MainThreadExtensionServiceSha
 			dependencyExtension = (
 				await this._extensionsWorkbenchService.getExtensions([{ id: missingDependency }], CancellationToken.None)
 			)[0];
-		} catch (err) {}
+		} catch (_err) {}
 		if (dependencyExtension) {
 			this._notificationService.notify({
 				severity: Severity.Error,
@@ -323,7 +322,7 @@ class ExtensionHostProxy implements IExtensionHostProxy {
 	}
 	async getCanonicalURI(remoteAuthority: string, uri: URI): Promise<URI | null> {
 		const uriComponents = await this._actual.$getCanonicalURI(remoteAuthority, uri);
-		return uriComponents ? URI.revive(uriComponents) : uriComponents;
+		return uriComponents ? URI.revive(uriComponents) : (uriComponents as any);
 	}
 	startExtensionHost(extensionsDelta: IExtensionDescriptionDelta): Promise<void> {
 		return this._actual.$startExtensionHost(extensionsDelta);

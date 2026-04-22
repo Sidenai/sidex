@@ -126,7 +126,7 @@ function _createPick(
 	filter: string,
 	debugService: IDebugService,
 	viewsService: IViewsService,
-	commandService: ICommandService
+	_commandService: ICommandService
 ): IPickerDebugItem | undefined {
 	const pickInfo = _getSessionInfo(session);
 	const highlights = matchesFuzzy(filter, pickInfo.label, true);

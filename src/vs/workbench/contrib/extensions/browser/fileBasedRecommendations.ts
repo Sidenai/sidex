@@ -334,7 +334,7 @@ export class FileBasedRecommendations extends ExtensionRecommendations {
 			if (result === RecommendationsNotificationResult.Accepted) {
 				this.addToPromptedRecommendations(language, extensions);
 			}
-		} catch (error) { /* Ignore */ }
+		} catch (_error) { /* Ignore */ }
 	}
 
 	private getPromptedRecommendations(): IStringDictionary<string[]> {

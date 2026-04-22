@@ -654,7 +654,7 @@ export abstract class AbstractFileOutputChannelModel extends Disposable implemen
 					if (this.replacePromise) {
 						try {
 							await this.replacePromise;
-						} catch (e) {
+						} catch (_e) {
 							/* Ignore */
 						}
 						/* Abort if operation is cancelled */
@@ -745,10 +745,10 @@ export abstract class AbstractFileOutputChannelModel extends Disposable implemen
 		super.dispose();
 	}
 
-	append(message: string): void {
+	append(_message: string): void {
 		throw new Error('Not supported');
 	}
-	replace(message: string): void {
+	replace(_message: string): void {
 		throw new Error('Not supported');
 	}
 
@@ -793,7 +793,7 @@ export class FileOutputChannelModel extends AbstractFileOutputChannelModel imple
 		});
 	}
 
-	override updateChannelSources(files: IOutputContentSource[]): void {
+	override updateChannelSources(_files: IOutputContentSource[]): void {
 		throw new Error('Not supported');
 	}
 }
@@ -834,7 +834,7 @@ export class MultiFileOutputChannelModel extends AbstractFileOutputChannelModel 
 		});
 	}
 
-	override update(mode: OutputChannelUpdateMode, till: number | undefined, immediate: boolean): void {
+	override update(_mode: OutputChannelUpdateMode, _till: number | undefined, _immediate: boolean): void {
 		throw new Error('Not supported');
 	}
 }

@@ -186,7 +186,7 @@ export function getUriFromSource(
 
 	try {
 		return _getUriFromSource(path);
-	} catch (err) {
+	} catch (_err) {
 		logService.error('Invalid path from debug adapter: ' + path);
 		return _getUriFromSource('/invalidDebugSource');
 	}

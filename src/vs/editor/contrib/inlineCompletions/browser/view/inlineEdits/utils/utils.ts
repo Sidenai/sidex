@@ -529,7 +529,7 @@ export function observeEditorBoundingClientRect(
 	const dom = editor.getContainerDomNode()!;
 	const initialDomRect = observableValue('domRect', dom.getBoundingClientRect());
 	store.add(
-		editor.onDidLayoutChange(e => {
+		editor.onDidLayoutChange(_e => {
 			initialDomRect.set(dom.getBoundingClientRect(), undefined);
 		})
 	);

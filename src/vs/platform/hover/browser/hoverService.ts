@@ -148,7 +148,7 @@ export class HoverService extends Disposable implements IHoverService {
 		options: IHoverOptions,
 		focus?: boolean,
 		skipLastFocusedUpdate?: boolean,
-		dontShow?: boolean
+		_dontShow?: boolean
 	): IHoverWidget | undefined {
 		const hover = this._createHover(options, skipLastFocusedUpdate);
 		if (!hover) {
@@ -599,7 +599,7 @@ export class HoverService extends Disposable implements IHoverService {
 		}
 	}
 
-	private _keyUp(e: KeyboardEvent, hover: HoverWidget) {
+	private _keyUp(e: KeyboardEvent, _hover: HoverWidget) {
 		if (e.key === 'Alt') {
 			// Unlock all hovers in the stack when Alt is released
 			for (const entry of this._hoverStack) {

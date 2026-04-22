@@ -208,7 +208,7 @@ export class KeepAliveObserver implements IObserver {
 		private readonly _handleValue: ((value: any) => void) | undefined
 	) {}
 
-	beginUpdate<T>(observable: IObservable<T>): void {
+	beginUpdate<T>(_observable: IObservable<T>): void {
 		this._counter++;
 	}
 
@@ -223,11 +223,11 @@ export class KeepAliveObserver implements IObserver {
 		this._counter--;
 	}
 
-	handlePossibleChange<T>(observable: IObservable<T>): void {
+	handlePossibleChange<T>(_observable: IObservable<T>): void {
 		// NO OP
 	}
 
-	handleChange<T, TChange>(observable: IObservableWithChange<T, TChange>, change: TChange): void {
+	handleChange<T, TChange>(_observable: IObservableWithChange<T, TChange>, _change: TChange): void {
 		// NO OP
 	}
 }

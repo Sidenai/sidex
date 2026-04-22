@@ -71,13 +71,13 @@ export class CursorUndoRedoController extends Disposable implements IEditorContr
 		this._redoStack = [];
 
 		this._register(
-			editor.onDidChangeModel(e => {
+			editor.onDidChangeModel(_e => {
 				this._undoStack = [];
 				this._redoStack = [];
 			})
 		);
 		this._register(
-			editor.onDidChangeModelContent(e => {
+			editor.onDidChangeModelContent(_e => {
 				this._undoStack = [];
 				this._redoStack = [];
 			})
@@ -163,7 +163,7 @@ export class CursorUndo extends EditorAction {
 		});
 	}
 
-	public run(accessor: ServicesAccessor, editor: ICodeEditor, args: unknown): void {
+	public run(accessor: ServicesAccessor, editor: ICodeEditor, _args: unknown): void {
 		CursorUndoRedoController.get(editor)?.cursorUndo();
 	}
 }
@@ -177,7 +177,7 @@ export class CursorRedo extends EditorAction {
 		});
 	}
 
-	public run(accessor: ServicesAccessor, editor: ICodeEditor, args: unknown): void {
+	public run(accessor: ServicesAccessor, editor: ICodeEditor, _args: unknown): void {
 		CursorUndoRedoController.get(editor)?.cursorRedo();
 	}
 }

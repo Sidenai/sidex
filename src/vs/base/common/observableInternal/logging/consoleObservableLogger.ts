@@ -74,7 +74,6 @@ export class ConsoleObservableLogger implements IObservableLogger {
 			const debugTrackUpdating = false;
 			if (debugTrackUpdating) {
 				const updating: IObservable<any>[] = [];
-				// eslint-disable-next-line local/code-no-any-casts
 				(derived as any).__debugUpdating = updating;
 
 				const existingBeginUpdate = derived.beginUpdate;
@@ -96,7 +95,7 @@ export class ConsoleObservableLogger implements IObservableLogger {
 		}
 	}
 
-	handleOnListenerCountChanged(observable: IObservable<any>, newCount: number): void {}
+	handleOnListenerCountChanged(_observable: IObservable<any>, _newCount: number): void {}
 
 	handleObservableUpdated(observable: IObservable<unknown>, info: IChangeInformation): void {
 		if (!this._isIncluded(observable)) {
@@ -125,7 +124,7 @@ export class ConsoleObservableLogger implements IObservableLogger {
 		return styled(' (changed deps: ' + [...changes].map(o => o.debugName).join(', ') + ')', { color: 'gray' });
 	}
 
-	handleDerivedDependencyChanged(derived: Derived<any>, observable: IObservable<any>, change: unknown): void {
+	handleDerivedDependencyChanged(derived: Derived<any>, observable: IObservable<any>, _change: unknown): void {
 		if (!this._isIncluded(derived)) {
 			return;
 		}
@@ -187,9 +186,9 @@ export class ConsoleObservableLogger implements IObservableLogger {
 		this.changedObservablesSets.set(autorun, new Set());
 	}
 
-	handleAutorunDisposed(autorun: AutorunObserver): void {}
+	handleAutorunDisposed(_autorun: AutorunObserver): void {}
 
-	handleAutorunDependencyChanged(autorun: AutorunObserver, observable: IObservable<any>, change: unknown): void {
+	handleAutorunDependencyChanged(autorun: AutorunObserver, observable: IObservable<any>, _change: unknown): void {
 		if (!this._isIncluded(autorun)) {
 			return;
 		}
@@ -217,7 +216,7 @@ export class ConsoleObservableLogger implements IObservableLogger {
 		this.indentation++;
 	}
 
-	handleAutorunFinished(autorun: AutorunObserver): void {
+	handleAutorunFinished(_autorun: AutorunObserver): void {
 		this.indentation--;
 	}
 

@@ -197,7 +197,7 @@ async function isAlpineLinux(fileService: IFileService, logService: ILogService)
 	try {
 		const fileContent = await fileService.readFile(URI.file('/etc/os-release'));
 		content = fileContent.value.toString();
-	} catch (error) {
+	} catch (_error) {
 		try {
 			const fileContent = await fileService.readFile(URI.file('/usr/lib/os-release'));
 			content = fileContent.value.toString();

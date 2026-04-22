@@ -2135,7 +2135,7 @@ export class SearchView extends ViewPane {
 		includePatternText?: string,
 		completed?: ISearchComplete,
 		shouldDoFinalRefresh = true,
-		keywords?: AISearchKeyword[]
+		_keywords?: AISearchKeyword[]
 	) {
 		this.state = SearchUIState.Idle;
 
@@ -2807,7 +2807,7 @@ export class SearchView extends ViewPane {
 					if (editorWidget) {
 						// Ensure that the editor widget is binded. If if is, then this should return immediately.
 						// Otherwise, it will bind the widget.
-						elemParent.bindNotebookEditorWidget(editorWidget);
+						elemParent.bindNotebookEditorWidget(editorWidget as any);
 						await elemParent.updateMatchesForEditorWidget();
 
 						const matchIndex = oldParentMatches.findIndex(e => e.id() === element.id());

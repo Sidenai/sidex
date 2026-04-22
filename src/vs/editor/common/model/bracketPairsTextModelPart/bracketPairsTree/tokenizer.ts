@@ -403,7 +403,7 @@ export class FastTokenizer implements Tokenizer {
 		return this.tokens[this.idx] || null;
 	}
 
-	skip(length: Length): void {
+	skip(_length: Length): void {
 		throw new NotSupportedError();
 	}
 

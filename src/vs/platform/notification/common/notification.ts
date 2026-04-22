@@ -446,9 +446,9 @@ export class NoOpNotification implements INotificationHandle {
 	readonly onDidClose = Event.None;
 	readonly onDidChangeVisibility = Event.None;
 
-	updateSeverity(severity: Severity): void {}
-	updateMessage(message: NotificationMessage): void {}
-	updateActions(actions?: INotificationActions): void {}
+	updateSeverity(_severity: Severity): void {}
+	updateMessage(_message: NotificationMessage): void {}
+	updateActions(_actions?: INotificationActions): void {}
 
 	close(): void {}
 }
@@ -456,8 +456,8 @@ export class NoOpNotification implements INotificationHandle {
 export class NoOpProgress implements INotificationProgress {
 	infinite(): void {}
 	done(): void {}
-	total(value: number): void {}
-	worked(value: number): void {}
+	total(_value: number): void {}
+	worked(_value: number): void {}
 }
 
 export function withSeverityPrefix(label: string, severity: Severity): string {

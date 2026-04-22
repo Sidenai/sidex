@@ -56,13 +56,13 @@ export class OvertypingCapturer implements IDisposable {
 		);
 
 		this._disposables.add(
-			suggestModel.onDidTrigger(e => {
+			suggestModel.onDidTrigger(_e => {
 				this._locked = true;
 			})
 		);
 
 		this._disposables.add(
-			suggestModel.onDidCancel(e => {
+			suggestModel.onDidCancel(_e => {
 				this._locked = false;
 			})
 		);

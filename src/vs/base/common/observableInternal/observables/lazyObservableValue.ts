@@ -141,8 +141,8 @@ export class LazyObservableValue<T, TChange = void>
 				{
 					beginUpdate: () => this._beginUpdate(),
 					endUpdate: () => this._endUpdate(),
-					handleChange: (observable, change) => {},
-					handlePossibleChange: observable => {}
+					handleChange: (_observable, _change) => {},
+					handlePossibleChange: _observable => {}
 				},
 				this
 			);

@@ -43,7 +43,7 @@ export class SectionHeaderDetector extends Disposable implements IEditorContribu
 		this.currentOccurrences = {};
 
 		this._register(
-			editor.onDidChangeModel(e => {
+			editor.onDidChangeModel(_e => {
 				this.currentOccurrences = {};
 				this.options = this.createOptions(editor.getOption(EditorOption.minimap));
 				this.stop();
@@ -52,7 +52,7 @@ export class SectionHeaderDetector extends Disposable implements IEditorContribu
 		);
 
 		this._register(
-			editor.onDidChangeModelLanguage(e => {
+			editor.onDidChangeModelLanguage(_e => {
 				this.currentOccurrences = {};
 				this.options = this.createOptions(editor.getOption(EditorOption.minimap));
 				this.stop();
@@ -92,13 +92,13 @@ export class SectionHeaderDetector extends Disposable implements IEditorContribu
 		);
 
 		this._register(
-			this.editor.onDidChangeModelContent(e => {
+			this.editor.onDidChangeModelContent(_e => {
 				this.computeSectionHeaders.schedule();
 			})
 		);
 
 		this._register(
-			editor.onDidChangeModelTokens(e => {
+			editor.onDidChangeModelTokens(_e => {
 				if (!this.computeSectionHeaders.isScheduled()) {
 					this.computeSectionHeaders.schedule(1000);
 				}

@@ -123,12 +123,16 @@ export class CompositeDragAndDrop implements ICompositeDragAndDrop {
 	onDragEnter(
 		data: CompositeDragAndDropData,
 		targetCompositeId: string | undefined,
-		originalEvent: DragEvent
+		_originalEvent: DragEvent
 	): boolean {
 		return this.canDrop(data, targetCompositeId);
 	}
 
-	onDragOver(data: CompositeDragAndDropData, targetCompositeId: string | undefined, originalEvent: DragEvent): boolean {
+	onDragOver(
+		data: CompositeDragAndDropData,
+		targetCompositeId: string | undefined,
+		_originalEvent: DragEvent
+	): boolean {
 		return this.canDrop(data, targetCompositeId);
 	}
 
@@ -223,11 +227,11 @@ class CompositeBarDndCallbacks implements ICompositeDragAndDropObserverCallbacks
 		this.insertDropBefore = this.updateFromDragging(this.compositeBarContainer, validDropTarget, insertAtFront, true);
 	}
 
-	onDragLeave(e: IDraggedCompositeData) {
+	onDragLeave(_e: IDraggedCompositeData) {
 		this.insertDropBefore = this.updateFromDragging(this.compositeBarContainer, false, false, false);
 	}
 
-	onDragEnd(e: IDraggedCompositeData) {
+	onDragEnd(_e: IDraggedCompositeData) {
 		this.insertDropBefore = this.updateFromDragging(this.compositeBarContainer, false, false, false);
 	}
 
@@ -464,7 +468,7 @@ export class CompositeBar extends Widget implements ICompositeBar {
 		}
 	}
 
-	deactivateComposite(id: string): void {
+	deactivateComposite(_id: string): void {
 		const previousActiveItem = this.model.activeItem;
 		if (this.model.deactivate()) {
 			if (previousActiveItem && !previousActiveItem.pinned) {

@@ -73,7 +73,7 @@ export class BrowserUserDataProfilesService extends UserDataProfilesService impl
 						updated,
 						all: this.profiles
 					});
-				} catch (error) {
+				} catch (_error) {
 					/* ignore */
 				}
 			})

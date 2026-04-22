@@ -289,7 +289,7 @@ export class SettingsTargetsWidget extends Widget {
 				focusOnlyEnabledItems: true,
 				ariaLabel: localize('settingsSwitcherBarAriaLabel', 'Settings Switcher'),
 				ariaRole: 'tablist',
-				actionViewItemProvider: (action: IAction, options: IActionViewItemOptions) =>
+				actionViewItemProvider: (action: IAction, _options: IActionViewItemOptions) =>
 					action.id === 'folderSettings' ? this.folderSettings : undefined
 			})
 		);

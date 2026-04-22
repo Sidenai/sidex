@@ -30,7 +30,7 @@ import {
 } from '../../../../base/browser/dom.js';
 import { CLOSE_EDITOR_COMMAND_ID, UNLOCK_GROUP_COMMAND_ID } from './editorCommands.js';
 import { Color } from '../../../../base/common/color.js';
-import { assertReturnsDefined, assertReturnsAllDefined } from '../../../../base/common/types.js';
+import { assertReturnsAllDefined } from '../../../../base/common/types.js';
 import { equals } from '../../../../base/common/objects.js';
 import { toDisposable } from '../../../../base/common/lifecycle.js';
 import { defaultBreadcrumbsWidgetStyles } from '../../../../platform/theme/browser/defaultStyles.js';
@@ -183,11 +183,11 @@ export class SingleEditorTabsControl extends EditorTabsControl {
 		setTimeout(() => this.quickInputService.quickAccess.show(), 50);
 	}
 
-	openEditor(editor: EditorInput): boolean {
+	openEditor(_editor: EditorInput): boolean {
 		return this.doHandleOpenEditor();
 	}
 
-	openEditors(editors: EditorInput[]): boolean {
+	openEditors(_editors: EditorInput[]): boolean {
 		return this.doHandleOpenEditor();
 	}
 
@@ -200,19 +200,19 @@ export class SingleEditorTabsControl extends EditorTabsControl {
 		return activeEditorChanged;
 	}
 
-	beforeCloseEditor(editor: EditorInput): void {
+	beforeCloseEditor(_editor: EditorInput): void {
 		// Nothing to do before closing an editor
 	}
 
-	closeEditor(editor: EditorInput): void {
+	closeEditor(_editor: EditorInput): void {
 		this.ifActiveEditorChanged(() => this.redraw());
 	}
 
-	closeEditors(editors: EditorInput[]): void {
+	closeEditors(_editors: EditorInput[]): void {
 		this.ifActiveEditorChanged(() => this.redraw());
 	}
 
-	moveEditor(editor: EditorInput, fromIndex: number, targetIndex: number): void {
+	moveEditor(_editor: EditorInput, _fromIndex: number, _targetIndex: number): void {
 		this.ifActiveEditorChanged(() => this.redraw());
 	}
 
@@ -220,11 +220,11 @@ export class SingleEditorTabsControl extends EditorTabsControl {
 		this.ifEditorIsActive(editor, () => this.redraw());
 	}
 
-	stickEditor(editor: EditorInput): void {}
+	stickEditor(_editor: EditorInput): void {}
 
-	unstickEditor(editor: EditorInput): void {}
+	unstickEditor(_editor: EditorInput): void {}
 
-	setActive(isActive: boolean): void {
+	setActive(_isActive: boolean): void {
 		if (!this.titleContainer) {
 			return;
 		}

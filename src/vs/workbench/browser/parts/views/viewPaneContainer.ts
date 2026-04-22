@@ -203,10 +203,10 @@ class ViewPaneDropOverlay extends Themable {
 					}
 				},
 
-				onDragLeave: e => this.dispose(),
-				onDragEnd: e => this.dispose(),
+				onDragLeave: _e => this.dispose(),
+				onDragEnd: _e => this.dispose(),
 
-				onDrop: e => {
+				onDrop: _e => {
 					// Dispose overlay
 					this.dispose();
 				}
@@ -550,7 +550,7 @@ export class ViewPaneContainer<MementoType extends object = object>
 							toggleDropEffect(e.eventData.dataTransfer, 'move', overlay !== undefined);
 						}
 					},
-					onDragLeave: e => {
+					onDragLeave: _e => {
 						overlay?.dispose();
 						overlay = undefined;
 					},
@@ -1049,7 +1049,7 @@ export class ViewPaneContainer<MementoType extends object = object>
 					onDragOver: e => {
 						toggleDropEffect(e.eventData.dataTransfer, 'move', overlay !== undefined);
 					},
-					onDragLeave: e => {
+					onDragLeave: _e => {
 						overlay?.dispose();
 						overlay = undefined;
 					},
@@ -1318,10 +1318,9 @@ export class ViewPaneContainer<MementoType extends object = object>
 }
 
 export abstract class ViewPaneContainerAction<T extends IViewPaneContainer> extends Action2 {
-	override readonly desc: Readonly<IAction2Options> & { viewPaneContainerId: string };
+	declare readonly desc: Readonly<IAction2Options> & { viewPaneContainerId: string };
 	constructor(desc: Readonly<IAction2Options> & { viewPaneContainerId: string }) {
 		super(desc);
-		this.desc = desc;
 	}
 
 	run(accessor: ServicesAccessor, ...args: unknown[]): unknown {

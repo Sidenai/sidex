@@ -877,7 +877,7 @@ registerAction2(
 				f1: true
 			});
 		}
-		run(accessor: ServicesAccessor, ...args: unknown[]): void {
+		run(accessor: ServicesAccessor, ..._args: unknown[]): void {
 			focusAndSelectHandler(accessor, true);
 		}
 	}
@@ -898,7 +898,7 @@ registerAction2(
 				f1: true
 			});
 		}
-		run(accessor: ServicesAccessor, ...args: unknown[]): void {
+		run(accessor: ServicesAccessor, ..._args: unknown[]): void {
 			focusAndSelectHandler(accessor, false);
 		}
 	}

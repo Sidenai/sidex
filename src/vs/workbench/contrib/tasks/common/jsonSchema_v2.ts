@@ -807,7 +807,7 @@ export function updateProblemMatchers() {
 		const matcherIds = ProblemMatcherRegistry.keys().map(key => '$' + key);
 		definitions.problemMatcherType2.oneOf![0].enum = matcherIds;
 		(definitions.problemMatcherType2.oneOf![2].items as IJSONSchema).anyOf![0].enum = matcherIds;
-	} catch (err) {
+	} catch (_err) {
 		console.log('Installing problem matcher ids failed');
 	}
 }

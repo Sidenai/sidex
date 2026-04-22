@@ -126,7 +126,7 @@ export class ViewCursor {
 		}
 	}
 
-	public onConfigurationChanged(e: viewEvents.ViewConfigurationChangedEvent): boolean {
+	public onConfigurationChanged(_e: viewEvents.ViewConfigurationChangedEvent): boolean {
 		const options = this._context.configuration.options;
 		const fontInfo = options.get(EditorOption.fontInfo);
 
@@ -263,7 +263,7 @@ export class ViewCursor {
 		this._renderData = this._prepareRender(ctx);
 	}
 
-	public render(ctx: RestrictedRenderingContext): IViewCursorRenderData | null {
+	public render(_ctx: RestrictedRenderingContext): IViewCursorRenderData | null {
 		if (!this._renderData) {
 			this._domNode.setDisplay('none');
 			return null;

@@ -116,7 +116,7 @@ export class AuthenticationUsageService extends Disposable implements IAuthentic
 		if (storedUsages) {
 			try {
 				usages = JSON.parse(storedUsages);
-			} catch (e) {
+			} catch (_e) {
 				// ignore
 			}
 		}

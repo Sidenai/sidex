@@ -287,10 +287,10 @@ export class TextMateTokenizationFeature extends Disposable implements ITextMate
 						progress.report({
 							message: nls.localize('progress2', 'Now logging TM Grammar parsing. Press Stop when finished.')
 						});
-						return new Promise<void>((resolve, reject) => {});
+						return new Promise<void>((_resolve, _reject) => {});
 					});
 				},
-				choice => {
+				_choice => {
 					this._getVSCodeOniguruma().then(vscodeOniguruma => {
 						this._debugModePrintFunc = () => {};
 						this._debugMode = false;

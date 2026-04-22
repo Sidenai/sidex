@@ -20,14 +20,14 @@ export interface IDebugNameData {
 	 * A function that points to the defining function of the object.
 	 * Used for debugging only.
 	 */
-	readonly debugReferenceFn?: Function | undefined;
+	readonly debugReferenceFn?: ((...args: any[]) => any) | undefined;
 }
 
 export class DebugNameData {
 	constructor(
 		public readonly owner: DebugOwner | undefined,
 		public readonly debugNameSource: DebugNameSource | undefined,
-		public readonly referenceFn: Function | undefined
+		public readonly referenceFn: ((...args: any[]) => any) | undefined
 	) {}
 
 	public getDebugName(target: object): string | undefined {
@@ -138,7 +138,7 @@ export function getClassName(obj: object): string | undefined {
 	return undefined;
 }
 
-export function getFunctionName(fn: Function): string | undefined {
+export function getFunctionName(fn: (...args: any[]) => any): string | undefined {
 	const fnSrc = fn.toString();
 	// Pattern: /** @description ... */
 	const regexp = /\/\*\*\s*@description\s*([^*]*)\*\//;

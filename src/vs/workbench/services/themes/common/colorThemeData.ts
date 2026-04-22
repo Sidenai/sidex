@@ -579,7 +579,7 @@ export class ColorThemeData implements IWorkbenchColorTheme {
 					if (rule) {
 						this.customSemanticTokenRules.push(rule);
 					}
-				} catch (e) {
+				} catch (_e) {
 					// invalid selector, ignore
 				}
 			}
@@ -745,7 +745,6 @@ export class ColorThemeData implements IWorkbenchColorTheme {
 					case 'settingsId':
 					case 'watch':
 					case 'themeSemanticHighlighting':
-						// eslint-disable-next-line local/code-no-any-casts
 						(theme as any)[key] = data[key];
 						break;
 					case 'semanticTokenRules': {
@@ -772,7 +771,7 @@ export class ColorThemeData implements IWorkbenchColorTheme {
 				return undefined;
 			}
 			return theme;
-		} catch (e) {
+		} catch (_e) {
 			return undefined;
 		}
 	}
@@ -912,7 +911,7 @@ async function _loadColorTheme(
 					if (rule) {
 						result.semanticTokenRules.push(rule);
 					}
-				} catch (e) {
+				} catch (_e) {
 					return Promise.reject(
 						new Error(
 							nls.localize(

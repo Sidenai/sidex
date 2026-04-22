@@ -35,7 +35,7 @@ export class DeleteWordPartLeft extends DeleteWordCommand {
 		});
 	}
 
-	protected _delete(ctx: DeleteWordContext, wordNavigationType: WordNavigationType): Range {
+	protected _delete(ctx: DeleteWordContext, _wordNavigationType: WordNavigationType): Range {
 		const r = WordPartOperations.deleteWordPartLeft(ctx);
 		if (r) {
 			return r;
@@ -60,7 +60,7 @@ export class DeleteWordPartRight extends DeleteWordCommand {
 		});
 	}
 
-	protected _delete(ctx: DeleteWordContext, wordNavigationType: WordNavigationType): Range {
+	protected _delete(ctx: DeleteWordContext, _wordNavigationType: WordNavigationType): Range {
 		const r = WordPartOperations.deleteWordPartRight(ctx);
 		if (r) {
 			return r;
@@ -125,8 +125,8 @@ export class WordPartRightCommand extends MoveWordCommand {
 		wordSeparators: WordCharacterClassifier,
 		model: ITextModel,
 		position: Position,
-		wordNavigationType: WordNavigationType,
-		hasMulticursor: boolean
+		_wordNavigationType: WordNavigationType,
+		_hasMulticursor: boolean
 	): Position {
 		return WordPartOperations.moveWordPartRight(wordSeparators, model, position);
 	}

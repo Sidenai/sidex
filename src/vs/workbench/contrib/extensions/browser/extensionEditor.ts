@@ -90,7 +90,7 @@ import { IExtensionGalleryManifestService } from '../../../../platform/extension
 import { ShowCurrentReleaseNotesActionId } from '../../update/common/update.js';
 import { ThemeIcon } from '../../../../base/common/themables.js';
 import { Codicon } from '../../../../base/common/codicons.js';
-import { fromNow } from '../../../../base/common/date.js';
+import { fromNow as _fromNow } from '../../../../base/common/date.js';
 
 class NavBar extends Disposable {
 
@@ -772,7 +772,7 @@ export class ExtensionEditor extends EditorPane {
 			}));
 
 			return webview;
-		} catch (e) {
+		} catch (_e) {
 			const p = append(container, $('p.nocontent'));
 			p.textContent = noContentCopy;
 			return p;
@@ -1129,17 +1129,17 @@ class AdditionalDetailsWidget extends Disposable {
 		if (extension.repository) {
 			try {
 				resources.push([localize('repository', "Repository"), ThemeIcon.fromId(Codicon.repo.id), URI.parse(extension.repository)]);
-			} catch (error) {/* Ignore */ }
+			} catch (_error) {/* Ignore */ }
 		}
 		if (extension.supportUrl) {
 			try {
 				resources.push([localize('issues', "Issues"), ThemeIcon.fromId(Codicon.issues.id), URI.parse(extension.supportUrl)]);
-			} catch (error) {/* Ignore */ }
+			} catch (_error) {/* Ignore */ }
 		}
 		if (extension.licenseUrl) {
 			try {
 				resources.push([localize('license', "License"), ThemeIcon.fromId(Codicon.linkExternal.id), URI.parse(extension.licenseUrl)]);
-			} catch (error) {/* Ignore */ }
+			} catch (_error) {/* Ignore */ }
 		}
 		if (extension.publisherUrl) {
 			resources.push([extension.publisherDisplayName, ThemeIcon.fromId(Codicon.linkExternal.id), extension.publisherUrl]);
@@ -1151,7 +1151,7 @@ class AdditionalDetailsWidget extends Disposable {
 			const extensionResourcesContainer = append(container, $('.resources-container.additional-details-element'));
 			append(extensionResourcesContainer, $('.additional-details-title', undefined, localize('resources', "Resources")));
 			const resourcesElement = append(extensionResourcesContainer, $('.resources'));
-			for (const [label, icon, uri] of resources) {
+			for (const [label, _icon, uri] of resources) {
 				const resourceElement = append(resourcesElement, $('.resource'));
 				const anchor = append(resourceElement, $('a', { tabindex: '0' }, label));
 				anchor.setAttribute('title', uri.toString());

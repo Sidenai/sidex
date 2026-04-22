@@ -219,7 +219,7 @@ export class TestItemImpl implements vscode.TestItem {
 				}
 			},
 			children: {
-				value: createTestItemChildren(api, getPrivateApiFor, TestItemImpl),
+				value: createTestItemChildren(api, getPrivateApiFor, TestItemImpl as any),
 				enumerable: true,
 				writable: false
 			},
@@ -242,7 +242,7 @@ export class ExtHostTestItemCollection extends TestItemCollection<TestItemImpl> 
 			controllerId,
 			getDocumentVersion: uri => uri && editors.getDocument(uri)?.version,
 			getApiFor: getPrivateApiFor as (impl: TestItemImpl) => ITestItemApi<TestItemImpl>,
-			getChildren: item => item.children as ITestChildrenLike<TestItemImpl>,
+			getChildren: item => item.children as unknown as ITestChildrenLike<TestItemImpl>,
 			root: new TestItemRootImpl(controllerId, controllerLabel),
 			toITestItem: Convert.TestItem.from
 		});

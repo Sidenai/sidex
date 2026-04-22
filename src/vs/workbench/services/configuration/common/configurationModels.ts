@@ -106,7 +106,7 @@ export class StandaloneConfigurationModelParser extends ConfigurationModelParser
 
 	protected override doParseRaw(
 		raw: IStringDictionary<unknown>,
-		configurationParseOptions?: ConfigurationParseOptions
+		_configurationParseOptions?: ConfigurationParseOptions
 	): IConfigurationModel {
 		const contents = toValuesTree(raw, message => console.error(`Conflict in settings file ${this._name}: ${message}`));
 		const scopedContents = Object.create(null);

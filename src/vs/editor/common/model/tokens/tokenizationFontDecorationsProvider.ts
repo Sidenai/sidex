@@ -130,7 +130,7 @@ export class TokenizationFontDecorationProvider extends Disposable implements De
 		ownerId?: number,
 		filterOutValidation?: boolean,
 		filterFontDecorations?: boolean,
-		onlyMinimapDecorations?: boolean
+		_onlyMinimapDecorations?: boolean
 	): IModelDecoration[] {
 		const startOffsetOfRange = this.textModel.getOffsetAt(range.getStartPosition());
 		const endOffsetOfRange = this.textModel.getOffsetAt(range.getEndPosition());

@@ -278,7 +278,7 @@ export class InMemoryFileSystemProvider
 		this._fireSoon({ type: FileChangeType.DELETED, resource: from }, { type: FileChangeType.ADDED, resource: to });
 	}
 
-	async delete(resource: URI, opts: IFileDeleteOptions): Promise<void> {
+	async delete(resource: URI, _opts: IFileDeleteOptions): Promise<void> {
 		const dirname = resources.dirname(resource);
 		const basename = resources.basename(resource);
 		const parent = this._lookupAsDirectory(dirname, false);
@@ -361,7 +361,7 @@ export class InMemoryFileSystemProvider
 	private _bufferedChanges: IFileChange[] = [];
 	private _fireSoonHandle?: Timeout;
 
-	watch(resource: URI, opts: IWatchOptions): IDisposable {
+	watch(_resource: URI, _opts: IWatchOptions): IDisposable {
 		// ignore, fires for all changes...
 		return Disposable.None;
 	}

@@ -989,7 +989,6 @@ export function getDomNodeZoomLevel(domNode: HTMLElement): number {
 	let testElement: HTMLElement | null = domNode;
 	let zoom = 1.0;
 	do {
-		// eslint-disable-next-line local/code-no-any-casts
 		const elementZoomLevel = (getComputedStyle(testElement) as any).zoom;
 		if (elementZoomLevel !== null && elementZoomLevel !== undefined && elementZoomLevel !== '1') {
 			zoom *= elementZoomLevel;
@@ -1614,7 +1613,6 @@ function _$<T extends Element>(
 			}
 
 			if (/^on\w+$/.test(name)) {
-				// eslint-disable-next-line local/code-no-any-casts
 				(<any>result)[name] = value;
 			} else if (name === 'selected') {
 				if (value) {
@@ -1811,7 +1809,6 @@ export function windowOpenWithSuccess(url: string, noOpener = true): boolean {
 	if (newTab) {
 		if (noOpener) {
 			// see `windowOpenNoOpener` for details on why this is important
-			// eslint-disable-next-line local/code-no-any-casts
 			(newTab as any).opener = null;
 		}
 		newTab.location.href = url;
@@ -1839,7 +1836,7 @@ export function triggerDownload(dataOrUri: Uint8Array | URI, name: string): void
 	if (URI.isUri(dataOrUri)) {
 		url = dataOrUri.toString(true);
 	} else {
-		const blob = new Blob([dataOrUri as Uint8Array<ArrayBuffer>]);
+		const blob = new Blob([dataOrUri as Uint8Array]);
 		url = URL.createObjectURL(blob);
 
 		// Ensure to free the data from DOM eventually
@@ -1913,7 +1910,6 @@ export interface IDetectedFullscreen {
 
 export function detectFullscreen(targetWindow: Window): IDetectedFullscreen | null {
 	// Browser fullscreen: use DOM APIs to detect
-	// eslint-disable-next-line local/code-no-any-casts
 	if (
 		targetWindow.document.fullscreenElement ||
 		(<any>targetWindow.document).webkitFullscreenElement ||
@@ -2280,7 +2276,11 @@ export class DisposableResizeObserver extends Disposable {
 }
 
 type HTMLElementAttributeKeys<T> = Partial<{
-	[K in keyof T]: T[K] extends Function ? never : T[K] extends object ? HTMLElementAttributeKeys<T[K]> : T[K];
+	[K in keyof T]: T[K] extends (...args: any[]) => any
+		? never
+		: T[K] extends object
+			? HTMLElementAttributeKeys<T[K]>
+			: T[K];
 }>;
 type ElementAttributes<T> = HTMLElementAttributeKeys<T> & Record<string, any>;
 type RemoveHTMLElement<T> = T extends HTMLElement ? never : T;
@@ -2362,7 +2362,6 @@ export function h(
 		attributes = {};
 		children = args[0];
 	} else {
-		// eslint-disable-next-line local/code-no-any-casts
 		attributes = (args[0] as any) || {};
 		children = args[1];
 	}
@@ -2475,7 +2474,6 @@ export function svgElem(
 		attributes = {};
 		children = args[0];
 	} else {
-		// eslint-disable-next-line local/code-no-any-casts
 		attributes = (args[0] as any) || {};
 		children = args[1];
 	}
@@ -2487,7 +2485,6 @@ export function svgElem(
 	}
 
 	const tagName = match.groups['tag'] || 'div';
-	// eslint-disable-next-line local/code-no-any-casts
 	const el = document.createElementNS('http://www.w3.org/2000/svg', tagName) as any as HTMLElement;
 
 	if (match.groups['id']) {
@@ -2655,7 +2652,6 @@ export namespace n {
 			const obsRef = attributes.obsRef;
 			delete attributes.obsRef;
 
-			// eslint-disable-next-line local/code-no-any-casts
 			return new ObserverNodeWithElement(tag as any, ref, obsRef, elementNs, className, attributes, children);
 		};
 	}
@@ -2664,7 +2660,6 @@ export namespace n {
 		tag: TKey,
 		elementNs: string | undefined = undefined
 	): DomCreateFn<TMap[TKey], TMap[TKey]> {
-		// eslint-disable-next-line local/code-no-any-casts
 		const f = nodeNs(elementNs) as any;
 		return (attributes, children) => {
 			return f(tag, attributes, children);
@@ -2697,7 +2692,6 @@ export namespace n {
 				return value;
 			}
 		});
-		// eslint-disable-next-line local/code-no-any-casts
 		return result as any;
 	}
 }
@@ -2824,7 +2818,6 @@ export abstract class ObserverNode<T extends HTMLOrSVGElement = HTMLOrSVGElement
 					this._deriveds.push(
 						derived(this, reader => {
 							/** @description set.tabIndex */
-							// eslint-disable-next-line local/code-no-any-casts
 							this._element.tabIndex = value.read(reader) as any;
 						})
 					);
@@ -2832,7 +2825,6 @@ export abstract class ObserverNode<T extends HTMLOrSVGElement = HTMLOrSVGElement
 					this._element.tabIndex = value;
 				}
 			} else if (key.startsWith('on')) {
-				// eslint-disable-next-line local/code-no-any-casts
 				(this._element as any)[key] = value;
 			} else {
 				if (isObservable(value)) {
@@ -2959,7 +2951,6 @@ function resolve<T>(value: ValueOrList<T>, reader: IReader | undefined, cb: (val
 		}
 		return;
 	}
-	// eslint-disable-next-line local/code-no-any-casts
 	cb(value as any);
 }
 function getClassName(
@@ -3028,8 +3019,10 @@ function setOrRemoveAttribute(element: HTMLOrSVGElement, key: string, value: unk
 }
 
 type ElementAttributeKeys<T> = Partial<{
-	[K in keyof T]: T[K] extends Function
-		? never
+	[K in keyof T]: T[K] extends ((...args: any[]) => any) | null
+		? K extends `on${string}`
+			? T[K]
+			: never
 		: T[K] extends object
 			? ElementAttributeKeys<T[K]>
 			: Value<number | T[K] | undefined | null>;

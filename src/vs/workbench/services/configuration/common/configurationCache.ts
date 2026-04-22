@@ -73,7 +73,7 @@ class CachedConfiguration {
 		try {
 			const content = await this.fileService.readFile(this.cachedConfigurationFileResource);
 			return content.value.toString();
-		} catch (e) {
+		} catch (_e) {
 			return '';
 		}
 	}
@@ -106,7 +106,7 @@ class CachedConfiguration {
 		try {
 			await this.fileService.createFolder(this.cachedConfigurationFolderResource);
 			return true;
-		} catch (error) {
+		} catch (_error) {
 			return false;
 		}
 	}

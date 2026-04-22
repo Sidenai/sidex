@@ -201,7 +201,7 @@ export function toLinkSuffix(match: RegExpExecArray | null): ILinkSuffix | null 
 
 function parseIntOptional(value: string | undefined): number | undefined {
 	if (value === undefined) {
-		return value;
+		return undefined;
 	}
 	return parseInt(value);
 }

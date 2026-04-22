@@ -203,7 +203,7 @@ export class ViewModelLinesFromProjectedModel implements IViewModelLines {
 		}
 
 		// Original slow path for word wrap or hidden areas
-		const linesContent = this.model.getLinesContent();
+		const _linesContent = this.model.getLinesContent();
 		const lineBreaksComputer = this.createLineBreaksComputer();
 
 		for (let i = 0; i < lineCount; i++) {
@@ -1454,7 +1454,7 @@ export class ViewModelLinesFromModelAsIs implements IViewModelLines {
 	public createLineBreaksComputer(): ILineBreaksComputer {
 		const result: null[] = [];
 		return {
-			addRequest: (lineNumber: number, previousLineBreakData: ModelLineProjectionData | null) => {
+			addRequest: (_lineNumber: number, _previousLineBreakData: ModelLineProjectionData | null) => {
 				result.push(null);
 			},
 			finalize: () => {
@@ -1477,7 +1477,7 @@ export class ViewModelLinesFromModelAsIs implements IViewModelLines {
 		_versionId: number | null,
 		fromLineNumber: number,
 		toLineNumber: number,
-		lineBreaks: (ModelLineProjectionData | null)[]
+		_lineBreaks: (ModelLineProjectionData | null)[]
 	): viewEvents.ViewLinesInsertedEvent | null {
 		return new viewEvents.ViewLinesInsertedEvent(fromLineNumber, toLineNumber);
 	}
@@ -1485,7 +1485,7 @@ export class ViewModelLinesFromModelAsIs implements IViewModelLines {
 	public onModelLineChanged(
 		_versionId: number | null,
 		lineNumber: number,
-		lineBreakData: ModelLineProjectionData | null
+		_lineBreakData: ModelLineProjectionData | null
 	): [
 		boolean,
 		viewEvents.ViewLinesChangedEvent | null,
@@ -1516,7 +1516,7 @@ export class ViewModelLinesFromModelAsIs implements IViewModelLines {
 	public getViewLinesBracketGuides(
 		startLineNumber: number,
 		endLineNumber: number,
-		activePosition: IPosition | null
+		_activePosition: IPosition | null
 	): IndentGuide[][] {
 		return new Array(endLineNumber - startLineNumber + 1).fill([]);
 	}
@@ -1596,7 +1596,7 @@ export class ViewModelLinesFromModelAsIs implements IViewModelLines {
 		return this.model.getLineIndentColumn(lineNumber);
 	}
 
-	public getInjectedTextAt(position: Position): InjectedText | null {
+	public getInjectedTextAt(_position: Position): InjectedText | null {
 		// Identity lines collection does not support injected text.
 		return null;
 	}

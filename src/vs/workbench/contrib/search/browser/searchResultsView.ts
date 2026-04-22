@@ -90,7 +90,7 @@ interface IMatchTemplate {
 export class SearchDelegate implements IListVirtualDelegate<RenderableMatch> {
 	public static ITEM_HEIGHT = 22;
 
-	getHeight(element: RenderableMatch): number {
+	getHeight(_element: RenderableMatch): number {
 		return SearchDelegate.ITEM_HEIGHT;
 	}
 
@@ -198,9 +198,9 @@ export class TextSearchResultRenderer
 	}
 
 	renderCompressedElements(
-		node: ITreeNode<ICompressedTreeNode<ITextSearchHeading>, any>,
-		index: number,
-		templateData: ITextSearchResultTemplate
+		_node: ITreeNode<ICompressedTreeNode<ITextSearchHeading>, any>,
+		_index: number,
+		_templateData: ITextSearchResultTemplate
 	): void {}
 }
 export class FolderMatchRenderer
@@ -375,9 +375,9 @@ export class FileMatchRenderer
 	}
 
 	renderCompressedElements(
-		node: ITreeNode<ICompressedTreeNode<ISearchTreeFileMatch>, any>,
-		index: number,
-		templateData: IFileMatchTemplate
+		_node: ITreeNode<ICompressedTreeNode<ISearchTreeFileMatch>, any>,
+		_index: number,
+		_templateData: IFileMatchTemplate
 	): void {
 		throw new Error('Should never happen since node is incompressible.');
 	}
@@ -492,9 +492,9 @@ export class MatchRenderer
 		super();
 	}
 	renderCompressedElements(
-		node: ITreeNode<ICompressedTreeNode<ISearchTreeMatch>, void>,
-		index: number,
-		templateData: IMatchTemplate
+		_node: ITreeNode<ICompressedTreeNode<ISearchTreeMatch>, void>,
+		_index: number,
+		_templateData: IMatchTemplate
 	): void {
 		throw new Error('Should never happen since node is incompressible.');
 	}

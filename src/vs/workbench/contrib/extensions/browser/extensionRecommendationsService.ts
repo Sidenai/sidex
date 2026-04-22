@@ -94,7 +94,7 @@ export class ExtensionRecommendationsService extends Disposable implements IExte
 				this.remoteExtensionsScannerService.whenExtensionsReady(),
 				this.userDataInitializationService.whenInitializationFinished(),
 				this.lifecycleService.when(LifecyclePhase.Restored)]);
-		} catch (error) { /* ignore */ }
+		} catch (_error) { /* ignore */ }
 
 		// activate all recommendations
 		await Promise.all([

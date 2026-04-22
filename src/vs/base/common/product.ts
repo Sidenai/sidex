@@ -207,6 +207,10 @@ export interface IProductConfiguration {
 	readonly remoteDefaultExtensionsIfInstalledLocally?: string[];
 
 	readonly extensionConfigurationPolicy?: IStringDictionary<IPolicy>;
+
+	readonly aiGeneratedWorkspaceTrust?: {
+		readonly endpoint: string;
+	};
 }
 
 export interface ITunnelApplicationConfig {

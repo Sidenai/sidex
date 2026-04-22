@@ -153,7 +153,7 @@ export class BracketMatchingController extends Disposable implements IEditorCont
 
 		this._updateBracketsSoon.schedule();
 		this._register(
-			editor.onDidChangeCursorPosition(e => {
+			editor.onDidChangeCursorPosition(_e => {
 				if (this._matchBrackets === 'never') {
 					// Early exit if nothing needs to be done!
 					// Leave some form of early exit check here if you wish to continue being a cursor position change listener ;)
@@ -164,18 +164,18 @@ export class BracketMatchingController extends Disposable implements IEditorCont
 			})
 		);
 		this._register(
-			editor.onDidChangeModelContent(e => {
+			editor.onDidChangeModelContent(_e => {
 				this._updateBracketsSoon.schedule();
 			})
 		);
 		this._register(
-			editor.onDidChangeModel(e => {
+			editor.onDidChangeModel(_e => {
 				this._lastBracketsData = [];
 				this._updateBracketsSoon.schedule();
 			})
 		);
 		this._register(
-			editor.onDidChangeModelLanguageConfiguration(e => {
+			editor.onDidChangeModelLanguageConfiguration(_e => {
 				this._lastBracketsData = [];
 				this._updateBracketsSoon.schedule();
 			})

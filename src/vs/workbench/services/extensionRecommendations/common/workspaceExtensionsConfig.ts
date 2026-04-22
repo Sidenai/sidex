@@ -67,7 +67,9 @@ export class WorkspaceExtensionsConfigService extends Disposable implements IWor
 		@IJSONEditingService private readonly jsonEditingService: IJSONEditingService
 	) {
 		super();
-		this._register(workspaceContextService.onDidChangeWorkspaceFolders(e => this._onDidChangeExtensionsConfigs.fire()));
+		this._register(
+			workspaceContextService.onDidChangeWorkspaceFolders(_e => this._onDidChangeExtensionsConfigs.fire())
+		);
 		this._register(
 			fileService.onDidFilesChange(e => {
 				const workspace = workspaceContextService.getWorkspace();
@@ -420,7 +422,7 @@ export class WorkspaceExtensionsConfigService extends Disposable implements IWor
 				parse(content.value.toString())['extensions']
 			);
 			return extensionsConfigContent ? this.parseExtensionConfig(extensionsConfigContent) : undefined;
-		} catch (e) {
+		} catch (_e) {
 			/* Ignore */
 		}
 		return undefined;
@@ -433,7 +435,7 @@ export class WorkspaceExtensionsConfigService extends Disposable implements IWor
 			const content = await this.fileService.readFile(workspaceFolder.toResource(EXTENSIONS_CONFIG));
 			const extensionsConfigContent = <IExtensionsConfigContent>parse(content.value.toString());
 			return this.parseExtensionConfig(extensionsConfigContent);
-		} catch (e) {
+		} catch (_e) {
 			/* ignore */
 		}
 		return {};

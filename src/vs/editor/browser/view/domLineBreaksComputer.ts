@@ -36,11 +36,11 @@ export class DOMLineBreaksComputerFactory implements ILineBreaksComputerFactory 
 		wrappingColumn: number,
 		wrappingIndent: WrappingIndent,
 		wordBreak: 'normal' | 'keepAll',
-		wrapOnEscapedLineFeeds: boolean
+		_wrapOnEscapedLineFeeds: boolean
 	): ILineBreaksComputer {
 		const lineNumbers: number[] = [];
 		return {
-			addRequest: (lineNumber: number, previousLineBreakData: ModelLineProjectionData | null) => {
+			addRequest: (lineNumber: number, _previousLineBreakData: ModelLineProjectionData | null) => {
 				lineNumbers.push(lineNumber);
 			},
 			finalize: () => {

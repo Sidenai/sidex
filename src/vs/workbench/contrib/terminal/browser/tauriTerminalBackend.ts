@@ -20,7 +20,6 @@ import {
 	ITerminalProfile,
 	ITerminalBackendRegistry,
 	TerminalExtensions,
-	IProcessDetails,
 	IPtyHostLatencyMeasurement,
 	ITerminalsLayoutInfo,
 	ITerminalsLayoutInfoById,
@@ -31,6 +30,7 @@ import {
 	IProcessPropertyMap,
 	ITerminalLaunchResult
 } from '../../../../platform/terminal/common/terminal.js';
+import type { IProcessDetails } from '../../../../platform/terminal/common/terminalProcess.js';
 import type { IProcessEnvironment } from '../../../../base/common/platform.js';
 import { IWorkbenchContribution } from '../../../common/contributions.js';
 import { ITerminalInstanceService, ITerminalService } from './terminal.js';
@@ -191,7 +191,7 @@ class TauriPty extends Disposable implements ITerminalChildProcess {
 		}
 	}
 
-	shutdown(immediate: boolean): void {
+	shutdown(_immediate: boolean): void {
 		try {
 			if (this._backendId !== undefined && _invoke) {
 				_invoke('terminal_kill', { terminalId: this._backendId }).catch(() => {});
@@ -481,7 +481,7 @@ class TauriTerminalBackend extends Disposable implements ITerminalBackend {
 	async getTerminalLayoutInfo(): Promise<ITerminalsLayoutInfo | undefined> {
 		return undefined;
 	}
-	async getPerformanceMarks(): Promise<performance.PerformanceMark[]> {
+	async getPerformanceMarks(): Promise<any[]> {
 		return [];
 	}
 	async reduceConnectionGraceTime(): Promise<void> {}

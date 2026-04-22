@@ -56,7 +56,7 @@ export class DropdownMenuActionViewItem extends BaseActionViewItem {
 		return this._onDidChangeVisibility.event;
 	}
 
-	protected override readonly options: IDropdownMenuActionViewItemOptions;
+	declare protected readonly options: IDropdownMenuActionViewItemOptions;
 
 	constructor(
 		action: IAction,

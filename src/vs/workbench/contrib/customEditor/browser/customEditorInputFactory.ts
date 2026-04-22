@@ -5,6 +5,10 @@
 export interface CustomDocumentBackupData {
 	readonly viewType: string;
 	readonly editorResource: unknown;
-	readonly backupId: string;
+	backupId: string;
 	readonly extension?: unknown;
+	readonly customTitle?: string;
+	readonly iconPath?: unknown;
+	readonly webview?: unknown;
+	[key: string]: unknown;
 }

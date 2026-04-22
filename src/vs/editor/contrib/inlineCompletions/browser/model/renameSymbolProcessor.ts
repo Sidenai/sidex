@@ -502,7 +502,7 @@ class RenameSymbolRunnable {
 				}
 			}
 			return { edits };
-		} catch (error) {
+		} catch (_error) {
 			return { rejectReason: 'Rename failed', edits: [] };
 		}
 	}
@@ -702,7 +702,7 @@ export class RenameSymbolProcessor extends Disposable {
 			} else {
 				return result;
 			}
-		} catch (error) {
+		} catch (_error) {
 			return no;
 		}
 	}

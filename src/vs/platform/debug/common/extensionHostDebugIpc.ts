@@ -37,7 +37,7 @@ export class ExtensionHostDebugBroadcastChannel<TContext> extends Disposable imp
 		throw new Error('Method not implemented.');
 	}
 
-	listen(ctx: TContext, event: string, arg?: any): Event<any> {
+	listen(ctx: TContext, event: string, _arg?: any): Event<any> {
 		switch (event) {
 			case 'close':
 				return this._onCloseEmitter.event;

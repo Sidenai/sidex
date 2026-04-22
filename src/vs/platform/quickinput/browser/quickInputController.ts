@@ -308,7 +308,7 @@ export class QuickInputController extends Disposable {
 		const ok = this._register(new Button(okContainer, this.styles.button));
 		ok.label = localize('ok', 'OK');
 		this._register(
-			ok.onDidClick(e => {
+			ok.onDidClick(_e => {
 				this.onDidAcceptEmitter.fire();
 			})
 		);
@@ -319,7 +319,7 @@ export class QuickInputController extends Disposable {
 		);
 		customButton.label = localize('custom', 'Custom');
 		this._register(
-			customButton.onDidClick(e => {
+			customButton.onDidClick(_e => {
 				this.onDidCustomEmitter.fire();
 			})
 		);
@@ -495,7 +495,7 @@ export class QuickInputController extends Disposable {
 			})
 		);
 		this._register(
-			dom.addDisposableListener(container, dom.EventType.FOCUS, (e: FocusEvent) => {
+			dom.addDisposableListener(container, dom.EventType.FOCUS, (_e: FocusEvent) => {
 				inputBox.setFocus();
 			})
 		);
@@ -817,10 +817,10 @@ export class QuickInputController extends Disposable {
 		useSeparators: boolean;
 	}): IQuickPick<T, { useSeparators: false }>;
 	createQuickPick<T extends IQuickPickItem>(
-		options: { useSeparators: boolean } = { useSeparators: false }
+		_options: { useSeparators: boolean } = { useSeparators: false }
 	): IQuickPick<T, { useSeparators: boolean }> {
 		const ui = this.getUI(true);
-		return new QuickPick<T, typeof options>(ui);
+		return new QuickPick<T, { useSeparators: boolean }>(ui);
 	}
 
 	createInputBox(): IInputBox {
@@ -1378,7 +1378,7 @@ class QuickInputDragAndDropController extends Disposable {
 
 					this._layout(e.clientY - dragOffsetY, e.clientX - dragOffsetX);
 				});
-				const mouseUpListener = dom.addDisposableGenericMouseUpListener(activeWindow, (e: MouseEvent) => {
+				const mouseUpListener = dom.addDisposableGenericMouseUpListener(activeWindow, (_e: MouseEvent) => {
 					if (isMovingQuickInput) {
 						// Save position
 						const state = this.dndViewState.get();

@@ -314,7 +314,7 @@ export class FilesConfigurationService extends Disposable implements IFilesConfi
 			let stat: IFileStatWithMetadata | undefined = undefined;
 			try {
 				stat = await this.fileService.resolve(resource, { resolveMetadata: true });
-			} catch (error) {
+			} catch (_error) {
 				// ignore
 			}
 

@@ -77,7 +77,7 @@ export class StandaloneColorPickerRenderedParts extends Disposable {
 		);
 		let editorUpdatedByColorPicker = false;
 		this._register(
-			editor.onDidChangeModelContent(e => {
+			editor.onDidChangeModelContent(_e => {
 				if (editorUpdatedByColorPicker) {
 					editorUpdatedByColorPicker = false;
 				} else {

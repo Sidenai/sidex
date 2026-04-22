@@ -937,7 +937,7 @@ export class ConfigurationEditing {
 		key: string,
 		relativePath: string,
 		resource: URI | null | undefined,
-		scope: ConfigurationScope | undefined
+		_scope: ConfigurationScope | undefined
 	): URI | null {
 		if (target === EditableConfigurationTarget.USER_LOCAL) {
 			if (key === TASKS_CONFIGURATION_KEY) {

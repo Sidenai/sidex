@@ -307,7 +307,7 @@ export interface IActionViewItemOptions extends IBaseActionViewItemOptions {
 
 export class ActionViewItem extends BaseActionViewItem {
 	protected label: HTMLElement | undefined;
-	protected override readonly options: IActionViewItemOptions;
+	declare protected readonly options: IActionViewItemOptions;
 
 	private cssClass?: string;
 
@@ -515,7 +515,7 @@ export class SelectActionViewItem<T = string> extends BaseActionViewItem {
 		this.actionRunner.run(this._action, this.getActionContext(option, index));
 	}
 
-	protected getActionContext(option: string, index: number): T | string {
+	protected getActionContext(option: string, _index: number): T | string {
 		return option;
 	}
 

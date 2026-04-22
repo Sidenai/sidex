@@ -65,7 +65,7 @@ export namespace SocketDiagnostics {
 	const socketIds = new WeakMap<any, string>();
 	let lastUsedSocketId = 0;
 
-	function getSocketId(nativeObject: unknown, label: string): string {
+	function getSocketId(nativeObject: unknown, _label: string): string {
 		if (!socketIds.has(nativeObject)) {
 			const id = String(++lastUsedSocketId);
 			socketIds.set(nativeObject, id);
@@ -451,7 +451,7 @@ class ProtocolWriter {
 	public dispose(): void {
 		try {
 			this.flush();
-		} catch (err) {
+		} catch (_err) {
 			// ignore error, since the socket could be already closed
 		}
 		this._isDisposed = true;
@@ -857,7 +857,6 @@ export class PersistentProtocol implements IMessagePassingProtocol {
 	private _socket: ISocket;
 	private _socketWriter: ProtocolWriter;
 	private _socketReader: ProtocolReader;
-	// eslint-disable-next-line local/code-no-potentially-unsafe-disposables
 	private _socketDisposables: DisposableStore;
 
 	private readonly _loadEstimator: ILoadEstimator;

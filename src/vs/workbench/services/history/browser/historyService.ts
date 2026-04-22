@@ -1135,7 +1135,7 @@ export class HistoryService extends Disposable implements IHistoryService {
 		return this.history;
 	}
 
-	private ensureHistoryLoaded(history: Array<EditorInput | IResourceEditorInput> | undefined): asserts history {
+	private ensureHistoryLoaded(_history: Array<EditorInput | IResourceEditorInput> | undefined): asserts _history {
 		if (!this.history) {
 			// Until history is loaded, it is just empty
 			this.history = [];
@@ -2354,7 +2354,7 @@ class EditorHelper {
 
 	onEditorDispose(
 		editor: EditorInput,
-		listener: Function,
+		listener: (...args: any[]) => any,
 		mapEditorToDispose: DisposableMap<EditorInput, DisposableStore>
 	): void {
 		const toDispose = Event.once(editor.onWillDispose)(() => listener());

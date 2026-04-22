@@ -365,7 +365,7 @@ function rewriteRenderedLinks(markdown: IMarkdownString, options: MarkdownRender
 					// absolute or relative local path, or file: uri
 					href = resolveWithBaseUri(URI.from(markdown.baseUri), href);
 				}
-			} catch (err) {}
+			} catch (_err) {}
 
 			el.setAttribute('src', massageHref(markdown, href, true));
 
@@ -502,7 +502,7 @@ function uriMassage(markdown: IMarkdownString, part: string): string {
 	let data: unknown;
 	try {
 		data = parse(decodeURIComponent(part));
-	} catch (e) {
+	} catch (_e) {
 		// ignore
 	}
 	if (!data) {
@@ -833,7 +833,7 @@ const linkFormatter = ({ text, href }: marked.Tokens.Link): string => {
 			const uri = URI.parse(href);
 			return text.trim() || basename(uri);
 		}
-	} catch (e) {
+	} catch (_e) {
 		return text.trim() || pathBasename(href);
 	}
 	return text;

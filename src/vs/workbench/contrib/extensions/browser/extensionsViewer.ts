@@ -259,7 +259,7 @@ class AsyncDataSource implements IAsyncDataSource<IExtensionData, any> {
 
 class VirualDelegate implements IListVirtualDelegate<IExtensionData> {
 
-	public getHeight(element: IExtensionData): number {
+	public getHeight(_element: IExtensionData): number {
 		return 62;
 	}
 	public getTemplateId({ extension }: IExtensionData): string {
@@ -342,7 +342,7 @@ class UnknownExtensionRenderer implements IListRenderer<ITreeNode<IExtensionData
 		data.identifier.textContent = node.element.extension.identifier.id;
 	}
 
-	public disposeTemplate(data: IUnknownExtensionTemplateData): void {
+	public disposeTemplate(_data: IUnknownExtensionTemplateData): void {
 	}
 }
 

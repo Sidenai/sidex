@@ -624,8 +624,8 @@ class ConfigurationRegistry extends Disposable implements IConfigurationRegistry
 			// If the default value is an object, merge the objects and store the source of each keys
 			if (isObjectSetting) {
 				(defaultValue as IStringDictionary<unknown>)[propertyKey] = {
-					...((defaultValue as IStringDictionary<unknown>)[propertyKey] ?? {}),
-					...propertyDefaultValue
+					...(((defaultValue as IStringDictionary<unknown>)[propertyKey] as Record<string, unknown>) ?? {}),
+					...(propertyDefaultValue as Record<string, unknown>)
 				};
 				// Track the source of each value in the object
 				if (valueSource) {
@@ -713,7 +713,7 @@ class ConfigurationRegistry extends Disposable implements IConfigurationRegistry
 		this._onDidUpdateConfiguration.fire({ properties, defaultsOverrides });
 	}
 
-	public notifyConfigurationSchemaUpdated(...configurations: IConfigurationNode[]) {
+	public notifyConfigurationSchemaUpdated(..._configurations: IConfigurationNode[]) {
 		this._onDidSchemaChange.fire();
 	}
 

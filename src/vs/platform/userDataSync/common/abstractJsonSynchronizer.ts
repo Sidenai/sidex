@@ -84,7 +84,7 @@ export abstract class AbstractJsonSynchronizer extends AbstractFileSynchroniser 
 		remoteUserData: IRemoteUserData,
 		lastSyncUserData: IRemoteUserData | null,
 		isRemoteDataFromCurrentMachine: boolean,
-		userDataSyncConfiguration: IUserDataSyncConfiguration
+		_userDataSyncConfiguration: IUserDataSyncConfiguration
 	): Promise<IJsonResourcePreview[]> {
 		const remoteContent = remoteUserData.syncData
 			? this.getContentFromSyncContent(remoteUserData.syncData.content)
@@ -177,7 +177,7 @@ export abstract class AbstractJsonSynchronizer extends AbstractFileSynchroniser 
 
 	protected async getMergeResult(
 		resourcePreview: IJsonResourcePreview,
-		token: CancellationToken
+		_token: CancellationToken
 	): Promise<IMergeResult> {
 		return resourcePreview.previewResult;
 	}
@@ -186,7 +186,7 @@ export abstract class AbstractJsonSynchronizer extends AbstractFileSynchroniser 
 		resourcePreview: IJsonResourcePreview,
 		resource: URI,
 		content: string | null | undefined,
-		token: CancellationToken
+		_token: CancellationToken
 	): Promise<IAcceptResult> {
 		/* Accept local resource */
 		if (this.extUri.isEqual(resource, this.localResource)) {
@@ -264,7 +264,7 @@ export abstract class AbstractJsonSynchronizer extends AbstractFileSynchroniser 
 		// Delete the preview
 		try {
 			await this.fileService.del(this.previewResource);
-		} catch (e) {
+		} catch (_e) {
 			/* ignore */
 		}
 

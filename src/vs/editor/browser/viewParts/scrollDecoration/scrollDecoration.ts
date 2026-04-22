@@ -66,7 +66,7 @@ export class ScrollDecorationViewPart extends ViewPart {
 
 	// --- begin event handlers
 
-	public override onConfigurationChanged(e: viewEvents.ViewConfigurationChangedEvent): boolean {
+	public override onConfigurationChanged(_e: viewEvents.ViewConfigurationChangedEvent): boolean {
 		const options = this._context.configuration.options;
 		const scrollbar = options.get(EditorOption.scrollbar);
 		this._useShadows = scrollbar.useShadows;
@@ -81,11 +81,11 @@ export class ScrollDecorationViewPart extends ViewPart {
 
 	// --- end event handlers
 
-	public prepareRender(ctx: RenderingContext): void {
+	public prepareRender(_ctx: RenderingContext): void {
 		// Nothing to read
 	}
 
-	public render(ctx: RestrictedRenderingContext): void {
+	public render(_ctx: RestrictedRenderingContext): void {
 		this._domNode.setWidth(this._width);
 		this._domNode.setClassName(this._shouldShow ? 'scroll-decoration' : '');
 	}

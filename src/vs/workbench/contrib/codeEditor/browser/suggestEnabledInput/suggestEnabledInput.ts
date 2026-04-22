@@ -128,7 +128,7 @@ export class SuggestEnabledInput extends Widget {
 		this._onInputDidChange.fire(value);
 	}
 
-	override focus(): void {
+	focus(): void {
 		this.inputElement.focus();
 	}
 

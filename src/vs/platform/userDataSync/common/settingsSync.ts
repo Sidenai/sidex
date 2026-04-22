@@ -224,7 +224,7 @@ export class SettingsSynchroniser extends AbstractJsonFileSynchroniser implement
 
 	protected async getMergeResult(
 		resourcePreview: ISettingsResourcePreview,
-		token: CancellationToken
+		_token: CancellationToken
 	): Promise<IMergeResult> {
 		const formatUtils = await this.getFormattingOptions();
 		const ignoredSettings = await this.getIgnoredSettings();
@@ -242,7 +242,7 @@ export class SettingsSynchroniser extends AbstractJsonFileSynchroniser implement
 		resourcePreview: ISettingsResourcePreview,
 		resource: URI,
 		content: string | null | undefined,
-		token: CancellationToken
+		_token: CancellationToken
 	): Promise<IAcceptResult> {
 		const formattingOptions = await this.getFormattingOptions();
 		const ignoredSettings = await this.getIgnoredSettings();
@@ -360,7 +360,7 @@ export class SettingsSynchroniser extends AbstractJsonFileSynchroniser implement
 		// Delete the preview
 		try {
 			await this.fileService.del(this.previewResource);
-		} catch (e) {
+		} catch (_e) {
 			/* ignore */
 		}
 

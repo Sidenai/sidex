@@ -35,11 +35,11 @@ export class EditorGutter<T extends IGutterItemInfo = IGutterItemInfo> extends D
 		private readonly itemProvider: IGutterItemProvider<T>
 	) {
 		super();
-		this.scrollTop = observableFromEvent(this, this._editor.onDidScrollChange, e =>
+		this.scrollTop = observableFromEvent(this, this._editor.onDidScrollChange, _e =>
 			/** @description editor.onDidScrollChange */ this._editor.getScrollTop()
 		);
 		this.isScrollTopZero = this.scrollTop.map(scrollTop => /** @description isScrollTopZero */ scrollTop === 0);
-		this.modelAttached = observableFromEvent(this, this._editor.onDidChangeModel, e =>
+		this.modelAttached = observableFromEvent(this, this._editor.onDidChangeModel, _e =>
 			/** @description editor.onDidChangeModel */ this._editor.hasModel()
 		);
 		this.editorOnDidChangeViewZones = observableSignalFromEvent(

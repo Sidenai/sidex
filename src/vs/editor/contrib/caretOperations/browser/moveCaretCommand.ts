@@ -44,7 +44,7 @@ export class MoveCaretCommand implements ICommand {
 		}
 	}
 
-	public computeCursorState(model: ITextModel, helper: ICursorStateComputerData): Selection {
+	public computeCursorState(_model: ITextModel, _helper: ICursorStateComputerData): Selection {
 		if (this._isMovingLeft) {
 			return new Selection(
 				this._selection.startLineNumber,

@@ -136,7 +136,7 @@ export class ScreenReaderSupport extends Disposable {
 		this._primaryCursorVisibleRange = ctx.visibleRangeForPosition(this._primarySelection.getPosition());
 	}
 
-	public render(ctx: RestrictedRenderingContext): void {
+	public render(_ctx: RestrictedRenderingContext): void {
 		if (!this._primaryCursorVisibleRange) {
 			// The primary cursor is outside the viewport => place textarea to the top left
 			this._renderAtTopLeft();

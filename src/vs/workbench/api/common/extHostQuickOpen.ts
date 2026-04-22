@@ -170,7 +170,7 @@ export function createExtHostQuickOpen(
 							} else if (item.kind === QuickPickItemKind.Separator) {
 								pickItems.push({ type: 'separator', label: item.label });
 							} else {
-								if (item.tooltip) {
+								if ((item as any).tooltip) {
 									checkProposedApiEnabled(extension, 'quickPickItemTooltip');
 								}
 
@@ -181,7 +181,7 @@ export function createExtHostQuickOpen(
 									detail: item.detail,
 									picked: item.picked,
 									alwaysShow: item.alwaysShow,
-									tooltip: MarkdownString.fromStrict(item.tooltip),
+									tooltip: MarkdownString.fromStrict((item as any).tooltip),
 									resourceUri: item.resourceUri,
 									handle
 								});
@@ -248,7 +248,7 @@ export function createExtHostQuickOpen(
 
 			const result = await this._validateInput(input);
 			if (!result || typeof result === 'string') {
-				return result;
+				return result as any;
 			}
 
 			let severity: Severity;
@@ -277,7 +277,7 @@ export function createExtHostQuickOpen(
 
 		async showWorkspaceFolderPick(
 			options?: WorkspaceFolderPickOptions,
-			token = CancellationToken.None
+			_token = CancellationToken.None
 		): Promise<WorkspaceFolder | undefined> {
 			const selectedFolder = await this._commands.executeCommand<WorkspaceFolder>('_workbench.pickWorkspaceFolder', [
 				options
@@ -636,7 +636,7 @@ export function createExtHostQuickOpen(
 				if (item.kind === QuickPickItemKind.Separator) {
 					pickItems.push({ type: 'separator', label: item.label });
 				} else {
-					if (item.tooltip) {
+					if ((item as any).tooltip) {
 						checkProposedApiEnabled(this._extension, 'quickPickItemTooltip');
 					}
 
@@ -648,7 +648,7 @@ export function createExtHostQuickOpen(
 						detail: item.detail,
 						picked: item.picked,
 						alwaysShow: item.alwaysShow,
-						tooltip: MarkdownString.fromStrict(item.tooltip),
+						tooltip: MarkdownString.fromStrict((item as any).tooltip),
 						resourceUri: item.resourceUri,
 						buttons: item.buttons?.map<TransferQuickInputButton>((button, i) => {
 							return {

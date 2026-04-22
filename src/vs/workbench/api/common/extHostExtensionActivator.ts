@@ -456,7 +456,6 @@ class ActivationOperation {
 					const error = new Error(
 						`Cannot activate the '${this.friendlyName}' extension because its dependency '${dep.friendlyName}' failed to activate`
 					);
-					// eslint-disable-next-line local/code-no-any-casts
 					(<any>error).detail = dep.value.activationFailedError;
 					this._value = new FailedExtension(error);
 					this._host.onExtensionActivationError(this._id, error, null);

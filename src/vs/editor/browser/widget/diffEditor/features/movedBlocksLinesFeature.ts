@@ -276,7 +276,7 @@ export class MovedBlocksLinesFeature extends Disposable {
 				{
 					changeTracker: {
 						createChangeSummary: () => undefined,
-						handleChange: (ctx, summary) => {
+						handleChange: (ctx, _summary) => {
 							if (ctx.didChange(originalHasFocus)) {
 								lastChangedEditor = 'original';
 							}

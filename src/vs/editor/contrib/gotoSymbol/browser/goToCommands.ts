@@ -934,7 +934,7 @@ class GenericGoToLocationAction extends SymbolNavigationAction {
 	}
 
 	protected async _getLocationModel(
-		languageFeaturesService: ILanguageFeaturesService,
+		_languageFeaturesService: ILanguageFeaturesService,
 		_model: ITextModel,
 		_position: corePosition.Position,
 		_token: CancellationToken
@@ -960,7 +960,7 @@ CommandsRegistry.registerCommand({
 	metadata: {
 		description: 'Go to locations from a position in a file',
 		args: [
-			{ name: 'uri', description: 'The text document in which to start', constraint: URI },
+			{ name: 'uri', description: 'The text document in which to start', constraint: URI.isUri },
 			{
 				name: 'position',
 				description: 'The position at which to start',
@@ -1022,7 +1022,7 @@ CommandsRegistry.registerCommand({
 	metadata: {
 		description: 'Peek locations from a position in a file',
 		args: [
-			{ name: 'uri', description: 'The text document in which to start', constraint: URI },
+			{ name: 'uri', description: 'The text document in which to start', constraint: URI.isUri },
 			{
 				name: 'position',
 				description: 'The position at which to start',

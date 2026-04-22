@@ -107,7 +107,6 @@ export class SimpleTypedRpcConnection<T extends Side> {
 			}
 		);
 
-		// eslint-disable-next-line local/code-no-any-casts
 		this.api = { notifications: notifications, requests: requests } as any;
 	}
 }

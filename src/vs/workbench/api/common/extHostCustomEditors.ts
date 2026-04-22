@@ -213,7 +213,7 @@ export class ExtHostCustomEditors implements extHostProtocol.ExtHostCustomEditor
 							const editId = entry.addEdit(e);
 							this._proxy.$onDidEdit(e.document.uri, viewType, editId, e.label);
 						} else {
-							this._proxy.$onContentChange(e.document.uri, viewType);
+							this._proxy.$onContentChange((e as any).document.uri, viewType);
 						}
 					})
 				);

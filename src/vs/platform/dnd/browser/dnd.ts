@@ -59,7 +59,7 @@ export function extractEditorsDropData(e: DragEvent): Array<IDraggedResourceEdit
 		if (rawEditorsData) {
 			try {
 				editors.push(...parse(rawEditorsData));
-			} catch (error) {
+			} catch (_error) {
 				// Invalid transfer
 			}
 		}
@@ -69,7 +69,7 @@ export function extractEditorsDropData(e: DragEvent): Array<IDraggedResourceEdit
 			try {
 				const rawResourcesData = e.dataTransfer.getData(DataTransfers.RESOURCES);
 				editors.push(...createDraggedEditorInputFromRawResourcesData(rawResourcesData));
-			} catch (error) {
+			} catch (_error) {
 				// Invalid transfer
 			}
 		}
@@ -81,7 +81,7 @@ export function extractEditorsDropData(e: DragEvent): Array<IDraggedResourceEdit
 				if (file && getPathForFile(file)) {
 					try {
 						editors.push({ resource: URI.file(getPathForFile(file)!), isExternal: true, allowWorkspaceOpen: true });
-					} catch (error) {
+					} catch (_error) {
 						// Invalid URI
 					}
 				}
@@ -96,7 +96,7 @@ export function extractEditorsDropData(e: DragEvent): Array<IDraggedResourceEdit
 				for (const codeFile of codeFiles) {
 					editors.push({ resource: URI.file(codeFile), isExternal: true, allowWorkspaceOpen: true });
 				}
-			} catch (error) {
+			} catch (_error) {
 				// Invalid transfer
 			}
 		}
@@ -108,7 +108,7 @@ export function extractEditorsDropData(e: DragEvent): Array<IDraggedResourceEdit
 			if (data) {
 				try {
 					editors.push(...contribution.getEditorInputs(data));
-				} catch (error) {
+				} catch (_error) {
 					// Invalid transfer
 				}
 			}
@@ -426,7 +426,7 @@ function getDataAsJSON<T>(e: DragEvent, kind: string, defaultValue: T): T {
 	if (rawSymbolsData) {
 		try {
 			return JSON.parse(rawSymbolsData);
-		} catch (error) {
+		} catch (_error) {
 			// Invalid transfer
 		}
 	}

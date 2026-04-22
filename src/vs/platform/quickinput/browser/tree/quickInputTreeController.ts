@@ -224,7 +224,7 @@ export class QuickInputTreeController extends Disposable {
 			case QuickPickFocus.Second: {
 				this._tree.scrollTop = 0;
 				let isSecondItem = false;
-				this._tree.focusFirst(undefined, e => {
+				this._tree.focusFirst(undefined, _e => {
 					if (isSecondItem) {
 						return true;
 					}
@@ -370,7 +370,7 @@ export class QuickInputTreeController extends Disposable {
 		// Ensure that selection follows focus
 		this._register(
 			this._tree.onDidChangeFocus(e => {
-				const item = this._tree.getFocus().findLast(item => item !== null);
+				const item = [...this._tree.getFocus()].reverse().find(item => item !== null);
 				this._tree.setSelection(item ? [item] : [], e.browserEvent);
 			})
 		);

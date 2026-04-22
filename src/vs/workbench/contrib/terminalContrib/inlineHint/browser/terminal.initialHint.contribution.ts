@@ -53,7 +53,7 @@ export class InitialHintAddon extends Disposable implements ITerminalAddon {
 	constructor(private readonly _capabilities: ITerminalCapabilityStore) {
 		super();
 	}
-	activate(terminal: RawXtermTerminal): void {
+	activate(_terminal: RawXtermTerminal): void {
 		const store = this._register(new DisposableStore());
 		this._disposables.value = store;
 		const capability = this._capabilities.get(TerminalCapability.CommandDetection);
@@ -253,7 +253,7 @@ class TerminalInitialHintWidget extends Disposable {
 					this._instance.hasFocus &&
 					this._isVisible &&
 					this._ariaLabel &&
-					this._configurationService.getValue(AccessibilityVerbositySettingId.TerminalInlineChat)
+					this._configurationService.getValue(AccessibilityVerbositySettingId.Terminal)
 				) {
 					status(this._ariaLabel);
 				}
@@ -413,7 +413,7 @@ class TerminalInitialHintWidget extends Disposable {
 				localize(
 					'disableHint',
 					' Toggle {0} in settings to disable this hint.',
-					AccessibilityVerbositySettingId.TerminalInlineChat
+					AccessibilityVerbositySettingId.Terminal
 				)
 			);
 

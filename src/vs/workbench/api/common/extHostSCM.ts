@@ -49,11 +49,11 @@ type ProviderHandle = number;
 type GroupHandle = number;
 type ResourceStateHandle = number;
 
-function isUri(thing: any): thing is vscode.Uri {
+function _isUri(thing: any): thing is vscode.Uri {
 	return thing instanceof URI;
 }
 
-function uriEquals(a: vscode.Uri, b: vscode.Uri): boolean {
+function _uriEquals(a: vscode.Uri, b: vscode.Uri): boolean {
 	if (a.scheme === Schemas.file && b.scheme === Schemas.file && isLinux) {
 		return a.toString() === b.toString();
 	}
@@ -744,7 +744,6 @@ class ExtHostSourceControl implements vscode.SourceControl {
 	}
 
 	// We know what we're doing here:
-	// eslint-disable-next-line local/code-no-potentially-unsafe-disposables
 	private _actionButtonDisposables = new DisposableStore();
 	private _actionButton: vscode.SourceControlActionButton | undefined;
 	get actionButton(): vscode.SourceControlActionButton | undefined {
@@ -791,7 +790,6 @@ class ExtHostSourceControl implements vscode.SourceControl {
 	}
 
 	// We know what we're doing here:
-	// eslint-disable-next-line local/code-no-potentially-unsafe-disposables
 	private _statusBarDisposables = new DisposableStore();
 	private _statusBarCommands: vscode.Command[] | undefined = undefined;
 

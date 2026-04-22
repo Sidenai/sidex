@@ -57,7 +57,6 @@ export function registerTerminalContribution(
 	ctor: TerminalContributionCtor | DetachedCompatibleTerminalContributionCtor,
 	canRunInDetachedTerminals: boolean = false
 ): void {
-	// eslint-disable-next-line local/code-no-dangerous-type-assertions
 	TerminalContributionRegistry.INSTANCE.registerTerminalContribution({
 		id,
 		ctor,

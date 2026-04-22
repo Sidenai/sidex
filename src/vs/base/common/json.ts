@@ -755,7 +755,7 @@ export function getLocation(text: string, position: number): Location {
 	}
 	try {
 		visit(text, {
-			onObjectBegin: (offset: number, length: number) => {
+			onObjectBegin: (offset: number, _length: number) => {
 				if (position <= offset) {
 					throw earlyReturnException;
 				}
@@ -773,21 +773,21 @@ export function getLocation(text: string, position: number): Location {
 					throw earlyReturnException;
 				}
 			},
-			onObjectEnd: (offset: number, length: number) => {
+			onObjectEnd: (offset: number, _length: number) => {
 				if (position <= offset) {
 					throw earlyReturnException;
 				}
 				previousNode = undefined;
 				segments.pop();
 			},
-			onArrayBegin: (offset: number, length: number) => {
+			onArrayBegin: (offset: number, _length: number) => {
 				if (position <= offset) {
 					throw earlyReturnException;
 				}
 				previousNode = undefined;
 				segments.push(0);
 			},
-			onArrayEnd: (offset: number, length: number) => {
+			onArrayEnd: (offset: number, _length: number) => {
 				if (position <= offset) {
 					throw earlyReturnException;
 				}
@@ -804,7 +804,7 @@ export function getLocation(text: string, position: number): Location {
 					throw earlyReturnException;
 				}
 			},
-			onSeparator: (sep: string, offset: number, length: number) => {
+			onSeparator: (sep: string, offset: number, _length: number) => {
 				if (position <= offset) {
 					throw earlyReturnException;
 				}
@@ -929,7 +929,7 @@ export function parseTree(text: string, errors: ParseError[] = [], options: Pars
 			currentParent = currentParent.parent!;
 			ensurePropertyComplete(offset + length);
 		},
-		onArrayBegin: (offset: number, length: number) => {
+		onArrayBegin: (offset: number, _length: number) => {
 			currentParent = onValue({ type: 'array', offset, length: -1, parent: currentParent, children: [] });
 		},
 		onArrayEnd: (offset: number, length: number) => {
@@ -941,7 +941,7 @@ export function parseTree(text: string, errors: ParseError[] = [], options: Pars
 			onValue({ type: getNodeType(value), offset, length, parent: currentParent, value });
 			ensurePropertyComplete(offset + length);
 		},
-		onSeparator: (sep: string, offset: number, length: number) => {
+		onSeparator: (sep: string, offset: number, _length: number) => {
 			if (currentParent.type === 'property') {
 				if (sep === ':') {
 					currentParent.colonOffset = offset;
@@ -1181,7 +1181,7 @@ export function visit(text: string, visitor: JSONVisitor, options: ParseOptions 
 						handleError(ParseErrorCode.InvalidNumberFormat);
 						value = 0;
 					}
-				} catch (e) {
+				} catch (_e) {
 					handleError(ParseErrorCode.InvalidNumberFormat);
 				}
 				onLiteralValue(value);

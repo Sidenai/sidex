@@ -25,10 +25,10 @@ class ConstObservable<T> extends ConvenientObservable<T, void> {
 	public get(): T {
 		return this.value;
 	}
-	public addObserver(observer: IObserver): void {
+	public addObserver(_observer: IObserver): void {
 		// NO OP
 	}
-	public removeObserver(observer: IObserver): void {
+	public removeObserver(_observer: IObserver): void {
 		// NO OP
 	}
 

@@ -723,7 +723,7 @@ class ClickToLocationContribution extends Disposable implements IEditorContribut
 		const clickLinkGesture = this._register(new ClickLinkGesture(editor));
 
 		this._register(
-			clickLinkGesture.onMouseMoveOrRelevantKeyDown(([mouseEvent, keyboardEvent]) => {
+			clickLinkGesture.onMouseMoveOrRelevantKeyDown(([mouseEvent, _keyboardEvent]) => {
 				this.onMove(mouseEvent);
 			})
 		);

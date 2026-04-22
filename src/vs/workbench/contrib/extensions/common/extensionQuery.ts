@@ -72,7 +72,7 @@ export class Query {
 
 	static parse(value: string): Query {
 		let sortBy = '';
-		value = value.replace(/@sort:(\w+)(-\w*)?/g, (match, by: string, order: string) => {
+		value = value.replace(/@sort:(\w+)(-\w*)?/g, (match, by: string, _order: string) => {
 			sortBy = by;
 
 			return '';

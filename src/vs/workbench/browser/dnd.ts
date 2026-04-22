@@ -79,7 +79,7 @@ export async function extractTreeDropData(dataTransfer: VSDataTransfer): Promise
 			const asString = await dataTransfer.get(resourcesKey)?.asString();
 			const rawResourcesData = JSON.stringify(UriList.parse(asString ?? ''));
 			editors.push(...createDraggedEditorInputFromRawResourcesData(rawResourcesData));
-		} catch (error) {
+		} catch (_error) {
 			// Invalid transfer
 		}
 	}
@@ -208,7 +208,7 @@ export class ResourcesDropHandler {
 						toOpen.push({ folderUri: stat.resource });
 						folderURIs.push({ uri: stat.resource });
 					}
-				} catch (error) {
+				} catch (_error) {
 					// Ignore error
 				}
 			})
@@ -491,7 +491,7 @@ export class CompositeDragAndDropData implements IDragAndDropData {
 		private id: string
 	) {}
 
-	update(dataTransfer: DataTransfer): void {
+	update(_dataTransfer: DataTransfer): void {
 		// no-op
 	}
 
@@ -803,26 +803,26 @@ export class ResourceListDnDHandler<T> implements IListDragAndDrop<T> {
 		}
 	}
 
-	protected onWillDragElements(elements: readonly T[], originalEvent: DragEvent): void {
+	protected onWillDragElements(_elements: readonly T[], _originalEvent: DragEvent): void {
 		// noop
 	}
 
 	onDragOver(
-		data: IDragAndDropData,
-		targetElement: T,
-		targetIndex: number,
-		targetSector: ListViewTargetSector | undefined,
-		originalEvent: DragEvent
+		_data: IDragAndDropData,
+		_targetElement: T,
+		_targetIndex: number,
+		_targetSector: ListViewTargetSector | undefined,
+		_originalEvent: DragEvent
 	): boolean | ITreeDragOverReaction {
 		return false;
 	}
 
 	drop(
-		data: IDragAndDropData,
-		targetElement: T,
-		targetIndex: number,
-		targetSector: ListViewTargetSector | undefined,
-		originalEvent: DragEvent
+		_data: IDragAndDropData,
+		_targetElement: T,
+		_targetIndex: number,
+		_targetSector: ListViewTargetSector | undefined,
+		_originalEvent: DragEvent
 	): void {}
 
 	dispose(): void {}

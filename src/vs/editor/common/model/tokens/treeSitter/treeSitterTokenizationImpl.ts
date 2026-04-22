@@ -964,7 +964,7 @@ export class TreeSitterTokenizationImpl extends Disposable {
 		};
 	}
 
-	private _getInjectionCaptures(parentCapture: QueryCapture, range: Range): QueryCapture[] {
+	private _getInjectionCaptures(_parentCapture: QueryCapture, _range: Range): QueryCapture[] {
 		/*
 				const injection = textModelTreeSitter.getInjection(parentCapture.node.startIndex, this._treeSitterModel.languageId);
 				if (!injection?.tree || injection.versionId !== textModelTreeSitter.parseResult?.versionId) {

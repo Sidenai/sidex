@@ -87,7 +87,7 @@ export class LanguageConfigurationService extends Disposable implements ILanguag
 			this.configurationService.onDidChangeConfiguration(e => {
 				const globalConfigChanged = e.change.keys.some(k => languageConfigKeys.has(k));
 				const localConfigChanged = e.change.overrides
-					.filter(([overrideLangName, keys]) => keys.some(k => languageConfigKeys.has(k)))
+					.filter(([_overrideLangName, keys]) => keys.some(k => languageConfigKeys.has(k)))
 					.map(([overrideLangName]) => overrideLangName);
 
 				if (globalConfigChanged) {

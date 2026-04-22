@@ -2031,7 +2031,7 @@ registerAction2(
 			);
 
 			disposables.add(
-				quickPick.onDidAccept(event => {
+				quickPick.onDidAccept(_event => {
 					if (quickPick.selectedItems.length) {
 						selectedItem = quickPick.selectedItems[0] as CustomizeLayoutItem;
 						commandService.executeCommand(selectedItem.id);

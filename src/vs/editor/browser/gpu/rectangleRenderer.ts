@@ -288,16 +288,12 @@ export class RectangleRenderer extends ViewEventHandler {
 
 	// #region Event handlers
 
-	public override onScrollChanged(e: ViewScrollChangedEvent): boolean {
+	public override onScrollChanged(_e: ViewScrollChangedEvent): boolean {
 		if (this._device) {
 			const dpr = getActiveWindow().devicePixelRatio;
 			this._scrollOffsetValueBuffer[0] = this._context.viewLayout.getCurrentScrollLeft() * dpr;
 			this._scrollOffsetValueBuffer[1] = this._context.viewLayout.getCurrentScrollTop() * dpr;
-			this._device.queue.writeBuffer(
-				this._scrollOffsetBindBuffer,
-				0,
-				this._scrollOffsetValueBuffer as Float32Array<ArrayBuffer>
-			);
+			this._device.queue.writeBuffer(this._scrollOffsetBindBuffer, 0, this._scrollOffsetValueBuffer as Float32Array);
 		}
 		return true;
 	}
@@ -321,7 +317,7 @@ export class RectangleRenderer extends ViewEventHandler {
 		}
 	}
 
-	draw(viewportData: ViewportData) {
+	draw(_viewportData: ViewportData) {
 		if (!this._initialized) {
 			return;
 		}

@@ -631,12 +631,12 @@ export abstract class AbstractScrollableElement extends Widget {
 		this._hide();
 	}
 
-	private _onMouseLeave(e: IMouseEvent): void {
+	private _onMouseLeave(_e: IMouseEvent): void {
 		this._mouseIsOver = false;
 		this._hide();
 	}
 
-	private _onMouseOver(e: IMouseEvent): void {
+	private _onMouseOver(_e: IMouseEvent): void {
 		this._mouseIsOver = true;
 		this._reveal();
 	}

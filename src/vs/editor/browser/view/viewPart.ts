@@ -23,7 +23,7 @@ export abstract class ViewPart extends ViewEventHandler {
 		super.dispose();
 	}
 
-	public onBeforeRender(viewportData: ViewportData): void {}
+	public onBeforeRender(_viewportData: ViewportData): void {}
 
 	public abstract prepareRender(ctx: RenderingContext): void;
 	public abstract render(ctx: RestrictedRenderingContext): void;

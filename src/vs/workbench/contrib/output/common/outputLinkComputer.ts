@@ -160,7 +160,7 @@ export class OutputLinkComputer implements IWebWorkerServerRequestHandler {
 					if (resource) {
 						resourceString = resource.toString();
 					}
-				} catch (error) {
+				} catch (_error) {
 					continue; // we might find an invalid URI and then we dont want to loose all other links
 				}
 

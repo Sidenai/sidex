@@ -755,7 +755,7 @@ export class MainThreadAuthentication extends Disposable implements MainThreadAu
 			try {
 				await this.clipboardService.writeText(userCode);
 				return await this.openerService.open(URI.parse(verificationUri));
-			} catch (error) {
+			} catch (_error) {
 				this.notificationService.error(nls.localize('failedToOpenUri', 'Failed to open {0}', verificationUri));
 			}
 		}
@@ -783,7 +783,7 @@ export class MainThreadAuthentication extends Disposable implements MainThreadAu
 					run: async () => {
 						try {
 							await this.clipboardService.writeText(redirectUrls);
-						} catch (error) {
+						} catch (_error) {
 							this.notificationService.error(
 								nls.localize('dcrFailedToCopy', 'Failed to copy redirect URIs to clipboard.')
 							);

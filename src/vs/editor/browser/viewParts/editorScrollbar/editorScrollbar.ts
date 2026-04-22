@@ -107,22 +107,22 @@ export class EditorScrollbar extends ViewPart {
 
 		// I've seen this happen both on the view dom node & on the lines content dom node.
 		this._register(
-			dom.addDisposableListener(viewDomNode.domNode, 'scroll', (e: Event) =>
+			dom.addDisposableListener(viewDomNode.domNode, 'scroll', (_e: Event) =>
 				onBrowserDesperateReveal(viewDomNode.domNode, true, true)
 			)
 		);
 		this._register(
-			dom.addDisposableListener(linesContent.domNode, 'scroll', (e: Event) =>
+			dom.addDisposableListener(linesContent.domNode, 'scroll', (_e: Event) =>
 				onBrowserDesperateReveal(linesContent.domNode, true, false)
 			)
 		);
 		this._register(
-			dom.addDisposableListener(overflowGuardDomNode.domNode, 'scroll', (e: Event) =>
+			dom.addDisposableListener(overflowGuardDomNode.domNode, 'scroll', (_e: Event) =>
 				onBrowserDesperateReveal(overflowGuardDomNode.domNode, true, false)
 			)
 		);
 		this._register(
-			dom.addDisposableListener(this.scrollbarDomNode.domNode, 'scroll', (e: Event) =>
+			dom.addDisposableListener(this.scrollbarDomNode.domNode, 'scroll', (_e: Event) =>
 				onBrowserDesperateReveal(this.scrollbarDomNode.domNode, true, false)
 			)
 		);
@@ -195,21 +195,21 @@ export class EditorScrollbar extends ViewPart {
 		}
 		return true;
 	}
-	public override onScrollChanged(e: viewEvents.ViewScrollChangedEvent): boolean {
+	public override onScrollChanged(_e: viewEvents.ViewScrollChangedEvent): boolean {
 		return true;
 	}
-	public override onThemeChanged(e: viewEvents.ViewThemeChangedEvent): boolean {
+	public override onThemeChanged(_e: viewEvents.ViewThemeChangedEvent): boolean {
 		this.scrollbar.updateClassName('editor-scrollable' + ' ' + getThemeTypeSelector(this._context.theme.type));
 		return true;
 	}
 
 	// --- end event handlers
 
-	public prepareRender(ctx: RenderingContext): void {
+	public prepareRender(_ctx: RenderingContext): void {
 		// Nothing to do
 	}
 
-	public render(ctx: RestrictedRenderingContext): void {
+	public render(_ctx: RestrictedRenderingContext): void {
 		this.scrollbar.renderNow();
 	}
 }

@@ -634,7 +634,7 @@ export abstract class AbstractTaskService extends Disposable implements ITaskSer
 			return;
 		}
 
-		const taskRunSource = this._taskRunSources.get(event.taskId);
+		const _taskRunSource = this._taskRunSources.get(event.taskId);
 
 		const terminalForTask = this._terminalService.instances.find(i => i.instanceId === event.terminalId);
 		if (!terminalForTask) {
@@ -742,7 +742,7 @@ export abstract class AbstractTaskService extends Disposable implements ITaskSer
 			}
 		});
 
-		CommandsRegistry.registerCommand('workbench.action.tasks.reRunTask', async accessor => {
+		CommandsRegistry.registerCommand('workbench.action.tasks.reRunTask', async _accessor => {
 			if (await this._trust()) {
 				this._reRunTaskCommand();
 			}
@@ -757,7 +757,7 @@ export abstract class AbstractTaskService extends Disposable implements ITaskSer
 			}
 		);
 
-		CommandsRegistry.registerCommand(RerunAllRunningTasksCommandId, async accessor => {
+		CommandsRegistry.registerCommand(RerunAllRunningTasksCommandId, async _accessor => {
 			if (await this._trust()) {
 				this._runRerunAllRunningTasksCommand();
 			}
@@ -934,7 +934,7 @@ export abstract class AbstractTaskService extends Disposable implements ITaskSer
 	protected _showOutput(
 		runSource: TaskRunSource = TaskRunSource.User,
 		userRequested?: boolean,
-		errorMessage?: string
+		_errorMessage?: string
 	): void {
 		if (
 			!VirtualWorkspaceContext.getValue(this._contextKeyService) &&
@@ -1172,7 +1172,7 @@ export abstract class AbstractTaskService extends Disposable implements ITaskSer
 			if (resolvedTask && resolvedTask._id === configuringTask._id) {
 				return TaskConfig.createCustomTask(resolvedTask, configuringTask);
 			}
-		} catch (error) {
+		} catch (_error) {
 			// Ignore errors. The task could not be provided by any of the providers.
 		}
 
@@ -1260,7 +1260,7 @@ export abstract class AbstractTaskService extends Disposable implements ITaskSer
 						this._recentlyUsedTasksV1.set(value, value);
 					}
 				}
-			} catch (error) {
+			} catch (_error) {
 				// Ignore. We use the empty result
 			}
 		}
@@ -1311,7 +1311,7 @@ export abstract class AbstractTaskService extends Disposable implements ITaskSer
 						this._recentlyUsedTasks.set(value[0], value[1]);
 					}
 				}
-			} catch (error) {
+			} catch (_error) {
 				// Ignore. We use the empty result
 			}
 		}
@@ -1337,7 +1337,7 @@ export abstract class AbstractTaskService extends Disposable implements ITaskSer
 						this._persistentTasks.set(value[0], value[1]);
 					}
 				}
-			} catch (error) {
+			} catch (_error) {
 				// Ignore. We use the empty result
 			}
 		}
@@ -2013,7 +2013,9 @@ export abstract class AbstractTaskService extends Disposable implements ITaskSer
 		let toCustomize: TaskConfig.ICustomTask | TaskConfig.IConfiguringTask | undefined;
 		const taskConfig = CustomTask.is(task) || ConfiguringTask.is(task) ? task._source.config : undefined;
 		if (taskConfig && taskConfig.element) {
-			toCustomize = { ...taskConfig.element };
+			toCustomize = { ...(taskConfig.element as Record<string, unknown>) } as
+				| TaskConfig.ICustomTask
+				| TaskConfig.IConfiguringTask;
 		} else if (ContributedTask.is(task)) {
 			toCustomize = {};
 			const identifier: TaskConfig.ITaskIdentifier = Object.assign(Object.create(null), task.defines);
@@ -2925,7 +2927,7 @@ export abstract class AbstractTaskService extends Disposable implements ITaskSer
 										result.add(key, TaskConfig.createCustomTask(resolvedTask, configuringTask));
 										return;
 									}
-								} catch (error) {
+								} catch (_error) {
 									// Ignore errors. The task could not be provided by any of the providers.
 								}
 							}
@@ -3856,7 +3858,7 @@ export abstract class AbstractTaskService extends Disposable implements ITaskSer
 			if (task === null) {
 				this._runConfigureTasks();
 			} else {
-				this.run(task, { attachProblemMatcher: true }, TaskRunSource.User).then(undefined, reason => {
+				this.run(task, { attachProblemMatcher: true }, TaskRunSource.User).then(undefined, _reason => {
 					// eat the error, it has already been surfaced to the user and we don't care about it here
 				});
 			}
@@ -3969,7 +3971,7 @@ export abstract class AbstractTaskService extends Disposable implements ITaskSer
 				problemMatcherOptions: IProblemMatcherRunOptions | undefined,
 				that: AbstractTaskService
 			) {
-				that.run(task, problemMatcherOptions, TaskRunSource.User).then(undefined, reason => {
+				that.run(task, problemMatcherOptions, TaskRunSource.User).then(undefined, _reason => {
 					// eat the error, it has already been surfaced to the user and we don't care about it here
 				});
 			}

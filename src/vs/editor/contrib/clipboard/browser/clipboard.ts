@@ -269,7 +269,7 @@ function registerExecCommandImpl(target: MultiCommand | undefined, browserComman
 	}
 
 	// 1. handle case when focus is in editor.
-	target.addImplementation(10000, 'code-editor', (accessor: ServicesAccessor, args: unknown) => {
+	target.addImplementation(10000, 'code-editor', (accessor: ServicesAccessor, _args: unknown) => {
 		const logService = accessor.get(ILogService);
 		const clipboardService = accessor.get(IClipboardService);
 		logService.trace('registerExecCommandImpl (addImplementation code-editor for : ', browserCommand, ')');
@@ -306,7 +306,7 @@ function registerExecCommandImpl(target: MultiCommand | undefined, browserComman
 	});
 
 	// 2. (default) handle case when focus is somewhere else.
-	target.addImplementation(0, 'generic-dom', (accessor: ServicesAccessor, args: unknown) => {
+	target.addImplementation(0, 'generic-dom', (accessor: ServicesAccessor, _args: unknown) => {
 		const logService = accessor.get(ILogService);
 		logService.trace('registerExecCommandImpl (addImplementation generic-dom for : ', browserCommand, ')');
 		logService.trace('registerExecCommandImpl (before execCommand ' + browserCommand + ')');
@@ -331,7 +331,7 @@ registerExecCommandImpl(CopyAction, 'copy');
 
 if (PasteAction) {
 	// 1. Paste: handle case when focus is in editor.
-	PasteAction.addImplementation(10000, 'code-editor', (accessor: ServicesAccessor, args: unknown) => {
+	PasteAction.addImplementation(10000, 'code-editor', (accessor: ServicesAccessor, _args: unknown) => {
 		const logService = accessor.get(ILogService);
 		logService.trace('registerExecCommandImpl (addImplementation code-editor for : paste)');
 		const codeEditorService = accessor.get(ICodeEditorService);
@@ -398,7 +398,7 @@ if (PasteAction) {
 	});
 
 	// 2. Paste: (default) handle case when focus is somewhere else.
-	PasteAction.addImplementation(0, 'generic-dom', (accessor: ServicesAccessor, args: unknown) => {
+	PasteAction.addImplementation(0, 'generic-dom', (accessor: ServicesAccessor, _args: unknown) => {
 		const logService = accessor.get(ILogService);
 		logService.trace('registerExecCommandImpl (addImplementation generic-dom for : paste)');
 		const triggerPaste = accessor.get(IClipboardService).triggerPaste(getActiveWindow().vscodeWindowId);

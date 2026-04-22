@@ -263,7 +263,7 @@ export class ExtensionStorageService extends Disposable implements IExtensionSto
 			if (Array.isArray(migrationList)) {
 				return migrationList;
 			}
-		} catch (error) {
+		} catch (_error) {
 			/* ignore */
 		}
 		return [];

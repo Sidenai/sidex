@@ -347,8 +347,8 @@ export class PlainTextMessagePeek extends Disposable implements IPeekOutputRende
 		const message = subject.message;
 		if (
 			ITestMessage.isDiffable(message) ||
-			message.type === TestMessageType.Output ||
-			typeof message.message !== 'string'
+			(message as any).type === TestMessageType.Output ||
+			typeof (message as any).message !== 'string'
 		) {
 			this.clear();
 			return false;
@@ -376,7 +376,7 @@ export class PlainTextMessagePeek extends Disposable implements IPeekOutputRende
 
 		this.widget.value.setModel(modelRef.object.textEditorModel);
 		this.widget.value.updateOptions(commonEditorOptions);
-		this.widgetDecorations.value = colorizeTestMessageInEditor(message.message, this.widget.value);
+		this.widgetDecorations.value = colorizeTestMessageInEditor((message as any).message, this.widget.value);
 		return true;
 	}
 
@@ -528,7 +528,7 @@ export class TerminalMessagePeek extends Disposable implements IPeekOutputRender
 			subject.message.type === TestMessageType.Output &&
 			subject.message.marker !== undefined
 		) {
-			terminal?.xterm.selectMarkedRange(
+			(terminal as IDetachedTerminalInstance | undefined)?.xterm.selectMarkedRange(
 				getMarkId(subject.message.marker, true),
 				getMarkId(subject.message.marker, false),
 				/* scrollIntoView= */ true

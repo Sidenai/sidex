@@ -134,7 +134,7 @@ export abstract class AbstractExtensionResourceLoaderService
 			version,
 			targetPlatform
 		}: { publisher: string; name: string; version: string; targetPlatform?: TargetPlatform },
-		path?: string
+		_path?: string
 	): Promise<URI | undefined> {
 		await this._initPromise;
 		if (this._extensionGalleryResourceUrlTemplate) {

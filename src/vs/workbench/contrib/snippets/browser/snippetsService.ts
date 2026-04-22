@@ -440,7 +440,7 @@ export class SnippetsService implements ISnippetsService {
 										);
 									}
 								},
-								err => {
+								_err => {
 									// generic error
 									extension.collector.warn(
 										localize('badFile', 'The snippet file "{0}" could not be read.', file.location.toString())

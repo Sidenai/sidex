@@ -53,7 +53,7 @@ export class QuickTree<T extends IQuickTreeItem> extends QuickInput implements I
 		this._register(ui.tree.onDidChangeCheckboxState(e => this._onDidChangeCheckboxState.fire(e.item as T)));
 		// Sync active items with tree focus changes
 		this._register(
-			ui.tree.tree.onDidChangeFocus(e => {
+			ui.tree.tree.onDidChangeFocus(_e => {
 				this._activeItems.set(ui.tree.getActiveItems() as T[], undefined);
 			})
 		);
@@ -118,7 +118,6 @@ export class QuickTree<T extends IQuickTreeItem> extends QuickInput implements I
 	}
 
 	// TODO: Fix the any casting
-	// eslint-disable-next-line local/code-no-any-casts
 	get checkedLeafItems(): readonly T[] {
 		return this.ui.tree.getCheckedLeafItems() as any as readonly T[];
 	}
@@ -173,7 +172,7 @@ export class QuickTree<T extends IQuickTreeItem> extends QuickInput implements I
 				})
 			);
 			this.visibleDisposables.add(
-				this.ui.tree.onDidChangeCheckboxState(e => {
+				this.ui.tree.onDidChangeCheckboxState(_e => {
 					const checkAllState = getParentNodeState([...this.ui.tree.tree.getNode().children]);
 					if (this.ui.checkAll.checked !== checkAllState) {
 						this.ui.checkAll.checked = checkAllState;

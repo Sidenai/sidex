@@ -204,7 +204,7 @@ export class ExtensionService extends AbstractExtensionService implements IExten
 		// monitor for breakage
 		const connection = this._remoteAgentService.getConnection();
 		if (connection) {
-			this._register(connection.onDidStateChange(async (e) => {
+			this._register(connection.onDidStateChange(async (e: any) => {
 				if (e.type === PersistentConnectionEventType.ConnectionLost) {
 					this._remoteAuthorityResolverService._clearResolvedAuthority(remoteAuthority);
 				}

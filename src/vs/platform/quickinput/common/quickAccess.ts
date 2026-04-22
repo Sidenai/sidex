@@ -280,7 +280,7 @@ export class QuickAccessRegistry implements IQuickAccessRegistry {
 		return result || this.defaultProvider;
 	}
 
-	clear(): Function {
+	clear(): () => void {
 		const providers = [...this.providers];
 		const defaultProvider = this.defaultProvider;
 

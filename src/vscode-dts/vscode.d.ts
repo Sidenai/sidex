@@ -18030,6 +18030,10 @@ declare module 'vscode' {
 		 * attempt to return the sessions that are only related to this account.
 		 */
 		account?: AuthenticationSessionAccountInformation;
+		/**
+		 * The authorization server URI that the session should be created for.
+		 */
+		authorizationServer?: Uri;
 	}
 
 	/**

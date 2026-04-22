@@ -209,7 +209,7 @@ export class AuxiliaryWindow extends BaseWindow implements IAuxiliaryWindow {
 		}
 	}
 
-	protected handleVetoBeforeClose(e: BeforeUnloadEvent, reason: string): void {
+	protected handleVetoBeforeClose(e: BeforeUnloadEvent, _reason: string): void {
 		this.preventUnload(e);
 	}
 
@@ -445,14 +445,14 @@ export class BrowserAuxiliaryWindowService extends Disposable implements IAuxili
 		return auxiliaryWindow?.window;
 	}
 
-	protected async resolveWindowId(auxiliaryWindow: Window): Promise<number> {
+	protected async resolveWindowId(_auxiliaryWindow: Window): Promise<number> {
 		return BrowserAuxiliaryWindowService.WINDOW_IDS++;
 	}
 
 	protected createContainer(
 		auxiliaryWindow: CodeWindow,
 		disposables: DisposableStore,
-		options?: IAuxiliaryWindowOpenOptions
+		_options?: IAuxiliaryWindowOpenOptions
 	): { stylesLoaded: Barrier; container: HTMLElement } {
 		auxiliaryWindow.document.createElement = function () {
 			// Disallow `createElement` because it would create

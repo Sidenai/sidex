@@ -79,10 +79,10 @@ export class ParameterHintsModel extends Disposable {
 
 		this._register(this.editor.onDidBlurEditorWidget(() => this.cancel()));
 		this._register(this.editor.onDidChangeConfiguration(() => this.onEditorConfigurationChange()));
-		this._register(this.editor.onDidChangeModel(e => this.onModelChanged()));
+		this._register(this.editor.onDidChangeModel(_e => this.onModelChanged()));
 		this._register(this.editor.onDidChangeModelLanguage(_ => this.onModelChanged()));
 		this._register(this.editor.onDidChangeCursorSelection(e => this.onCursorChange(e)));
-		this._register(this.editor.onDidChangeModelContent(e => this.onModelContentChange()));
+		this._register(this.editor.onDidChangeModelContent(_e => this.onModelContentChange()));
 		this._register(this.providers.onDidChange(this.onModelChanged, this));
 		this._register(this.editor.onDidType(text => this.onDidType(text)));
 

@@ -244,7 +244,7 @@ export class TerminalEditor extends EditorPane {
 		let defaultProfileName;
 		try {
 			defaultProfileName = this._terminalProfileService.getDefaultProfileName();
-		} catch (e) {
+		} catch (_e) {
 			defaultProfileName = this._terminalProfileResolverService.defaultProfileName;
 		}
 		return defaultProfileName!;

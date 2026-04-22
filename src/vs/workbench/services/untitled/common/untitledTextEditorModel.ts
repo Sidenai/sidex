@@ -321,7 +321,7 @@ export class UntitledTextEditorModel extends BaseTextEditorModel implements IUnt
 		this._onDidRevert.fire();
 	}
 
-	async backup(token: CancellationToken): Promise<IWorkingCopyBackup> {
+	async backup(_token: CancellationToken): Promise<IWorkingCopyBackup> {
 		let content: VSBufferReadable | undefined = undefined;
 
 		// Make sure to check whether this model has been resolved
@@ -334,8 +334,8 @@ export class UntitledTextEditorModel extends BaseTextEditorModel implements IUnt
 			content = await this.textFileService.getEncodedReadable(this.resource, this.createSnapshot() ?? undefined, {
 				encoding: UTF8
 			});
-		} else if (typeof this.initialValue === 'string') {
-			content = bufferToReadable(VSBuffer.fromString(this.initialValue));
+		} else if (typeof (this as any).initialValue === 'string') {
+			content = bufferToReadable(VSBuffer.fromString((this as any).initialValue));
 		}
 
 		return { content };

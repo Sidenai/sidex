@@ -77,7 +77,7 @@ import { IPreferencesService } from '../../../services/preferences/common/prefer
 import { ILabelService, Verbosity } from '../../../../platform/label/common/label.js';
 import { IProductService } from '../../../../platform/product/common/productService.js';
 import { MANAGE_TRUST_COMMAND_ID, WorkspaceTrustContext } from '../common/workspace.js';
-import { isWeb } from '../../../../base/common/platform.js';
+import { isWeb as _isWeb } from '../../../../base/common/platform.js';
 import { IRemoteAgentService } from '../../../services/remote/common/remoteAgentService.js';
 import { securityConfigurationNodeBase } from '../../../common/configuration.js';
 import { basename, dirname as uriDirname } from '../../../../base/common/resources.js';
@@ -473,10 +473,10 @@ export class WorkspaceTrustUXHandler extends Disposable implements IWorkbenchCon
 				let dontTrustOption: string | undefined;
 				const isAiGeneratedWorkspace = await this.isAiGeneratedWorkspace();
 				if (isAiGeneratedWorkspace && this.productService.aiGeneratedWorkspaceTrust) {
-					titleString = this.productService.aiGeneratedWorkspaceTrust.title;
-					learnMoreString = this.productService.aiGeneratedWorkspaceTrust.startupTrustRequestLearnMore;
-					trustOption = this.productService.aiGeneratedWorkspaceTrust.trustOption;
-					dontTrustOption = this.productService.aiGeneratedWorkspaceTrust.dontTrustOption;
+					titleString = (this.productService.aiGeneratedWorkspaceTrust as any).title;
+					learnMoreString = (this.productService.aiGeneratedWorkspaceTrust as any).startupTrustRequestLearnMore;
+					trustOption = (this.productService.aiGeneratedWorkspaceTrust as any).trustOption;
+					dontTrustOption = (this.productService.aiGeneratedWorkspaceTrust as any).dontTrustOption;
 				} else {
 					console.warn('AI generated workspace trust dialog contents not available.');
 				}
@@ -669,7 +669,7 @@ export class WorkspaceTrustUXHandler extends Disposable implements IWorkbenchCon
 					if (workspaces.indexOf(this.workspaceContextService.getWorkspace().folders[0].uri.toString()) > -1) {
 						return true;
 					}
-				} catch (e) {
+				} catch (_e) {
 					// Ignore errors when resolving file contents
 				}
 			}
@@ -892,11 +892,11 @@ Registry.as<IWorkbenchContributionsRegistry>(WorkbenchExtensions.Workbench).regi
  * Trusted Workspace GUI Editor
  */
 class WorkspaceTrustEditorInputSerializer implements IEditorSerializer {
-	canSerialize(editorInput: EditorInput): boolean {
+	canSerialize(_editorInput: EditorInput): boolean {
 		return true;
 	}
 
-	serialize(input: WorkspaceTrustEditorInput): string {
+	serialize(_input: WorkspaceTrustEditorInput): string {
 		return '';
 	}
 

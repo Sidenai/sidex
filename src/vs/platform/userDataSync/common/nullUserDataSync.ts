@@ -8,7 +8,6 @@ import { AbstractLogger } from '../../log/common/log.js';
 import { Disposable } from '../../../base/common/lifecycle.js';
 import { createDecorator } from '../../instantiation/common/instantiation.js';
 import { InstantiationType, registerSingleton } from '../../instantiation/common/extensions.js';
-import { URI } from '../../../base/common/uri.js';
 
 // SyncResource enum (inlined to avoid importing heavy module)
 export const enum SyncResource {

@@ -266,7 +266,7 @@ export class KeybindingsSynchroniser extends AbstractJsonFileSynchroniser implem
 
 	protected async getMergeResult(
 		resourcePreview: IKeybindingsResourcePreview,
-		token: CancellationToken
+		_token: CancellationToken
 	): Promise<IMergeResult> {
 		return resourcePreview.previewResult;
 	}
@@ -275,7 +275,7 @@ export class KeybindingsSynchroniser extends AbstractJsonFileSynchroniser implem
 		resourcePreview: IKeybindingsResourcePreview,
 		resource: URI,
 		content: string | null | undefined,
-		token: CancellationToken
+		_token: CancellationToken
 	): Promise<IAcceptResult> {
 		/* Accept local resource */
 		if (this.extUri.isEqual(resource, this.localResource)) {
@@ -362,7 +362,7 @@ export class KeybindingsSynchroniser extends AbstractJsonFileSynchroniser implem
 		// Delete the preview
 		try {
 			await this.fileService.del(this.previewResource);
-		} catch (e) {
+		} catch (_e) {
 			/* ignore */
 		}
 

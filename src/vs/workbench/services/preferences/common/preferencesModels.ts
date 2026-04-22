@@ -269,7 +269,7 @@ export class Settings2EditorModel extends AbstractSettingsModel implements ISett
 			})
 		);
 		this._register(
-			Registry.as<IConfigurationRegistry>(Extensions.Configuration).onDidSchemaChange(e => {
+			Registry.as<IConfigurationRegistry>(Extensions.Configuration).onDidSchemaChange(_e => {
 				this.dirty = true;
 				this._onDidChangeGroups.fire();
 			})
@@ -470,7 +470,7 @@ function parse(
 			}
 		},
 		onLiteralValue: onValue,
-		onError: error => {
+		onError: _error => {
 			const setting = settings[settings.length - 1];
 			if (setting && (isNullRange(setting.range) || isNullRange(setting.keyRange) || isNullRange(setting.valueRange))) {
 				settings.pop();

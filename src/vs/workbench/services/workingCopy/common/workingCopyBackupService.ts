@@ -75,7 +75,7 @@ export class WorkingCopyBackupsModel {
 						})
 				);
 			}
-		} catch (error) {
+		} catch (_error) {
 			// ignore any errors
 		}
 	}
@@ -550,7 +550,7 @@ class WorkingCopyBackupServiceImpl extends Disposable implements IWorkingCopyBac
 						meta = undefined;
 					}
 				}
-			} catch (error) {
+			} catch (_error) {
 				// ignore JSON parse errors
 			}
 		}
@@ -572,7 +572,7 @@ export class InMemoryWorkingCopyBackupService extends Disposable implements IWor
 
 	private backups = new ResourceMap<{ typeId: string; content: VSBuffer; meta?: IWorkingCopyBackupMeta }>();
 
-	hasBackupSync(identifier: IWorkingCopyIdentifier, versionId?: number): boolean {
+	hasBackupSync(identifier: IWorkingCopyIdentifier, _versionId?: number): boolean {
 		const backupResource = this.toBackupResource(identifier);
 
 		return this.backups.has(backupResource);
@@ -583,7 +583,7 @@ export class InMemoryWorkingCopyBackupService extends Disposable implements IWor
 		content?: VSBufferReadable | VSBufferReadableStream,
 		versionId?: number,
 		meta?: IWorkingCopyBackupMeta,
-		token?: CancellationToken
+		_token?: CancellationToken
 	): Promise<void> {
 		const backupResource = this.toBackupResource(identifier);
 		this.backups.set(backupResource, {

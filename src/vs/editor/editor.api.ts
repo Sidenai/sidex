@@ -18,7 +18,7 @@ EditorOptions.overviewRulerLanes.defaultValue = 2;
 
 // We need to register a formatter selector which simply picks the first available formatter.
 // See https://github.com/microsoft/monaco-editor/issues/2327
-FormattingConflicts.setFormatterSelector((formatter, document, mode) => Promise.resolve(formatter[0]));
+FormattingConflicts.setFormatterSelector((formatter, _document, _mode) => Promise.resolve(formatter[0]));
 
 const api = createMonacoBaseAPI();
 api.editor = createMonacoEditorAPI();
@@ -38,7 +38,8 @@ export const Token = api.Token;
 export const editor = api.editor;
 export const languages = api.languages;
 
-interface IFunctionWithAMD extends Function {
+interface IFunctionWithAMD {
+	(...args: any[]): any;
 	amd?: boolean;
 }
 

@@ -248,17 +248,15 @@ if (TRACK_DISPOSABLES) {
 			trackDisposable(x: IDisposable): void {
 				const stack = new Error('Potentially leaked disposable').stack!;
 				setTimeout(() => {
-					// eslint-disable-next-line local/code-no-any-casts
 					if (!(x as any)[__is_disposable_tracked__]) {
 						console.log(stack);
 					}
 				}, 3000);
 			}
 
-			setParent(child: IDisposable, parent: IDisposable | null): void {
+			setParent(child: IDisposable, _parent: IDisposable | null): void {
 				if (child && child !== Disposable.None) {
 					try {
-						// eslint-disable-next-line local/code-no-any-casts
 						(child as any)[__is_disposable_tracked__] = true;
 					} catch {
 						// noop
@@ -269,14 +267,13 @@ if (TRACK_DISPOSABLES) {
 			markAsDisposed(disposable: IDisposable): void {
 				if (disposable && disposable !== Disposable.None) {
 					try {
-						// eslint-disable-next-line local/code-no-any-casts
 						(disposable as any)[__is_disposable_tracked__] = true;
 					} catch {
 						// noop
 					}
 				}
 			}
-			markAsSingleton(disposable: IDisposable): void {}
+			markAsSingleton(_disposable: IDisposable): void {}
 		})()
 	);
 }
@@ -330,7 +327,6 @@ export interface IDisposable {
  * Check if `thing` is {@link IDisposable disposable}.
  */
 export function isDisposable<E>(thing: E): thing is E & IDisposable {
-	// eslint-disable-next-line local/code-no-any-casts
 	return (
 		typeof thing === 'object' &&
 		thing !== null &&

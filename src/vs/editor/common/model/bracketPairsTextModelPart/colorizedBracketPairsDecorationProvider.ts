@@ -36,7 +36,7 @@ export class ColorizedBracketPairsDecorationProvider extends Disposable implemen
 		this.colorizationOptions = textModel.getOptions().bracketPairColorizationOptions;
 
 		this._register(
-			textModel.bracketPairs.onDidChange(e => {
+			textModel.bracketPairs.onDidChange(_e => {
 				this.onDidChangeEmitter.fire();
 			})
 		);
@@ -44,7 +44,7 @@ export class ColorizedBracketPairsDecorationProvider extends Disposable implemen
 
 	//#region TextModel events
 
-	public handleDidChangeOptions(e: IModelOptionsChangedEvent): void {
+	public handleDidChangeOptions(_e: IModelOptionsChangedEvent): void {
 		this.colorizationOptions = this.textModel.getOptions().bracketPairColorizationOptions;
 	}
 

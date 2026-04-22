@@ -319,13 +319,13 @@ namespace CustomExecutionDTO {
 		return candidate && candidate.customExecution === 'customExecution';
 	}
 
-	export function from(value: ICommandConfiguration): ICustomExecutionDTO {
+	export function from(_value: ICommandConfiguration): ICustomExecutionDTO {
 		return {
 			customExecution: 'customExecution'
 		};
 	}
 
-	export function to(value: ICustomExecutionDTO): ICommandConfiguration {
+	export function to(_value: ICustomExecutionDTO): ICommandConfiguration {
 		return {
 			runtime: RuntimeType.CustomExecution,
 			presentation: undefined
@@ -732,7 +732,7 @@ export class MainThreadTask extends Disposable implements MainThreadTaskShape {
 											this._proxy.$OnDidEndTask(result);
 										}
 									},
-									reason => {
+									_reason => {
 										// eat the error, it has already been surfaced to the user and we don't care about it here
 									}
 								);
@@ -748,7 +748,7 @@ export class MainThreadTask extends Disposable implements MainThreadTaskShape {
 				}
 			} else {
 				const task = TaskDTO.to(value, this._workspaceContextServer, true)!;
-				this._taskService.run(task).then(undefined, reason => {
+				this._taskService.run(task).then(undefined, _reason => {
 					// eat the error, it has already been surfaced to the user and we don't care about it here
 				});
 				const result: ITaskExecutionDTO = {
@@ -766,7 +766,7 @@ export class MainThreadTask extends Disposable implements MainThreadTaskShape {
 				for (const task of tasks) {
 					if (id === task._id) {
 						this._taskService.extensionCallbackTaskComplete(task, result).then(
-							value => {
+							_value => {
 								resolve(undefined);
 							},
 							error => {
@@ -787,10 +787,10 @@ export class MainThreadTask extends Disposable implements MainThreadTaskShape {
 				for (const task of tasks) {
 					if (id === task._id) {
 						this._taskService.terminate(task).then(
-							value => {
+							_value => {
 								resolve(undefined);
 							},
-							error => {
+							_error => {
 								reject(undefined);
 							}
 						);

@@ -179,7 +179,7 @@ export class CodeActionController extends Disposable implements IEditorContribut
 			const command = actionItem.action.command;
 			if (command && command.id === 'inlineChat.start') {
 				if (command.arguments && command.arguments.length >= 1 && command.arguments[0]) {
-					command.arguments[0] = { ...command.arguments[0], autoSend: false };
+					command.arguments[0] = { ...(command.arguments[0] as Record<string, unknown>), autoSend: false };
 				}
 			}
 			await this.applyCodeAction(actionItem, false, false, ApplyCodeActionReason.FromAILightbulb);
@@ -410,7 +410,7 @@ export class CodeActionController extends Disposable implements IEditorContribut
 				this._actionWidgetService.hide(false);
 				currentDecorations.clear();
 			},
-			onHide: (didCancel?) => {
+			onHide: (_didCancel?) => {
 				this._editor?.focus();
 				currentDecorations.clear();
 			},

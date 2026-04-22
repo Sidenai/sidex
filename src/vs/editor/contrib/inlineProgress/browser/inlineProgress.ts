@@ -84,7 +84,7 @@ class InlineProgressWidget extends Disposable implements IContentWidget {
 		);
 
 		this._register(
-			dom.addDisposableListener(this.domNode, dom.EventType.CLICK, e => {
+			dom.addDisposableListener(this.domNode, dom.EventType.CLICK, _e => {
 				this.delegate.cancel();
 			})
 		);

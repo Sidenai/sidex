@@ -25,7 +25,7 @@ class TextualDocumentHighlightProvider implements DocumentHighlightProvider, Mul
 	provideDocumentHighlights(
 		model: ITextModel,
 		position: Position,
-		token: CancellationToken
+		_token: CancellationToken
 	): ProviderResult<DocumentHighlight[]> {
 		const result: DocumentHighlight[] = [];
 
@@ -53,7 +53,7 @@ class TextualDocumentHighlightProvider implements DocumentHighlightProvider, Mul
 		primaryModel: ITextModel,
 		position: Position,
 		otherModels: ITextModel[],
-		token: CancellationToken
+		_token: CancellationToken
 	): ProviderResult<ResourceMap<DocumentHighlight[]>> {
 		const result = new ResourceMap<DocumentHighlight[]>();
 

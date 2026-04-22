@@ -145,7 +145,7 @@ export class MouseHandler extends ViewEventHandler {
 		// See https://github.com/microsoft/vscode/issues/146486 for repro steps.
 		// To compensate for that, we simply register here a `pointerup` listener and just communicate it.
 		this._register(
-			dom.addDisposableListener(this.viewHelper.viewDomNode, dom.EventType.POINTER_UP, (e: PointerEvent) => {
+			dom.addDisposableListener(this.viewHelper.viewDomNode, dom.EventType.POINTER_UP, (_e: PointerEvent) => {
 				this._mouseDownOperation.onPointerUp();
 			})
 		);
@@ -243,7 +243,7 @@ export class MouseHandler extends ViewEventHandler {
 		this._mouseDownOperation.onCursorStateChanged(e);
 		return false;
 	}
-	public override onFocusChanged(e: viewEvents.ViewFocusChangedEvent): boolean {
+	public override onFocusChanged(_e: viewEvents.ViewFocusChangedEvent): boolean {
 		return false;
 	}
 	// --- end event handlers

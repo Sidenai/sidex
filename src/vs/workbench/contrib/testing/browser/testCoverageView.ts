@@ -505,7 +505,7 @@ class TestCoverageTree extends Disposable {
 }
 
 class TestCoverageTreeListDelegate implements IListVirtualDelegate<CoverageTreeElement> {
-	getHeight(element: CoverageTreeElement): number {
+	getHeight(_element: CoverageTreeElement): number {
 		return 22;
 	}
 

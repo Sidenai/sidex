@@ -11,6 +11,6 @@ export class ContributedExternalUriOpenersStore extends Disposable {
 	didRegisterOpener(_id: string, _extensionId: string): void {}
 	delete(_scheme: string): void {}
 	getAll(): Iterable<never> {
-		return [];
+		return [] as never[];
 	}
 }

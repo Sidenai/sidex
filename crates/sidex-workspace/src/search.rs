@@ -355,7 +355,7 @@ impl SearchEngine {
             })
             .collect();
 
-        output.sort_by(|a, b| a.file_path.cmp(&b.file_path));
+        output.sort_by_key(|a| a.file_path.clone());
         Ok(output)
     }
 
@@ -440,7 +440,7 @@ impl SearchEngine {
             .into_iter()
             .map(|(path, edits)| FileReplacement { path, edits })
             .collect();
-        result.sort_by(|a, b| a.path.cmp(&b.path));
+        result.sort_by_key(|a| a.path.clone());
         Ok(result)
     }
 

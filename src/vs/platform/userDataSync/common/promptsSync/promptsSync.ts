@@ -146,7 +146,7 @@ export class PromptsSynchronizer extends AbstractSynchroniser implements IUserDa
 
 	protected async getMergeResult(
 		resourcePreview: IPromptsResourcePreview,
-		token: CancellationToken
+		_token: CancellationToken
 	): Promise<IMergeResult> {
 		return resourcePreview.previewResult;
 	}
@@ -155,7 +155,7 @@ export class PromptsSynchronizer extends AbstractSynchroniser implements IUserDa
 		resourcePreview: IPromptsResourcePreview,
 		resource: URI,
 		content: string | null | undefined,
-		token: CancellationToken
+		_token: CancellationToken
 	): Promise<IAcceptResult> {
 		/* Accept local resource */
 		if (
@@ -254,7 +254,7 @@ export class PromptsSynchronizer extends AbstractSynchroniser implements IUserDa
 			// Delete the preview
 			try {
 				await this.fileService.del(previewResource);
-			} catch (e) {
+			} catch (_e) {
 				/* ignore */
 			}
 		}
@@ -565,7 +565,7 @@ export class PromptsSynchronizer extends AbstractSynchroniser implements IUserDa
 			if (Object.keys(local).length) {
 				return true;
 			}
-		} catch (error) {
+		} catch (_error) {
 			/* ignore error */
 		}
 		return false;

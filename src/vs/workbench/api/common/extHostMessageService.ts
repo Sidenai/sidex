@@ -66,7 +66,7 @@ export class ExtHostMessageService {
 			items = [optionsOrFirstItem, ...rest];
 		} else {
 			options.modal = optionsOrFirstItem?.modal;
-			options.useCustom = optionsOrFirstItem?.useCustom;
+			options.useCustom = (optionsOrFirstItem as any)?.useCustom;
 			options.detail = optionsOrFirstItem?.detail;
 			items = rest;
 		}

@@ -195,7 +195,7 @@ export abstract class Composite<MementoType extends object = object>
 	 * of an action. Returns undefined to indicate that the action is not rendered through
 	 * an action item.
 	 */
-	getActionViewItem(action: IAction, options: IBaseActionViewItemOptions): IActionViewItem | undefined {
+	getActionViewItem(_action: IAction, _options: IBaseActionViewItemOptions): IActionViewItem | undefined {
 		return undefined;
 	}
 

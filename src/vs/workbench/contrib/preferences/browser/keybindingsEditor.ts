@@ -2,7 +2,6 @@
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
-/* eslint-disable local/code-no-dangerous-type-assertions */
 
 import './media/keybindingsEditor.css';
 import { localize } from '../../../../nls.js';
@@ -677,7 +676,7 @@ export class KeybindingsEditor extends EditorPane<IKeybindingsEditorMemento> imp
 		) as WorkbenchTable<IKeybindingItemEntry>;
 
 		this._register(this.keybindingsTable.onContextMenu(e => this.onContextMenu(e)));
-		this._register(this.keybindingsTable.onDidChangeFocus(e => this.onFocusChange()));
+		this._register(this.keybindingsTable.onDidChangeFocus(_e => this.onFocusChange()));
 		this._register(
 			this.keybindingsTable.onDidFocus(() => {
 				this.keybindingsTable.getHTMLElement().classList.add('focused');
@@ -1377,7 +1376,9 @@ class WhenInputWidget extends Disposable {
 			)
 		);
 
-		this._register(DOM.addDisposableListener(this.input.element, DOM.EventType.DBLCLICK, e => DOM.EventHelper.stop(e)));
+		this._register(
+			DOM.addDisposableListener((this.input as any).element, DOM.EventType.DBLCLICK, e => DOM.EventHelper.stop(e))
+		);
 		this._register(toDisposable(() => focusContextKey.reset()));
 
 		this._register(keybindingsEditor.onAcceptWhenExpression(() => this._onDidAccept.fire(this.input.getValue())));
@@ -1392,7 +1393,7 @@ class WhenInputWidget extends Disposable {
 
 	show(value: string): void {
 		this.input.setValue(value);
-		this.input.focus(true);
+		(this.input as any).focus(true);
 	}
 }
 

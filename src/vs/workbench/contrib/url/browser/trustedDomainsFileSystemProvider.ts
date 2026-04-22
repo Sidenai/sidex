@@ -106,7 +106,7 @@ export class TrustedDomainsFileSystemProvider
 		this.fileService.registerProvider(TRUSTED_DOMAINS_SCHEMA, this);
 	}
 
-	stat(resource: URI): Promise<IStat> {
+	stat(_resource: URI): Promise<IStat> {
 		return Promise.resolve(TRUSTED_DOMAINS_STAT);
 	}
 
@@ -131,7 +131,7 @@ export class TrustedDomainsFileSystemProvider
 		return buffer;
 	}
 
-	writeFile(resource: URI, content: Uint8Array, opts: IFileWriteOptions): Promise<void> {
+	writeFile(resource: URI, content: Uint8Array, _opts: IFileWriteOptions): Promise<void> {
 		try {
 			const trustedDomainsContent = VSBuffer.wrap(content).toString();
 			const trustedDomains = parse(trustedDomainsContent);
@@ -148,28 +148,28 @@ export class TrustedDomainsFileSystemProvider
 				StorageScope.APPLICATION,
 				StorageTarget.USER
 			);
-		} catch (err) {}
+		} catch (_err) {}
 
 		return Promise.resolve();
 	}
 
-	watch(resource: URI, opts: IWatchOptions): IDisposable {
+	watch(_resource: URI, _opts: IWatchOptions): IDisposable {
 		return {
 			dispose() {
 				return;
 			}
 		};
 	}
-	mkdir(resource: URI): Promise<void> {
+	mkdir(_resource: URI): Promise<void> {
 		return Promise.resolve(undefined!);
 	}
-	readdir(resource: URI): Promise<[string, FileType][]> {
+	readdir(_resource: URI): Promise<[string, FileType][]> {
 		return Promise.resolve(undefined!);
 	}
-	delete(resource: URI, opts: IFileDeleteOptions): Promise<void> {
+	delete(_resource: URI, _opts: IFileDeleteOptions): Promise<void> {
 		return Promise.resolve(undefined!);
 	}
-	rename(from: URI, to: URI, opts: IFileOverwriteOptions): Promise<void> {
+	rename(_from: URI, _to: URI, _opts: IFileOverwriteOptions): Promise<void> {
 		return Promise.resolve(undefined!);
 	}
 }

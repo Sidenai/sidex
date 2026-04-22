@@ -148,7 +148,7 @@ export class DuplicateSelectionAction extends EditorAction {
 		});
 	}
 
-	public run(accessor: ServicesAccessor, editor: ICodeEditor, args: unknown): void {
+	public run(accessor: ServicesAccessor, editor: ICodeEditor, _args: unknown): void {
 		if (!editor.hasModel()) {
 			return;
 		}
@@ -1243,7 +1243,7 @@ export class UpperCaseAction extends AbstractCaseAction {
 		});
 	}
 
-	protected _modifyText(text: string, wordSeparators: string): string {
+	protected _modifyText(text: string, _wordSeparators: string): string {
 		return text.toLocaleUpperCase();
 	}
 }
@@ -1258,7 +1258,7 @@ export class LowerCaseAction extends AbstractCaseAction {
 		});
 	}
 
-	protected _modifyText(text: string, wordSeparators: string): string {
+	protected _modifyText(text: string, _wordSeparators: string): string {
 		return text.toLocaleLowerCase();
 	}
 }
@@ -1280,7 +1280,7 @@ class BackwardsCompatibleRegExp {
 			this._evaluated = true;
 			try {
 				this._actual = new RegExp(this._pattern, this._flags);
-			} catch (err) {
+			} catch (_err) {
 				// this browser does not support this regular expression
 			}
 		}
@@ -1304,7 +1304,7 @@ export class TitleCaseAction extends AbstractCaseAction {
 		});
 	}
 
-	protected _modifyText(text: string, wordSeparators: string): string {
+	protected _modifyText(text: string, _wordSeparators: string): string {
 		const titleBoundary = TitleCaseAction.titleBoundary.get();
 		if (!titleBoundary) {
 			// cannot support this
@@ -1327,7 +1327,7 @@ export class SnakeCaseAction extends AbstractCaseAction {
 		});
 	}
 
-	protected _modifyText(text: string, wordSeparators: string): string {
+	protected _modifyText(text: string, _wordSeparators: string): string {
 		const caseBoundary = SnakeCaseAction.caseBoundary.get();
 		const singleLetters = SnakeCaseAction.singleLetters.get();
 		if (!caseBoundary || !singleLetters) {
@@ -1352,7 +1352,7 @@ export class CamelCaseAction extends AbstractCaseAction {
 		});
 	}
 
-	protected _modifyText(text: string, wordSeparators: string): string {
+	protected _modifyText(text: string, _wordSeparators: string): string {
 		const wordBoundary = /\r\n|\r|\n/.test(text)
 			? CamelCaseAction.multiLineWordBoundary.get()
 			: CamelCaseAction.singleLineWordBoundary.get();
@@ -1383,7 +1383,7 @@ export class PascalCaseAction extends AbstractCaseAction {
 		});
 	}
 
-	protected _modifyText(text: string, wordSeparators: string): string {
+	protected _modifyText(text: string, _wordSeparators: string): string {
 		const wordBoundary = PascalCaseAction.wordBoundary.get();
 		const wordBoundaryToMaintain = PascalCaseAction.wordBoundaryToMaintain.get();
 		const upperCaseWordMatcher = PascalCaseAction.upperCaseWordMatcher.get();

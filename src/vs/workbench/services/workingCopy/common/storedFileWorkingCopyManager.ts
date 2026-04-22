@@ -671,7 +671,7 @@ export class StoredFileWorkingCopyManager<M extends IStoredFileWorkingCopyModel>
 			currentWorkingCopyResolve = nextPendingWorkingCopyResolve;
 			try {
 				await nextPendingWorkingCopyResolve;
-			} catch (error) {
+			} catch (_error) {
 				// ignore any error here, it will bubble to the original requestor
 			}
 		}

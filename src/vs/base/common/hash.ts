@@ -4,7 +4,7 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { encodeHex, VSBuffer } from './buffer.js';
-import { wasmSha1, wasmSha1Streaming } from './hashWasm.js';
+import { wasmSha1, wasmSha1Streaming as _wasmSha1Streaming } from './hashWasm.js';
 import * as strings from './strings.js';
 
 type NotSyncHashable = ArrayBufferLike | ArrayBufferView;
@@ -93,7 +93,7 @@ export const hashAsync = (input: string | ArrayBufferView | VSBuffer) => {
 		buff = input;
 	}
 
-	return crypto.subtle.digest('sha-1', buff as ArrayBufferView<ArrayBuffer>).then(toHexString); // CodeQL [SM04514] we use sha1 here for validating old stored client state, not for security
+	return crypto.subtle.digest('sha-1', buff as ArrayBufferView).then(toHexString); // CodeQL [SM04514] we use sha1 here for validating old stored client state, not for security
 };
 
 const enum SHA1Constant {

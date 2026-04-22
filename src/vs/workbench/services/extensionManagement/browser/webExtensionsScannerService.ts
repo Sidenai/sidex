@@ -970,17 +970,18 @@ export class WebExtensionsScannerService extends Disposable implements IWebExten
 
 		if (isSidexTauri && !this.extensionManifestPropertiesService.canExecuteOnWeb(manifest)) {
 			if (!manifest.browser && !manifest.main) {
-				manifest.browser = '';
+				(manifest as any).browser = '';
 			} else if (!manifest.browser && manifest.main) {
-				manifest.browser = manifest.main;
+				(manifest as any).browser = manifest.main;
 			}
 		}
 
 		if (fallbackPackageNLSUri === undefined) {
 			try {
-				fallbackPackageNLSUri = joinPath(extensionLocation, 'package.nls.json');
-				await this.extensionResourceLoaderService.readExtensionResource(fallbackPackageNLSUri);
-			} catch (error) {
+				const nlsUri = joinPath(extensionLocation, 'package.nls.json');
+				await this.extensionResourceLoaderService.readExtensionResource(nlsUri);
+				fallbackPackageNLSUri = nlsUri;
+			} catch (_error) {
 				fallbackPackageNLSUri = undefined;
 			}
 		}
@@ -1106,7 +1107,7 @@ export class WebExtensionsScannerService extends Disposable implements IWebExten
 			if (translations) {
 				manifest = localizeManifest(this.logService, manifest, translations, fallbackTranslations);
 			}
-		} catch (error) {
+		} catch (_error) {
 			/* ignore */
 		}
 		return manifest;

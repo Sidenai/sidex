@@ -361,7 +361,7 @@ export class Edit<T extends BaseReplacement<T>> extends BaseEdit<T, Edit<T>> {
 	 * Represents a set of edits to a string.
 	 * All these edits are applied at once.
 	 */
-	public static readonly empty = new Edit<never>([]);
+	public static readonly empty = new Edit<never>([] as never[]);
 
 	public static create<T extends BaseReplacement<T>>(replacements: readonly T[]): Edit<T> {
 		return new Edit(replacements);

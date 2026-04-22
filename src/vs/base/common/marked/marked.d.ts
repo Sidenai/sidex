@@ -185,9 +185,9 @@ export type TokensList = Token[] & {
 /**
  * Renderer
  */
-declare class _Renderer {
+declare class MarkedRenderer {
 	options: MarkedOptions;
-	parser: _Parser;
+	parser: MarkedParser;
 	constructor(options?: MarkedOptions);
 	space(token: Tokens.Space): string;
 	code({ text, lang, escaped }: Tokens.Code): string;
@@ -218,7 +218,7 @@ declare class _Renderer {
  * TextRenderer
  * returns only the textual part of the token
  */
-declare class _TextRenderer {
+declare class MarkedTextRenderer {
 	strong({ text }: Tokens.Strong): string;
 	em({ text }: Tokens.Em): string;
 	codespan({ text }: Tokens.Codespan): string;
@@ -232,10 +232,10 @@ declare class _TextRenderer {
 /**
  * Parsing & Compiling
  */
-declare class _Parser {
+declare class MarkedParser {
 	options: MarkedOptions;
-	renderer: _Renderer;
-	textRenderer: _TextRenderer;
+	renderer: MarkedRenderer;
+	textRenderer: MarkedTextRenderer;
 	constructor(options?: MarkedOptions);
 	/**
 	 * Static Parse Method
@@ -252,9 +252,9 @@ declare class _Parser {
 	/**
 	 * Parse Inline Tokens
 	 */
-	parseInline(tokens: Token[], renderer?: _Renderer | _TextRenderer): string;
+	parseInline(tokens: Token[], renderer?: MarkedRenderer | MarkedTextRenderer): string;
 }
-declare const blockNormal: {
+declare const _blockNormal: {
 	blockquote: RegExp;
 	code: RegExp;
 	def: RegExp;
@@ -269,8 +269,8 @@ declare const blockNormal: {
 	table: RegExp;
 	text: RegExp;
 };
-export type BlockKeys = keyof typeof blockNormal;
-declare const inlineNormal: {
+export type BlockKeys = keyof typeof _blockNormal;
+declare const _inlineNormal: {
 	_backpedal: RegExp;
 	anyPunctuation: RegExp;
 	autolink: RegExp;
@@ -291,7 +291,7 @@ declare const inlineNormal: {
 	text: RegExp;
 	url: RegExp;
 };
-export type InlineKeys = keyof typeof inlineNormal;
+export type InlineKeys = keyof typeof _inlineNormal;
 /**
  * exports
  */
@@ -440,10 +440,10 @@ export interface Rules {
 /**
  * Tokenizer
  */
-declare class _Tokenizer {
+declare class MarkedTokenizer {
 	options: MarkedOptions;
 	rules: Rules;
-	lexer: _Lexer;
+	lexer: MarkedLexer;
 	constructor(options?: MarkedOptions);
 	space(src: string): Tokens.Space | undefined;
 	code(src: string): Tokens.Code | undefined;
@@ -470,7 +470,7 @@ declare class _Tokenizer {
 	url(src: string): Tokens.Link | undefined;
 	inlineText(src: string): Tokens.Text | undefined;
 }
-declare class _Hooks {
+declare class MarkedHooks {
 	options: MarkedOptions;
 	constructor(options?: MarkedOptions);
 	static passThroughHooks: Set<string>;
@@ -488,7 +488,7 @@ declare class _Hooks {
 	processAllTokens(tokens: Token[] | TokensList): Token[] | TokensList;
 }
 export interface TokenizerThis {
-	lexer: _Lexer;
+	lexer: MarkedLexer;
 }
 export type TokenizerExtensionFunction = (
 	this: TokenizerThis,
@@ -504,7 +504,7 @@ export interface TokenizerExtension {
 	childTokens?: string[] | undefined;
 }
 export interface RendererThis {
-	parser: _Parser;
+	parser: MarkedParser;
 }
 export type RendererExtensionFunction = (this: RendererThis, token: Tokens.Generic) => string | false | undefined;
 export interface RendererExtension {
@@ -515,24 +515,24 @@ export type TokenizerAndRendererExtension =
 	| TokenizerExtension
 	| RendererExtension
 	| (TokenizerExtension & RendererExtension);
-export type HooksApi = Omit<_Hooks, 'constructor' | 'options'>;
+export type HooksApi = Omit<MarkedHooks, 'constructor' | 'options'>;
 export type HooksObject = {
 	[K in keyof HooksApi]?: (
-		this: _Hooks,
+		this: MarkedHooks,
 		...args: Parameters<HooksApi[K]>
 	) => ReturnType<HooksApi[K]> | Promise<ReturnType<HooksApi[K]>>;
 };
-export type RendererApi = Omit<_Renderer, 'constructor' | 'options' | 'parser'>;
+export type RendererApi = Omit<MarkedRenderer, 'constructor' | 'options' | 'parser'>;
 export type RendererObject = {
 	[K in keyof RendererApi]?: (
-		this: _Renderer,
+		this: MarkedRenderer,
 		...args: Parameters<RendererApi[K]>
 	) => ReturnType<RendererApi[K]> | false;
 };
-export type TokenizerApi = Omit<_Tokenizer, 'constructor' | 'options' | 'rules' | 'lexer'>;
+export type TokenizerApi = Omit<MarkedTokenizer, 'constructor' | 'options' | 'rules' | 'lexer'>;
 export type TokenizerObject = {
 	[K in keyof TokenizerApi]?: (
-		this: _Tokenizer,
+		this: MarkedTokenizer,
 		...args: Parameters<TokenizerApi[K]>
 	) => ReturnType<TokenizerApi[K]> | false;
 };
@@ -593,17 +593,17 @@ export interface MarkedOptions extends Omit<
 	/**
 	 * Hooks are methods that hook into some part of marked.
 	 */
-	hooks?: _Hooks | undefined | null;
+	hooks?: MarkedHooks | undefined | null;
 	/**
 	 * Type: object Default: new Renderer()
 	 *
 	 * An object containing functions to render tokens to HTML.
 	 */
-	renderer?: _Renderer | undefined | null;
+	renderer?: MarkedRenderer | undefined | null;
 	/**
 	 * The tokenizer defines how to turn markdown text into tokens.
 	 */
-	tokenizer?: _Tokenizer | undefined | null;
+	tokenizer?: MarkedTokenizer | undefined | null;
 	/**
 	 * Custom extensions
 	 */
@@ -627,7 +627,7 @@ export interface MarkedOptions extends Omit<
 /**
  * Block Lexer
  */
-declare class _Lexer {
+declare class MarkedLexer {
 	tokens: TokensList;
 	options: MarkedOptions;
 	state: {
@@ -843,12 +843,12 @@ export declare class Marked {
 		): string;
 		(src: string, options?: MarkedOptions | undefined | null): string | Promise<string>;
 	};
-	Parser: typeof _Parser;
-	Renderer: typeof _Renderer;
-	TextRenderer: typeof _TextRenderer;
-	Lexer: typeof _Lexer;
-	Tokenizer: typeof _Tokenizer;
-	Hooks: typeof _Hooks;
+	Parser: typeof MarkedParser;
+	Renderer: typeof MarkedRenderer;
+	TextRenderer: typeof MarkedTextRenderer;
+	Lexer: typeof MarkedLexer;
+	Tokenizer: typeof MarkedTokenizer;
+	Hooks: typeof MarkedHooks;
 	constructor(...args: MarkedExtension[]);
 	/**
 	 * Run callback for every token
@@ -895,16 +895,16 @@ export declare function marked(
 ): Promise<string>;
 export declare function marked(src: string, options?: MarkedOptions | undefined | null): string | Promise<string>;
 export declare namespace marked {
-	var options: (options: MarkedOptions) => typeof marked;
-	var setOptions: (options: MarkedOptions) => typeof marked;
-	var getDefaults: typeof _getDefaults;
-	var defaults: MarkedOptions;
-	var use: (...args: MarkedExtension[]) => typeof marked;
-	var walkTokens: (
+	const options: (options: MarkedOptions) => typeof marked;
+	const setOptions: (options: MarkedOptions) => typeof marked;
+	const getDefaults: typeof _getDefaults;
+	const defaults: MarkedOptions;
+	const use: (...args: MarkedExtension[]) => typeof marked;
+	const walkTokens: (
 		tokens: Token[] | TokensList,
 		callback: (token: Token) => MaybePromise | MaybePromise[]
 	) => MaybePromise[];
-	var parseInline: {
+	const parseInline: {
 		(
 			src: string,
 			options: MarkedOptions & {
@@ -919,15 +919,15 @@ export declare namespace marked {
 		): string;
 		(src: string, options?: MarkedOptions | undefined | null): string | Promise<string>;
 	};
-	var Parser: typeof _Parser;
-	var parser: typeof _Parser.parse;
-	var Renderer: typeof _Renderer;
-	var TextRenderer: typeof _TextRenderer;
-	var Lexer: typeof _Lexer;
-	var lexer: typeof _Lexer.lex;
-	var Tokenizer: typeof _Tokenizer;
-	var Hooks: typeof _Hooks;
-	var parse: typeof marked;
+	const Parser: typeof MarkedParser;
+	const parser: typeof MarkedParser.parse;
+	const Renderer: typeof MarkedRenderer;
+	const TextRenderer: typeof MarkedTextRenderer;
+	const Lexer: typeof MarkedLexer;
+	const lexer: typeof MarkedLexer.lex;
+	const Tokenizer: typeof MarkedTokenizer;
+	const Hooks: typeof MarkedHooks;
+	const parse: typeof marked;
 }
 export declare const options: (options: MarkedOptions) => typeof marked;
 export declare const setOptions: (options: MarkedOptions) => typeof marked;
@@ -952,16 +952,16 @@ export declare const parseInline: {
 	(src: string, options?: MarkedOptions | undefined | null): string | Promise<string>;
 };
 export declare const parse: typeof marked;
-export declare const parser: typeof _Parser.parse;
-export declare const lexer: typeof _Lexer.lex;
+export declare const parser: typeof MarkedParser.parse;
+export declare const lexer: typeof MarkedLexer.lex;
 
 export {
-	_Hooks as Hooks,
-	_Lexer as Lexer,
-	_Parser as Parser,
-	_Renderer as Renderer,
-	_TextRenderer as TextRenderer,
-	_Tokenizer as Tokenizer,
+	MarkedHooks as Hooks,
+	MarkedLexer as Lexer,
+	MarkedParser as Parser,
+	MarkedRenderer as Renderer,
+	MarkedTextRenderer as TextRenderer,
+	MarkedTokenizer as Tokenizer,
 	_defaults as defaults,
 	_getDefaults as getDefaults
 };

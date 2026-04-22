@@ -132,7 +132,7 @@ class TaskDefinitionRegistryImpl implements ITaskDefinitionRegistry {
 
 	constructor() {
 		this.taskTypes = Object.create(null);
-		this.readyPromise = new Promise<void>((resolve, reject) => {
+		this.readyPromise = new Promise<void>((resolve, _reject) => {
 			taskDefinitionsExtPoint.setHandler((extensions, delta) => {
 				this._schema = undefined;
 				try {
@@ -156,7 +156,7 @@ class TaskDefinitionRegistryImpl implements ITaskDefinitionRegistry {
 					if (delta.removed.length > 0 || delta.added.length > 0) {
 						this._onDefinitionsChanged.fire();
 					}
-				} catch (error) {}
+				} catch (_error) {}
 				resolve(undefined);
 			});
 		});

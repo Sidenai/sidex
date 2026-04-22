@@ -321,7 +321,7 @@ export function loadKeyTargets(storage: IStorage): IKeyTargets {
 	if (keysRaw) {
 		try {
 			return JSON.parse(keysRaw);
-		} catch (error) {
+		} catch (_error) {
 			// Fail gracefully
 		}
 	}
@@ -519,7 +519,7 @@ export abstract class AbstractStorageService extends Disposable implements IStor
 		});
 	}
 
-	private withPausedEmitters(fn: Function): void {
+	private withPausedEmitters(fn: (...args: any[]) => any): void {
 		// Pause emitters
 		this._onDidChangeValue.pause();
 		this._onDidChangeTarget.pause();
@@ -789,7 +789,7 @@ export class InMemoryStorageService extends AbstractStorageService {
 		return false;
 	}
 
-	hasScope(scope: IAnyWorkspaceIdentifier | IUserDataProfile): boolean {
+	hasScope(_scope: IAnyWorkspaceIdentifier | IUserDataProfile): boolean {
 		return false;
 	}
 }
@@ -805,7 +805,7 @@ export async function logStorage(
 	const safeParse = (value: string) => {
 		try {
 			return JSON.parse(value);
-		} catch (error) {
+		} catch (_error) {
 			return value;
 		}
 	};

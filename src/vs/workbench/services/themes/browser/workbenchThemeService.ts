@@ -651,7 +651,7 @@ export class WorkbenchThemeService extends Disposable implements IWorkbenchTheme
 				await theme.reload(this.extensionResourceLoaderService);
 				theme.setCustomizations(this.settings);
 				await this.applyTheme(theme, undefined, false);
-			} catch (error) {
+			} catch (_error) {
 				this.logService.info('Unable to reload {0}: {1}', this.currentColorTheme.location?.toString());
 			}
 		});

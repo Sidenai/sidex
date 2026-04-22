@@ -97,7 +97,7 @@ export class LocalSearchProvider implements ISearchProvider {
 		this._filter = cleanFilter(this._filter);
 	}
 
-	searchModel(preferencesModel: ISettingsEditorModel, token: CancellationToken): Promise<ISearchResult | null> {
+	searchModel(preferencesModel: ISettingsEditorModel, _token: CancellationToken): Promise<ISearchResult | null> {
 		if (!this._filter) {
 			return Promise.resolve(null);
 		}

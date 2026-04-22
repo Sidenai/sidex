@@ -654,7 +654,7 @@ const newCommands: ApiCommand[] = [
 		[ApiCommandArgument.Uri],
 		new ApiCommandResult<languages.FoldingRange[] | undefined, vscode.FoldingRange[] | undefined>(
 			'A promise that resolves to an array of FoldingRange objects',
-			(result, args) => {
+			(result, _args) => {
 				if (result) {
 					return result.map(typeConverters.FoldingRange.to);
 				}
@@ -751,11 +751,11 @@ const newCommands: ApiCommand[] = [
 				'Either the column in which to open or editor options, see vscode.TextDocumentShowOptions',
 				v => v === undefined || typeof v === 'number' || typeof v === 'object',
 				v =>
-					!v
+					(!v
 						? v
 						: typeof v === 'number'
 							? [typeConverters.ViewColumn.from(v), undefined]
-							: [typeConverters.ViewColumn.from(v.viewColumn), typeConverters.TextEditorOpenOptions.from(v)]
+							: [typeConverters.ViewColumn.from(v.viewColumn), typeConverters.TextEditorOpenOptions.from(v)]) as any
 			).optional(),
 			ApiCommandArgument.String.with('label', '').optional()
 		],
@@ -779,11 +779,11 @@ const newCommands: ApiCommand[] = [
 				'Either the column in which to open or editor options, see vscode.TextDocumentShowOptions',
 				v => v === undefined || typeof v === 'number' || typeof v === 'object',
 				v =>
-					!v
+					(!v
 						? v
 						: typeof v === 'number'
 							? [typeConverters.ViewColumn.from(v), undefined]
-							: [typeConverters.ViewColumn.from(v.viewColumn), typeConverters.TextEditorOpenOptions.from(v)]
+							: [typeConverters.ViewColumn.from(v.viewColumn), typeConverters.TextEditorOpenOptions.from(v)]) as any
 			).optional()
 		],
 		ApiCommandResult.Void

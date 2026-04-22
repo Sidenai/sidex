@@ -151,7 +151,7 @@ export class ConfigurationService extends Disposable implements IConfigurationSe
 		value: unknown,
 		arg3?: unknown,
 		arg4?: unknown,
-		options?: IConfigurationUpdateOptions
+		_options?: IConfigurationUpdateOptions
 	): Promise<void> {
 		const overrides: IConfigurationUpdateOverrides | undefined = isConfigurationUpdateOverrides(arg3)
 			? arg3

@@ -45,7 +45,7 @@ import { ISearchTreeAIFileMatch } from './aiSearchModelBase.js';
 import { ResourceSet } from '../../../../../base/common/map.js';
 
 export class AITextSearchHeadingImpl extends TextSearchHeadingImpl<IAITextQuery> {
-	public override hidden: boolean;
+	declare public hidden: boolean;
 	constructor(
 		parent: ISearchResult,
 		@IInstantiationService instantiationService: IInstantiationService,
@@ -178,7 +178,7 @@ export class AIFolderMatchWorkspaceRootImpl extends Disposable implements ISearc
 	}
 
 	private latestRank = 0;
-	createAndConfigureFileMatch(rawFileMatch: IFileMatch<URI>, searchInstanceID: string): FileMatchImpl {
+	createAndConfigureFileMatch(rawFileMatch: IFileMatch<URI>, _searchInstanceID: string): FileMatchImpl {
 		const fileMatch = this.instantiationService.createInstance(
 			AIFileMatch,
 			this._query.contentPattern,
@@ -324,18 +324,18 @@ export class AIFolderMatchWorkspaceRootImpl extends Disposable implements ISearc
 		}
 	}
 
-	replace(match: ISearchTreeFileMatch): Promise<any> {
+	replace(_match: ISearchTreeFileMatch): Promise<any> {
 		throw new Error('Cannot replace in AI search');
 	}
 	replacingAll: boolean = false;
 
-	bindModel(model: ITextModel): void {
+	bindModel(_model: ITextModel): void {
 		// no op
 	}
-	unbindNotebookEditorWidget(editor: NotebookEditorWidget, resource: URI): void {
+	unbindNotebookEditorWidget(_editor: NotebookEditorWidget, _resource: URI): void {
 		//no op
 	}
-	bindNotebookEditorWidget(editor: NotebookEditorWidget, resource: URI): Promise<void> {
+	bindNotebookEditorWidget(_editor: NotebookEditorWidget, _resource: URI): Promise<void> {
 		//no op
 		return Promise.resolve();
 	}

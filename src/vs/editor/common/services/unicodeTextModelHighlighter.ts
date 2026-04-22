@@ -133,7 +133,7 @@ export class UnicodeTextModelHighlighter {
 	}
 }
 
-function buildRegExpCharClassExpr(codePoints: number[], flags?: string): string {
+function buildRegExpCharClassExpr(codePoints: number[], _flags?: string): string {
 	const src = `[${strings.escapeRegExpCharacters(codePoints.map(i => String.fromCodePoint(i)).join(''))}]`;
 	return src;
 }

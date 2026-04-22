@@ -818,7 +818,7 @@ namespace ShellConfiguration {
 	export function from(
 		this: void,
 		config: IShellConfiguration | undefined,
-		context: IParseContext
+		_context: IParseContext
 	): Tasks.IShellConfiguration | undefined {
 		if (!is(config)) {
 			return undefined;
@@ -860,7 +860,7 @@ namespace ShellConfiguration {
 	export function fillDefaults(
 		this: void,
 		value: Tasks.IShellConfiguration,
-		context: IParseContext
+		_context: IParseContext
 	): Tasks.IShellConfiguration {
 		return value;
 	}
@@ -982,7 +982,7 @@ namespace CommandConfiguration {
 		export function from(
 			this: void,
 			config: IPresentationOptionsShape,
-			context: IParseContext
+			_context: IParseContext
 		): Tasks.IPresentationOptions | undefined {
 			let echo: boolean;
 			let reveal: Tasks.RevealKind;

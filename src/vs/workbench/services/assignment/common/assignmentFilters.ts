@@ -89,7 +89,7 @@ export class CopilotAssignmentFilterProvider extends Disposable implements IExpe
 		);
 
 		this._register(
-			this._defaultAccountService.onDidChangeCopilotTokenInfo(() => {
+			(this._defaultAccountService as any).onDidChangeCopilotTokenInfo(() => {
 				this.updateCopilotTokenInfo();
 			})
 		);
@@ -153,7 +153,7 @@ export class CopilotAssignmentFilterProvider extends Disposable implements IExpe
 	}
 
 	private updateCopilotTokenInfo() {
-		const tokenInfo = this._defaultAccountService.copilotTokenInfo;
+		const tokenInfo = (this._defaultAccountService as any).copilotTokenInfo;
 		const newIsSn = tokenInfo?.sn === '1' ? '1' : '0';
 		const newIsFcv1 = tokenInfo?.fcv1 === '1' ? '1' : '0';
 

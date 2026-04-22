@@ -261,7 +261,6 @@ const translateLegacyConfig = (
 		useIgnores: 'useExcludeSettingsAndIgnoreFiles'
 	};
 	Object.entries(legacyConfig).forEach(([key, value]) => {
-		// eslint-disable-next-line local/code-no-any-casts
 		(config as any)[(overrides as any)[key] ?? key] = value;
 	});
 	return config;
@@ -695,7 +694,7 @@ registerAction2(
 				]
 			});
 		}
-		run(accessor: ServicesAccessor, ...args: unknown[]) {
+		run(accessor: ServicesAccessor, ..._args: unknown[]) {
 			return openSearchEditor(accessor);
 		}
 	}

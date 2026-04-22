@@ -588,7 +588,7 @@ export class OpenEditorsView extends ViewPane {
 					this.list.setFocus([index]);
 					this.list.setSelection([index]);
 					this.list.reveal(index);
-				} catch (e) {
+				} catch (_e) {
 					// noop list updated in the meantime
 				}
 				return;

@@ -202,7 +202,10 @@ export class ProgressService extends Disposable implements IProgressService {
 			const progressCommand = options.command;
 			let text: string;
 			let title: string;
-			const source = options.source && typeof options.source !== 'string' ? options.source.label : options.source;
+			const source: string | undefined =
+				options.source && typeof options.source !== 'string'
+					? options.source.label
+					: (options.source as string | undefined);
 
 			if (progressTitle && progressMessage) {
 				// <title>: <message>

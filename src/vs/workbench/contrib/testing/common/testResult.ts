@@ -269,7 +269,7 @@ interface TestResultItemWithChildren extends TestResultItem {
 	children: TestResultItemWithChildren[];
 }
 
-const itemToNode = (controllerId: string, item: ITestItem, parent: string | null): TestResultItemWithChildren => ({
+const itemToNode = (controllerId: string, item: ITestItem, _parent: string | null): TestResultItemWithChildren => ({
 	controllerId,
 	expand: TestItemExpandState.NotExpandable,
 	item: { ...item },
@@ -726,7 +726,7 @@ export class HydratedTestResult implements ITestResult {
 	) {
 		this.id = serialized.id;
 		this.completedAt = serialized.completedAt;
-		this.tasks = serialized.tasks.map((task, i) => ({
+		this.tasks = serialized.tasks.map((task, _i) => ({
 			id: task.id,
 			name: task.name || localize('testUnnamedTask', 'Unnamed Task'),
 			ctrlId: task.ctrlId,

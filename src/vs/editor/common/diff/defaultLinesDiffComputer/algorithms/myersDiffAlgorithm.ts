@@ -57,14 +57,14 @@ export class MyersDiffAlgorithm implements IDiffAlgorithm {
 			const lowerBound = -Math.min(d, seqY.length + (d % 2));
 			const upperBound = Math.min(d, seqX.length + (d % 2));
 			for (k = lowerBound; k <= upperBound; k += 2) {
-				let step = 0;
+				let _step = 0;
 				// We can use the X values of (d-1)-lines to compute X value of the longest d-lines.
 				const maxXofDLineTop = k === upperBound ? -1 : V.get(k + 1); // We take a vertical non-diagonal (add a symbol in seqX)
 				const maxXofDLineLeft = k === lowerBound ? -1 : V.get(k - 1) + 1; // We take a horizontal non-diagonal (+1 x) (delete a symbol in seqX)
-				step++;
+				_step++;
 				const x = Math.min(Math.max(maxXofDLineTop, maxXofDLineLeft), seqX.length);
 				const y = x - k;
-				step++;
+				_step++;
 				if (x > seqX.length || y > seqY.length) {
 					// This diagonal is irrelevant for the result.
 					// TODO: Don't pay the cost for this in the next iteration.

@@ -3641,7 +3641,7 @@ class LayoutStateModel extends Disposable {
 			const defaultAuxiliaryBarVisibility = this.configurationService.getValue(
 				WorkbenchLayoutSettings.AUXILIARYBAR_DEFAULT_VISIBILITY
 			);
-			const startupEditor = this.configurationService.getValue<
+			const _startupEditor = this.configurationService.getValue<
 				'none' | 'welcomePage' | 'readme' | 'newUntitledFile' | 'welcomePageInEmptyWorkbench' | 'terminal'
 			>('workbench.startupEditor');
 			if (

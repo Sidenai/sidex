@@ -874,7 +874,7 @@ export class AnythingQuickAccessProvider extends PickerQuickAccessProvider<IAnyt
 				if (stat.isFile) {
 					return await this.matchFilenameCasing(resource);
 				}
-			} catch (error) {
+			} catch (_error) {
 				// ignore if file does not exist
 			}
 		}
@@ -911,7 +911,7 @@ export class AnythingQuickAccessProvider extends PickerQuickAccessProvider<IAnyt
 					if (stat.isFile) {
 						resources.push(await this.matchFilenameCasing(resource));
 					}
-				} catch (error) {
+				} catch (_error) {
 					// ignore if file does not exist
 				}
 			}
@@ -1081,7 +1081,7 @@ export class AnythingQuickAccessProvider extends PickerQuickAccessProvider<IAnyt
 				resource: activeGlobalResource,
 				options: { preserveFocus: true, revealIfOpened: true, ignoreError: true }
 			});
-		} catch (error) {
+		} catch (_error) {
 			return []; // return if resource cannot be opened
 		}
 
@@ -1099,13 +1099,13 @@ export class AnythingQuickAccessProvider extends PickerQuickAccessProvider<IAnyt
 				}
 
 				model = modelReference.object.textEditorModel;
-			} catch (error) {
+			} catch (_error) {
 				return []; // return if model cannot be resolved
 			}
 		}
 
 		// Ask provider for editor symbols
-		const editorSymbolPicks = await this.editorSymbolsQuickAccess.getSymbolPicks(
+		const editorSymbolPicks = await (this.editorSymbolsQuickAccess as any).getSymbolPicks(
 			model,
 			filter,
 			{ extraContainerLabel: stripIcons(activeGlobalPick.label) },
@@ -1148,11 +1148,11 @@ export class AnythingQuickAccessProvider extends PickerQuickAccessProvider<IAnyt
 	}
 
 	addDecorations(editor: IEditor, range: IRange): void {
-		this.editorSymbolsQuickAccess.addDecorations(editor, range);
+		(this.editorSymbolsQuickAccess as any).addDecorations(editor, range);
 	}
 
 	clearDecorations(editor: IEditor): void {
-		this.editorSymbolsQuickAccess.clearDecorations(editor);
+		(this.editorSymbolsQuickAccess as any).clearDecorations(editor);
 	}
 
 	//#endregion

@@ -22,3 +22,7 @@ export class TypeHierarchyModel {
 		return undefined;
 	}
 }
+
+export const TypeHierarchyProviderRegistry: any = {
+	register: () => ({ dispose: () => {} })
+};

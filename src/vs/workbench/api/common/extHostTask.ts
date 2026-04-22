@@ -149,7 +149,7 @@ export namespace CustomExecutionDTO {
 		}
 	}
 
-	export function from(value: vscode.CustomExecution): tasks.ICustomExecutionDTO {
+	export function from(_value: vscode.CustomExecution): tasks.ICustomExecutionDTO {
 		return {
 			customExecution: 'customExecution'
 		};
@@ -347,9 +347,9 @@ class TaskExecutionImpl implements vscode.TaskExecution {
 		this.#tasks.terminateTask(this);
 	}
 
-	public fireDidStartProcess(value: tasks.ITaskProcessStartedDTO): void {}
+	public fireDidStartProcess(_value: tasks.ITaskProcessStartedDTO): void {}
 
-	public fireDidEndProcess(value: tasks.ITaskProcessEndedDTO): void {}
+	public fireDidEndProcess(_value: tasks.ITaskProcessEndedDTO): void {}
 
 	public get terminal(): vscode.Terminal | undefined {
 		return this._terminal;
@@ -551,12 +551,12 @@ export abstract class ExtHostTaskBase implements ExtHostTaskShape, IExtHostTask 
 		let execution;
 		try {
 			execution = await this.getTaskExecution(value.execution.id);
-		} catch (error) {
+		} catch (_error) {
 			// The task execution is not available anymore
 			return;
 		}
 
-		this._onDidStartTaskProblemMatchers.fire({ execution });
+		this._onDidStartTaskProblemMatchers.fire({ execution } as any);
 	}
 
 	public get onDidEndTaskProblemMatchers(): Event<vscode.TaskProblemMatcherEndedEvent> {
@@ -567,12 +567,12 @@ export abstract class ExtHostTaskBase implements ExtHostTaskShape, IExtHostTask 
 		let execution;
 		try {
 			execution = await this.getTaskExecution(value.execution.id);
-		} catch (error) {
+		} catch (_error) {
 			// The task execution is not available anymore
 			return;
 		}
 
-		this._onDidEndTaskProblemMatchers.fire({ execution, hasErrors: value.hasErrors });
+		this._onDidEndTaskProblemMatchers.fire({ execution, hasErrors: value.hasErrors } as any);
 	}
 
 	protected abstract provideTasksInternal(
@@ -855,8 +855,8 @@ export class WorkerExtHostTask extends ExtHostTaskBase {
 	}
 
 	public async $resolveVariables(
-		uriComponents: UriComponents,
-		toResolve: { process?: { name: string; cwd?: string; path?: string }; variables: string[] }
+		_uriComponents: UriComponents,
+		_toResolve: { process?: { name: string; cwd?: string; path?: string }; variables: string[] }
 	): Promise<{ process?: string; variables: { [key: string]: string } }> {
 		const result = {
 			process: (<unknown>undefined) as string,
@@ -870,9 +870,9 @@ export class WorkerExtHostTask extends ExtHostTaskBase {
 	}
 
 	public async $findExecutable(
-		command: string,
-		cwd?: string | undefined,
-		paths?: string[] | undefined
+		_command: string,
+		_cwd?: string | undefined,
+		_paths?: string[] | undefined
 	): Promise<string | undefined> {
 		return undefined;
 	}

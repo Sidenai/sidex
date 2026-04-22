@@ -579,7 +579,7 @@ export class TerminalStickyScrollOverlay extends Disposable {
 			// Dispose of existing addon before creating a new one to avoid leaking WebGL contexts
 			this._webglAddon.value = new WebglAddon({
 				customGlyphs: this._terminalConfigurationService.config.customGlyphs
-			});
+			} as any);
 			this._webglAddonCustomGlyphs = this._terminalConfigurationService.config.customGlyphs;
 			this._stickyScrollOverlay?.loadAddon(this._webglAddon.value);
 		} else if (!this._shouldLoadWebgl() && this._webglAddon.value) {
