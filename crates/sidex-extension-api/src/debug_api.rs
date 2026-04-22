@@ -496,7 +496,7 @@ impl DebugApi {
 
     /// Adds a breakpoint. Applies to all active sessions.
     pub fn add_breakpoint(&self, location: &BreakpointLocation) -> Result<()> {
-        log::debug!("[ext] breakpoint at {}:{}", location.uri, location.line,);
+        log::debug!("[ext] breakpoint at {}:{}", location.uri, location.line);
 
         let mut sessions = self.sessions.write().expect("debug sessions lock poisoned");
 

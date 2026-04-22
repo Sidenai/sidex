@@ -102,9 +102,7 @@ pub fn relative_path(base: &Path, target: &Path) -> Option<PathBuf> {
 
 /// Check if a path matches a glob pattern.
 pub fn glob_match(pattern: &str, path: &str) -> bool {
-    glob::Pattern::new(pattern)
-        .map(|p| p.matches(path))
-        .unwrap_or(false)
+    glob::Pattern::new(pattern).is_ok_and(|p| p.matches(path))
 }
 
 /// Categorise a file extension into a language family.

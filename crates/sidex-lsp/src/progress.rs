@@ -144,10 +144,7 @@ impl ProgressTracker {
 
     /// Returns whether there is at least one active progress task.
     pub fn has_active_tasks(&self) -> bool {
-        self.active
-            .lock()
-            .map(|map| !map.is_empty())
-            .unwrap_or(false)
+        self.active.lock().is_ok_and(|map| !map.is_empty())
     }
 
     /// Clears all tracked progress state.

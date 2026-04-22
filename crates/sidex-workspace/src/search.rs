@@ -1192,7 +1192,7 @@ pub fn search_files(
         });
     }
 
-    scored.sort_unstable_by(|a, b| b.score.cmp(&a.score));
+    scored.sort_unstable_by_key(|s| std::cmp::Reverse(s.score));
     scored.truncate(max_results);
     scored
 }

@@ -256,7 +256,7 @@ pub fn get_local_history(path: &Path, history_dir: &Path) -> WorkspaceResult<Vec
         let timestamp_str = file_name.trim_end_matches(".snapshot");
         let timestamp: u64 = timestamp_str.parse().unwrap_or(0);
 
-        let size = entry.metadata().map(|m| m.len()).unwrap_or(0);
+        let size = entry.metadata().map_or(0, |m| m.len());
         let label = format_local_timestamp(timestamp);
 
         entries.push(TimelineEntry {

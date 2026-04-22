@@ -359,9 +359,7 @@ impl FileOperationService {
     /// Check if a file is read-only.
     #[must_use]
     pub fn is_readonly(path: &Path) -> bool {
-        std::fs::metadata(path)
-            .map(|m| m.permissions().readonly())
-            .unwrap_or(false)
+        std::fs::metadata(path).is_ok_and(|m| m.permissions().readonly())
     }
 
     // ── Large file detection ────────────────────────────────────────────
@@ -375,15 +373,13 @@ impl FileOperationService {
     /// Check if a file exceeds a custom byte threshold.
     #[must_use]
     pub fn is_file_larger_than(path: &Path, threshold: u64) -> bool {
-        std::fs::metadata(path)
-            .map(|m| m.len() > threshold)
-            .unwrap_or(false)
+        std::fs::metadata(path).is_ok_and(|m| m.len() > threshold)
     }
 
     /// Get the file size in bytes, or 0 if it cannot be read.
     #[must_use]
     pub fn file_size(path: &Path) -> u64 {
-        std::fs::metadata(path).map(|m| m.len()).unwrap_or(0)
+        std::fs::metadata(path).map_or(0, |m| m.len())
     }
 }
 

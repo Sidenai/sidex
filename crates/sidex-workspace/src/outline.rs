@@ -328,7 +328,7 @@ fn sort_symbols(symbols: &mut [DocumentSymbol], order: OutlineSortOrder) {
             symbols.sort_by_key(|s| (s.range.start.line, s.range.start.character));
         }
         OutlineSortOrder::Alphabetical => {
-            symbols.sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
+            symbols.sort_by_key(|a| a.name.to_lowercase());
         }
         OutlineSortOrder::Category => {
             symbols.sort_by(|a, b| {
