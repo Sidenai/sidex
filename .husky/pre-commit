@@ -1,0 +1,14 @@
+#!/bin/sh
+# Pre-commit hook to run formatting checks locally
+# This replaces the removed GitHub Actions CI
+# Run manually: .husky/pre-commit
+
+set -e
+
+echo "Running pre-commit checks..."
+
+# Prettier format check (fastest - catches most common style issues)
+echo "🔍 Checking Prettier format..."
+npm run format:check
+
+echo "✅ Prettier check passed!"
