@@ -10,14 +10,15 @@
 	width: 100%;
 	left: 0;
 	top: 0;
-	z-index: 2575; /* Above Context Views, Below Workbench Hover */
+	z-index: 2575;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 }
 
 .monaco-dialog-modal-block.dimmed {
-	background: rgba(0, 0, 0, 0.3);
+	background: rgba(0, 0, 0, 0.5);
+	backdrop-filter: blur(2px);
 }
 
 /** Dialog: Container */
@@ -26,17 +27,18 @@
 	flex-direction: column-reverse;
 	width: min-content;
 	min-width: 480px;
-	max-width: 90vw;
+	max-width: 480px;
 	max-height: 90vh;
 	min-height: 75px;
-	padding: 8px;
+	padding: 16px;
 	transform: translate3d(0px, 0px, 0px);
-	border-radius: var(--vscode-cornerRadius-xLarge);
-	box-shadow: var(--vscode-shadow-xl);
+	border-radius: 10px;
+	border: 1px solid var(--vscode-widget-border, #252525);
+	box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
 }
 
 .monaco-dialog-box.align-vertical {
-	min-width: 350px; /* more narrow when aligned vertically */
+	min-width: 350px;
 }
 
 /** Dialog: Title Actions Row */
@@ -56,7 +58,7 @@
 	flex-grow: 1;
 	align-items: center;
 	padding: 0 8px 0 12px;
-	min-height: 0; /* allow flex item to shrink below content size */
+	min-height: 0;
 	overflow: hidden;
 }
 
@@ -65,7 +67,7 @@
 }
 
 .monaco-dialog-box.align-vertical .dialog-message-row .dialog-message-container {
-	min-height: 0; /* allow flex item to shrink below content size in column layout */
+	min-height: 0;
 }
 
 .monaco-dialog-box .dialog-message-row > .dialog-icon.codicon {
@@ -85,7 +87,7 @@
 }
 
 .monaco-dialog-box:not(.align-vertical) .dialog-message-row .dialog-message-container {
-	align-self: stretch; /* fill row height so overflow-y scrolling works */
+	align-self: stretch;
 }
 
 /** Dialog: Message/Footer Container */
@@ -98,7 +100,7 @@
 	text-overflow: ellipsis;
 	user-select: text;
 	-webkit-user-select: text;
-	word-wrap: break-word; /* never overflow long words, but break to next line */
+	word-wrap: break-word;
 	white-space: normal;
 }
 
@@ -119,16 +121,16 @@
 
 .monaco-dialog-box .dialog-message-row .dialog-message-container ul,
 .monaco-dialog-box .dialog-footer-row ul {
-	padding-inline-start: 20px; /* reduce excessive indent of list items in the dialog */
+	padding-inline-start: 20px;
 }
 
 /** Dialog: Message */
 .monaco-dialog-box .dialog-message-row .dialog-message-container .dialog-message {
-	font-size: 14px;
-	font-weight: 600;
-	flex: 1; /* let the message always grow */
+	font-size: 13px;
+	font-weight: 500;
+	flex: 1;
 	white-space: normal;
-	word-wrap: break-word; /* never overflow long words, but break to next line */
+	word-wrap: break-word;
 	min-height: 22px;
 	margin-bottom: 4px;
 	display: flex;
@@ -138,7 +140,7 @@
 /** Dialog: Details */
 .monaco-dialog-box .dialog-message-row .dialog-message-container .dialog-message-detail {
 	line-height: 20px;
-	flex: 1; /* let the message always grow */
+	flex: 1;
 }
 
 .monaco-dialog-box .dialog-message-row .dialog-message-container .dialog-message a:focus {
@@ -178,22 +180,22 @@
 .monaco-dialog-box > .dialog-buttons-row {
 	display: flex;
 	align-items: center;
-	padding-right: 1px;
-	overflow: hidden; /* buttons row should never overflow */
+	overflow: hidden;
 	white-space: nowrap;
 	padding: 20px 0px 0px;
+	justify-content: flex-end;
 }
 
 /** Dialog: Buttons */
 .monaco-dialog-box > .dialog-buttons-row > .dialog-buttons {
 	display: flex;
 	width: 100%;
+	gap: 8px;
+	justify-content: flex-end;
 }
 
 .monaco-dialog-box:not(.align-vertical) > .dialog-buttons-row > .dialog-buttons {
 	overflow: hidden;
-	justify-content: flex-end;
-	margin-left: 67px; /* for long buttons, force align with text */
 }
 
 .monaco-dialog-box.align-vertical > .dialog-buttons-row > .dialog-buttons {
@@ -205,12 +207,12 @@
 .monaco-dialog-box > .dialog-buttons-row > .dialog-buttons > .monaco-button {
 	overflow: hidden;
 	text-overflow: ellipsis;
-	margin: 4px; /* allows button focus outline to be visible */
+	margin: 0;
 	outline-offset: 1px !important;
 }
 
 .monaco-dialog-box.align-vertical > .dialog-buttons-row > .dialog-buttons > .monaco-button {
-	margin: 4px 0; /* allows button focus outline to be visible */
+	margin: 0;
 }
 
 .monaco-dialog-box:not(.align-vertical) > .dialog-buttons-row > .dialog-buttons > .monaco-button {
@@ -219,7 +221,7 @@
 
 /** Dialog: Dropdown */
 .monaco-dialog-box:not(.align-vertical) > .dialog-buttons-row > .dialog-buttons > .monaco-button-dropdown {
-	margin: 4px 5px;
+	margin: 0;
 }
 
 .monaco-dialog-box.align-vertical > .dialog-buttons-row > .dialog-buttons > .monaco-button-dropdown {
@@ -227,16 +229,11 @@
 }
 
 .monaco-dialog-box > .dialog-buttons-row > .dialog-buttons > .monaco-button-dropdown:focus-within {
-	/**
-	 * This is a trick to make the focus outline appear on the entire
-	 * container of the dropdown button to ensure the dialog box looks
-	 * consistent to dialogs without dropdown buttons.
-	 */
 	outline-offset: 2px !important;
 	outline-width: 1px;
 	outline-style: solid;
 	outline-color: var(--vscode-focusBorder);
-	border-radius: 4px;
+	border-radius: 3px;
 }
 
 
@@ -249,5 +246,5 @@
 }
 
 .monaco-dialog-modal-block .dialog-shadow {
-	border-radius: var(--vscode-cornerRadius-xLarge);
+	border-radius: 10px;
 }

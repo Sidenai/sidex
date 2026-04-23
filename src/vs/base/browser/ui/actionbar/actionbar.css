@@ -26,7 +26,7 @@
 	align-items: center;
 	justify-content: center;
 	cursor: pointer;
-	position: relative;  /* DO NOT REMOVE - this is the key to preventing the ghosting icon bug in Chrome 42 */
+	position: relative;
 }
 
 .monaco-action-bar .action-item.disabled {
@@ -49,18 +49,28 @@
 .monaco-action-bar .action-item .keybinding  {
 	display: flex;
 	font-size: 11px;
-	padding: 3px;
-	border-radius: var(--vscode-cornerRadius-medium);
+	padding: 4px;
+	border-radius: 3px;
+	transition: background-color 120ms ease;
 }
 
-.monaco-action-bar .action-item.disabled .action-label:not(.icon) ,
+.monaco-action-bar .action-item:not(.disabled) .action-label:hover {
+	background-color: var(--vscode-toolbar-hoverBackground);
+}
+
+/* Menus handle their own hover via JS selectionBackgroundColor — don't double up */
+.monaco-menu .monaco-action-bar .action-item:not(.disabled) .action-label:hover {
+	background-color: transparent !important;
+}
+
+.monaco-action-bar .action-item.disabled .action-label:not(.icon),
 .monaco-action-bar .action-item.disabled .action-label:not(.icon)::before,
 .monaco-action-bar .action-item.disabled .action-label:not(.icon):hover {
 	color: var(--vscode-disabledForeground);
 }
 
 /* Unable to change color of SVGs, hence opacity is used */
-.monaco-action-bar .action-item.disabled .action-label.icon ,
+.monaco-action-bar .action-item.disabled .action-label.icon,
 .monaco-action-bar .action-item.disabled .action-label.icon::before,
 .monaco-action-bar .action-item.disabled .action-label.icon:hover {
 	opacity: 0.6;
@@ -102,7 +112,7 @@
 
 /* Action Items */
 .monaco-action-bar .action-item.select-container {
-	overflow: hidden; /* somehow the dropdown overflows its container, we prevent it here to not push */
+	overflow: hidden;
 	flex: 1;
 	max-width: 170px;
 	min-width: 60px;

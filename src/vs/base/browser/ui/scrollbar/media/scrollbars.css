@@ -11,12 +11,8 @@
 
 .monaco-scrollable-element > .visible {
 	opacity: 1;
-
-	/* Background rule added for IE9 - to allow clicks on dom node */
-	background:rgba(0,0,0,0);
-
-	transition: opacity 100ms linear;
-	/* In front of peek view */
+	background: rgba(0,0,0,0);
+	transition: opacity 120ms ease;
 	z-index: 11;
 }
 .monaco-scrollable-element > .invisible {
@@ -24,7 +20,7 @@
 	pointer-events: none;
 }
 .monaco-scrollable-element > .invisible.fade {
-	transition: opacity 800ms linear;
+	transition: opacity 600ms ease;
 }
 
 /* Scrollable Content Inset Shadow */
@@ -59,12 +55,16 @@
 	box-shadow: var(--vscode-scrollbar-shadow) 6px 0 6px -6px inset;
 }
 
+/* Thin scrollbar track: transparent */
 .monaco-scrollable-element > .scrollbar {
-	background: var(--vscode-scrollbar-background);
+	background: transparent;
 }
 
+/* Thin scrollbar thumb: subtle, rounded */
 .monaco-scrollable-element > .scrollbar > .slider {
 	background: var(--vscode-scrollbarSlider-background);
+	border-radius: 4px;
+	transition: background-color 120ms ease;
 }
 
 .monaco-scrollable-element > .scrollbar > .slider:hover {

@@ -5,28 +5,31 @@
 
 .monaco-workbench > .notifications-center {
 	position: absolute;
-	z-index: 2545; /* above modal editor backdrop (2540), below quick input (2550) and dialogs (2575) */
-	right: 7px; /* attempt to position at same location as a toast */
-	bottom: 29px; /* 22px status bar height + 7px (attempt to position at same location as a toast) */
+	z-index: 2545;
+	right: 12px;
+	bottom: 36px;
 	display: none;
 	overflow: hidden;
-	border: 1px solid var(--vscode-editorWidget-border);
-	border-radius: var(--vscode-cornerRadius-small);
-	box-shadow: var(--vscode-shadow-lg);
+	background: var(--vscode-notifications-background);
+	border: 1px solid var(--vscode-notifications-border, var(--vscode-widget-border));
+	border-radius: 8px;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+	max-width: 420px;
+	min-width: 320px;
 }
 
 .monaco-workbench.nostatusbar > .notifications-center {
-	bottom: 11px; /* attempt to position at same location as a toast */
+	bottom: 12px;
 }
 
 .monaco-workbench > .notifications-center.bottom-left {
 	right: auto;
-	left: 7px;
+	left: 12px;
 }
 
 .monaco-workbench > .notifications-center.top-right {
 	bottom: auto;
-	top: 7px;
+	top: 12px;
 }
 
 .monaco-workbench > .notifications-center.visible {
@@ -38,14 +41,17 @@
 .monaco-workbench > .notifications-center > .notifications-center-header {
 	display: flex;
 	align-items: center;
-	padding-left: 8px;
-	padding-right: 5px;
-	height: 35px;
+	padding: 10px 14px;
+	height: auto;
+	border-bottom: 1px solid var(--vscode-notifications-border, var(--vscode-widget-border));
 }
 
 .monaco-workbench > .notifications-center > .notifications-center-header > .notifications-center-header-title {
 	text-transform: uppercase;
 	font-size: 11px;
+	font-weight: 500;
+	letter-spacing: 0.5px;
+	opacity: 0.6;
 }
 
 .monaco-workbench > .notifications-center > .notifications-center-header > .notifications-center-header-toolbar {
@@ -57,23 +63,26 @@
 }
 
 .monaco-workbench > .notifications-center .notifications-list-container .monaco-list-row:not(:last-child) > .notification-list-item {
-	border-bottom: 1px solid var(--vscode-notifications-border);
+	border-bottom: 1px solid var(--vscode-notifications-border, var(--vscode-widget-border));
 }
 
 .monaco-workbench > .notifications-center .notifications-list-container .monaco-list-row:last-child {
-	border-radius: 0px 0px var(--vscode-cornerRadius-small) var(--vscode-cornerRadius-small); /* adopt the border radius at the end of the notifications center */
+	border-radius: 0 0 8px 8px;
 }
 
 /* Icons */
 
 .monaco-workbench > .notifications-center .codicon.codicon-error {
 	color: var(--vscode-notificationsErrorIcon-foreground) !important;
+	font-size: 16px;
 }
 
 .monaco-workbench > .notifications-center .codicon.codicon-warning {
 	color: var(--vscode-notificationsWarningIcon-foreground) !important;
+	font-size: 16px;
 }
 
 .monaco-workbench > .notifications-center .codicon.codicon-info {
 	color: var(--vscode-notificationsInfoIcon-foreground) !important;
+	font-size: 16px;
 }

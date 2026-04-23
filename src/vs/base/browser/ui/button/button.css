@@ -7,22 +7,24 @@
 	box-sizing: border-box;
 	display: flex;
 	width: 100%;
-	padding: 4px 8px;
-	border-radius: 4px;
+	padding: 7px 16px;
+	border-radius: 3px;
 	text-align: center;
 	cursor: pointer;
 	justify-content: center;
 	align-items: center;
 	border: 1px solid var(--vscode-button-border, transparent);
-	line-height: 16px;
-	font-size: 12px;
+	line-height: 18px;
+	font-size: 13px;
+	font-weight: 500;
 	overflow-wrap: normal;
+	transition: background-color 120ms ease, border-color 120ms ease;
 }
 
 .monaco-text-button.small {
 	line-height: 14px;
 	font-size: 11px;
-	padding: 3px 6px;
+	padding: 4px 10px;
 }
 
 .monaco-text-button:focus {
@@ -109,21 +111,22 @@
 .monaco-button-dropdown > .monaco-button.monaco-dropdown-button {
 	border: 1px solid var(--vscode-button-border, transparent);
 	border-left-width: 0 !important;
-	border-radius: 0 4px 4px 0;
+	border-radius: 0 3px 3px 0;
 	padding: 0 4px;
 	display: flex;
 	align-items: center;
+	transition: background-color 120ms ease;
 }
 
 .monaco-button-dropdown > .monaco-button.monaco-text-button {
-	border-radius: 4px 0 0 4px;
+	border-radius: 3px 0 0 3px;
 }
 
 .monaco-description-button {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	margin: 4px 5px; /* allows button focus outline to be visible */
+	margin: 4px 5px;
 }
 
 .monaco-description-button .monaco-button-description {
@@ -162,6 +165,7 @@
 .monaco-button-dropdown.default-colors > .monaco-button.secondary {
 	color: var(--vscode-button-secondaryForeground);
 	background-color: var(--vscode-button-secondaryBackground);
+	border: 1px solid var(--vscode-button-border, #252525);
 }
 
 .monaco-button.default-colors.secondary:hover,

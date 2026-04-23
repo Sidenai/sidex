@@ -13,17 +13,18 @@
 
 .monaco-workbench .notifications-list-container .notification-list-item {
 	display: flex;
-	flex-direction: column-reverse; /* the details row appears first in order for better keyboard access to notification buttons */
-	padding: 10px 5px;
+	flex-direction: column-reverse;
+	padding: 12px 14px;
 	height: 100%;
 	box-sizing: border-box;
+	max-width: 360px;
 }
 
 .monaco-workbench .notifications-list-container .notification-offset-helper {
 	opacity: 0;
 	position: absolute;
 	line-height: 22px;
-	word-wrap: break-word; /* never overflow long words, but break to next line */
+	word-wrap: break-word;
 }
 
 /** Notification: Main Row */
@@ -31,31 +32,34 @@
 .monaco-workbench .notifications-list-container .notification-list-item > .notification-list-item-main-row {
 	display: flex;
 	flex-grow: 1;
+	align-items: flex-start;
 }
 
-/** Notification: Icon */
+/** Notification: Icon — 16px, left-aligned */
 
 .monaco-workbench .notifications-list-container .notification-list-item .notification-list-item-icon {
 	display: flex;
 	align-items: center;
 	flex: 0 0 16px;
 	height: 22px;
-	margin-right: 4px;
-	margin-left: 4px;
-	font-size: 18px;
+	margin-right: 8px;
+	margin-left: 0;
+	font-size: 16px;
 	background-position: center;
 	background-repeat: no-repeat;
 }
 
-/** Notification: Message */
+/** Notification: Message — 13px, max-width 360px */
 
 .monaco-workbench .notifications-list-container .notification-list-item .notification-list-item-message {
-	line-height: 22px;
+	line-height: 20px;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	flex: 1; /* let the message always grow */
+	flex: 1;
 	user-select: text;
 	-webkit-user-select: text;
+	font-size: 13px;
+	max-width: 360px;
 }
 
 .monaco-workbench .notifications-list-container .notification-list-item .notification-list-item-message a {
@@ -70,21 +74,27 @@
 
 .monaco-workbench .notifications-list-container .notification-list-item.expanded .notification-list-item-message {
 	white-space: normal;
-	word-wrap: break-word; /* never overflow long words, but break to next line */
+	word-wrap: break-word;
 }
 
-/** Notification: Toolbar Container */
+/** Notification: Toolbar Container — close button only on hover, 16px top-right */
 
 .monaco-workbench .notifications-list-container .notification-list-item .notification-list-item-toolbar-container {
 	display: none;
 	height: 22px;
+	flex-shrink: 0;
 }
 
-.monaco-workbench .notifications-list-container .monaco-list:focus-within .notification-list-item .notification-list-item-toolbar-container,
 .monaco-workbench .notifications-list-container .notification-list-item:hover .notification-list-item-toolbar-container,
+.monaco-workbench .notifications-list-container .monaco-list:focus-within .notification-list-item .notification-list-item-toolbar-container,
 .monaco-workbench .notifications-list-container .monaco-list-row.focused .notification-list-item .notification-list-item-toolbar-container,
 .monaco-workbench .notifications-list-container .notification-list-item.expanded .notification-list-item-toolbar-container {
-	display: block;
+	display: flex;
+	align-items: center;
+}
+
+.monaco-workbench .notifications-list-container .notification-list-item .notification-list-item-toolbar-container .action-item .codicon {
+	font-size: 16px;
 }
 
 /** Notification: Details Row */
@@ -92,8 +102,9 @@
 .monaco-workbench .notifications-list-container .notification-list-item > .notification-list-item-details-row {
 	display: none;
 	align-items: center;
-	padding-left: 5px;
-	overflow: hidden; /* details row should never overflow */
+	padding-left: 24px;
+	padding-top: 6px;
+	overflow: hidden;
 }
 
 .monaco-workbench .notifications-list-container .notification-list-item.expanded > .notification-list-item-details-row {
@@ -104,21 +115,25 @@
 
 .monaco-workbench .notifications-list-container .notification-list-item .notification-list-item-source {
 	flex: 1;
-	font-size: 12px;
-	overflow: hidden; /* always give away space to buttons container */
+	font-size: 11px;
+	overflow: hidden;
 	text-overflow: ellipsis;
+	opacity: 0.7;
 }
 
-/** Notification: Buttons */
+/** Notification: Buttons — small, rounded (3px), secondary style */
 
 .monaco-workbench .notifications-list-container .notification-list-item .notification-list-item-buttons-container {
 	display: flex;
 	overflow: hidden;
+	gap: 6px;
+	padding-top: 8px;
+	padding-left: 24px;
 }
 
 .monaco-workbench .notifications-list-container .notification-list-item .notification-list-item-buttons-container > .monaco-button-dropdown,
 .monaco-workbench .notifications-list-container .notification-list-item .notification-list-item-buttons-container > .monaco-button {
-	margin: 4px 5px; /* allows button focus outline to be visible */
+	margin: 0;
 }
 
 .monaco-workbench .notifications-list-container .notification-list-item .notification-list-item-buttons-container .monaco-button {
@@ -127,17 +142,22 @@
 
 .monaco-workbench .notifications-list-container .notification-list-item .notification-list-item-buttons-container .monaco-text-button {
 	width: fit-content;
-	display: inline-block;	/* to enable ellipsis in text overflow */
+	display: inline-block;
 	overflow: hidden;
 	text-overflow: ellipsis;
+	padding: 4px 12px;
+	border-radius: 3px;
+	font-size: 12px;
 }
 
 .monaco-workbench .notifications-list-container .notification-list-item .notification-list-item-buttons-container .monaco-dropdown-button {
-	padding: 5px
+	padding: 4px 8px;
+	border-radius: 3px;
 }
 
 /** Notification: Progress */
 
 .monaco-workbench .notifications-list-container .progress-bit {
 	bottom: 0;
+	border-radius: 0 0 8px 8px;
 }

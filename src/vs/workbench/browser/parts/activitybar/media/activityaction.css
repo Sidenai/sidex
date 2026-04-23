@@ -6,13 +6,29 @@
 .monaco-workbench .activitybar > .content :not(.monaco-menu) > .monaco-action-bar .action-item {
 	display: block;
 	position: relative;
+	transition: background-color 120ms ease;
 }
 
+/* Hover background for icon rail feel */
+.monaco-workbench .activitybar > .content :not(.monaco-menu) > .monaco-action-bar .action-item:hover {
+	background-color: var(--sidex-activitybar-hover-bg, rgba(255, 255, 255, 0.04));
+}
+
+/* Active/checked background highlight */
+.monaco-workbench .activitybar > .content :not(.monaco-menu) > .monaco-action-bar .action-item.checked {
+	background-color: var(--sidex-activitybar-active-bg, rgba(255, 255, 255, 0.05));
+}
+
+/*
+ * Drag-and-drop reorder indicators — keep functional but visually hidden.
+ * The ::before/::after pseudo-elements are used by the DnD system;
+ * we make the colored bar transparent so it doesn't clutter the minimal rail.
+ */
 .monaco-workbench .activitybar > .content .composite-bar > .monaco-action-bar .action-item::before,
 .monaco-workbench .activitybar > .content .composite-bar > .monaco-action-bar .action-item::after {
 	position: absolute;
 	content: '';
-	width: var(--activity-bar-width, 48px);
+	width: var(--activity-bar-width, 40px);
 	height: 2px;
 	display: none;
 	background-color: transparent;
@@ -41,30 +57,33 @@
 	background-color: var(--insert-border-color);
 }
 
+/* Action label — sized for compact icon rail */
 .monaco-workbench .activitybar > .content :not(.monaco-menu) > .monaco-action-bar .action-label {
 	position: relative;
 	z-index: 1;
 	display: flex;
 	overflow: hidden;
-	width: var(--activity-bar-width, 48px);
-	height: var(--activity-bar-action-height, 48px);
+	width: var(--activity-bar-width, 40px);
+	height: var(--activity-bar-action-height, 40px);
 	margin-right: 0;
 	box-sizing: border-box;
-
+	transition: color 120ms ease;
 }
 
 .monaco-workbench .activitybar > .content :not(.monaco-menu) > .monaco-action-bar .action-label:not(.codicon) {
 	font-size: 15px;
-	line-height: var(--activity-bar-action-height, 48px);
-	padding: 0 0 0 var(--activity-bar-width, 48px);
+	line-height: var(--activity-bar-action-height, 40px);
+	padding: 0 0 0 var(--activity-bar-width, 40px);
 }
 
+/* Icon sizing — 18px target via CSS variable */
 .monaco-workbench .activitybar > .content :not(.monaco-menu) > .monaco-action-bar .action-label.codicon {
-	font-size: var(--activity-bar-icon-size, 24px);
+	font-size: var(--activity-bar-icon-size, 18px);
 	align-items: center;
 	justify-content: center;
 }
 
+/* Foreground on active / focus / hover */
 .monaco-workbench .activitybar > .content :not(.monaco-menu) > .monaco-action-bar .action-item.active .action-label.codicon,
 .monaco-workbench .activitybar > .content :not(.monaco-menu) > .monaco-action-bar .action-item:focus .action-label.codicon,
 .monaco-workbench .activitybar > .content :not(.monaco-menu) > .monaco-action-bar .action-item:hover .action-label.codicon {
@@ -76,6 +95,7 @@
 	background-color: var(--vscode-activityBar-foreground) !important;
 }
 
+/* Active indicator — thin 2px left border */
 .monaco-workbench .activitybar > .content :not(.monaco-menu) > .monaco-action-bar .action-item.checked .active-item-indicator:before,
 .monaco-workbench .activitybar > .content :not(.monaco-menu) > .monaco-action-bar .action-item:focus .active-item-indicator:before {
 	content: "";
@@ -85,6 +105,7 @@
 	height: 100%;
 	width: 0;
 	border-left: 2px solid;
+	transition: border-color 120ms ease;
 }
 
 .monaco-workbench.hc-black .activitybar > .content :not(.monaco-menu) > .monaco-action-bar .action-item.checked .active-item-indicator:before,
@@ -97,7 +118,6 @@
 	height: 100%;
 }
 
-
 /* Hides active elements in high contrast mode */
 .monaco-workbench.hc-black .activitybar > .content :not(.monaco-menu) > .monaco-action-bar .action-item.checked:not(:focus) .active-item-indicator.action-item,
 .monaco-workbench.hc-light .activitybar > .content :not(.monaco-menu) > .monaco-action-bar .action-item.checked:not(:focus) .active-item-indicator {
@@ -106,7 +126,7 @@
 
 .monaco-workbench .activitybar > .content :not(.monaco-menu) > .monaco-action-bar .action-item.clicked:focus:before,
 .monaco-workbench .activitybar > .content :not(.monaco-menu) > .monaco-action-bar .action-item.clicked:focus .active-item-indicator::before {
-	border-left: none !important; /* no focus feedback when using mouse */
+	border-left: none !important;
 }
 
 .monaco-workbench .activitybar.left > .content :not(.monaco-menu) > .monaco-action-bar .action-item .active-item-indicator:before{
@@ -155,52 +175,54 @@
 	left: -2px;
 }
 
+/* Badges — smaller for compact rail (12px height) */
 .monaco-workbench .activitybar > .content :not(.monaco-menu) > .monaco-action-bar .badge .badge-content {
 	position: absolute;
-	top: 24px;
-	right: 8px;
-	font-size: 9px;
+	top: 4px;
+	right: 3px;
+	font-size: 8px;
 	font-weight: 600;
-	min-width: 8px;
-	height: 16px;
-	line-height: 16px;
-	padding: 0 4px;
-	border-radius: 20px;
+	min-width: 7px;
+	height: 12px;
+	line-height: 12px;
+	padding: 0 2px;
+	border-radius: 12px;
 	text-align: center;
 }
 
 .monaco-workbench .activitybar.compact > .content :not(.monaco-menu) > .monaco-action-bar .badge .badge-content {
-	top: 17px;
-	right: 6px;
-	min-width: 9px;
-	height: 13px;
-	line-height: 13px;
+	top: 2px;
+	right: 2px;
+	min-width: 6px;
+	height: 10px;
+	line-height: 10px;
 	padding: 0 2px;
-	border-radius: 13px;
+	border-radius: 10px;
 	border: none !important;
+	font-size: 7px;
 }
 
 .monaco-workbench .activitybar > .content :not(.monaco-menu) > .monaco-action-bar .profile-badge .profile-text-overlay {
 	position: absolute;
 	font-weight: 600;
-	font-size: 9px;
-	line-height: 10px;
-	top: 24px;
-	right: 6px;
-	padding: 2px 3px;
-	border-radius: 7px;
-	background-color: var(--vscode-profileBadge-background);
-	color: var(--vscode-profileBadge-foreground);
-	border: 2px solid var(--vscode-activityBar-background);
-}
-
-.monaco-workbench .activitybar.compact > .content :not(.monaco-menu) > .monaco-action-bar .profile-badge .profile-text-overlay {
 	font-size: 8px;
-	line-height: 8px;
-	top: 14px;
+	line-height: 9px;
+	top: 4px;
 	right: 2px;
 	padding: 2px 2px;
 	border-radius: 6px;
+	background-color: var(--vscode-profileBadge-background);
+	color: var(--vscode-profileBadge-foreground);
+	border: 1px solid var(--vscode-activityBar-background);
+}
+
+.monaco-workbench .activitybar.compact > .content :not(.monaco-menu) > .monaco-action-bar .profile-badge .profile-text-overlay {
+	font-size: 7px;
+	line-height: 7px;
+	top: 2px;
+	right: 1px;
+	padding: 1px 2px;
+	border-radius: 5px;
 }
 
 .monaco-workbench .activitybar > .content :not(.monaco-menu) > .monaco-action-bar .action-item:active .profile-text-overlay,
@@ -210,7 +232,7 @@
 }
 
 .monaco-workbench .activitybar > .content :not(.monaco-menu) > .monaco-action-bar .badge .codicon.badge-content {
-	font-size: 13px;
+	font-size: 11px;
 	font-weight: unset;
 	padding: 0;
 	justify-content: center;

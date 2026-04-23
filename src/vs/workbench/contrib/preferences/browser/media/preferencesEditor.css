@@ -7,32 +7,31 @@
 
 	height: 100%;
 	overflow: hidden;
-	max-width: 1400px;
+	max-width: 1000px;
 	margin: auto;
 
 	.preferences-editor-header {
 		box-sizing: border-box;
 		margin: auto;
 		overflow: hidden;
-		margin-top: 11px;
-		padding-top: 3px;
-		padding-left: 24px;
-		padding-right: 24px;
-		max-width: 1400px;
+		margin-top: 16px;
+		padding: 0 28px;
+		max-width: 1000px;
 
 		.search-container {
 			position: relative;
 
 			.suggest-input-container {
-				border: 1px solid #ddd;
+				border: 1px solid var(--vscode-input-border, #252525);
+				border-radius: var(--sidex-radius-md, 6px);
 			}
 		}
 
 		.preferences-tabs-container {
 			height: 32px;
 			display: flex;
-			border-bottom: solid 1px;
-			margin-top: 10px;
+			border-bottom: 1px solid var(--vscode-panel-border, #1a1a1a);
+			margin-top: 12px;
 			border-color: var(--vscode-settings-headerBorder);
 
 			.action-item {
@@ -46,22 +45,23 @@
 				}
 
 				.action-details {
-					opacity: 0.9;
+					opacity: 0.7;
 					text-transform: none;
 					margin-left: 0.5em;
 					font-size: 10px;
 				}
 
 				.action-label {
-					font-size: 13px;
-					padding: 7px 8px 6.5px 8px;
-					opacity: 0.9;
+					font-size: 12px;
+					padding: 7px 10px 6px;
+					opacity: 0.7;
 					border-radius: 0;
 					color: var(--vscode-foreground);
 					overflow: hidden;
 					text-overflow: ellipsis;
 					background: none !important;
 					color: var(--vscode-panelTitle-inactiveForeground);
+					transition: opacity var(--sidex-transition-fast, 120ms ease);
 				}
 
 				.action-label.checked {
@@ -73,6 +73,7 @@
 				}
 
 				.action-label:hover {
+					opacity: 1;
 					color: var(--vscode-panelTitle-activeForeground);
 					border-bottom: 1px solid var(--vscode-panelTitle-activeBorder);
 					outline: 1px solid var(--vscode-contrastActiveBorder, transparent);
@@ -90,7 +91,6 @@
 				}
 
 				.action-label:not(.checked):not(:focus) {
-					/* Still maintain a border for alignment, but keep it transparent */
 					border-bottom: 1px solid transparent;
 				}
 

@@ -22,7 +22,8 @@
 
 .monaco-workbench .part.editor > .content .editor-group-container > .title .title-label a,
 .monaco-workbench .part.editor > .content .editor-group-container > .title .tabs-container > .tab .tab-label a {
-	font-size: 13px;
+	font-size: 12px;
+	font-weight: 400;
 }
 
 .monaco-workbench .part.editor > .content .editor-group-container > .title .monaco-icon-label::before,

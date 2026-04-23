@@ -3,6 +3,8 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+/* Sidex: Open editors — 24px rows, uppercase group headers, muted action icons */
+
 .pane-header .open-editors-dirty-count-container {
 	min-width: fit-content;
 	display: flex;
@@ -14,10 +16,13 @@
 	display: none;
 }
 
+/* Dirty count badge — rounded pill, muted */
 .pane-header .open-editors-dirty-count-container > .dirty-count.monaco-count-badge {
 	padding: 2px 4px;
 	margin-left: 6px;
 	min-height: auto;
+	border-radius: 8px;
+	font-size: 11px;
 }
 
 .open-editors .monaco-list .monaco-list-row:hover > .monaco-action-bar,
@@ -30,6 +35,12 @@
 .open-editors .monaco-list .monaco-list-row > .monaco-action-bar .action-label {
 	display: block;
 	padding: 2px;
+	border-radius: 3px;
+	transition: background-color 120ms ease;
+}
+
+.open-editors .monaco-list .monaco-list-row > .monaco-action-bar .action-label:hover {
+	background-color: rgba(255, 255, 255, 0.03);
 }
 
 .open-editors .monaco-list .monaco-list-row > .monaco-action-bar .codicon {
@@ -37,13 +48,11 @@
 }
 
 .open-editors .monaco-list .monaco-list-row.dirty:not(:hover) > .monaco-action-bar .codicon-pinned::before {
-	/* use `pinned-dirty` icon unicode for sticky-dirty indication */
 	content: var(--vscode-icon-pinned-dirty-content);
 	font-family: var(--vscode-icon-pinned-dirty-font-family);
 }
 
 .open-editors .monaco-list .monaco-list-row.dirty:not(:hover) > .monaco-action-bar .codicon-close::before {
-	/* use `circle-filled` icon unicode for dirty indication */
 	content: var(--vscode-icon-circle-filled-content);
 	font-family: var(--vscode-icon-circle-filled-font-family);
 }
@@ -73,14 +82,17 @@
 	align-items: center;
 }
 
+/* Editor group headers — 10px uppercase, muted */
 .open-editors .monaco-list .monaco-list-row .editor-group {
-	font-size: 11px;
-	font-weight: bold;
+	font-size: 10px;
+	font-weight: 600;
 	text-transform: uppercase;
+	letter-spacing: 0.06em;
 	cursor: default;
+	opacity: 0.7;
 }
 
-/* Bold font style does not go well with CJK fonts */
+/* CJK font weight */
 .composite:lang(zh-Hans) .open-editors .monaco-list .monaco-list-row .editor-group,
 .composite:lang(zh-Hant) .open-editors .monaco-list .monaco-list-row .editor-group,
 .composite:lang(ja) .open-editors .monaco-list .monaco-list-row .editor-group,
@@ -88,10 +100,11 @@
 	font-weight: normal;
 }
 
+/* 24px row height */
 .open-editors .open-editor,
 .open-editors .editor-group {
-	height: 22px;
-	line-height: 22px;
+	height: 24px;
+	line-height: 24px;
 }
 
 .open-editors .open-editor > a,

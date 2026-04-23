@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-/* Debug viewlet */
+/* Sidex: Debug viewlet — clean sections, monospace values, muted types */
 
 .debug-pane {
 	height: 100%;
@@ -17,14 +17,14 @@
 	content: '';
 	width: 6px;
 	height: 6px;
-	background-color: #CC6633;
+	background-color: var(--vscode-editorWarning-foreground, #CC6633);
 	position: absolute;
 	top: 10px;
 	right: 6px;
 	border-radius: 10px;
-	border: 1px solid white;
 }
 
+/* Start debug action — clean rounded */
 .monaco-workbench .part > .title > .title-actions .start-debug-action-item {
 	display: flex;
 	align-items: center;
@@ -58,14 +58,10 @@
 	padding-top: 0;
 	padding-bottom: 0;
 	border-radius: 0 var(--vscode-cornerRadius-small) var(--vscode-cornerRadius-small) 0;
-
-	/* The debug view title is crowded, let this one get narrower than others */
 	min-width: 90px;
-
 	white-space: nowrap;
 	text-overflow: ellipsis;
 }
-
 
 .monaco-workbench.safari .monaco-action-bar .start-debug-action-item .configuration .monaco-select-box {
 	margin-bottom: 0px;
@@ -77,15 +73,17 @@
 	cursor: initial;
 }
 
-/* Debug viewlet trees */
-
+/* Debug tree items */
 .debug-pane .line-number {
 	padding-left: 4px;
 	padding-right: 4px;
+	font-family: var(--monaco-monospace-font);
+	font-size: 0.9em;
+	opacity: 0.6;
 }
 
 .debug-pane .disabled {
-	opacity: 0.65;
+	opacity: 0.5;
 	cursor: initial;
 }
 
@@ -96,7 +94,6 @@
 }
 
 /* Call stack */
-
 .debug-pane .call-stack-state-message {
 	flex: 1;
 	text-align: right;
@@ -108,8 +105,9 @@
 
 .debug-pane .call-stack-state-message > .label {
 	border-radius: 3px;
-	padding: 1px 2px;
+	padding: 1px 4px;
 	font-size: 9px;
+	opacity: 0.8;
 }
 
 .debug-pane .debug-call-stack .thread,
@@ -138,7 +136,9 @@
 	margin: 0 10px;
 	text-transform: uppercase;
 	align-self: center;
-	font-size: 0.8em;
+	font-size: 0.75em;
+	letter-spacing: 0.04em;
+	opacity: 0.7;
 }
 
 .debug-pane .debug-call-stack .monaco-list-row:hover .state.label {
@@ -161,6 +161,7 @@
 
 .debug-pane .monaco-list-row .monaco-action-bar .action-label {
 	padding: 2px;
+	border-radius: 3px;
 }
 
 .debug-pane .session .codicon {
@@ -202,6 +203,7 @@
 	overflow: hidden;
 	text-overflow: ellipsis;
 	margin-right: 0.8em;
+	opacity: 0.7;
 }
 
 .debug-pane .debug-call-stack .stack-frame > .file:not(:first-child) {
@@ -223,10 +225,9 @@
 	overflow: hidden;
 }
 
-/* Variables & Expression view */
-
+/* Variables & Expression view — monospace values, muted types */
 .debug-pane .scope {
-	font-weight: bold;
+	font-weight: 600;
 	font-size: 11px;
 }
 
@@ -239,10 +240,11 @@
 	overflow: hidden;
 	white-space: pre;
 	text-overflow: ellipsis;
+	font-family: var(--monaco-monospace-font);
 }
 
 .debug-pane .monaco-list-row .expression .value.changed {
-	border-radius: 4px;
+	border-radius: 3px;
 }
 
 .debug-pane .monaco-inputbox {
@@ -266,6 +268,7 @@
 .debug-pane .monaco-inputbox > .ibwrapper > .input {
 	padding: 0px;
 	color: initial;
+	border-radius: 3px;
 }
 
 .debug-pane .watch-expression {
@@ -283,6 +286,7 @@
 	font-family: var(--monaco-monospace-font);
 	font-weight: normal;
 }
+
 .debug-view-content .monaco-tl-contents .highlight {
 	color: unset !important;
 	background-color: var(--vscode-list-filterMatchBackground);
@@ -290,8 +294,7 @@
 	outline-offset: -1px;
 }
 
-/* Breakpoints */
-
+/* Breakpoints — subtle dots, clean layout */
 .debug-pane .monaco-list-row {
 	line-height: 22px;
 }
@@ -342,14 +345,15 @@
 }
 
 .debug-pane .debug-breakpoints .breakpoint > .access-type {
-	opacity: 0.7;
+	opacity: 0.6;
 	margin-left: 0.9em;
 	text-overflow: ellipsis;
 	overflow: hidden;
 }
+
 .debug-pane .debug-breakpoints .breakpoint > .file-path,
 .debug-pane .debug-breakpoints .breakpoint > .condition {
-	opacity: 0.7;
+	opacity: 0.6;
 	margin-left: 0.9em;
 	flex: 1;
 	text-overflow: ellipsis;

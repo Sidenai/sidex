@@ -3,61 +3,107 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+/* Sidex Notification Toasts */
+
+@keyframes sidex-toast-slide-in {
+	from {
+		transform: translateX(100%);
+		opacity: 0;
+	}
+	to {
+		transform: translateX(0);
+		opacity: 1;
+	}
+}
+
+@keyframes sidex-toast-slide-in-top {
+	from {
+		transform: translateY(-100%);
+		opacity: 0;
+	}
+	to {
+		transform: translateY(0);
+		opacity: 1;
+	}
+}
+
+@keyframes sidex-toast-fade-out {
+	from {
+		opacity: 1;
+		transform: translateX(0);
+	}
+	to {
+		opacity: 0;
+		transform: translateX(40px);
+	}
+}
+
 .monaco-workbench > .notifications-toasts {
 	position: absolute;
-	z-index: 2545; /* above modal editor backdrop (2540), below quick input (2550) and dialogs (2575) */
-	right: 3px;
-	bottom: 25px; /* 22px status bar height + 3px */
+	z-index: 2545;
+	right: 12px;
+	bottom: 36px;
 	display: none;
-	border-radius: var(--vscode-cornerRadius-small);
+	max-width: 400px;
 }
 
 .monaco-workbench.nostatusbar > .notifications-toasts {
-	bottom: 3px;
+	bottom: 12px;
 }
 
 .monaco-workbench > .notifications-toasts.bottom-left {
 	right: auto;
-	left: 3px;
+	left: 12px;
 }
 
 .monaco-workbench > .notifications-toasts.top-right {
 	bottom: auto;
-	top: 3px;
-}
-
-.monaco-workbench > .notifications-toasts.top-right .notification-toast-container > .notification-toast {
-	transform: translate3d(100%, 0px, 0px); /* slide in from right */
+	top: 12px;
 }
 
 .monaco-workbench > .notifications-toasts.visible {
 	display: flex;
 	flex-direction: column;
+	gap: 8px;
 }
 
+/* Toast container: max 3 visible */
+.monaco-workbench > .notifications-toasts .notification-toast-container:nth-child(n+4) {
+	display: none;
+}
+
+/* Individual toast styling */
 .monaco-workbench > .notifications-toasts .notification-toast-container > .notification-toast {
-	margin: 4px; /* enables separation and drop shadows around toasts */
-	transform: translate3d(0px, 100%, 0px); /* move the notification 50px to the bottom (to prevent bleed through) */
-	opacity: 0; /*  fade the toast in */
-	transition:	transform 300ms ease-out, opacity 300ms ease-out;
+	opacity: 0;
+	transform: translateX(100%);
+	transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1), opacity 200ms ease-out;
+}
+
+.monaco-workbench > .notifications-toasts.top-right .notification-toast-container > .notification-toast {
+	transform: translateY(-100%);
 }
 
 .monaco-workbench > .notifications-toasts .notifications-list-container {
-	box-shadow: var(--vscode-shadow-lg);
+	background: #161616;
+	border: 1px solid #252525;
+	border-radius: 8px;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+	overflow: hidden;
 }
 
-.monaco-workbench > .notifications-toasts .notifications-list-container,
 .monaco-workbench > .notifications-toasts .notification-toast-container > .notification-toast,
 .monaco-workbench > .notifications-toasts .notification-toast-container > .notification-toast .monaco-scrollable-element,
 .monaco-workbench > .notifications-toasts .notification-toast-container > .notification-toast .monaco-list:not(.element-focused):focus:before,
 .monaco-workbench > .notifications-toasts .notification-toast-container > .notification-toast .monaco-list-row {
-	border-radius: 4px;
+	border-radius: 8px;
 }
 
+/* Reduced motion */
 .monaco-workbench.monaco-reduce-motion > .notifications-toasts .notification-toast-container > .notification-toast {
-	transition: transform 0ms ease-out, opacity 0ms ease-out;
+	transition: none;
 }
 
+/* Fade-in states */
 .monaco-workbench > .notifications-toasts .notification-toast-container > .notification-toast.notification-fade-in {
 	opacity: 1;
 	transform: none;
@@ -69,16 +115,18 @@
 	transition: none;
 }
 
-/* Icons */
-
+/* Icons: 16px, left-aligned */
 .monaco-workbench > .notifications-toasts .codicon.codicon-error {
 	color: var(--vscode-notificationsErrorIcon-foreground) !important;
+	font-size: 16px;
 }
 
 .monaco-workbench > .notifications-toasts .codicon.codicon-warning {
 	color: var(--vscode-notificationsWarningIcon-foreground) !important;
+	font-size: 16px;
 }
 
 .monaco-workbench > .notifications-toasts .codicon.codicon-info {
 	color: var(--vscode-notificationsInfoIcon-foreground) !important;
+	font-size: 16px;
 }

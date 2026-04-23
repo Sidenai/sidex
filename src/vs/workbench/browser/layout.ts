@@ -3590,7 +3590,7 @@ class LayoutStateModel extends Disposable {
 		LayoutStateKeys.PANEL_SIZE.defaultValue =
 			(this.stateCache.get(LayoutStateKeys.PANEL_POSITION.name) ??
 			isHorizontal(LayoutStateKeys.PANEL_POSITION.defaultValue))
-				? mainContainerDimension.height / 3
+				? mainContainerDimension.height * 0.3
 				: mainContainerDimension.width / 4;
 		LayoutStateKeys.PANEL_POSITION.defaultValue = positionFromString(
 			this.configurationService.getValue(WorkbenchLayoutSettings.PANEL_POSITION) ?? 'bottom'

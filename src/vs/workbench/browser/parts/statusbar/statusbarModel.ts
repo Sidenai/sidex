@@ -49,6 +49,17 @@ export class StatusbarViewModel extends Disposable {
 		this.registerListeners();
 	}
 
+	private static readonly SIDEX_DEFAULT_HIDDEN = new Set([
+		'status.editor.eol',
+		'status.editor.columnSelectionMode',
+		'status.editor.tabFocusMode',
+		'status.editor.inputMode',
+		'status.editor.info',
+		'status.workbench.keyboardLayout',
+		'status.scm.0',
+		'status.scm.provider',
+	]);
+
 	private restoreState(): void {
 		const hiddenRaw = this.storageService.get(StatusbarViewModel.HIDDEN_ENTRIES_KEY, StorageScope.PROFILE);
 		if (hiddenRaw) {
@@ -56,6 +67,11 @@ export class StatusbarViewModel extends Disposable {
 				this.hidden = new Set(JSON.parse(hiddenRaw));
 			} catch (_error) {
 				// ignore parsing errors
+			}
+		}
+		if (!hiddenRaw) {
+			for (const id of StatusbarViewModel.SIDEX_DEFAULT_HIDDEN) {
+				this.hidden.add(id);
 			}
 		}
 	}

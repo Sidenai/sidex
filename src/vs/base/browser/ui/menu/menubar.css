@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-/* Menubar styles */
+/* Sidex Menubar */
 
 .menubar {
 	display: flex;
@@ -42,7 +42,7 @@
 
 .menubar.compact {
 	flex-shrink: 0;
-	overflow: visible; /* to avoid the compact menu to be repositioned when clicking */
+	overflow: visible;
 }
 
 .menubar.compact > .menubar-menu-button {
@@ -56,6 +56,7 @@
 	border-radius: 5px;
 }
 
+/* Dropdown menu holder — the panel that opens below a menubar item */
 .menubar .menubar-menu-items-holder {
 	position: fixed;
 	left: 0px;
@@ -70,6 +71,11 @@
 .menubar .menubar-menu-items-holder.monaco-menu-container {
 	outline: 0;
 	border: none;
+	background: #141414;
+	border: 1px solid #252525;
+	border-radius: 8px;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+	overflow: hidden;
 }
 
 .menubar .menubar-menu-items-holder.monaco-menu-container :focus {

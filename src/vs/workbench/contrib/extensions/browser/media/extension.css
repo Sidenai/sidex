@@ -3,6 +3,8 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+/* Sidex: Extension list items — monochrome, rounded 4px icons, muted descriptions */
+
 .extension-bookmark-container {
 	position: relative;
 }
@@ -18,6 +20,7 @@
 	padding: 0 0 0 16px;
 	overflow: hidden;
 	display: flex;
+	border-radius: 6px;
 }
 
 .extension-list-item > .icon-container {
@@ -26,6 +29,7 @@
 	align-items: center;
 }
 
+/* Extension icon — rounded 4px */
 .extension-list-item > .icon-container .extension-badge {
 	position: absolute;
 	bottom: 10px;
@@ -72,7 +76,7 @@
 }
 
 .extension-list-item > .details > .header-container > .header > .name {
-	font-weight: bold;
+	font-weight: 600;
 	white-space: nowrap;
 	text-overflow: ellipsis;
 	overflow: hidden;
@@ -120,6 +124,7 @@
 .extension-list-item > .details > .header-container > .header > .install-count:not(:empty) {
 	font-size: 11px;
 	margin: 0 6px 0 auto;
+	opacity: 0.7;
 }
 
 .extension-list-item > .details > .header-container > .header > .activation-status:not(:empty) {
@@ -137,8 +142,10 @@
 	-webkit-mask: inherit;
 }
 
+/* Rating stars — monochrome */
 .extension-list-item > .details > .header-container > .header > .ratings {
 	text-align: right;
+	opacity: 0.6;
 }
 
 .extension-list-item > .details > .header-container > .header .extension-icon-badge .codicon {
@@ -169,13 +176,15 @@
 	font-size: 100%;
 }
 
+/* Description — 12px, muted */
 .extension-list-item > .details > .description {
 	padding-right: 11px;
 	line-height: normal;
+	font-size: 12px;
 	color: var(--vscode-descriptionForeground);
 }
 
-.monaco-list-row.selected .extension-list-item > .details > .description{
+.monaco-list-row.selected .extension-list-item > .details > .description {
 	color: unset;
 }
 
@@ -204,12 +213,13 @@
 }
 
 .extension-list-item > .details > .footer .publisher > .publisher-name {
-	font-size: 90%;
+	font-size: 12px;
 	color: var(--vscode-descriptionForeground);
 	font-weight: 600;
+	opacity: 0.7;
 }
 
-.monaco-list-row.selected .extension-list-item > .details > .footer .publisher > .publisher-name{
+.monaco-list-row.selected .extension-list-item > .details > .footer .publisher > .publisher-name {
 	color: unset;
 }
 
@@ -223,8 +233,9 @@
 	text-overflow: ellipsis;
 }
 
+/* Install/manage buttons — rounded 3px, monochrome */
 .extension-list-item > .details > .footer > .monaco-action-bar > .actions-container .action-label:not(.icon) {
-	border-radius: var(--vscode-cornerRadius-small);
+	border-radius: 3px;
 }
 
 .extension-list-item > .details > .footer > .monaco-action-bar > .actions-container .extension-action.label {
@@ -288,15 +299,16 @@
 	border-left-width: 0;
 }
 
-/* single install */
+/* single install — rounded 3px */
 .extension-list-item .monaco-action-bar > .actions-container > .action-item.action-dropdown-item.empty > .extension-action {
-	border-radius: var(--vscode-cornerRadius-small);
+	border-radius: 3px;
 }
 
-/* split install */
+/* split install — rounded 3px */
 .extension-list-item .monaco-action-bar > .actions-container > .action-item.action-dropdown-item:not(.empty) > .extension-action.label:not(.dropdown) {
-	border-radius: var(--vscode-cornerRadius-small) 0 0 var(--vscode-cornerRadius-small);
+	border-radius: 3px 0 0 3px;
 }
+
 .extension-list-item .monaco-action-bar > .actions-container > .action-item.action-dropdown-item > .monaco-dropdown .extension-action {
-	border-radius: 0 var(--vscode-cornerRadius-small) var(--vscode-cornerRadius-small) 0;
+	border-radius: 0 3px 3px 0;
 }

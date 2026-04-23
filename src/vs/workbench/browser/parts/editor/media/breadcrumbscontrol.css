@@ -11,6 +11,11 @@
 	display: none;
 }
 
+.monaco-workbench .part.editor > .content .editor-group-container .breadcrumbs-control {
+	height: 20px;
+	line-height: 20px;
+}
+
 .monaco-workbench .part.editor > .content .editor-group-container .breadcrumbs-control .monaco-breadcrumb-item.selected .monaco-icon-label,
 .monaco-workbench .part.editor > .content .editor-group-container .breadcrumbs-control .monaco-breadcrumb-item.focused .monaco-icon-label {
 	text-decoration-line: underline;
@@ -34,7 +39,7 @@
 }
 
 .monaco-workbench .monaco-breadcrumbs-picker .picker-item {
-	line-height: 22px;
+	line-height: 20px;
 	flex: 1;
 }
 

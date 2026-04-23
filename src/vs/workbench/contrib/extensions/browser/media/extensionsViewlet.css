@@ -3,6 +3,8 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+/* Sidex: Extensions viewlet — monochrome cards, rounded inputs, muted badges */
+
 .extensions-viewlet {
 	position: relative;
 	height: 100%;
@@ -28,22 +30,25 @@
 	padding: 5px 12px 6px 20px;
 }
 
-.extensions-viewlet > .header  > .extensions-search-container {
+.extensions-viewlet > .header > .extensions-search-container {
 	position: relative;
 }
 
-.extensions-viewlet > .header  > .extensions-search-container >  .search-box {
+/* Search box — rounded 3px, monochrome border */
+.extensions-viewlet > .header > .extensions-search-container > .search-box {
 	width: 100%;
 	height: 28px;
 	line-height: 18px;
 	box-sizing: border-box;
-	padding: 4px;
-	border: 1px solid transparent;
+	padding: 4px 8px;
+	border: 1px solid var(--vscode-input-border, #252525);
+	border-radius: 3px;
 	-webkit-appearance: textfield;
 	-moz-appearance: textfield;
+	transition: border-color 120ms ease;
 }
 
-.extensions-viewlet > .header  > .extensions-search-container >  .extensions-search-actions-container {
+.extensions-viewlet > .header > .extensions-search-container > .extensions-search-actions-container {
 	display: flex;
 	align-items: center;
 	position: absolute;
@@ -92,12 +97,13 @@
 
 .extensions-viewlet .notification-container .message-action-button {
 	cursor: pointer;
-	padding: 1px 6px;
-	border-radius: var(--vscode-cornerRadius-small);
+	padding: 1px 8px;
+	border-radius: 3px;
 	font-size: 11px;
 	color: var(--vscode-button-foreground);
 	background-color: var(--vscode-button-background);
 	white-space: nowrap;
+	transition: background-color 120ms ease;
 }
 
 .extensions-viewlet .notification-container .message-action-button:hover {
@@ -159,13 +165,18 @@
 	flex-shrink: 0;
 }
 
+/* Extension cards — rounded 4px, subtle elevation */
 .extensions-viewlet > .extensions .extension-list-item {
 	position: absolute;
-	box-shadow: var(--vscode-shadow-sm);
+	border-radius: 4px;
+	box-shadow: none;
+	border: 1px solid rgba(255, 255, 255, 0.04);
+	transition: border-color 120ms ease;
 }
 
 .extensions-viewlet > .extensions .extension-list-item:hover {
-	box-shadow: var(--vscode-shadow-md);
+	box-shadow: none;
+	border-color: rgba(255, 255, 255, 0.08);
 }
 
 .extensions-viewlet > .extensions .extension-list-item.loading {
@@ -183,16 +194,19 @@
 .extensions-viewlet > .extensions .extension-list-item.loading > .icon-container {
 	display: none;
 }
+
 .extensions-viewlet.narrow > .extensions .extension-list-item > .icon-container {
 	display: flex;
 	align-items: flex-start;
 	padding-top: 10px;
 }
+
 .extensions-viewlet.narrow > .extensions .extension-list-item > .icon-container > .extension-icon .icon {
 	width: 24px;
 	height: 24px;
 	padding-right: 8px;
 }
+
 .extensions-viewlet.narrow > .extensions .extension-list-item > .icon-container > .extension-icon .codicon {
 	font-size: 24px !important;
 	padding-right: 8px;
@@ -216,14 +230,18 @@
 	opacity: 0.5;
 }
 
+/* Severity icons — muted monochrome */
 .extensions-viewlet .codicon-error::before {
-	color: var(--vscode-editorError-foreground);
+	color: var(--vscode-foreground);
+	opacity: 0.7;
 }
 
 .extensions-viewlet .codicon-warning::before {
-	color: var(--vscode-editorWarning-foreground);
+	color: var(--vscode-foreground);
+	opacity: 0.6;
 }
 
 .extensions-viewlet .codicon-info::before {
-	color: var(--vscode-editorInfo-foreground);
+	color: var(--vscode-foreground);
+	opacity: 0.5;
 }

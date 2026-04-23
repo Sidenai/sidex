@@ -3,12 +3,14 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+/* Sidex: Breakpoint indicators — subtle dots, not flashy */
+
 .codicon-debug-hint {
 	cursor: pointer;
 }
 
 .codicon-debug-hint:not([class*='codicon-debug-breakpoint']):not([class*='codicon-debug-stackframe']) {
-	opacity: 0.4 !important;
+	opacity: 0.3 !important;
 }
 
 .inline-breakpoint-widget.codicon {
@@ -17,7 +19,7 @@
 }
 
 .inline-breakpoint-widget.codicon-debug-breakpoint-disabled {
-	opacity: 0.7;
+	opacity: 0.5;
 }
 
 .monaco-editor .inline-breakpoint-widget.line-start {
@@ -30,7 +32,6 @@
 	vertical-align: middle;
 	margin-top: -1px;
 }
-
 
 .codicon-debug-breakpoint-conditional.codicon-debug-stackframe-focused::after,
 .codicon-debug-breakpoint-conditional.codicon-debug-stackframe::after,
@@ -48,7 +49,7 @@
 	-moz-osx-font-smoothing: grayscale;
 	margin-left: 0;
 	margin-right: 4px;
-	margin-top: -1px; /* TODO @misolori: figure out a way to not use negative margin for alignment */
+	margin-top: -1px;
 	align-items: center;
 	width: 0.9em;
 	display: inline-flex;
@@ -63,12 +64,11 @@
 	display: inline !important;
 }
 
-/* Do not push text with inline decoration when decoration on start of line */
 .monaco-editor .debug-top-stack-frame-column.start-of-line {
 	position: absolute;
 	top: 50%;
 	transform: translate(-17px, -50%);
-	margin-top: 0px; /* TODO @misolori: figure out a way to not use negative margin for alignment */
+	margin-top: 0px;
 }
 
 .monaco-editor .inline-breakpoint-widget {
@@ -80,8 +80,7 @@
 	text-overflow: ellipsis;
 }
 
-/* Expressions */
-
+/* Expressions — monospace, muted values */
 
 .monaco-workbench .monaco-list-row .expression {
 	display: flex;
@@ -103,12 +102,13 @@
 
 .monaco-workbench .monaco-list-row .expression .value {
 	margin-left: 6px;
+	opacity: 0.85;
 }
 
 .monaco-workbench .monaco-list-row .expression .lazy-button {
 	margin-left: 3px;
 	display: none;
-	border-radius: 5px;
+	border-radius: 4px;
 	align-self: center;
 }
 
@@ -117,7 +117,6 @@
 }
 
 /* Links */
-
 .monaco-workbench .monaco-list-row .expression .value a.link:hover {
 	text-decoration: underline;
 }
@@ -126,7 +125,6 @@
 	cursor: pointer;
 }
 
-/* White color when element is selected and list is focused. White looks better on blue selection background. */
 .monaco-workbench .monaco-list:focus .monaco-list-row.selected .expression .name,
 .monaco-workbench .monaco-list:focus .monaco-list-row.selected .expression .value {
 	color: inherit;
@@ -147,4 +145,6 @@
 .monaco-workbench .debug-inline-value {
 	background-color: var(--vscode-editor-inlineValuesBackground);
 	color: var(--vscode-editor-inlineValuesForeground);
+	border-radius: 2px;
+	padding: 0 2px;
 }

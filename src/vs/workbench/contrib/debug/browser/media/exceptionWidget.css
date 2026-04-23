@@ -7,11 +7,13 @@
 	overflow: hidden;
 }
 
+/* Sidex: Exception widget — rounded, clean */
 .monaco-editor .zone-widget .zone-widget-container.exception-widget {
-	padding: 6px 10px;
+	padding: 8px 12px;
 	white-space: pre-wrap;
 	user-select: text;
 	-webkit-user-select: text;
+	border-radius: 6px;
 }
 
 .monaco-editor .zone-widget .zone-widget-container.exception-widget .title {

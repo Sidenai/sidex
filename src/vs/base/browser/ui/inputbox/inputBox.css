@@ -8,17 +8,19 @@
 	display: block;
 	padding: 0;
 	box-sizing:	border-box;
-	border-radius: 4px;
-
-	/* Customizable */
+	border-radius: 3px;
+	border: 1px solid var(--vscode-input-border, #252525);
+	transition: border-color 120ms ease;
 	font-size: inherit;
+}
+
+.monaco-inputbox:focus-within {
+	border-color: var(--vscode-focusBorder);
 }
 
 .monaco-inputbox > .ibwrapper > .input,
 .monaco-inputbox > .ibwrapper > .mirror {
-
-	/* Customizable */
-	padding: 4px 6px;
+	padding: 5px 8px;
 }
 
 .monaco-inputbox > .ibwrapper {
@@ -37,6 +39,13 @@
 	font-size: inherit;
 	resize: none;
 	color: inherit;
+	background: transparent;
+}
+
+.monaco-inputbox > .ibwrapper > .input::placeholder {
+	color: var(--vscode-input-placeholderForeground);
+	font-size: 13px;
+	opacity: 0.6;
 }
 
 .monaco-inputbox > .ibwrapper > input {
@@ -45,12 +54,12 @@
 
 .monaco-inputbox > .ibwrapper > textarea.input {
 	display: block;
-	scrollbar-width: none; /* Firefox: hide scrollbars */
+	scrollbar-width: none;
 	outline: none;
 }
 
 .monaco-inputbox > .ibwrapper > textarea.input::-webkit-scrollbar {
-	display: none; /* Chrome + Safari: hide scrollbar */
+	display: none;
 }
 
 .monaco-inputbox > .ibwrapper > textarea.input.empty {
@@ -86,6 +95,19 @@
 	line-height: 17px;
 	margin-top: -1px;
 	word-wrap: break-word;
+}
+
+/* Error/warning/info: subtle left border indicator */
+.monaco-inputbox.error {
+	border-left: 2px solid var(--vscode-inputValidation-errorBorder, #be1100);
+}
+
+.monaco-inputbox.warning {
+	border-left: 2px solid var(--vscode-inputValidation-warningBorder, #b89500);
+}
+
+.monaco-inputbox.info {
+	border-left: 2px solid var(--vscode-inputValidation-infoBorder, #007acc);
 }
 
 /* Action bar support */

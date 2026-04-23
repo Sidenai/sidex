@@ -92,14 +92,14 @@
 .monaco-workbench .pane > .pane-body .welcome-view-content {
 	display: flex;
 	flex-direction: column;
-	padding: 0 20px 1em 20px;
+	padding: 16px 20px 1em 20px;
 	box-sizing: border-box;
 	align-items: center;
 }
 
 .monaco-workbench .pane > .pane-body .welcome-view-content > .button-container {
 	width: 100%;
-	max-width: 300px;
+	max-width: 260px;
 }
 
 .monaco-workbench.monaco-enable-motion .pane > .pane-body .welcome-view-content > .button-container {
@@ -111,7 +111,8 @@
 }
 
 .monaco-workbench .pane > .pane-body .welcome-view-content > .button-container > .monaco-button {
-	max-width: 300px;
+	max-width: 260px;
+	border-radius: 4px;
 }
 
 .monaco-workbench .pane > .pane-body .tree-explorer-viewlet-tree-view > .message .button-container > .monaco-button span,
@@ -123,10 +124,12 @@
 
 .monaco-workbench .pane > .pane-body .welcome-view-content > p {
 	width: 100%;
+	font-size: 12px;
+	color: #606060;
 }
 
 .monaco-workbench .pane > .pane-body .welcome-view-content > * {
-	margin-block-start: 1em;
+	margin-block-start: 0.8em;
 	margin-block-end: 0;
 	margin-inline-start: 0px;
 	margin-inline-end: 0px;
@@ -151,14 +154,16 @@
 	padding-left: 0px;
 }
 
+/* Sidex: tighter tree view items — 24px height, rounded hover/selection */
 .customview-tree .monaco-list .monaco-list-row .custom-view-tree-node-item {
 	display: flex;
-	height: 22px;
-	line-height: 22px;
+	height: 24px;
+	line-height: 24px;
 	flex: 1;
 	text-overflow: ellipsis;
 	overflow: hidden;
 	flex-wrap: nowrap;
+	border-radius: 3px;
 }
 
 .customview-tree .monaco-list .monaco-list-row.selected .custom-view-tree-node-item .custom-view-tree-node-item-checkbox {
@@ -169,7 +174,7 @@
 .customview-tree .monaco-list .monaco-list-row .custom-view-tree-node-item .custom-view-tree-node-item-checkbox {
 	width: 16px;
 	height: 16px;
-	margin: 3px 6px 3px 0px;
+	margin: 4px 6px 4px 0px;
 	padding: 0px;
 	border: 1px solid var(--vscode-checkbox-border);
 	opacity: 1;
@@ -202,23 +207,25 @@
 	display: block;
 }
 
+/* Sidex: muted icons — 15px, slightly lower opacity */
 .timeline-tree-view .monaco-list .monaco-list-row .custom-view-tree-node-item > .custom-view-tree-node-item-icon,
 .customview-tree .monaco-list .monaco-list-row .custom-view-tree-node-item > .custom-view-tree-node-item-resourceLabel > .custom-view-tree-node-item-icon {
-	background-size: 16px;
+	background-size: 15px;
 	background-position: left center;
 	background-repeat: no-repeat;
 	padding-right: 6px;
-	width: 16px;
-	height: 22px;
+	width: 15px;
+	height: 24px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
+	opacity: 0.75;
 }
 
 .customview-tree .monaco-list .monaco-list-row .custom-view-tree-node-item > .custom-view-tree-node-item-resourceLabel > .custom-view-tree-node-item-icon.disabled {
-	opacity: 0.6;
+	opacity: 0.5;
 }
 
 /* makes spinning icons square */

@@ -3,6 +3,15 @@
  *  Entry point. Globals set by inline script in index.html.
  *--------------------------------------------------------------------------------------------*/
 
+// --- Global crash handler: catches ALL unhandled errors ---
+window.addEventListener('error', (event) => {
+	console.error('[SideX CRASH] Uncaught error:', event.error?.message || event.message, '\n', event.error?.stack || `at ${event.filename}:${event.lineno}:${event.colno}`);
+});
+window.addEventListener('unhandledrejection', (event) => {
+	const reason = event.reason;
+	console.error('[SideX CRASH] Unhandled promise rejection:', reason?.message || reason, '\n', reason?.stack || '(no stack)');
+});
+
 import { loadNlsMessages } from './nls-loader.js';
 
 async function sidexOpenFolder() {
@@ -20,8 +29,10 @@ async function sidexOpenFolder() {
 (window as any).__sidex_openFolder = sidexOpenFolder;
 
 function navigateToFolder(folderUri: string) {
+	console.error('[SideX DEBUG] navigateToFolder called with:', folderUri);
 	const url = new URL(window.location.href);
 	url.searchParams.set('folder', folderUri);
+	console.error('[SideX DEBUG] Navigating to:', url.toString());
 	window.location.href = url.toString();
 }
 
@@ -132,35 +143,47 @@ async function boot() {
 		},
 		additionalBuiltinExtensions: [],
 		configurationDefaults: {
+			// --- Sidex identity ---
 			'workbench.startupEditor': 'welcomePage',
 			'workbench.enableExperiments': false,
 			'workbench.iconTheme': 'vs-seti',
-			'workbench.colorTheme': 'Dark Modern',
+			'workbench.colorTheme': 'Default Dark+',
 			'editor.experimentalGpuAcceleration': 'auto',
 			'workbench.productIconTheme': 'Default',
+
+			// --- Sidex layout defaults ---
+			'workbench.activityBar.location': 'default',
+			'workbench.activityBar.compact': false,
+			'workbench.statusBar.visible': true,
 			'workbench.editor.showTabs': 'multiple',
 			'workbench.editor.enablePreview': false,
 			'workbench.editor.tabCloseButton': 'right',
-			'window.menuBarVisibility': navigator.userAgent.includes('Mac') ? 'hidden' : 'classic',
+			'workbench.editor.tabSizing': 'fit',
+			'workbench.editor.highlightModifiedTabs': true,
+			'workbench.list.smoothScrolling': true,
+			'workbench.tree.renderIndentGuides': 'always',
+
+			// --- Window & chrome ---
 			'window.titleBarStyle': 'custom',
+			'window.menuBarVisibility': navigator.userAgent.includes('Mac') ? 'hidden' : 'classic',
 			'window.commandCenter': true,
-			'scm.defaultViewMode': 'list',
-			'telemetry.telemetryLevel': 'off',
-			'update.mode': 'none',
-			'update.showReleaseNotes': false,
-			'extensions.autoUpdate': false,
-			'extensions.autoCheckUpdates': false,
-			'extensions.autoRestart': true,
-			'workbench.settings.enableNaturalLanguageSearch': false,
-			'chat.editor.enabled': false,
-			'chat.commandCenter.enabled': false,
+			'breadcrumbs.enabled': false,
+
+			// --- Editor: keep VSCode defaults, only change chrome-level settings ---
+			'editor.minimap.enabled': false,
+			'editor.stickyScroll.enabled': false,
+			'editor.smoothScrolling': true,
+			'editor.cursorBlinking': 'smooth',
+			'editor.cursorSmoothCaretAnimation': 'on',
 			'editor.bracketPairColorization.enabled': true,
 			'editor.guides.bracketPairs': true,
 			'editor.linkedEditing': true,
 			'editor.suggest.showStatusBar': true,
 			'editor.inlineSuggest.enabled': true,
-			'editor.stickyScroll.enabled': true,
-			'editor.minimap.enabled': false,
+
+			// --- Terminal ---
+			'terminal.integrated.smoothScrolling': true,
+			'terminal.integrated.enablePersistentSessions': false,
 			'terminal.integrated.defaultProfile.osx': 'zsh',
 			'terminal.integrated.defaultProfile.linux': 'bash',
 			'terminal.integrated.profiles.osx': {
@@ -177,36 +200,29 @@ async function boot() {
 				tmux: { path: 'tmux', icon: 'terminal-tmux' },
 				pwsh: { path: 'pwsh', icon: 'terminal-powershell' }
 			},
-			'terminal.integrated.enablePersistentSessions': false,
-			'editor.formatOnPaste': false,
-			'editor.renderWhitespace': 'selection',
-			'editor.smoothScrolling': false,
-			'editor.cursorBlinking': 'smooth',
-			'editor.cursorSmoothCaretAnimation': 'off',
-			'editor.mouseWheelZoom': true,
-			'editor.wordWrap': 'off',
-			'editor.suggest.preview': true,
-			'editor.parameterHints.enabled': true,
-			'editor.hover.enabled': true,
-			'editor.folding': true,
-			'editor.foldingImportsByDefault': true,
-			'editor.showFoldingControls': 'mouseover',
-			'editor.glyphMargin': true,
-			'editor.lightbulb.enabled': 'on',
-			'editor.colorDecorators': true,
-			'editor.renderLineHighlight': 'all',
-			'editor.matchBrackets': 'always',
-			'editor.occurrencesHighlight': 'singleFile',
-			'workbench.editor.highlightModifiedTabs': true,
-			'workbench.tree.renderIndentGuides': 'always',
+
+			// --- SCM & extensions ---
+			'scm.defaultViewMode': 'list',
+			'extensions.autoUpdate': false,
+			'extensions.autoCheckUpdates': false,
+			'extensions.autoRestart': true,
+
+			// --- Disable VSCode-specific features ---
+			'telemetry.telemetryLevel': 'off',
+			'update.mode': 'none',
+			'update.showReleaseNotes': false,
+			'workbench.settings.enableNaturalLanguageSearch': false,
+			'chat.editor.enabled': false,
+			'chat.commandCenter.enabled': false,
 			'security.workspace.trust.startupPrompt': 'never',
 			'security.workspace.trust.banner': 'never',
 			'security.workspace.trust.enabled': false
 		}
 	};
 
+	console.error('[SideX DEBUG] About to call create(document.body, options)');
 	create(document.body, options);
-
+	console.error('[SideX DEBUG] create() completed successfully');
 	setupTauriExternalOpener();
 	setupMenuActions();
 	setupWindowStateSave();

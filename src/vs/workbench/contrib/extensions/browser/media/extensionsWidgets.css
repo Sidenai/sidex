@@ -3,12 +3,14 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+/* Sidex: Extension icon — rounded 6px */
 .extension-icon .icon {
 	width: 42px;
 	height: 42px;
 	padding-right: 14px;
 	flex-shrink: 0;
 	object-fit: contain;
+	border-radius: 6px;
 }
 
 .extension-icon .codicon {
@@ -40,8 +42,9 @@
 	margin-left: 0;
 }
 
+/* Rating stars — monochrome */
 .extension-ratings .codicon-extensions-star-empty {
-	opacity: .75;
+	opacity: .5;
 }
 
 .verified-publisher {

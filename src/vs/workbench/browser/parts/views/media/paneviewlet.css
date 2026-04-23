@@ -4,11 +4,11 @@
  *--------------------------------------------------------------------------------------------*/
 
 .monaco-pane-view .split-view-view:first-of-type > .pane > .pane-header {
-	border-top: none !important; /* less clutter: do not show any border for first views in a pane */
+	border-top: none !important;
 }
 
 .monaco-pane-view .split-view-view:first-of-type > .pane {
-	border-left: none !important; /* less clutter: do not show any border for first views in a pane */
+	border-left: none !important;
 }
 
 .monaco-pane-view .pane > .pane-header {
@@ -39,14 +39,20 @@
 	margin-top: 4px;
 }
 
+/* Sidex: section titles — 10px uppercase, 600 weight, muted color */
 .monaco-pane-view .pane > .pane-header h3.title {
 	white-space: nowrap;
 	text-overflow: ellipsis;
 	overflow: hidden;
-	font-size: 11px;
+	font-size: 10px;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
 	min-width: 3ch;
 	-webkit-margin-before: 0;
 	-webkit-margin-after: 0;
+	color: var(--vscode-sideBarSectionHeader-foreground, inherit);
+	opacity: 0.8;
 }
 
 .monaco-pane-view .pane > .pane-header .description {

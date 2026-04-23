@@ -10,14 +10,13 @@
 .monaco-workbench .pane-composite-part > .title.has-composite-bar > .title-actions .monaco-action-bar .action-item,
 .monaco-workbench .pane-composite-part > .title.has-composite-bar > .global-actions .monaco-action-bar .action-item,
 .monaco-workbench .pane-composite-part > .title.has-composite-bar > .global-actions-left .monaco-action-bar .action-item {
-	margin-right: 4px;
+	margin-right: 2px;
 }
 
 .monaco-workbench .pane-composite-part > .title.has-composite-bar > .title-actions .monaco-action-bar .action-item .action-label {
 	outline-offset: -2px;
 }
 
-/* Global left actions toolbar: rendered first visually via CSS order */
 .monaco-workbench .pane-composite-part > .title > .global-actions-left {
 	order: -1;
 	display: flex;
@@ -65,28 +64,58 @@
 	color: inherit !important;
 }
 
+/* Sidex: action bar uses gap for tab spacing */
 .monaco-workbench .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar,
 .monaco-workbench .pane-composite-part > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar {
-	line-height: 27px; /* matches panel titles in settings */
+	line-height: 28px;
 }
 
+.monaco-workbench .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .actions-container,
+.monaco-workbench .pane-composite-part > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .actions-container {
+	gap: 4px;
+}
+
+/* Sidex: flat tab items — clean, normal case, 28px */
 .monaco-workbench .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item,
 .monaco-workbench .pane-composite-part > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item {
-	text-transform: uppercase;
-	padding-left: 10px;
-	padding-right: 10px;
+	text-transform: none;
 	font-size: 11px;
-	padding-bottom: 2px; /* puts the bottom border down */
-	padding-top: 2px;
+	font-weight: 500;
+	letter-spacing: 0;
+	height: 28px;
+	padding: 0;
 	display: flex;
+	align-items: center;
+	background: none !important;
+	color: var(--vscode-panelTitle-inactiveForeground);
+	position: relative;
 }
 
-.monaco-workbench .pane-composite-part > .title > .composite-bar-container >.composite-bar > .monaco-action-bar .action-item.icon,
-.monaco-workbench .pane-composite-part > .header-or-footer > .composite-bar-container >.composite-bar > .monaco-action-bar .action-item.icon {
-	height: 35px; /* matches height of composite container */
+/* Sidex: active/checked tab — bright text */
+.monaco-workbench .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.checked,
+.monaco-workbench .pane-composite-part > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.checked {
+	color: var(--vscode-panelTitle-activeForeground) !important;
+	background: none !important;
+}
+
+/* Sidex: inactive tab color */
+.monaco-workbench .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item:not(.checked),
+.monaco-workbench .pane-composite-part > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item:not(.checked) {
+	color: var(--vscode-panelTitle-inactiveForeground) !important;
+}
+
+/* Sidex: hover — brighten inactive tabs */
+.monaco-workbench .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item:not(.checked):hover,
+.monaco-workbench .pane-composite-part > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item:not(.checked):hover {
+	color: var(--vscode-panelTitle-activeForeground) !important;
+}
+
+/* Sidex: icon items inside panel composite bar */
+.monaco-workbench .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.icon,
+.monaco-workbench .pane-composite-part > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.icon {
+	height: 28px;
 	padding: 0 3px;
 }
-
 
 .monaco-workbench .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.icon .action-label:not(.codicon),
 .monaco-workbench .pane-composite-part > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.icon .action-label:not(.codicon) {
@@ -94,13 +123,14 @@
 	height: 16px;
 }
 
+/* Drag-and-drop insertion indicators */
 .monaco-workbench .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item::before,
 .monaco-workbench .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item::after,
 .monaco-workbench .pane-composite-part > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item::before,
 .monaco-workbench .pane-composite-part > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item::after {
 	content: '';
 	width: 2px;
-	height: 24px;
+	height: 20px;
 	position: absolute;
 	display: none;
 	opacity: 0;
@@ -128,7 +158,6 @@
 	right: 1px;
 	margin-right: -2px;
 }
-
 
 .monaco-workbench .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item:first-of-type::before,
 .monaco-workbench .pane-composite-part > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item:first-of-type::before {
@@ -166,10 +195,13 @@
 	opacity: 1;
 }
 
+/* Sidex: action label — flat, no background, no margin */
 .monaco-workbench .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item .action-label,
 .monaco-workbench .pane-composite-part > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item .action-label {
 	margin-right: 0;
-	padding: 2px;
+	padding: 0 2px;
+	background: none !important;
+	color: inherit;
 }
 
 .monaco-workbench .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item .action-label:not(.codicon-more),
@@ -187,8 +219,10 @@
 .monaco-workbench .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.checked .action-label,
 .monaco-workbench .pane-composite-part > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.checked .action-label {
 	margin-right: 0;
+	color: inherit;
 }
 
+/* Badges */
 .monaco-workbench .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .badge,
 .monaco-workbench .pane-composite-part > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .badge {
 	margin-left: 2px;
@@ -205,10 +239,10 @@
 .monaco-workbench .pane-composite-part > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .badge .badge-content {
 	padding: 3px 5px;
 	border-radius: 10px;
-	font-size: 10px;
-	min-width: 16px;
-	height: 16px;
-	line-height: 10px;
+	font-size: 9px;
+	min-width: 14px;
+	height: 14px;
+	line-height: 9px;
 	font-weight: normal;
 	text-align: center;
 	display: inline-block;
@@ -236,7 +270,7 @@
 .monaco-workbench .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.icon .badge.compact .badge-content,
 .monaco-workbench .pane-composite-part > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.icon .badge.compact .badge-content {
 	position: absolute;
-	top: 17px;
+	top: 15px;
 	right: 0px;
 	font-size: 9px;
 	font-weight: 600;
@@ -260,36 +294,32 @@
 	-webkit-mask-size: 13px;
 }
 
-/* active item indicator */
-.monaco-workbench .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item .active-item-indicator,
-.monaco-workbench .pane-composite-part > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item .active-item-indicator {
+/* Sidex: active item indicator — hidden in panel (we use pill background instead) */
+.monaco-workbench .part.panel .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item .active-item-indicator,
+.monaco-workbench .part.panel .pane-composite-part > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item .active-item-indicator {
+	display: none !important;
+}
+
+/* Keep indicator visible for sidebar (it uses bottom border there) */
+.monaco-workbench .pane-composite-part:not(.panel) > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item .active-item-indicator,
+.monaco-workbench .pane-composite-part:not(.panel) > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item .active-item-indicator {
 	position: absolute;
 	z-index: 1;
 	bottom: 0;
+	left: 0;
+	width: 100%;
 	overflow: hidden;
 	pointer-events: none;
-	height: 100%;
+	height: 2px;
 }
 
-.monaco-workbench .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item .active-item-indicator,
-.monaco-workbench .pane-composite-part > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item .active-item-indicator {
-	top: -4px;
-	left: 10px;
-	width: calc(100% - 20px);
-}
-
-.monaco-workbench .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.icon .active-item-indicator,
-.monaco-workbench .pane-composite-part > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.icon .active-item-indicator {
-	top: 1px;
-	left: 2px;
-	width: calc(100% - 4px);
-}
-
+/* Sidex: no background on checked icon items */
 .monaco-workbench .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.icon.checked,
 .monaco-workbench .pane-composite-part > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.icon.checked {
-	background-color: var(--vscode-activityBarTop-activeBackground);
+	background-color: transparent !important;
 }
 
+/* Sidex: 2px bottom border on active/checked tab (title bar / header) */
 .monaco-workbench .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.checked .active-item-indicator:before,
 .monaco-workbench .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item:focus .active-item-indicator:before,
 .monaco-workbench .pane-composite-part > .header-or-footer.header > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.checked .active-item-indicator:before,
@@ -297,45 +327,49 @@
 	content: "";
 	position: absolute;
 	z-index: 1;
-	bottom: 2px;
+	bottom: 0;
+	left: 0;
 	width: 100%;
-	height: 0;
-	border-top-width: 1px;
-	border-top-style: solid;
+	height: 2px;
+	background-color: var(--vscode-panelTitle-activeBorder, #d0d0d0);
+	border: none;
 }
 
+/* Footer variant: 2px top border */
 .monaco-workbench .pane-composite-part > .header-or-footer.footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.checked .active-item-indicator:before,
 .monaco-workbench .pane-composite-part > .header-or-footer.footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item:focus .active-item-indicator:before {
 	content: "";
 	position: absolute;
 	z-index: 1;
-	top: 2px;
+	top: 0;
+	left: 0;
 	width: 100%;
-	height: 0;
-	border-bottom-width: 1px;
-	border-bottom-style: solid;
+	height: 2px;
+	background-color: var(--vscode-panelTitle-activeBorder, #d0d0d0);
+	border: none;
 }
 
+/* Sidex: hide indicator when clicked but not checked */
 .monaco-workbench .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.clicked:not(.checked):focus .active-item-indicator:before,
 .monaco-workbench .pane-composite-part > .header-or-footer.header > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.clicked:not(.checked):focus .active-item-indicator:before {
-	border-top-color: transparent !important; /* hides border on clicked state */
+	background-color: transparent !important;
 }
 
 .monaco-workbench .pane-composite-part > .header-or-footer.footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.clicked:not(.checked):focus .active-item-indicator:before {
-	border-bottom-color: transparent !important; /* hides border on clicked state */
+	background-color: transparent !important;
 }
 
+/* Sidex: focus indicator uses focus border color */
 .monaco-workbench .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item:focus .active-item-indicator:before,
 .monaco-workbench .pane-composite-part > .header-or-footer.header > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item:focus .active-item-indicator:before {
-	border-top-color: var(--vscode-focusBorder) !important;
-	border-top-width: 2px;
+	background-color: var(--vscode-focusBorder, #d0d0d0) !important;
 }
 
 .monaco-workbench .pane-composite-part > .header-or-footer.footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item:focus .active-item-indicator:before {
-	border-bottom-color: var(--vscode-focusBorder) !important;
-	border-bottom-width: 2px;
+	background-color: var(--vscode-focusBorder, #d0d0d0) !important;
 }
 
+/* Sidex: hover/checked outlines — HC themes only */
 .monaco-workbench .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.checked .action-label,
 .monaco-workbench .pane-composite-part > .title > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item:hover .action-label,
 .monaco-workbench .pane-composite-part > .header-or-footer > .composite-bar-container > .composite-bar > .monaco-action-bar .action-item.checked .action-label,

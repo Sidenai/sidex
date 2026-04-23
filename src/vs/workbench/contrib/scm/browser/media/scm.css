@@ -3,6 +3,8 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+/* Sidex: SCM view — monochrome dark, rounded inputs, muted status indicators */
+
 .scm-view {
 	height: 100%;
 	position: relative;
@@ -38,7 +40,7 @@
 	height: 100%;
 	align-items: center;
 	flex-flow: nowrap;
-	box-shadow: var(--vscode-shadow-sm);
+	box-shadow: none;
 }
 
 .scm-view.hide-provider-counts .scm-provider > .count,
@@ -61,10 +63,11 @@
 	white-space: nowrap;
 }
 
+/* Section headers — clean, uppercase */
 .scm-view .scm-provider .monaco-highlighted-label {
 	display: flex;
 	align-items: center;
-	font-weight: bold;
+	font-weight: 600;
 }
 
 .scm-view .scm-provider > .actions {
@@ -130,11 +133,11 @@
 }
 
 .scm-view .monaco-list-row {
-	line-height: 22px;
+	line-height: 24px;
 }
 
 .scm-view .monaco-list-row .monaco-icon-label-container {
-	height: 22px;
+	height: 24px;
 }
 
 .scm-view .monaco-list-row .resource-group {
@@ -216,11 +219,13 @@
 	gap: 4px;
 }
 
+/* History item labels — rounded pill, muted background */
 .scm-view .monaco-list-row .history-item > .label-container > .label {
 	display: flex;
 	align-items: center;
 	border-radius: 10px;
 	line-height: 18px;
+	background-color: rgba(255, 255, 255, 0.04);
 }
 
 .scm-view .monaco-list-row .history-item > .label-container > .label > .count {
@@ -270,15 +275,22 @@
 	margin-left: 4px;
 }
 
+/* Resource group headers — 10px uppercase, muted */
 .scm-view .monaco-list-row .resource-group > .name {
 	flex: 1;
 	overflow: hidden;
 	text-overflow: ellipsis;
+	font-size: 10px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	opacity: 0.7;
 }
 
+/* Resource items — 24px height, subtle status decorations */
 .scm-view .monaco-list-row .resource {
 	display: flex;
-	height: 100%;
+	height: 24px;
 }
 
 .scm-view .monaco-list-row .resource.faded {
@@ -295,12 +307,14 @@
 	margin-right: 3px;
 }
 
+/* Status decoration — muted, monochrome */
 .scm-view .monaco-list-row .resource > .decoration-icon {
 	width: 16px;
 	height: 100%;
 	background-repeat: no-repeat;
 	background-position: 50% 50%;
 	margin-left: 5px;
+	opacity: 0.6;
 }
 
 .scm-view .monaco-list-row .resource > .decoration-icon.codicon {
@@ -351,8 +365,15 @@
 	display: block;
 }
 
+/* Action buttons — small, rounded, subtle hover */
 .scm-view .monaco-list-row .actions .action-label {
 	padding: 2px;
+	border-radius: 3px;
+	transition: background-color 120ms ease;
+}
+
+.scm-view .monaco-list-row .actions .action-label:hover {
+	background-color: rgba(255, 255, 255, 0.03);
 }
 
 .scm-view .scm-input {
@@ -386,15 +407,16 @@
 	border-radius: 4px;
 }
 
+/* SCM commit input — rounded 4px, monochrome border, subtle focus */
 .scm-view .scm-editor {
 	box-sizing: border-box;
 	width: 100%;
 	display: flex;
 	align-items: flex-start;
-	box-sizing: border-box;
-	border: 1px solid var(--vscode-input-border, transparent);
+	border: 1px solid var(--vscode-input-border, #252525);
 	background-color: var(--vscode-input-background);
 	border-radius: 4px;
+	transition: border-color 120ms ease;
 }
 
 .scm-view .button-container {
@@ -466,14 +488,15 @@
 	outline-offset: -1px;
 }
 
+/* Validation containers — rounded */
 .scm-editor-validation-container {
 	display: flex;
 	box-sizing: border-box;
 	border-width: 1px;
 	border-style: solid;
 	border-top: none;
-	border-bottom-left-radius: 2px;
-	border-bottom-right-radius: 2px;
+	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
 	padding: 2px;
 }
 
@@ -590,11 +613,13 @@
 	white-space: nowrap;
 }
 
+/* Timestamps — muted text */
 .scm-repositories-view .scm-artifact .timestamp-container {
 	flex-shrink: 0;
 	margin-left: 2px;
 	margin-right: 4px;
-	opacity: 0.5;
+	opacity: 0.45;
+	font-size: 12px;
 }
 
 .scm-repositories-view .scm-artifact .timestamp-container.duplicate {
@@ -682,12 +707,15 @@
 	min-width: fit-content;
 }
 
+/* SCM graph badge — rounded pill, muted monochrome */
 .pane-header .scm-graph-view-badge-container > .scm-graph-view-badge.monaco-count-badge.long {
-	background-color: var(--vscode-badge-background);
+	background-color: rgba(255, 255, 255, 0.06);
 	color: var(--vscode-badge-foreground);
-	border: 1px solid var(--vscode-contrastBorder);
+	border: 1px solid var(--vscode-contrastBorder, transparent);
 	margin: 0 6px;
 	padding: 2px 4px;
+	border-radius: 8px;
+	font-size: 11px;
 }
 
 .monaco-workbench .part.sidebar > .title > .title-actions .action-label.scm-graph-repository-picker,
@@ -737,13 +765,14 @@
 	align-items: center;
 }
 
+/* History state label — muted monochrome */
 .scm-history-view .scm-provider .state-label.monaco-count-badge.long {
 	display: flex;
 	font-size: 0.8em;
 	margin: 0 10px;
-	color: var(--vscode-debugView-stateLabelForeground);
-	background: var(--vscode-debugView-stateLabelBackground);
-	border-radius: 2px;
+	color: var(--vscode-descriptionForeground, rgba(255, 255, 255, 0.5));
+	background: rgba(255, 255, 255, 0.04);
+	border-radius: 3px;
 }
 
 .scm-history-view .scm-provider .actions {
@@ -788,12 +817,14 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	color: var(--vscode-textLink-foreground)
+	color: var(--vscode-textLink-foreground);
+	opacity: 0.7;
 }
 
 .scm-history-view .history-item-load-more .history-item-placeholder .monaco-highlighted-label .codicon {
 	font-size: 12px;
-	color: var(--vscode-textLink-foreground)
+	color: var(--vscode-textLink-foreground);
+	opacity: 0.7;
 }
 
 .scm-history-view .history-item-load-more .history-item-placeholder.shimmer {
@@ -802,7 +833,7 @@
 
 .scm-history-view .history-item-load-more .history-item-placeholder.shimmer .monaco-icon-label-container {
 	height: 18px;
-	background: var(--vscode-scmGraph-historyItemHoverDefaultLabelBackground);
-	border-radius: 2px;
+	background: rgba(255, 255, 255, 0.04);
+	border-radius: 3px;
 	opacity: 0.5;
 }

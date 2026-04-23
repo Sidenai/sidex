@@ -104,17 +104,21 @@ import { EditorPane } from '../editor/editorPane.js';
 import { IKeybindingService } from '../../../../platform/keybinding/common/keybinding.js';
 import { ResolvedKeybinding } from '../../../../base/common/keybindings.js';
 import { EditorCommandsContextActionRunner } from '../editor/editorTabsControl.js';
-import { IEditorCommandsContext, IEditorPartOptionsChangeEvent, IToolbarActions } from '../../../common/editor.js';
+import { EditorResourceAccessor, SideBySideEditor, IEditorCommandsContext, IEditorPartOptionsChangeEvent, IToolbarActions } from '../../../common/editor.js';
 import { CodeWindow, mainWindow } from '../../../../base/browser/window.js';
 import { ACCOUNTS_ACTIVITY_TILE_ACTION, GLOBAL_ACTIVITY_TITLE_ACTION } from './titlebarActions.js';
 import { IView } from '../../../../base/browser/ui/grid/grid.js';
 import { createInstantHoverDelegate } from '../../../../base/browser/ui/hover/hoverDelegateFactory.js';
 import { IBaseActionViewItemOptions } from '../../../../base/browser/ui/actionbar/actionViewItems.js';
 import { IHoverDelegate } from '../../../../base/browser/ui/hover/hoverDelegate.js';
-import { CommandsRegistry } from '../../../../platform/commands/common/commands.js';
+import { CommandsRegistry, ICommandService } from '../../../../platform/commands/common/commands.js';
 import { safeIntl } from '../../../../base/common/date.js';
 import { IsCompactTitleBarContext, TitleBarVisibleContext } from '../../../common/contextkeys.js';
 import { ServiceCollection } from '../../../../platform/instantiation/common/serviceCollection.js';
+import { ISCMViewService } from '../../../contrib/scm/common/scm.js';
+import { autorun, derived } from '../../../../base/common/observable.js';
+import { IWorkspaceContextService } from '../../../../platform/workspace/common/workspace.js';
+import { ILabelService } from '../../../../platform/label/common/label.js';
 
 export interface ITitleVariable {
 	readonly name: string;
@@ -312,7 +316,12 @@ export class BrowserTitlebarPart extends Part implements ITitlebarPart {
 
 	get minimumHeight(): number {
 		const wcoEnabled = isWeb && isWCOEnabled();
-		let value = this.isCommandCenterVisible || wcoEnabled ? DEFAULT_CUSTOM_TITLEBAR_HEIGHT : 30;
+		let value: number;
+		if ((globalThis as any).__SIDEX_TAURI__) {
+			value = 32;
+		} else {
+			value = this.isCommandCenterVisible || wcoEnabled ? DEFAULT_CUSTOM_TITLEBAR_HEIGHT : 28;
+		}
 		if (wcoEnabled) {
 			value = Math.max(value, getWCOTitlebarAreaRect(getWindow(this.element))?.height ?? 0);
 		}
@@ -382,6 +391,10 @@ export class BrowserTitlebarPart extends Part implements ITitlebarPart {
 
 	protected readonly instantiationService: IInstantiationService;
 
+	private projectNameElement: HTMLElement | undefined;
+	private branchElement: HTMLElement | undefined;
+	private breadcrumbsElement: HTMLElement | undefined;
+
 	constructor(
 		id: string,
 		targetWindow: CodeWindow,
@@ -395,9 +408,13 @@ export class BrowserTitlebarPart extends Part implements ITitlebarPart {
 		@IWorkbenchLayoutService layoutService: IWorkbenchLayoutService,
 		@IContextKeyService protected readonly contextKeyService: IContextKeyService,
 		@IHostService private readonly hostService: IHostService,
-		@IEditorService editorService: IEditorService,
+		@IEditorService private readonly editorService: IEditorService,
 		@IMenuService private readonly menuService: IMenuService,
-		@IKeybindingService private readonly keybindingService: IKeybindingService
+		@IKeybindingService private readonly keybindingService: IKeybindingService,
+		@ISCMViewService private readonly scmViewService: ISCMViewService,
+		@IWorkspaceContextService private readonly workspaceContextService: IWorkspaceContextService,
+		@ILabelService private readonly labelService: ILabelService,
+		@ICommandService private readonly commandService: ICommandService
 	) {
 		super(id, { hasTitle: false }, themeService, storageService, layoutService);
 
@@ -590,8 +607,57 @@ export class BrowserTitlebarPart extends Part implements ITitlebarPart {
 			this.installMenubar();
 		}
 
-		// Title
+		// --- Sidex Titlebar Customizations ---
+		try {
+			this.projectNameElement = append(this.leftContent, $('div.sidex-project-name'));
+			const branchContainer = append(this.leftContent, $('div.sidex-branch-container'));
+			const branchIcon = append(branchContainer, $('span.sidex-branch-icon.codicon.codicon-source-control'));
+			branchIcon.setAttribute('aria-hidden', 'true');
+			this.branchElement = append(branchContainer, $('span.sidex-branch-name'));
+
+			this.updateProjectName();
+			this.setupBranchTracking();
+
+			this._register(addDisposableListener(this.projectNameElement, EventType.CLICK, () => {
+				this.commandService.executeCommand('workbench.action.openRecent');
+			}));
+
+			this._register(this.workspaceContextService.onDidChangeWorkspaceName(() => this.updateProjectName()));
+			this._register(this.workspaceContextService.onDidChangeWorkspaceFolders(() => this.updateProjectName()));
+			this._register(this.editorService.onDidActiveEditorChange(() => this.updateBreadcrumbs()));
+
+			const centerBar = append(this.centerContent, $('div.sidex-center-bar'));
+			const centerSearchIcon = append(centerBar, $('span.codicon.codicon-search.sidex-center-icon'));
+			centerSearchIcon.setAttribute('aria-hidden', 'true');
+			this.breadcrumbsElement = append(centerBar, $('div.sidex-breadcrumbs'));
+			const centerPlaceholder = append(centerBar, $('span.sidex-center-placeholder'));
+			centerPlaceholder.textContent = 'Search...';
+			this.updateBreadcrumbs();
+
+			this._register(addDisposableListener(centerBar, EventType.CLICK, () => {
+				this.commandService.executeCommand('workbench.action.quickOpen');
+			}));
+
+			const runButton = append(this.rightContent, $('div.sidex-run-button'));
+			const runIcon = append(runButton, $('span.codicon.codicon-play.sidex-run-icon'));
+			runIcon.setAttribute('aria-hidden', 'true');
+			this._register(addDisposableListener(runButton, EventType.CLICK, () => {
+				this.commandService.executeCommand('workbench.action.debug.start');
+			}));
+
+			const settingsButton = append(this.rightContent, $('div.sidex-titlebar-action'));
+			const settingsIcon = append(settingsButton, $('span.codicon.codicon-settings-gear.sidex-action-icon'));
+			settingsIcon.setAttribute('aria-hidden', 'true');
+			this._register(addDisposableListener(settingsButton, EventType.CLICK, () => {
+				this.commandService.executeCommand('workbench.action.openSettings');
+			}));
+		} catch {
+			// Sidex customizations failed — titlebar still works with default VSCode behavior
+		}
+
+		// Title (hidden, kept for compatibility with window title updates)
 		this.title = append(this.centerContent, $('div.window-title'));
+		this.title.style.display = 'none';
 		this.createTitle();
 
 		// Center-Adjacent Toolbar (e.g., update indicator)
@@ -616,9 +682,10 @@ export class BrowserTitlebarPart extends Part implements ITitlebarPart {
 			);
 		}
 
-		// Create Toolbar Actions
+		// Create Toolbar Actions — hidden in Sidex (we use our own minimal buttons)
 		if (hasCustomTitlebar(this.configurationService, this.titleBarStyle)) {
 			this.actionToolBarElement = append(this.rightContent, $('div.action-toolbar-container'));
+			this.actionToolBarElement.style.display = 'none';
 			this.createActionToolBar();
 			this.createActionToolBarMenus();
 		}
@@ -627,9 +694,6 @@ export class BrowserTitlebarPart extends Part implements ITitlebarPart {
 		if (!hasNativeTitlebar(this.configurationService, this.titleBarStyle)) {
 			let primaryWindowControlsLocation = isMacintosh ? 'left' : 'right';
 			if (isMacintosh && isNative) {
-				// Check if the locale is RTL, macOS will move traffic lights in RTL locales
-				// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Locale/textInfo
-
 				const localeInfo = safeIntl.Locale(platformLocale).value;
 				const textInfo = (localeInfo as { textInfo?: unknown }).textInfo;
 				if (textInfo && typeof textInfo === 'object' && 'direction' in textInfo && textInfo.direction === 'rtl') {
@@ -638,10 +702,7 @@ export class BrowserTitlebarPart extends Part implements ITitlebarPart {
 			}
 
 			if (isMacintosh && isNative && primaryWindowControlsLocation === 'left') {
-				// macOS native: controls are on the left and the container is not needed to make room
-				// for something, except for web where a custom menu being supported). not putting the
-				// container helps with allowing to move the window when clicking very close to the
-				// window control buttons.
+				// macOS native: traffic lights handled by OS
 			} else if (getWindowControlsStyle(this.configurationService) === WindowControlsStyle.HIDDEN) {
 				// Linux/Windows: controls are explicitly disabled
 			} else {
@@ -650,8 +711,6 @@ export class BrowserTitlebarPart extends Part implements ITitlebarPart {
 					$('div.window-controls-container')
 				);
 				if (isWeb) {
-					// Web: its possible to have control overlays on both sides, for example on macOS
-					// with window controls on the left and PWA controls on the right.
 					append(
 						primaryWindowControlsLocation === 'left' ? this.rightContent : this.leftContent,
 						$('div.window-controls-container')
@@ -708,11 +767,7 @@ export class BrowserTitlebarPart extends Part implements ITitlebarPart {
 			}
 		}
 
-		// Context menu over title bar: depending on the OS and the location of the click this will either be
-		// the overall context menu for the entire title bar or a specific title context menu.
-		// Windows / Linux: we only support the overall context menu on the title bar
-		// macOS: we support both the overall context menu and the title context menu.
-		//        in addition, we allow Cmd+click to bring up the title context menu.
+		// Context menu over title bar
 		{
 			this._register(
 				addDisposableListener(this.rootContainer, EventType.CONTEXT_MENU, e => {
@@ -736,12 +791,11 @@ export class BrowserTitlebarPart extends Part implements ITitlebarPart {
 						EventType.MOUSE_DOWN,
 						e => {
 							if (e.metaKey) {
-								EventHelper.stop(e, true /* stop bubbling to prevent command center from opening */);
-
+								EventHelper.stop(e, true);
 								this.onContextMenu(e, MenuId.TitleBarTitleContext);
 							}
 						},
-						true /* capture phase to prevent command center from opening */
+						true
 					)
 				);
 			}
@@ -750,6 +804,109 @@ export class BrowserTitlebarPart extends Part implements ITitlebarPart {
 		this.updateStyles();
 
 		return this.element;
+	}
+
+	private updateProjectName(): void {
+		try {
+			if (!this.projectNameElement) { return; }
+			const workspace = this.workspaceContextService.getWorkspace();
+			const name = this.labelService.getWorkspaceLabel(workspace);
+			this.projectNameElement.textContent = name || 'SideX';
+		} catch { /* ignore during workspace transitions */ }
+	}
+
+	private setupBranchTracking(): void {
+		try {
+			if (!this.scmViewService || this.isAuxiliary) {
+				return;
+			}
+			const branchName = derived(reader => {
+				try {
+					const activeRepo = this.scmViewService?.activeRepository?.read(reader);
+					const historyProvider = activeRepo?.repository?.provider?.historyProvider?.read(reader);
+					const historyItemRef = historyProvider?.historyItemRef?.read(reader);
+					return historyItemRef?.name;
+				} catch {
+					return undefined;
+				}
+			});
+
+			this._register(autorun(reader => {
+				try {
+					const name = branchName.read(reader);
+					this.updateBranchDisplay(name);
+				} catch { /* ignore */ }
+			}));
+		} catch { /* SCM service may not be available */ }
+	}
+
+	private updateBranchDisplay(branchName: string | undefined): void {
+		if (!this.branchElement) {
+			return;
+		}
+		const container = this.branchElement.parentElement;
+		if (!container) {
+			return;
+		}
+		if (branchName) {
+			container.style.display = '';
+			this.branchElement.textContent = branchName;
+		} else {
+			container.style.display = 'none';
+			this.branchElement.textContent = '';
+		}
+	}
+
+	private updateBreadcrumbs(): void {
+		try {
+		if (!this.breadcrumbsElement) {
+			return;
+		}
+
+		const centerBar = this.breadcrumbsElement.parentElement;
+		const placeholder = centerBar?.querySelector('.sidex-center-placeholder') as HTMLElement | null;
+
+		const editor = this.editorService.activeEditor;
+		const resource = editor ? EditorResourceAccessor.getOriginalUri(editor, { supportSideBySide: SideBySideEditor.PRIMARY }) : undefined;
+
+		if (!resource || !resource.path) {
+			this.breadcrumbsElement.textContent = '';
+			this.breadcrumbsElement.style.display = 'none';
+			if (placeholder) { placeholder.style.display = ''; }
+			return;
+		}
+
+		this.breadcrumbsElement.style.display = '';
+		if (placeholder) { placeholder.style.display = 'none'; }
+
+		let relativePath = this.labelService.getUriLabel(resource, { relative: true });
+		if (!relativePath) {
+			relativePath = resource.path;
+		}
+
+		const segments = relativePath.split('/').filter(s => s.length > 0);
+		const fragment = document.createDocumentFragment();
+
+		for (let i = 0; i < segments.length; i++) {
+			const span = document.createElement('span');
+			span.classList.add('sidex-breadcrumb-segment');
+			const isLast = i === segments.length - 1;
+			if (isLast) {
+				span.classList.add('sidex-breadcrumb-file');
+			}
+			span.textContent = segments[i];
+			fragment.appendChild(span);
+
+			if (!isLast) {
+				const sep = document.createElement('span');
+				sep.classList.add('sidex-breadcrumb-sep');
+				sep.textContent = '›';
+				fragment.appendChild(sep);
+			}
+		}
+
+		reset(this.breadcrumbsElement, fragment);
+		} catch { /* ignore during workspace transitions */ }
 	}
 
 	private createTitle(): void {
@@ -980,35 +1137,15 @@ export class BrowserTitlebarPart extends Part implements ITitlebarPart {
 
 		// Part container
 		if (this.element) {
-			if (this.isInactive) {
-				this.element.classList.add('inactive');
-			} else {
-				this.element.classList.remove('inactive');
-			}
+			this.element.classList.remove('inactive');
 
 			const titleBackground =
-				this.getColor(this.isInactive ? TITLE_BAR_INACTIVE_BACKGROUND : TITLE_BAR_ACTIVE_BACKGROUND, (color, theme) => {
-					// LCD Rendering Support: the title bar part is a defining its own GPU layer.
-					// To benefit from LCD font rendering, we must ensure that we always set an
-					// opaque background color. As such, we compute an opaque color given we know
-					// the background color is the workbench background.
+				this.getColor(TITLE_BAR_ACTIVE_BACKGROUND, (color, theme) => {
 					return color.isOpaque() ? color : color.makeOpaque(WORKBENCH_BACKGROUND(theme));
 				}) || '';
 			this.element.style.backgroundColor = titleBackground;
 
-			if (this.appIconBadge) {
-				this.appIconBadge.style.backgroundColor = titleBackground;
-			}
-
-			if (titleBackground && Color.fromHex(titleBackground).isLighter()) {
-				this.element.classList.add('light');
-			} else {
-				this.element.classList.remove('light');
-			}
-
-			const titleForeground = this.getColor(
-				this.isInactive ? TITLE_BAR_INACTIVE_FOREGROUND : TITLE_BAR_ACTIVE_FOREGROUND
-			);
+			const titleForeground = this.getColor(TITLE_BAR_ACTIVE_FOREGROUND);
 			this.element.style.color = titleForeground || '';
 
 			const titleBorder = this.getColor(TITLE_BAR_BORDER);
@@ -1041,6 +1178,10 @@ export class BrowserTitlebarPart extends Part implements ITitlebarPart {
 	}
 
 	protected get isCommandCenterVisible() {
+		// Sidex: command center is hidden by default (the search bar is removed from the titlebar)
+		if ((globalThis as any).__SIDEX_TAURI__) {
+			return false;
+		}
 		return !this.isCompact && this.configurationService.getValue<boolean>(LayoutSettings.COMMAND_CENTER) !== false;
 	}
 
@@ -1113,8 +1254,8 @@ export class BrowserTitlebarPart extends Part implements ITitlebarPart {
 			this.customMenubar.value.layout(menubarDimension);
 		}
 
-		const hasCenter = this.isCommandCenterVisible || this.title.textContent !== '';
-		this.rootContainer.classList.toggle('has-center', hasCenter);
+		// Sidex always has center content (breadcrumbs)
+		this.rootContainer.classList.add('has-center');
 	}
 
 	focus(): void {
@@ -1152,7 +1293,11 @@ export class MainBrowserTitlebarPart extends BrowserTitlebarPart {
 		@IEditorGroupsService editorGroupService: IEditorGroupsService,
 		@IEditorService editorService: IEditorService,
 		@IMenuService menuService: IMenuService,
-		@IKeybindingService keybindingService: IKeybindingService
+		@IKeybindingService keybindingService: IKeybindingService,
+		@ISCMViewService scmViewService: ISCMViewService,
+		@IWorkspaceContextService workspaceContextService: IWorkspaceContextService,
+		@ILabelService labelService: ILabelService,
+		@ICommandService commandService: ICommandService
 	) {
 		super(
 			Parts.TITLEBAR_PART,
@@ -1169,7 +1314,11 @@ export class MainBrowserTitlebarPart extends BrowserTitlebarPart {
 			hostService,
 			editorService,
 			menuService,
-			keybindingService
+			keybindingService,
+			scmViewService,
+			workspaceContextService,
+			labelService,
+			commandService
 		);
 	}
 }
@@ -1204,7 +1353,11 @@ export class AuxiliaryBrowserTitlebarPart extends BrowserTitlebarPart implements
 		@IEditorGroupsService editorGroupService: IEditorGroupsService,
 		@IEditorService editorService: IEditorService,
 		@IMenuService menuService: IMenuService,
-		@IKeybindingService keybindingService: IKeybindingService
+		@IKeybindingService keybindingService: IKeybindingService,
+		@ISCMViewService scmViewService: ISCMViewService,
+		@IWorkspaceContextService workspaceContextService: IWorkspaceContextService,
+		@ILabelService labelService: ILabelService,
+		@ICommandService commandService: ICommandService
 	) {
 		const id = AuxiliaryBrowserTitlebarPart.COUNTER++;
 		super(
@@ -1222,7 +1375,11 @@ export class AuxiliaryBrowserTitlebarPart extends BrowserTitlebarPart implements
 			hostService,
 			editorService,
 			menuService,
-			keybindingService
+			keybindingService,
+			scmViewService,
+			workspaceContextService,
+			labelService,
+			commandService
 		);
 	}
 

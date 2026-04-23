@@ -7,7 +7,7 @@
 .monaco-workbench .part.titlebar {
 	display: flex;
 	flex-direction: row;
-	box-shadow: var(--vscode-shadow-md);
+	height: 32px;
 }
 
 .monaco-workbench.mac .part.titlebar {
@@ -48,8 +48,6 @@
 
 .monaco-workbench.web.safari .part.titlebar,
 .monaco-workbench.web.safari .part.titlebar > .titlebar-container {
-	/* Must be scoped to safari due to #148851 */
-	/* Is required in safari due to #149476 */
 	overflow: visible;
 }
 
@@ -74,32 +72,57 @@
 
 .monaco-workbench .part.titlebar > .titlebar-container.has-center > .titlebar-left {
 	order: 0;
-	width: 20%;
-	flex-grow: 2;
+	flex: 0 0 auto;
 	justify-content: flex-start;
+	padding-left: 8px;
+	gap: 2px;
+}
+
+/* macOS: push left content past native traffic light buttons */
+.monaco-workbench.mac .part.titlebar > .titlebar-container.has-center > .titlebar-left {
+	padding-left: 78px;
+}
+
+.monaco-workbench.mac.fullscreen .part.titlebar > .titlebar-container.has-center > .titlebar-left {
+	padding-left: 8px;
 }
 
 .monaco-workbench .part.titlebar > .titlebar-container.has-center > .titlebar-center {
 	order: 1;
-	width: 60%;
-	max-width: fit-content;
-	min-width: 0px;
-	margin: 0 10px;
-	/* flex-shrink: 10; */
+	position: absolute;
+	left: 0;
+	right: 0;
+	display: flex;
 	justify-content: center;
+	pointer-events: none;
+	overflow: hidden;
+}
+
+.monaco-workbench .part.titlebar .sidex-center-bar {
+	pointer-events: auto;
 }
 
 .monaco-workbench .part.titlebar > .titlebar-container.has-center > .titlebar-right {
 	order: 2;
-	width: 20%;
-	min-width: min-content;
-	flex-grow: 2;
+	flex: 0 0 auto;
 	justify-content: flex-end;
+	gap: 2px;
+	padding-right: 4px;
+	margin-left: auto;
 }
 
 .monaco-workbench .part.titlebar > .titlebar-container:not(.has-center) > .titlebar-left {
 	flex: 1 1 0%;
 	min-width: 0;
+	padding-left: 8px;
+}
+
+.monaco-workbench.mac .part.titlebar > .titlebar-container:not(.has-center) > .titlebar-left {
+	padding-left: 78px;
+}
+
+.monaco-workbench.mac.fullscreen .part.titlebar > .titlebar-container:not(.has-center) > .titlebar-left {
+	padding-left: 8px;
 }
 
 .monaco-workbench .part.titlebar > .titlebar-container:not(.has-center) > .titlebar-center {
@@ -108,13 +131,225 @@
 
 .monaco-workbench .part.titlebar > .titlebar-container:not(.has-center) > .titlebar-right {
 	flex: 0 0 auto;
-	padding-left: 16px; /* ensure there is some space between title and controls */
+	padding-left: 16px;
 }
 
-/* Window title text */
+/* ==============================
+   Sidex Titlebar Elements
+   Unified design system:
+   - All interactive items: 24px height, border-radius 5px
+   - Hover: rgba(255,255,255,0.07)
+   - All text: 11.5px
+   - All icons: 13px, opacity 0.5 default, 0.8 on hover
+   - All transitions: 100ms ease
+   - All items: -webkit-app-region: no-drag, z-index: 2500
+   ============================== */
+
+/* --- Shared interactive base --- */
+.monaco-workbench .part.titlebar .sidex-project-name,
+.monaco-workbench .part.titlebar .sidex-branch-container,
+.monaco-workbench .part.titlebar .sidex-search-trigger,
+.monaco-workbench .part.titlebar .sidex-run-button,
+.monaco-workbench .part.titlebar .sidex-titlebar-action {
+	display: flex;
+	align-items: center;
+	height: 24px;
+	border-radius: 5px;
+	cursor: pointer;
+	-webkit-app-region: no-drag;
+	z-index: 2500;
+	transition: background 100ms ease;
+	flex-shrink: 0;
+}
+
+.monaco-workbench .part.titlebar .sidex-project-name:hover,
+.monaco-workbench .part.titlebar .sidex-branch-container:hover,
+.monaco-workbench .part.titlebar .sidex-search-trigger:hover,
+.monaco-workbench .part.titlebar .sidex-run-button:hover,
+.monaco-workbench .part.titlebar .sidex-titlebar-action:hover {
+	background: rgba(255, 255, 255, 0.07);
+}
+
+.monaco-workbench .part.titlebar.inactive .sidex-project-name,
+.monaco-workbench .part.titlebar.inactive .sidex-branch-container,
+.monaco-workbench .part.titlebar.inactive .sidex-search-trigger,
+.monaco-workbench .part.titlebar.inactive .sidex-run-button,
+.monaco-workbench .part.titlebar.inactive .sidex-titlebar-action {
+	opacity: 1;
+}
+
+/* --- Project Name --- */
+.monaco-workbench .part.titlebar .sidex-project-name {
+	font-size: 11.5px;
+	font-weight: 600;
+	color: var(--vscode-titleBar-activeForeground);
+	padding: 0 6px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 180px;
+}
+
+/* --- Git Branch --- */
+.monaco-workbench .part.titlebar .sidex-branch-container {
+	gap: 4px;
+	padding: 0 6px;
+	margin-left: 0;
+}
+
+.monaco-workbench .part.titlebar .sidex-branch-separator {
+	display: none;
+}
+
+.monaco-workbench .part.titlebar .sidex-branch-icon {
+	font-size: 13px;
+	opacity: 0.45;
+	color: var(--vscode-titleBar-activeForeground);
+}
+
+.monaco-workbench .part.titlebar .sidex-branch-name {
+	font-size: 11.5px;
+	font-weight: 500;
+	color: var(--vscode-titleBar-activeForeground);
+	opacity: 0.7;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 120px;
+}
+
+.monaco-workbench .part.titlebar .sidex-branch-container:hover .sidex-branch-icon {
+	opacity: 0.7;
+}
+
+.monaco-workbench .part.titlebar .sidex-branch-container:hover .sidex-branch-name {
+	opacity: 0.9;
+}
+
+/* --- Center Bar (combined breadcrumbs + search trigger) --- */
+.monaco-workbench .part.titlebar .sidex-center-bar {
+	display: flex;
+	align-items: center;
+	height: 100%;
+	padding: 0;
+	gap: 6px;
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	-webkit-app-region: no-drag;
+	z-index: 2500;
+}
+
+.monaco-workbench .part.titlebar .sidex-center-bar:hover .sidex-center-icon,
+.monaco-workbench .part.titlebar .sidex-center-bar:hover .sidex-breadcrumbs,
+.monaco-workbench .part.titlebar .sidex-center-bar:hover .sidex-center-placeholder {
+	opacity: 0.7;
+}
+
+.monaco-workbench .part.titlebar.inactive .sidex-center-bar {
+	opacity: 1;
+}
+
+.monaco-workbench .part.titlebar .sidex-center-icon {
+	font-size: 12px;
+	color: var(--vscode-titleBar-activeForeground);
+	opacity: 0.25;
+	flex-shrink: 0;
+}
+
+.monaco-workbench .part.titlebar .sidex-center-placeholder {
+	font-size: 11.5px;
+	color: var(--vscode-titleBar-activeForeground);
+	opacity: 0.25;
+	white-space: nowrap;
+}
+
+.monaco-workbench .part.titlebar .sidex-center-bar:hover .sidex-center-placeholder {
+	opacity: 0.45;
+}
+
+/* --- Breadcrumbs inside center bar --- */
+.monaco-workbench .part.titlebar .sidex-breadcrumbs {
+	display: flex;
+	align-items: center;
+	gap: 0;
+	font-size: 11.5px;
+	color: var(--vscode-titleBar-activeForeground);
+	opacity: 0.4;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	min-width: 0;
+}
+
+.monaco-workbench .part.titlebar .sidex-breadcrumb-segment {
+	white-space: nowrap;
+	opacity: 0.7;
+}
+
+.monaco-workbench .part.titlebar .sidex-breadcrumb-file {
+	opacity: 1;
+	font-weight: 500;
+}
+
+.monaco-workbench .part.titlebar .sidex-breadcrumb-sep {
+	margin: 0 4px;
+	opacity: 0.3;
+	font-size: 9px;
+}
+
+/* --- Search Trigger (old, replaced by center bar) --- */
+.monaco-workbench .part.titlebar .sidex-search-trigger {
+	display: none;
+}
+
+.monaco-workbench .part.titlebar .sidex-search-icon,
+.monaco-workbench .part.titlebar .sidex-search-label,
+.monaco-workbench .part.titlebar .sidex-search-shortcut {
+	display: none;
+}
+.monaco-workbench .part.titlebar .sidex-run-button {
+	justify-content: center;
+	width: 28px;
+	margin-right: 2px;
+}
+
+.monaco-workbench .part.titlebar .sidex-run-icon {
+	font-size: 14px;
+	color: var(--vscode-debugIcon-startForeground, var(--vscode-titleBar-activeForeground));
+	opacity: 0.8;
+}
+
+.monaco-workbench .part.titlebar .sidex-run-button:hover .sidex-run-icon {
+	opacity: 1;
+}
+
+/* --- Action Buttons (settings, panel toggle, etc.) --- */
+.monaco-workbench .part.titlebar .sidex-titlebar-action {
+	justify-content: center;
+	width: 28px;
+	margin-right: 1px;
+}
+
+.monaco-workbench .part.titlebar .sidex-action-icon {
+	font-size: 14px;
+	color: var(--vscode-titleBar-activeForeground);
+	opacity: 0.4;
+}
+
+.monaco-workbench .part.titlebar .sidex-titlebar-action:hover .sidex-action-icon {
+	opacity: 0.8;
+}
+
+/* Breadcrumbs are styled inside the center bar section above */
+
+/* ==============================
+   Window title (hidden in Sidex layout, kept for compat)
+   ============================== */
 .monaco-workbench .part.titlebar > .titlebar-container > .titlebar-center > .window-title {
 	flex: 0 1 auto;
 	font-size: 12px;
+	font-weight: 500;
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
@@ -130,17 +365,17 @@
 
 .monaco-workbench.linux .part.titlebar > .titlebar-container > .titlebar-center > .window-title {
 	font-size: inherit;
-	/* see #55435 */
 }
 
 .monaco-workbench .part.titlebar > .titlebar-container .monaco-toolbar .actions-container {
 	gap: 4px;
 }
 
-/* Window Title Menu */
+/* Command Center (hidden by default in Sidex) */
 .monaco-workbench .part.titlebar > .titlebar-container > .titlebar-center > .window-title > .command-center {
 	z-index: 2500;
 	-webkit-app-region: no-drag;
+	display: none;
 }
 
 .monaco-workbench .part.titlebar > .titlebar-container > .titlebar-center > .window-title > .command-center.hide {
@@ -148,7 +383,7 @@
 }
 
 .monaco-workbench .part.titlebar.inactive > * {
-	opacity: 0.6;
+	opacity: 1;
 }
 
 .monaco-workbench .part.titlebar > .titlebar-container > .titlebar-center > .window-title > .command-center > .monaco-toolbar > .monaco-action-bar > .actions-container > .action-item > .action-label,
@@ -174,9 +409,9 @@
 	overflow: hidden;
 	margin: 0 6px;
 	border-radius: var(--vscode-cornerRadius-medium);
-	height: 22px;
+	height: 20px;
 	width: 38vw;
-	max-width: 600px;
+	max-width: 560px;
 }
 
 .monaco-workbench .part.titlebar > .titlebar-container > .titlebar-center > .window-title > .command-center .action-item.command-center-center .action-item.command-center-quick-pick {
@@ -205,7 +440,6 @@
 	color: var(--vscode-commandCenter-foreground);
 }
 
-/* Compact mode: centered label with icon */
 .monaco-workbench .part.titlebar > .titlebar-container > .titlebar-center > .window-title > .command-center .action-item.command-center-center .action-item.command-center-quick-pick.compact-mode {
 	justify-content: center;
 	padding-left: 8px;
@@ -235,7 +469,7 @@
 }
 
 .monaco-workbench .part.titlebar > .titlebar-container > .titlebar-center > .window-title > .command-center .action-item.command-center-center:only-child {
-	margin-left: 0; /* no margin if there is only the command center, without nav buttons */
+	margin-left: 0;
 }
 
 .monaco-workbench .part.titlebar.inactive > .titlebar-container > .titlebar-center > .window-title > .command-center .action-item.command-center-center {
@@ -251,7 +485,6 @@
 
 /* Menubar */
 .monaco-workbench .part.titlebar > .titlebar-container > .titlebar-left > .menubar {
-	/* move menubar above drag region as negative z-index on drag region cause greyscale AA */
 	z-index: 2500;
 	min-width: 36px;
 	flex-wrap: nowrap;
@@ -264,7 +497,7 @@
 
 .monaco-workbench .part.titlebar > .titlebar-container.counter-zoom .menubar .menubar-menu-button > .menubar-menu-items-holder.monaco-menu-container,
 .monaco-workbench .part.titlebar > .titlebar-container.counter-zoom .monaco-toolbar .dropdown-action-container {
-	zoom: var(--zoom-factor); /* helps to position the menu properly when counter zooming */
+	zoom: var(--zoom-factor);
 }
 
 /* Resizer */
@@ -284,7 +517,7 @@
 
 /* App Icon */
 .monaco-workbench .part.titlebar > .titlebar-container > .titlebar-left > .window-appicon {
-	width: 35px;
+	width: 32px;
 	height: 100%;
 	position: relative;
 	z-index: 2500;
@@ -293,13 +526,13 @@
 }
 
 .monaco-workbench .part.titlebar > .titlebar-container > .titlebar-left > .window-appicon:not(.codicon) {
-	-webkit-mask: url('../../../media/code-icon.svg') no-repeat center center / 20px;
-	mask: url('../../../media/code-icon.svg') no-repeat center center / 20px;
+	-webkit-mask: url('../../../media/code-icon.svg') no-repeat center center / 16px;
+	mask: url('../../../media/code-icon.svg') no-repeat center center / 16px;
 	background-color: var(--vscode-titleBar-activeForeground);
 }
 
 .monaco-workbench .part.titlebar > .titlebar-container > .titlebar-left > .window-appicon.codicon {
-	line-height: 30px;
+	line-height: 28px;
 }
 
 .monaco-workbench.fullscreen .part.titlebar > .titlebar-container > .titlebar-left > .window-appicon {
@@ -323,15 +556,14 @@
 	background-color: transparent;
 }
 
-/* Window Controls Container Web: Apply WCO environment variables (https://developer.mozilla.org/en-US/docs/Web/CSS/env#titlebar-area-x) */
 .monaco-workbench.web .part.titlebar .titlebar-right .window-controls-container {
 	width: calc(100vw - env(titlebar-area-width, 100vw) - env(titlebar-area-x, 0px));
-	height: env(titlebar-area-height, 35px);
+	height: env(titlebar-area-height, 32px);
 }
 
 .monaco-workbench.web .part.titlebar .titlebar-left .window-controls-container {
 	width: env(titlebar-area-x, 0px);
-	height: env(titlebar-area-height, 35px);
+	height: env(titlebar-area-height, 32px);
 }
 
 .monaco-workbench.web.mac .part.titlebar .titlebar-left .window-controls-container {
@@ -342,12 +574,11 @@
 	order: 1;
 }
 
-/* Window Controls Container Desktop: apply zoom friendly size */
 .monaco-workbench:not(.web):not(.mac) .part.titlebar .window-controls-container {
 	width: calc(138px / var(--zoom-factor, 1));
 }
 
-/* Tauri on Windows/Linux runs as web context but still needs custom controls width */
+/* Tauri on Windows/Linux */
 .monaco-workbench.web.windows .part.titlebar .titlebar-right .window-controls-container,
 .monaco-workbench.web.linux .part.titlebar .titlebar-right .window-controls-container {
 	width: calc(138px / var(--zoom-factor, 1));
@@ -417,43 +648,14 @@
 	color: white;
 }
 
-/* Center-Adjacent Toolbar (e.g., update indicator) */
+/* Center-Adjacent Toolbar — hidden in Sidex */
 .monaco-workbench .part.titlebar > .titlebar-container > .titlebar-right > .center-adjacent-toolbar-container {
-	z-index: 2500;
-	-webkit-app-region: no-drag;
-	margin-right: auto;
-	min-width: 0;
-	overflow: hidden;
+	display: none !important;
 }
 
-.monaco-workbench .part.titlebar > .titlebar-container > .titlebar-right > .center-adjacent-toolbar-container.has-no-actions {
-	display: none;
-}
-
-/* Action Tool Bar Controls */
+/* Action Tool Bar Controls — hidden in Sidex (we use custom titlebar buttons) */
 .monaco-workbench .part.titlebar > .titlebar-container > .titlebar-right > .action-toolbar-container {
-	display: none;
-	padding-right: 4px;
-	flex-grow: 0;
-	flex-shrink: 0;
-	text-align: center;
-	position: relative;
-	z-index: 2500;
-	-webkit-app-region: no-drag;
-	height: 100%;
-}
-
-.monaco-workbench .part.titlebar > .titlebar-container > .titlebar-right > .action-toolbar-container {
-	margin-left: auto;
-}
-
-.monaco-workbench.mac:not(.web) .part.titlebar > .titlebar-container > .titlebar-right > .action-toolbar-container {
-	right: 8px;
-}
-
-.monaco-workbench .part.titlebar > .titlebar-container > .titlebar-right > .action-toolbar-container:not(.has-no-actions) {
-	display: flex;
-	justify-content: center;
+	display: none !important;
 }
 
 .monaco-workbench .part.titlebar > .titlebar-container > .titlebar-right > .action-toolbar-container .codicon {
@@ -519,3 +721,5 @@
 	border-radius: 16px;
 	text-align: center;
 }
+
+/* Sidex titlebar action elements are styled in the unified section above */

@@ -21,9 +21,9 @@
 }
 
 .monaco-pane-view .pane > .pane-header {
-	height: 22px;
+	height: 28px;
 	font-size: 11px;
-	font-weight: bold;
+	font-weight: 600;
 	overflow: hidden;
 	display: flex;
 	cursor: pointer;
@@ -42,18 +42,20 @@
 .monaco-pane-view .pane.horizontal:not(.expanded) > .pane-header {
 	flex-direction: column;
 	height: 100%;
-	width: 22px;
+	width: 28px;
 }
 
 .monaco-pane-view .pane > .pane-header > .codicon:first-of-type {
 	margin: 0 2px;
+	font-size: 10px;
+	opacity: 0.7;
 }
 
 .monaco-pane-view .pane.horizontal:not(.expanded) > .pane-header > .codicon:first-of-type {
 	margin: 2px;
 }
 
-/* TODO: actions should be part of the pane, but they aren't yet */
+/* actions */
 .monaco-pane-view .pane > .pane-header > .actions {
 	display: none;
 	margin-left: auto;
@@ -68,7 +70,6 @@
 	padding: 2px;
 }
 
-/* TODO: actions should be part of the pane, but they aren't yet */
 .monaco-pane-view .pane:hover > .pane-header.expanded > .actions,
 .monaco-pane-view .pane:focus-within > .pane-header.expanded > .actions,
 .monaco-pane-view .pane > .pane-header.actions-always-visible.expanded > .actions,
@@ -144,7 +145,7 @@
 	min-height: 22px;
 	min-width: 19px;
 
-	pointer-events: none; /* very important to not take events away from the parent */
+	pointer-events: none;
 	transition: opacity 150ms ease-out;
 }
 
