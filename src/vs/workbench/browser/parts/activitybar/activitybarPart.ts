@@ -191,7 +191,7 @@ export class ActivitybarPart extends Part {
 			},
 			Parts.ACTIVITYBAR_PART,
 			this.paneCompositePart,
-			true
+			false
 		);
 	}
 

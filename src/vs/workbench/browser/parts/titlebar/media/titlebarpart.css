@@ -218,6 +218,12 @@
 	max-width: 120px;
 }
 
+.monaco-workbench .part.titlebar .sidex-branch-chevron {
+	font-size: 10px;
+	opacity: 0.3;
+	color: var(--vscode-titleBar-activeForeground);
+}
+
 .monaco-workbench .part.titlebar .sidex-branch-container:hover .sidex-branch-icon {
 	opacity: 0.7;
 }
@@ -339,6 +345,12 @@
 
 .monaco-workbench .part.titlebar .sidex-titlebar-action:hover .sidex-action-icon {
 	opacity: 0.8;
+}
+
+/* Account button — slightly larger for future profile pics */
+.monaco-workbench .part.titlebar .sidex-account-button {
+	width: 28px;
+	margin-left: 2px;
 }
 
 /* Breadcrumbs are styled inside the center bar section above */

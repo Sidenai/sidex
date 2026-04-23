@@ -91,7 +91,7 @@ import {
 } from '../globalCompositeBar.js';
 import { HoverPosition } from '../../../../base/browser/ui/hover/hoverWidget.js';
 import { IEditorGroupsContainer, IEditorGroupsService } from '../../../services/editor/common/editorGroupsService.js';
-import { ActionRunner, IAction } from '../../../../base/common/actions.js';
+import { ActionRunner, IAction, toAction } from '../../../../base/common/actions.js';
 import { IEditorService } from '../../../services/editor/common/editorService.js';
 import {
 	ActionsOrientation,
@@ -614,6 +614,21 @@ export class BrowserTitlebarPart extends Part implements ITitlebarPart {
 			const branchIcon = append(branchContainer, $('span.sidex-branch-icon.codicon.codicon-source-control'));
 			branchIcon.setAttribute('aria-hidden', 'true');
 			this.branchElement = append(branchContainer, $('span.sidex-branch-name'));
+			const branchChevron = append(branchContainer, $('span.sidex-branch-chevron.codicon.codicon-chevron-down'));
+			branchChevron.setAttribute('aria-hidden', 'true');
+
+			this._register(addDisposableListener(branchContainer, EventType.CLICK, () => {
+				const actions: IAction[] = [
+					toAction({ id: 'sidex.git.checkout', label: 'Switch Branch...', run: () => this.commandService.executeCommand('git.checkout').catch(() => {}) }),
+					toAction({ id: 'sidex.git.createBranch', label: 'Create Branch...', run: () => this.commandService.executeCommand('git.branch').catch(() => {}) }),
+					toAction({ id: 'sidex.git.pull', label: 'Pull', run: () => this.commandService.executeCommand('git.pull').catch(() => {}) }),
+					toAction({ id: 'sidex.git.push', label: 'Push', run: () => this.commandService.executeCommand('git.push').catch(() => {}) }),
+				];
+				this.contextMenuService.showContextMenu({
+					getAnchor: () => branchContainer,
+					getActions: () => actions,
+				});
+			}));
 
 			this.updateProjectName();
 			this.setupBranchTracking();
@@ -649,7 +664,27 @@ export class BrowserTitlebarPart extends Part implements ITitlebarPart {
 			const settingsIcon = append(settingsButton, $('span.codicon.codicon-settings-gear.sidex-action-icon'));
 			settingsIcon.setAttribute('aria-hidden', 'true');
 			this._register(addDisposableListener(settingsButton, EventType.CLICK, () => {
-				this.commandService.executeCommand('workbench.action.openSettings');
+				const actions: IAction[] = [
+					toAction({ id: 'sidex.manage.commandPalette', label: 'Command Palette...', run: () => this.commandService.executeCommand('workbench.action.showCommands') }),
+					toAction({ id: 'sidex.manage.settings', label: 'Settings', run: () => this.commandService.executeCommand('workbench.action.openSettings') }),
+					toAction({ id: 'sidex.manage.keybindings', label: 'Keyboard Shortcuts', run: () => this.commandService.executeCommand('workbench.action.openGlobalKeybindings') }),
+					toAction({ id: 'sidex.manage.snippets', label: 'Snippets', run: () => this.commandService.executeCommand('workbench.action.openSnippets') }),
+					toAction({ id: 'sidex.manage.themes', label: 'Themes', run: () => this.commandService.executeCommand('workbench.action.selectTheme') }),
+				];
+				this.contextMenuService.showContextMenu({
+					getAnchor: () => settingsButton,
+					getActions: () => actions,
+				});
+			}));
+
+			// Account / Profile button
+			const accountButton = append(this.rightContent, $('div.sidex-titlebar-action.sidex-account-button'));
+			const accountIcon = append(accountButton, $('span.codicon.codicon-account.sidex-action-icon'));
+			accountIcon.setAttribute('aria-hidden', 'true');
+			this._register(addDisposableListener(accountButton, EventType.CLICK, () => {
+				this.commandService.executeCommand('workbench.action.showEditorsInActiveGroup').catch(() => {
+					this.commandService.executeCommand('workbench.accounts.actions').catch(() => {});
+				});
 			}));
 		} catch {
 			// Sidex customizations failed — titlebar still works with default VSCode behavior
