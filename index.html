@@ -45,7 +45,7 @@
 				licenseName: 'MIT',
 				licenseUrl: 'https://github.com/sidenai/sidex/blob/main/LICENSE',
 				extensionsGallery: (() => {
-					const isDev = window.location.origin.includes('localhost:1420');
+					const isDev = ['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname);
 					const openVsx = isDev ? window.location.origin + '/open-vsx-proxy' : 'https://open-vsx.org';
 					return {
 						serviceUrl: 'https://marketplace.siden.ai/api/gallery',
