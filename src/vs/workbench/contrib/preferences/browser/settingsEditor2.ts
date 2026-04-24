@@ -194,9 +194,9 @@ export class SettingsEditor2 extends EditorPane {
 	private static SETTING_UPDATE_FAST_DEBOUNCE: number = 200;
 	private static SETTING_UPDATE_SLOW_DEBOUNCE: number = 1000;
 	private static CONFIG_SCHEMA_UPDATE_DELAYER = 500;
-	private static TOC_MIN_WIDTH: number = 100;
-	private static TOC_RESET_WIDTH: number = 200;
-	private static EDITOR_MIN_WIDTH: number = 500;
+	private static TOC_MIN_WIDTH: number = 160;
+	private static TOC_RESET_WIDTH: number = 240;
+	private static EDITOR_MIN_WIDTH: number = 400;
 	// Below NARROW_TOTAL_WIDTH, we only render the editor rather than the ToC.
 	private static NARROW_TOTAL_WIDTH: number = this.TOC_RESET_WIDTH + this.EDITOR_MIN_WIDTH;
 
@@ -719,10 +719,9 @@ export class SettingsEditor2 extends EditorPane {
 
 		this.layoutSplitView(dimension);
 
-		const innerWidth = Math.min(this.headerContainer.clientWidth, dimension.width) - 24 * 2; // 24px padding on left and right;
-		// minus padding inside inputbox, controls width, and extra padding before countElement
-		const monacoWidth = innerWidth - 10 - this.controlsElement.clientWidth - 12;
-		this.searchWidget.layout(new DOM.Dimension(monacoWidth, 20));
+		const tocWidth = this.splitView?.getViewSize(0) ?? SettingsEditor2.TOC_RESET_WIDTH;
+		const monacoWidth = tocWidth - 24;
+		this.searchWidget.layout(new DOM.Dimension(Math.max(monacoWidth, 80), 20));
 
 		this.rootElement.classList.toggle('narrow-width', dimension.width < SettingsEditor2.NARROW_TOTAL_WIDTH);
 	}
@@ -932,23 +931,6 @@ export class SettingsEditor2 extends EditorPane {
 
 		const headerControlsContainer = DOM.append(this.headerContainer, $('.settings-header-controls'));
 		headerControlsContainer.style.borderColor = asCssVariable(settingsHeaderBorder);
-
-		const targetWidgetContainer = DOM.append(headerControlsContainer, $('.settings-target-container'));
-		this.settingsTargetsWidget = this._register(
-			this.instantiationService.createInstance(SettingsTargetsWidget, targetWidgetContainer, {
-				enableRemoteSettings: true
-			})
-		);
-		this.settingsTargetsWidget.settingsTarget = ConfigurationTarget.USER_LOCAL;
-		this._register(this.settingsTargetsWidget.onDidTargetChange(target => this.onDidSettingsTargetChange(target)));
-		this._register(
-			DOM.addDisposableListener(targetWidgetContainer, DOM.EventType.KEY_DOWN, e => {
-				const event = new StandardKeyboardEvent(e);
-				if (event.keyCode === KeyCode.DownArrow) {
-					this.focusSettings();
-				}
-			})
-		);
 
 		if (this.userDataSyncWorkbenchService.enabled && this.userDataSyncEnablementService.canToggleEnablement()) {
 			const syncControls = this._register(
@@ -1167,6 +1149,29 @@ export class SettingsEditor2 extends EditorPane {
 		this.tocTreeContainer = $('.settings-toc-container');
 		this.settingsTreeContainer = $('.settings-tree-container');
 
+		// Move search + scope tabs into sidebar TOC
+		if (this.searchContainer) {
+			const sidebarSearchWrapper = DOM.append(this.tocTreeContainer, $('.settings-sidebar-search'));
+			sidebarSearchWrapper.appendChild(this.searchContainer);
+		}
+		const sidebarScopeWrapper = DOM.append(this.tocTreeContainer, $('.settings-sidebar-scope'));
+		const targetWidgetContainer = DOM.append(sidebarScopeWrapper, $('.settings-target-container'));
+		this.settingsTargetsWidget = this._register(
+			this.instantiationService.createInstance(SettingsTargetsWidget, targetWidgetContainer, {
+				enableRemoteSettings: true
+			})
+		);
+		this.settingsTargetsWidget.settingsTarget = ConfigurationTarget.USER_LOCAL;
+		this._register(this.settingsTargetsWidget.onDidTargetChange(target => this.onDidSettingsTargetChange(target)));
+		this._register(
+			DOM.addDisposableListener(targetWidgetContainer, DOM.EventType.KEY_DOWN, e => {
+				const event = new StandardKeyboardEvent(e);
+				if (event.keyCode === KeyCode.DownArrow) {
+					this.focusSettings();
+				}
+			})
+		);
+
 		this.createTOC(this.tocTreeContainer);
 		this.createSettingsTree(this.settingsTreeContainer);
 
@@ -1189,7 +1194,9 @@ export class SettingsEditor2 extends EditorPane {
 				maximumSize: Number.POSITIVE_INFINITY,
 				layout: (width, _, height) => {
 					this.tocTreeContainer.style.width = `${width}px`;
-					this.tocTree.layout(height, width);
+					const sidebarHeaderHeight = 70;
+					const treeHeight = height ? Math.max(0, height - sidebarHeaderHeight) : undefined;
+					this.tocTree.layout(treeHeight, width);
 				}
 			},
 			startingWidth,
@@ -2536,7 +2543,7 @@ export class SettingsEditor2 extends EditorPane {
 		if (!this.isVisible() || !this.splitView) {
 			return;
 		}
-		const listHeight = dimension.height - (72 + 11 + 14); /* header height + editor padding */
+		const listHeight = dimension.height;
 
 		this.splitView.el.style.height = `${listHeight}px`;
 

@@ -1,5 +1,5 @@
 /*---------------------------------------------------------------------------------------------
- *  SideX Settings Editor — Clean preferences panel
+ *  SideX Settings Editor — JetBrains-inspired design
  *--------------------------------------------------------------------------------------------*/
 
 .editor-instance#workbench\.editor\.settings2:focus {
@@ -9,8 +9,6 @@
 .settings-editor {
 	height: 100%;
 	overflow: hidden;
-	max-width: 1000px;
-	margin: auto;
 }
 
 .settings-editor:focus {
@@ -18,28 +16,19 @@
 }
 
 .settings-editor > .settings-header {
-	box-sizing: border-box;
-	margin: auto;
-	overflow: hidden;
-	margin-top: 16px;
-	padding: 0 28px;
-	max-width: 1000px;
+	display: none;
 }
 
 .settings-editor > .settings-header > .search-container {
-	position: relative;
+	display: none;
 }
 
 .settings-editor > .settings-header > .search-container > .suggest-input-container {
-	border: 1px solid var(--vscode-input-border, #252525) !important;
-	border-radius: 6px;
-	background: var(--vscode-input-background, transparent);
-	overflow: hidden;
-	transition: border-color 0.15s ease;
+	display: none;
 }
 
 .settings-editor > .settings-header > .search-container > .suggest-input-container:focus-within {
-	border-color: var(--vscode-focusBorder, #505050) !important;
+	border-color: var(--vscode-focusBorder) !important;
 }
 
 .settings-editor > .settings-header > .search-container > .suggest-input-container .monaco-inputbox {
@@ -52,26 +41,15 @@
 }
 
 .settings-editor > .settings-header > .search-container > .search-container-widgets {
-	display: flex;
-	align-items: center;
-	position: absolute;
-	top: 0;
-	right: 0;
-	height: 100%;
-	margin-right: 4px;
+	display: none;
 }
 
 .settings-editor > .settings-header > .search-container > .search-container-widgets .action-label {
-	padding: 3px;
-	margin-left: 0px;
-	box-sizing: content-box;
-	border-radius: 3px;
-	color: #606060;
-	transition: color 0.15s ease;
+	display: none;
 }
 
 .settings-editor > .settings-header > .search-container > .search-container-widgets .action-label:hover {
-	color: #c0c0c0;
+	color: var(--vscode-foreground);
 }
 
 .settings-editor > .settings-header > .search-container > .search-container-widgets .action-label.monaco-custom-toggle {
@@ -79,13 +57,7 @@
 }
 
 .settings-editor > .settings-header > .search-container > .search-container-widgets > .settings-count-widget {
-	margin-right: 6px;
-	padding: 1px 6px;
-	font-size: 11px;
-	color: #606060;
-	background: rgba(255, 255, 255, 0.04);
-	border-radius: 8px;
-	line-height: 1.4;
+	display: none;
 }
 
 .settings-editor > .settings-header > .search-container > .search-container-widgets > .settings-count-widget:empty {
@@ -93,11 +65,7 @@
 }
 
 .settings-editor > .settings-header > .settings-header-controls {
-	display: flex;
-	flex-wrap: wrap;
-	border-bottom: 1px solid #1e1e1e;
-	margin-top: 12px;
-	padding-bottom: 2px;
+	display: none;
 }
 
 .settings-editor > .settings-header > .settings-header-controls .settings-suggestions {
@@ -108,8 +76,8 @@
 }
 
 .settings-editor > .settings-header > .settings-header-controls .settings-suggestions a {
-	color: #c0c0c0;
-	background: rgba(255, 255, 255, 0.04);
+	color: var(--vscode-foreground);
+	background: var(--vscode-toolbar-hoverBackground);
 	cursor: pointer;
 	margin-right: 4px;
 	padding: 1px 6px 2px;
@@ -119,7 +87,7 @@
 }
 
 .settings-editor > .settings-header > .settings-header-controls .settings-suggestions a:hover {
-	background: rgba(255, 255, 255, 0.08);
+	background: var(--vscode-toolbar-activeBackground);
 }
 
 .settings-editor > .settings-header > .settings-header-controls .settings-target-container {
@@ -129,7 +97,7 @@
 .settings-editor > .settings-header > .settings-header-controls .settings-tabs-widget .action-label {
 	opacity: 0.7;
 	border-radius: 0;
-	color: #808080;
+	color: var(--vscode-descriptionForeground);
 	transition: opacity 0.12s ease, color 0.12s ease;
 }
 
@@ -147,11 +115,11 @@
 
 .settings-editor > .settings-header > .settings-header-controls .settings-tabs-widget .action-label.checked {
 	opacity: 1;
-	color: #c0c0c0;
+	color: var(--vscode-foreground);
 }
 
 .settings-editor > .settings-header > .settings-header-controls .settings-tabs-widget .action-label.checked:not(:focus) {
-	border-bottom-color: #808080;
+	border-bottom-color: var(--vscode-focusBorder);
 }
 
 .settings-editor > .settings-header .settings-tabs-widget > .monaco-action-bar .action-item .action-label {
@@ -182,22 +150,22 @@
 
 .settings-editor > .settings-body {
 	position: relative;
+	height: 100%;
 }
 
 .settings-editor > .settings-body > .no-results-message {
 	display: none;
-	max-width: 1000px;
 	margin: auto;
 	margin-top: 24px;
 	padding-left: 28px;
 	padding-right: 28px;
 	box-sizing: border-box;
-	color: #606060;
+	color: var(--vscode-descriptionForeground);
 	font-size: 13px;
 }
 
 .settings-editor > .settings-body > .monaco-split-view2 {
-	margin-top: 14px;
+	margin-top: 0;
 }
 
 .settings-editor > .settings-body > .monaco-split-view2.separator-border .split-view-view:not(:first-child):before {
@@ -207,11 +175,12 @@
 .settings-editor > .settings-body .settings-toc-container,
 .settings-editor > .settings-body .settings-tree-container {
 	height: 100%;
+	overflow: hidden;
 }
 
 .settings-editor > .settings-body .settings-tree-container .settings-group-title-label,
 .settings-editor > .settings-body .settings-tree-container .setting-item-label {
-	color: #c0c0c0;
+	color: var(--vscode-foreground);
 }
 
 .settings-editor > .settings-body .settings-tree-container .setting-item-extension-toggle .setting-item-extension-toggle-button {
@@ -239,7 +208,7 @@
 }
 
 .settings-editor.narrow-width > .settings-body .settings-tree-container .monaco-list-row .monaco-tl-contents {
-	padding-left: 28px;
+	padding-left: 16px;
 }
 
 .settings-editor > .settings-body .settings-tree-container .monaco-list-row {
@@ -251,7 +220,7 @@
 }
 
 .settings-editor > .settings-body .settings-tree-container .monaco-list-row.focused .settings-row-inner-container {
-	background-color: rgba(255, 255, 255, 0.02);
+	background-color: var(--vscode-list-hoverBackground);
 	border-radius: 3px;
 }
 
@@ -260,13 +229,13 @@
 }
 
 .settings-editor > .settings-body .settings-tree-container .monaco-list-row:not(.focused) .settings-row-inner-container:hover {
-	background-color: rgba(255, 255, 255, 0.02);
+	background-color: var(--vscode-list-hoverBackground);
 	border-radius: 3px;
 }
 
 .settings-editor > .settings-body .settings-tree-container .monaco-list:focus-within .monaco-list-row.focused .setting-item-contents,
 .settings-editor > .settings-body .settings-tree-container .monaco-list:focus-within .monaco-list-row.focused .settings-group-title-label {
-	outline: 1px solid rgba(255, 255, 255, 0.06);
+	outline: 1px solid var(--vscode-focusBorder);
 	outline-offset: -1px;
 	border-radius: 3px;
 }
@@ -313,9 +282,9 @@
 
 .settings-editor > .settings-body .settings-toc-container {
 	width: 100%;
-	pointer-events: none;
 	z-index: 10;
-	position: absolute;
+	height: 100%;
+	background-color: var(--vscode-sideBar-background, var(--vscode-editor-background));
 }
 
 .settings-editor > .settings-body .settings-toc-container .monaco-list {
@@ -327,52 +296,67 @@
 }
 
 .settings-editor > .settings-body .settings-toc-container .monaco-list-row:not(.selected) {
-	color: #808080;
-	opacity: 1;
+	color: var(--vscode-foreground);
+	opacity: 0.8;
 }
 
 .settings-editor > .settings-body .settings-toc-container .monaco-list-row .monaco-tl-contents {
 	display: flex;
+	padding: 0 6px;
 }
 
 .settings-editor > .settings-body .settings-toc-container .monaco-list-row .settings-toc-entry {
 	overflow: hidden;
 	text-overflow: ellipsis;
-	line-height: 22px;
+	line-height: 28px;
 	flex-shrink: 1;
 	font-size: 13px;
-	padding: 1px 8px;
-	border-radius: 3px;
-	transition: background 0.12s ease;
+	padding: 0 6px;
 }
 
 .settings-editor > .settings-body .settings-toc-container .monaco-list-row .settings-toc-count {
 	display: none;
-	line-height: 22px;
-	opacity: 0.6;
+	line-height: 28px;
+	opacity: 0.5;
 	margin-left: 4px;
 	font-size: 10px;
-	color: #606060;
-	background: rgba(255, 255, 255, 0.04);
-	padding: 0 5px;
-	border-radius: 6px;
+	color: var(--vscode-descriptionForeground);
 }
 
 .settings-editor.search-mode > .settings-body .settings-toc-container .monaco-list-row .settings-toc-count {
 	display: block;
 }
 
-.settings-editor > .settings-body .settings-toc-container .monaco-list-row.selected .settings-toc-entry {
-	font-weight: 600;
+/* Selected row */
+.settings-editor > .settings-body .settings-toc-container .monaco-list-row.selected,
+.settings-editor > .settings-body .settings-toc-container .monaco-list-row.focused.selected {
+	background: var(--vscode-list-activeSelectionBackground, rgba(255, 255, 255, 0.08)) !important;
+	color: var(--vscode-list-activeSelectionForeground, var(--vscode-foreground)) !important;
 	opacity: 1;
-	color: #c0c0c0;
-	background: rgba(255, 255, 255, 0.04);
+	border-radius: 4px;
+	outline: none !important;
 }
 
-.settings-editor > .settings-body .settings-tree-container {
-	border-spacing: 0;
-	border-collapse: separate;
-	position: relative;
+.settings-editor > .settings-body .settings-toc-container .monaco-list-row.selected .settings-toc-entry {
+	font-weight: 500;
+}
+
+/* Hover row */
+.settings-editor > .settings-body .settings-toc-container .monaco-list-row:hover:not(.selected) {
+	background: var(--vscode-list-hoverBackground, rgba(255, 255, 255, 0.04)) !important;
+	border-radius: 4px;
+	opacity: 1;
+}
+
+/* Kill all outlines/borders the monaco-list injects */
+.settings-editor > .settings-body .settings-toc-container .monaco-list-row {
+	outline: none !important;
+	margin: 0 6px;
+	width: calc(100% - 12px) !important;
+}
+
+.settings-editor > .settings-body .settings-toc-container .monaco-list-row.focused {
+	outline: none !important;
 }
 
 .settings-editor > .settings-body .settings-tree-container .monaco-scrollable-element {
@@ -384,10 +368,8 @@
 }
 
 .settings-editor > .settings-body .settings-toc-wrapper {
-	padding-left: 28px;
+	padding: 0 6px;
 	height: 100%;
-	max-width: 1000px;
-	margin: auto;
 }
 
 .settings-editor.narrow-width > .settings-body .settings-tree-container {
@@ -406,16 +388,16 @@
 }
 
 .settings-editor > .settings-body .settings-tree-container .monaco-list-row .monaco-tl-contents {
-	max-width: min(100%, 1000px);
-	margin: auto;
+	max-width: 900px;
+	margin: 0;
 	box-sizing: border-box;
-	padding-left: 28px;
-	padding-right: 28px;
+	padding-left: 24px;
+	padding-right: 24px;
 	overflow: visible;
 }
 
 .settings-editor > .settings-body .settings-tree-container .monaco-list-row .monaco-tl-contents.group-title {
-	max-width: min(100%, 1000px);
+	max-width: 900px;
 }
 
 .settings-editor > .settings-body .settings-tree-container .settings-group-title-label,
@@ -425,9 +407,9 @@
 
 .settings-editor > .settings-body .settings-tree-container .setting-item-contents {
 	position: relative;
-	padding: 12px 14px 18px;
+	padding: 10px 14px 14px;
 	white-space: normal;
-	transition: background 0.12s ease;
+	transition: background 0.1s ease;
 }
 
 .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-title {
@@ -448,7 +430,7 @@
 	width: 6px;
 	height: 6px;
 	border-radius: 50%;
-	background-color: #808080;
+	background-color: var(--vscode-descriptionForeground);
 	border-left-width: 0;
 	border-left-style: none;
 	left: 4px;
@@ -467,7 +449,7 @@
 
 .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-title .setting-item-overrides,
 .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-title .setting-item-ignored {
-	color: #606060;
+	color: var(--vscode-descriptionForeground);
 	opacity: 1;
 }
 
@@ -476,8 +458,8 @@
 }
 
 .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-title > .setting-indicators-container .setting-indicator.setting-item-preview {
-	color: #c0c0c0;
-	background: rgba(255, 255, 255, 0.06);
+	color: var(--vscode-foreground);
+	background: var(--vscode-toolbar-hoverBackground);
 	font-style: italic;
 	margin-right: 4px;
 	padding: 0px 5px 2px;
@@ -495,7 +477,7 @@
 }
 
 .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-title .setting-item-overrides a.modified-scope {
-	color: #c0c0c0;
+	color: var(--vscode-textLink-foreground);
 	text-decoration: none;
 	cursor: pointer;
 	transition: color 0.12s ease;
@@ -517,14 +499,14 @@
 .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-category {
 	font-weight: 500;
 	font-size: 13px;
-	color: #c0c0c0;
+	color: var(--vscode-foreground);
 	user-select: text;
 	-webkit-user-select: text;
 }
 
 .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-category {
 	opacity: 0.7;
-	color: #808080;
+	color: var(--vscode-descriptionForeground);
 }
 
 .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-deprecation-message {
@@ -548,7 +530,7 @@
 	margin-top: 2px;
 	user-select: text;
 	-webkit-user-select: text;
-	color: #606060;
+	color: var(--vscode-descriptionForeground);
 	font-size: 12px;
 	line-height: 1.5;
 	opacity: 1;
@@ -617,7 +599,7 @@
 .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-markdown a,
 .settings-editor > .settings-body .settings-tree-container .setting-item-contents .edit-in-settings-button,
 .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-markdown a > code {
-	color: #c0c0c0;
+	color: var(--vscode-textLink-foreground);
 }
 
 .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-markdown a,
@@ -627,10 +609,10 @@
 
 .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-markdown a:focus,
 .settings-editor > .settings-body .settings-tree-container .setting-item-contents .edit-in-settings-button:focus {
-	outline: 1px solid rgba(255, 255, 255, 0.15);
+	outline: 1px solid var(--vscode-focusBorder);
 	outline-offset: -1px;
 	text-decoration: underline;
-	outline-color: rgba(255, 255, 255, 0.15);
+	outline-color: var(--vscode-focusBorder);
 }
 
 .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-markdown a:hover,
@@ -639,7 +621,7 @@
 .settings-editor > .settings-body .settings-tree-container .setting-item-contents .edit-in-settings-button:active,
 .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-markdown a:hover > code,
 .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-markdown a:active > code {
-	color: #e0e0e0;
+	color: var(--vscode-textLink-activeForeground);
 }
 
 /* High contrast theme support - ensure proper color visibility */
@@ -692,7 +674,7 @@
 .settings-editor > .settings-body .settings-tree-container .setting-item-bool .setting-value-checkbox {
 	height: 18px;
 	width: 34px;
-	border: 1px solid #252525;
+	border: 1px solid var(--vscode-checkbox-border, var(--vscode-widget-border));
 	border-radius: 10px;
 	margin-right: 9px;
 	margin-left: 0px;
@@ -700,14 +682,14 @@
 	position: relative;
 	appearance: none;
 	-webkit-appearance: none;
-	background: rgba(255, 255, 255, 0.06);
+	background: var(--vscode-checkbox-background);
 	cursor: pointer;
 	transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .settings-editor > .settings-body .settings-tree-container .setting-item-bool .setting-value-checkbox.codicon.checked {
-	background: #808080;
-	border-color: #808080;
+	background: var(--vscode-checkbox-selectBackground, var(--vscode-focusBorder));
+	border-color: var(--vscode-checkbox-selectBorder, var(--vscode-focusBorder));
 }
 
 .settings-editor > .settings-body .settings-tree-container .setting-item-bool .setting-value-checkbox.codicon:not(.checked)::before {
@@ -742,15 +724,15 @@
 	height: 30px;
 	padding: 4px 10px;
 	border-radius: 3px;
-	border: 1px solid #252525;
-	background: transparent;
-	color: #c0c0c0;
+	border: 1px solid var(--vscode-input-border, transparent);
+	background: var(--vscode-input-background);
+	color: var(--vscode-input-foreground);
 	font-size: 13px;
 	transition: border-color 0.15s ease;
 }
 
 .settings-editor > .settings-body .settings-tree-container .setting-item-contents .monaco-select-box:focus {
-	border-color: #505050;
+	border-color: var(--vscode-focusBorder);
 }
 
 .monaco-select-box-dropdown-container > .select-box-details-pane > .select-box-description-markdown code {
@@ -764,7 +746,7 @@
 
 .monaco-select-box-dropdown-container > .select-box-details-pane > .select-box-description-markdown a,
 .monaco-select-box-dropdown-container > .select-box-details-pane > .select-box-description-markdown a > code {
-	color: #c0c0c0;
+	color: var(--vscode-textLink-foreground);
 	text-decoration: none;
 }
 
@@ -772,7 +754,7 @@
 .monaco-select-box-dropdown-container > .select-box-details-pane > .select-box-description-markdown a:active,
 .monaco-select-box-dropdown-container > .select-box-details-pane > .select-box-description-markdown a:hover > code,
 .monaco-select-box-dropdown-container > .select-box-details-pane > .select-box-description-markdown a:active > code {
-	color: #e0e0e0;
+	color: var(--vscode-textLink-activeForeground);
 	text-decoration: underline;
 }
 
@@ -797,34 +779,36 @@
 	font-weight: 600;
 	height: 100%;
 	box-sizing: border-box;
-	padding: 16px 14px 8px;
+	padding: 14px 14px 8px;
 	width: 100%;
 	position: relative;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	text-transform: uppercase;
-	letter-spacing: 0.08em;
-	color: #606060;
-	border-top: 1px solid #1e1e1e;
+	text-transform: none;
+	letter-spacing: normal;
+	color: var(--vscode-foreground);
+	border-top: 1px solid var(--vscode-widget-border, transparent);
 }
 
 .settings-editor > .settings-body .settings-tree-container .settings-group-title-label.settings-group-level-1 {
-	font-size: 10px;
-	padding-top: 16px;
+	font-size: 13px;
+	padding-top: 14px;
 }
 
 .settings-editor > .settings-body .settings-tree-container .settings-group-title-label.settings-group-level-2 {
-	font-size: 10px;
-	padding-top: 16px;
+	font-size: 12px;
+	padding-top: 14px;
+	color: var(--vscode-descriptionForeground);
 }
 
 .settings-editor > .settings-body .settings-tree-container .settings-group-title-label.settings-group-level-3 {
-	font-size: 10px;
-	padding-top: 16px;
+	font-size: 12px;
+	padding-top: 14px;
+	color: var(--vscode-descriptionForeground);
 }
 
-.settings-editor.search-mode > .settings-body .settings-toc-container .monaco-list-row .settings-toc-count {
-	display: block;
+.settings-editor > .settings-body .settings-tree-container .settings-group-title-label.settings-group-first {
+	border-top: none;
 }
 
 .settings-editor > .settings-body .settings-tree-container .setting-list-widget .setting-list-object-list-row.select-container {
@@ -843,7 +827,7 @@
 
 /* Search match highlighting */
 .settings-editor .highlight {
-	background-color: rgba(255, 255, 255, 0.06);
+	background-color: var(--vscode-editor-findMatchHighlightBackground);
 	border-radius: 2px;
 	padding: 1px 0;
 }
@@ -851,8 +835,8 @@
 /* Text inputs in settings */
 .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-value .monaco-inputbox {
 	border-radius: 3px;
-	border: 1px solid #252525;
-	background: transparent;
+	border: 1px solid var(--vscode-input-border, transparent);
+	background: var(--vscode-input-background);
 	transition: border-color 0.15s ease;
 }
 
@@ -860,9 +844,120 @@
 	padding: 5px 10px;
 	font-size: 13px;
 	border-radius: 3px;
-	color: #c0c0c0;
+	color: var(--vscode-input-foreground);
 }
 
 .settings-editor > .settings-body .settings-tree-container .setting-item-contents .setting-item-value .monaco-inputbox:focus-within {
-	border-color: #505050;
+	border-color: var(--vscode-focusBorder);
+}
+
+/* ===== Sidebar Search (JetBrains-style) ===== */
+.settings-editor .settings-sidebar-search {
+	padding: 8px 8px 4px;
+	box-sizing: border-box;
+}
+
+.settings-editor .settings-sidebar-search .search-container {
+	position: relative;
+}
+
+.settings-editor .settings-sidebar-search .suggest-input-container {
+	border: 1px solid var(--vscode-input-border, transparent) !important;
+	border-radius: 4px !important;
+	background: var(--vscode-input-background) !important;
+	overflow: hidden;
+	height: 28px !important;
+	line-height: 28px !important;
+}
+
+.settings-editor .settings-sidebar-search .suggest-input-container:focus-within {
+	border-color: var(--vscode-focusBorder) !important;
+}
+
+.settings-editor .settings-sidebar-search .suggest-input-container .suggest-input-input {
+	font-size: 12px !important;
+	height: 26px !important;
+	padding: 0 4px !important;
+}
+
+.settings-editor .settings-sidebar-search .search-container-widgets {
+	display: flex;
+	align-items: center;
+	position: absolute;
+	top: 0;
+	right: 0;
+	height: 100%;
+	margin-right: 2px;
+}
+
+.settings-editor .settings-sidebar-search .search-container-widgets .action-label {
+	padding: 2px;
+	margin-left: 0;
+	box-sizing: content-box;
+	border-radius: 3px;
+	color: var(--vscode-descriptionForeground);
+	font-size: 12px;
+}
+
+.settings-editor .settings-sidebar-search .search-container-widgets .action-label:hover {
+	color: var(--vscode-foreground);
+}
+
+.settings-editor .settings-sidebar-search .settings-count-widget {
+	display: none;
+}
+
+/* ===== Sidebar Scope Tabs ===== */
+.settings-editor .settings-sidebar-scope {
+	padding: 2px 8px 6px;
+	border-bottom: 1px solid var(--vscode-widget-border, rgba(255, 255, 255, 0.06));
+}
+
+.settings-editor .settings-sidebar-scope .settings-target-container {
+	display: flex;
+}
+
+.settings-editor .settings-sidebar-scope .settings-tabs-widget > .monaco-action-bar {
+	display: flex;
+}
+
+.settings-editor .settings-sidebar-scope .settings-tabs-widget > .monaco-action-bar .actions-container {
+	display: flex;
+	flex-wrap: nowrap;
+	gap: 0;
+}
+
+.settings-editor .settings-sidebar-scope .settings-tabs-widget > .monaco-action-bar .action-item {
+	padding: 0;
+}
+
+.settings-editor .settings-sidebar-scope .settings-tabs-widget > .monaco-action-bar .action-item .action-label {
+	font-size: 11px;
+	padding: 3px 8px;
+	border-radius: 3px;
+	text-transform: none;
+	color: var(--vscode-descriptionForeground);
+	opacity: 0.8;
+	border-bottom: none;
+	background: none !important;
+	margin-right: 0;
+}
+
+.settings-editor .settings-sidebar-scope .settings-tabs-widget > .monaco-action-bar .action-item .action-label.checked {
+	opacity: 1;
+	color: var(--vscode-foreground);
+	background: var(--vscode-toolbar-hoverBackground) !important;
+}
+
+.settings-editor .settings-sidebar-scope .settings-tabs-widget > .monaco-action-bar .action-item .action-label:hover:not(.checked) {
+	opacity: 1;
+	color: var(--vscode-foreground);
+}
+
+/* ===== Settings tree border on left ===== */
+.settings-editor > .settings-body .settings-tree-container {
+	border-spacing: 0;
+	border-collapse: separate;
+	position: relative;
+	border-left: 1px solid var(--vscode-widget-border, rgba(255, 255, 255, 0.06));
 }

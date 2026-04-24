@@ -91,7 +91,7 @@ import {
 } from '../globalCompositeBar.js';
 import { HoverPosition } from '../../../../base/browser/ui/hover/hoverWidget.js';
 import { IEditorGroupsContainer, IEditorGroupsService } from '../../../services/editor/common/editorGroupsService.js';
-import { ActionRunner, IAction, toAction } from '../../../../base/common/actions.js';
+import { ActionRunner, IAction, Separator, toAction } from '../../../../base/common/actions.js';
 import { IEditorService } from '../../../services/editor/common/editorService.js';
 import {
 	ActionsOrientation,
@@ -618,23 +618,165 @@ export class BrowserTitlebarPart extends Part implements ITitlebarPart {
 			branchChevron.setAttribute('aria-hidden', 'true');
 
 			this._register(addDisposableListener(branchContainer, EventType.CLICK, () => {
-				const actions: IAction[] = [
-					toAction({ id: 'sidex.git.checkout', label: 'Switch Branch...', run: () => this.commandService.executeCommand('git.checkout').catch(() => {}) }),
-					toAction({ id: 'sidex.git.createBranch', label: 'Create Branch...', run: () => this.commandService.executeCommand('git.branch').catch(() => {}) }),
-					toAction({ id: 'sidex.git.pull', label: 'Pull', run: () => this.commandService.executeCommand('git.pull').catch(() => {}) }),
-					toAction({ id: 'sidex.git.push', label: 'Push', run: () => this.commandService.executeCommand('git.push').catch(() => {}) }),
+				const backdrop = document.createElement('div');
+				backdrop.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:9998;background:rgba(0,0,0,0.15);';
+				document.body.appendChild(backdrop);
+
+				const popup = document.createElement('div');
+				popup.className = 'sidex-rich-popup';
+				const rect = branchContainer.getBoundingClientRect();
+				const bgColor = getComputedStyle(this.element!).getPropertyValue('--vscode-menu-background').trim() || getComputedStyle(this.element!).getPropertyValue('--vscode-quickInput-background').trim() || '#1f1f1f';
+				const borderColor = getComputedStyle(this.element!).getPropertyValue('--vscode-menu-border').trim() || '#404040';
+				const fgColor = getComputedStyle(this.element!).getPropertyValue('--vscode-menu-foreground').trim() || '#ccc';
+				const inputBg = getComputedStyle(this.element!).getPropertyValue('--vscode-input-background').trim() || '#2a2a2a';
+				const inputBorder = getComputedStyle(this.element!).getPropertyValue('--vscode-input-border').trim() || '#404040';
+				popup.style.cssText = `position:fixed;top:${rect.bottom + 4}px;left:${rect.left}px;z-index:9999;min-width:300px;max-width:400px;background:${bgColor};border:1px solid ${borderColor};border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.3);padding:6px;color:${fgColor};`;
+
+				// Search bar
+				const searchRow = document.createElement('div');
+				searchRow.style.cssText = 'display:flex;align-items:center;gap:6px;padding:4px 6px 8px 6px;';
+				const searchInput = document.createElement('input');
+				searchInput.type = 'text';
+				searchInput.placeholder = 'Search branches and actions...';
+				searchInput.style.cssText = `flex:1;background:${inputBg};border:1px solid ${inputBorder};border-radius:5px;padding:5px 8px;font-size:12px;color:${fgColor};outline:none;font-family:inherit;`;
+				searchRow.appendChild(searchInput);
+				popup.appendChild(searchRow);
+
+				const items: any[] = [
+					{ icon: 'codicon-cloud-download', label: 'Fetch', cmd: 'git.fetch' },
+					{ icon: 'codicon-arrow-down', label: 'Pull', cmd: 'git.pull' },
+					{ icon: 'codicon-arrow-up', label: 'Push', cmd: 'git.push' },
+					{ icon: 'codicon-sync', label: 'Sync', cmd: 'git.sync' },
+					{ separator: true },
+					{ icon: 'codicon-git-commit', label: 'Commit...', cmd: 'git.commit' },
+					{ icon: 'codicon-git-commit', label: 'Commit & Push', cmd: 'git.commitAndPush' },
+					{ icon: 'codicon-git-commit', label: 'Amend Last Commit', cmd: 'git.commitAmend' },
+					{ separator: true },
+					{ icon: 'codicon-git-branch', label: 'Switch Branch...', cmd: 'git.checkoutTo' },
+					{ icon: 'codicon-add', label: 'New Branch...', cmd: 'git.createBranch' },
+					{ separator: true },
+					{ icon: 'codicon-check-all', label: 'Stage All', cmd: 'git.stageAll' },
+					{ icon: 'codicon-discard', label: 'Discard All Changes', cmd: 'git.discardAll' },
+					{ separator: true },
+					{ icon: 'codicon-archive', label: 'Stash', cmd: 'git.stash' },
+					{ icon: 'codicon-archive', label: 'Pop Stash', cmd: 'git.stashPop' },
+					{ separator: true },
+					{ icon: 'codicon-diff', label: 'Show All Changes', cmd: 'git.openAllChanges' },
+					{ icon: 'codicon-tag', label: 'Create Tag...', cmd: 'git.createTag' },
+					{ icon: 'codicon-globe', label: 'Add Remote...', cmd: 'git.addRemote' },
 				];
-				this.contextMenuService.showContextMenu({
-					getAnchor: () => branchContainer,
-					getActions: () => actions,
+
+				const allRows: HTMLElement[] = [];
+				for (const item of items) {
+					if ((item as any).separator) {
+						const sep = document.createElement('div');
+						sep.className = 'sidex-popup-separator';
+						popup.appendChild(sep);
+					} else if ((item as any).header) {
+						const hdr = document.createElement('div');
+						hdr.className = 'sidex-popup-header';
+						hdr.textContent = (item as any).header;
+						popup.appendChild(hdr);
+					} else {
+						const row = document.createElement('div');
+						row.className = 'sidex-popup-item';
+						const desc = (item as any).description ? `<span class="sidex-popup-desc">${(item as any).description}</span>` : '';
+						row.innerHTML = `<span class="codicon ${(item as any).icon} sidex-popup-icon"></span><span class="sidex-popup-label">${(item as any).label}</span>${desc}`;
+						row.addEventListener('click', () => {
+							cleanup();
+							this.commandService.executeCommand((item as any).cmd).catch((err: any) => {
+								console.error('[sidex] Command failed:', (item as any).cmd, err?.message || err);
+							});
+						});
+						popup.appendChild(row);
+						allRows.push(row);
+						(row as any)._label = (item as any).label;
+					}
+				}
+
+				// Filter on search
+				searchInput.addEventListener('input', () => {
+					const q = searchInput.value.toLowerCase();
+					for (const row of allRows) {
+						const match = !q || ((row as any)._label as string).toLowerCase().includes(q);
+						row.style.display = match ? '' : 'none';
+					}
 				});
+
+				document.body.appendChild(popup);
+				searchInput.focus();
+
+				const cleanup = () => { popup.remove(); backdrop.remove(); };
+				backdrop.addEventListener('click', cleanup);
+				backdrop.addEventListener('contextmenu', (e) => { e.preventDefault(); cleanup(); });
+				searchInput.addEventListener('keydown', (e) => { if (e.key === 'Escape') cleanup(); });
 			}));
 
 			this.updateProjectName();
 			this.setupBranchTracking();
 
 			this._register(addDisposableListener(this.projectNameElement, EventType.CLICK, () => {
-				this.commandService.executeCommand('workbench.action.openRecent');
+				// Rich project picker dropdown
+				const workspace = this.workspaceContextService.getWorkspace();
+				const name = this.labelService.getWorkspaceLabel(workspace) || 'SideX';
+				const folderPath = workspace.folders[0]?.uri.fsPath || '';
+				const shortPath = folderPath.replace(/^\/Users\/[^/]+/, '~');
+
+				const backdrop = document.createElement('div');
+				backdrop.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:9998;background:rgba(0,0,0,0.15);';
+				document.body.appendChild(backdrop);
+
+				const popup = document.createElement('div');
+				popup.className = 'sidex-rich-popup';
+				const rect = this.projectNameElement!.getBoundingClientRect();
+				const bgColor = getComputedStyle(this.element!).getPropertyValue('--vscode-menu-background').trim() || getComputedStyle(this.element!).getPropertyValue('--vscode-quickInput-background').trim() || '#1f1f1f';
+				const borderColor = getComputedStyle(this.element!).getPropertyValue('--vscode-menu-border').trim() || '#404040';
+				popup.style.cssText = `position:fixed;top:${rect.bottom + 4}px;left:${rect.left}px;z-index:9999;min-width:260px;max-width:360px;background:${bgColor};border:1px solid ${borderColor};border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.3);padding:6px;`;
+
+				const items = [
+					{ icon: 'codicon-folder-opened', label: 'Open Folder...', cmd: 'workbench.action.files.openFolder' },
+					{ icon: 'codicon-file', label: 'Open File...', cmd: 'workbench.action.files.openFile' },
+					{ icon: 'codicon-source-control', label: 'Clone Repository...', cmd: 'git.clone' },
+					{ separator: true },
+					{ header: 'Recent' },
+					{ icon: 'codicon-window', label: 'Recent Projects...', cmd: 'workbench.action.openRecent' },
+					{ separator: true },
+					{ icon: 'codicon-empty-window', label: 'New Window', cmd: 'workbench.action.newWindow' },
+					{ icon: 'codicon-close', label: 'Close Folder', cmd: 'workbench.action.closeFolder' },
+				];
+
+				for (const item of items) {
+					if ((item as any).separator) {
+						const sep = document.createElement('div');
+						sep.className = 'sidex-popup-separator';
+						popup.appendChild(sep);
+					} else if ((item as any).header) {
+						const hdr = document.createElement('div');
+						hdr.className = 'sidex-popup-header';
+						hdr.textContent = (item as any).header;
+						popup.appendChild(hdr);
+					} else {
+						const row = document.createElement('div');
+						row.className = 'sidex-popup-item';
+						row.innerHTML = `<span class="codicon ${(item as any).icon} sidex-popup-icon"></span><span class="sidex-popup-label">${(item as any).label}</span>`;
+						row.addEventListener('click', () => {
+							cleanup();
+							this.commandService.executeCommand((item as any).cmd).catch((err: any) => {
+								console.error('[sidex] Command failed:', (item as any).cmd, err?.message || err);
+							});
+						});
+						popup.appendChild(row);
+					}
+				}
+
+				document.body.appendChild(popup);
+
+				const cleanup = () => {
+					popup.remove();
+					backdrop.remove();
+				};
+				backdrop.addEventListener('click', cleanup);
+				backdrop.addEventListener('contextmenu', (e) => { e.preventDefault(); cleanup(); });
 			}));
 
 			this._register(this.workspaceContextService.onDidChangeWorkspaceName(() => this.updateProjectName()));
