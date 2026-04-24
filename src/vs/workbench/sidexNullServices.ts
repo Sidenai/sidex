@@ -6,7 +6,16 @@
 import { InstantiationType, registerSingleton } from '../platform/instantiation/common/extensions.js';
 import { createDecorator } from '../platform/instantiation/common/instantiation.js';
 import { Emitter, Event } from '../base/common/event.js';
+import { IWorkbenchIssueService } from '../workbench/contrib/issue/common/issue.js';
 
+class NullWorkbenchIssueService implements IWorkbenchIssueService {
+	readonly _serviceBrand: undefined;
+	openReporter(_dataOverrides?: any): Promise<void> {
+		return Promise.resolve();
+	}
+}
+
+registerSingleton(IWorkbenchIssueService, NullWorkbenchIssueService, InstantiationType.Delayed);
 // --- IAccessibleViewService ---
 const IAccessibleViewService = createDecorator<IAccessibleViewService>('accessibleViewService');
 interface IAccessibleViewService {
