@@ -1,5 +1,6 @@
 mod commands;
 
+use commands::cache::FileMetadataCache;
 use commands::db_state::SidexDbState;
 use commands::debug::{DapClientStore, DebugAdapterStore};
 use commands::ext_host::ExtensionPlatformSupervisor;
@@ -471,6 +472,9 @@ pub fn run() {
 
             let process_store = app.state::<Arc<ProcessStore>>();
             process_store.set_app_handle(app.handle().clone());
+
+            // Initialize LRU cache for file metadata
+            app.manage(Arc::new(FileMetadataCache::new(10_000)));
 
             if let Err(err) = commands::updater::initialize(app.handle()) {
                 log::warn!("update manager disabled: {err}");
