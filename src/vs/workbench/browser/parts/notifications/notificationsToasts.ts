@@ -70,7 +70,7 @@ enum ToastVisibility {
 }
 
 export class NotificationsToasts extends Themable implements INotificationsToastController {
-	private static readonly MAX_WIDTH = 450;
+	private static readonly MAX_WIDTH = 500;
 	private static readonly MAX_NOTIFICATIONS = 3;
 
 	private static readonly PURGE_TIMEOUT: { [severity: number]: number } = {

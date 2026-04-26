@@ -3,48 +3,31 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-/* Sidex Notification Toasts */
+/* Sidex Notification Toasts — layout, animation, and toast-specific shape */
 
 @keyframes sidex-toast-slide-in {
-	from {
-		transform: translateX(100%);
-		opacity: 0;
-	}
-	to {
-		transform: translateX(0);
-		opacity: 1;
-	}
+	from { transform: translateX(100%); opacity: 0; }
+	to   { transform: translateX(0); opacity: 1; }
 }
 
 @keyframes sidex-toast-slide-in-top {
-	from {
-		transform: translateY(-100%);
-		opacity: 0;
-	}
-	to {
-		transform: translateY(0);
-		opacity: 1;
-	}
+	from { transform: translateY(-100%); opacity: 0; }
+	to   { transform: translateY(0); opacity: 1; }
 }
 
 @keyframes sidex-toast-fade-out {
-	from {
-		opacity: 1;
-		transform: translateX(0);
-	}
-	to {
-		opacity: 0;
-		transform: translateX(40px);
-	}
+	from { opacity: 1; transform: translateX(0); }
+	to   { opacity: 0; transform: translateX(40px); }
 }
 
+/** Toast wrapper — position + sizing */
 .monaco-workbench > .notifications-toasts {
 	position: absolute;
 	z-index: 2545;
 	right: 12px;
 	bottom: 36px;
 	display: none;
-	max-width: 400px;
+	max-width: 500px;
 }
 
 .monaco-workbench.nostatusbar > .notifications-toasts {
@@ -67,12 +50,19 @@
 	gap: 8px;
 }
 
-/* Toast container: max 3 visible */
 .monaco-workbench > .notifications-toasts .notification-toast-container:nth-child(n+4) {
 	display: none;
 }
 
-/* Individual toast styling */
+/** Toast shape — border-radius, shadow, border (background comes from notificationsList.css) */
+.monaco-workbench > .notifications-toasts .notifications-list-container {
+	border: 1px solid var(--vscode-notifications-border, transparent);
+	border-radius: 8px;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+	overflow: hidden;
+}
+
+/** Toast animation */
 .monaco-workbench > .notifications-toasts .notification-toast-container > .notification-toast {
 	opacity: 0;
 	transform: translateX(100%);
@@ -83,50 +73,38 @@
 	transform: translateY(-100%);
 }
 
-.monaco-workbench > .notifications-toasts .notifications-list-container {
-	background: #161616;
-	border: 1px solid #252525;
-	border-radius: 8px;
-	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-	overflow: hidden;
-}
-
-.monaco-workbench > .notifications-toasts .notification-toast-container > .notification-toast,
-.monaco-workbench > .notifications-toasts .notification-toast-container > .notification-toast .monaco-scrollable-element,
-.monaco-workbench > .notifications-toasts .notification-toast-container > .notification-toast .monaco-list:not(.element-focused):focus:before,
-.monaco-workbench > .notifications-toasts .notification-toast-container > .notification-toast .monaco-list-row {
-	border-radius: 8px;
-}
-
-/* Reduced motion */
 .monaco-workbench.monaco-reduce-motion > .notifications-toasts .notification-toast-container > .notification-toast {
 	transition: none;
 }
 
-/* Fade-in states */
-.monaco-workbench > .notifications-toasts .notification-toast-container > .notification-toast.notification-fade-in {
+.monaco-workbench > .notifications-toasts .notification-toast-container > .notification-toast.notification-fade-in,
+.monaco-workbench > .notifications-toasts .notification-toast-container > .notification-toast.notification-fade-in-done {
 	opacity: 1;
 	transform: none;
 }
 
 .monaco-workbench > .notifications-toasts .notification-toast-container > .notification-toast.notification-fade-in-done {
-	opacity: 1;
-	transform: none;
 	transition: none;
 }
 
-/* Icons: 16px, left-aligned */
+/** Toast inner elements — border-radius + kill outline noise */
+.monaco-workbench > .notifications-toasts .notification-toast-container > .notification-toast,
+.monaco-workbench > .notifications-toasts .notification-toast-container > .notification-toast .monaco-scrollable-element,
+.monaco-workbench > .notifications-toasts .notification-toast-container > .notification-toast .monaco-list-row {
+	border-radius: 8px;
+	outline: none !important;
+	overflow: hidden;
+}
+
+/** Toast icons */
 .monaco-workbench > .notifications-toasts .codicon.codicon-error {
 	color: var(--vscode-notificationsErrorIcon-foreground) !important;
-	font-size: 16px;
 }
 
 .monaco-workbench > .notifications-toasts .codicon.codicon-warning {
 	color: var(--vscode-notificationsWarningIcon-foreground) !important;
-	font-size: 16px;
 }
 
 .monaco-workbench > .notifications-toasts .codicon.codicon-info {
 	color: var(--vscode-notificationsInfoIcon-foreground) !important;
-	font-size: 16px;
 }

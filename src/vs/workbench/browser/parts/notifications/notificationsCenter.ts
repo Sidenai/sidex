@@ -59,7 +59,7 @@ import { DEFAULT_CUSTOM_TITLEBAR_HEIGHT } from '../../../../platform/window/comm
 import { ThemeIcon } from '../../../../base/common/themables.js';
 
 export class NotificationsCenter extends Themable implements INotificationsCenterController {
-	private static readonly MAX_DIMENSIONS = new Dimension(450, 400);
+	private static readonly MAX_DIMENSIONS = new Dimension(500, 400);
 
 	private static readonly MAX_NOTIFICATION_SOURCES = 10; // maximum number of notification sources to show in configure dropdown
 

@@ -3,13 +3,18 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-/** Notification: Container */
+/** Notification: Container — single source for color/background */
 
 .monaco-workbench .notifications-list-container {
 	color: var(--vscode-notifications-foreground);
 	background: var(--vscode-notifications-background);
-	outline-color: var(--vscode-contrastBorder);
 }
+
+.monaco-workbench .notifications-list-container .monaco-list-rows {
+	background: transparent !important;
+}
+
+/** Notification: List Item */
 
 .monaco-workbench .notifications-list-container .notification-list-item {
 	display: flex;
@@ -17,7 +22,8 @@
 	padding: 12px 14px;
 	height: 100%;
 	box-sizing: border-box;
-	max-width: 360px;
+	width: 100%;
+	overflow: hidden;
 }
 
 .monaco-workbench .notifications-list-container .notification-offset-helper {
@@ -35,7 +41,7 @@
 	align-items: flex-start;
 }
 
-/** Notification: Icon — 16px, left-aligned */
+/** Notification: Icon */
 
 .monaco-workbench .notifications-list-container .notification-list-item .notification-list-item-icon {
 	display: flex;
@@ -43,13 +49,10 @@
 	flex: 0 0 16px;
 	height: 22px;
 	margin-right: 8px;
-	margin-left: 0;
 	font-size: 16px;
-	background-position: center;
-	background-repeat: no-repeat;
 }
 
-/** Notification: Message — 13px, max-width 360px */
+/** Notification: Message */
 
 .monaco-workbench .notifications-list-container .notification-list-item .notification-list-item-message {
 	line-height: 20px;
@@ -59,7 +62,6 @@
 	user-select: text;
 	-webkit-user-select: text;
 	font-size: 13px;
-	max-width: 360px;
 }
 
 .monaco-workbench .notifications-list-container .notification-list-item .notification-list-item-message a {
@@ -67,9 +69,7 @@
 }
 
 .monaco-workbench .notifications-list-container .notification-list-item .notification-list-item-message a:focus {
-	outline-width: 1px;
-	outline-style: solid;
-	outline-color: var(--vscode-focusBorder);
+	outline: 1px solid var(--vscode-focusBorder);
 }
 
 .monaco-workbench .notifications-list-container .notification-list-item.expanded .notification-list-item-message {
@@ -77,7 +77,7 @@
 	word-wrap: break-word;
 }
 
-/** Notification: Toolbar Container — close button only on hover, 16px top-right */
+/** Notification: Toolbar — visible on hover/focus/expanded */
 
 .monaco-workbench .notifications-list-container .notification-list-item .notification-list-item-toolbar-container {
 	display: none;
@@ -121,7 +121,7 @@
 	opacity: 0.7;
 }
 
-/** Notification: Buttons — small, rounded (3px), secondary style */
+/** Notification: Buttons */
 
 .monaco-workbench .notifications-list-container .notification-list-item .notification-list-item-buttons-container {
 	display: flex;
