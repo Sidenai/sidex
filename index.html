@@ -44,18 +44,21 @@
 				reportIssueUrl: 'https://github.com/sidenai/sidex/issues/new',
 				licenseName: 'MIT',
 				licenseUrl: 'https://github.com/sidenai/sidex/blob/main/LICENSE',
-				extensionsGallery: {
-					serviceUrl: 'https://marketplace.siden.ai/api/gallery',
-					itemUrl: 'https://open-vsx.org/vscode/item',
-					resourceUrlTemplate: 'https://open-vsx.org/vscode/unpkg/{publisher}/{name}/{version}/{path}',
-					controlUrl: '',
-					nlsBaseUrl: 'https://open-vsx.org/vscode/unpkg/{publisher}/{name}/{version}/extension',
-					publisherUrl: ''
-				}
+				extensionsGallery: (() => {
+					const isDev = ['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname);
+					const openVsx = isDev ? window.location.origin + '/open-vsx-proxy' : 'https://open-vsx.org';
+					return {
+						serviceUrl: 'https://marketplace.siden.ai/api/gallery',
+						itemUrl: openVsx + '/vscode/item',
+						resourceUrlTemplate: openVsx + '/vscode/unpkg/{publisher}/{name}/{version}/{path}',
+						controlUrl: '',
+						nlsBaseUrl: openVsx + '/vscode/unpkg/{publisher}/{name}/{version}/extension',
+						publisherUrl: ''
+					};
+				})()
 			};
 		</script>
-		<script>
-		</script>
+		<script></script>
 		<script src="/builtin-extensions.js"></script>
 		<script type="module" src="/src/main.ts" defer></script>
 		<style>
