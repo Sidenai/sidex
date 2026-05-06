@@ -714,6 +714,7 @@ pub fn run() {
             commands::open_external_url,
             commands::env_shell,
             commands::env_app_host,
+            commands::remote_internal_set_active_folders,
             commands::debug_spawn_adapter,
             commands::debug_send,
             commands::debug_kill,

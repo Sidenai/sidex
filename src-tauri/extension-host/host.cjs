@@ -14,6 +14,39 @@ process.on('uncaughtException', (err) => {
 
 const _isWin = process.platform === 'win32';
 
+class VscEventEmitter {
+  constructor() {
+    this._listeners = [];
+  }
+  get event() {
+    const self = this;
+    return (listener, thisArg, disposables) => {
+      const bound = thisArg ? listener.bind(thisArg) : listener;
+      self._listeners.push(bound);
+      const d = {
+        dispose() {
+          const i = self._listeners.indexOf(bound);
+          if (i >= 0) self._listeners.splice(i, 1);
+        },
+      };
+      if (disposables) disposables.push(d);
+      return d;
+    };
+  }
+  fire(data) {
+    for (const fn of this._listeners.slice()) {
+      try {
+        fn(data);
+      } catch (e) {
+        try { process.stderr.write(`event error: ${e.message}\n`); } catch {}
+      }
+    }
+  }
+  dispose() {
+    this._listeners = [];
+  }
+}
+
 function uriPathToFsPath(uriPath) {
   if (!uriPath) return uriPath;
   if (_isWin && /^\/[A-Za-z]:/.test(uriPath)) {
@@ -162,6 +195,10 @@ class ExtensionHost extends EventEmitter {
     this._nextWatcherId = 1;
     this._activationPromises = new Map();
     this._failedExtensions = new Set();
+    this._onWorkspaceFoldersChangeEvent = new VscEventEmitter();
+    this._lensCache = new Map();
+    this._lensIdCounter = 0;
+    this._isReady = false;
   }
 
   initialize() {
@@ -225,6 +262,8 @@ class ExtensionHost extends EventEmitter {
         return this._invokeProviders('codeAction', id, params);
       case 'provideCodeLenses':
         return this._invokeProviders('codeLens', id, params);
+      case 'resolveCodeLens':
+        return this._handleResolveCodeLens(id, params);
       case 'provideFormatting':
         return this._invokeProviders('formatting', id, params);
       case 'provideRangeFormatting':
@@ -281,10 +320,12 @@ class ExtensionHost extends EventEmitter {
         return this._handleGetProviderCapabilities(id);
       case 'getExtensionState':
         return this._handleGetExtensionState(id);
-      case 'resetPanels':
-        return this._handleResetPanels(id);
-      case 'activateByEvent':
-        this._checkActivationEvents(params?.event || '');
+      case 'updateWorkspaceFolders':
+        this._workspaceFolders = params.workspaceFolders || [];
+        this._onWorkspaceFoldersChangeEvent?.fire({
+          added: [], // Simple sync for now, full delta can be added if needed
+          removed: [],
+        });
         return { id, result: true };
       case 'viewOpened':
         this._checkActivationEvents(`onView:${params?.viewId || ''}`);
@@ -422,8 +463,7 @@ class ExtensionHost extends EventEmitter {
       if (ext && !ext.activated) {
         const events = ext.manifest?.activationEvents || [];
         const hasStar = events.includes('*') || events.length === 0;
-        const hasStartupFinished = events.includes('onStartupFinished');
-        if (!hasStar && hasStartupFinished && !this._initialEditorsReceived) {
+        if (!this._isReady || (!hasStar && hasStartupFinished && !this._initialEditorsReceived)) {
           if (!this._deferredStartupActivations) {
             this._deferredStartupActivations = new Set();
           }
@@ -885,6 +925,33 @@ class ExtensionHost extends EventEmitter {
     return { id, result: true };
   }
 
+  _handleProvideCodeActions(reqId, params) {
+    return this._invokeProviders('codeAction', reqId, params);
+  }
+
+  _handleResolveCodeLens(reqId, params) {
+    const { id } = params;
+    const cached = this._lensCache.get(id);
+    if (!cached || typeof cached.provider.resolveCodeLens !== 'function') {
+      this.emit('event', { id: reqId, result: null });
+      return;
+    }
+    const token = { isCancellationRequested: false, onCancellationRequested: noopEvent };
+    Promise.resolve(cached.provider.resolveCodeLens(cached.lens, token))
+      .then((resolved) => {
+        if (!resolved || !resolved.command) {
+          this.emit('event', { id: reqId, result: null });
+        } else {
+          this.emit('event', { id: reqId, result: { command: resolved.command } });
+        }
+      })
+      .catch((e) => {
+        this.emit('event', { id: reqId, error: e.message });
+      });
+  }
+
+  _invokeProviders(kind, id, params) {
+  }
   _handleProvideCompletionItems(id, params) {
     return this._invokeProviders('completion', id, params);
   }
@@ -1290,7 +1357,7 @@ class ExtensionHost extends EventEmitter {
       .filter((p) => this._matchSelector(p.selector, doc))
       .map((p, idx) => {
         try {
-          return Promise.resolve(callFn(p.provider));
+          return Promise.resolve(callFn(p.provider)).then((res) => ({ provider: p.provider, res }));
         } catch (e) {
           return Promise.resolve(null);
         }
@@ -1309,7 +1376,9 @@ class ExtensionHost extends EventEmitter {
                 kind === 'signatureHelp'
               ? null
               : [];
-        for (const r of results) {
+        for (const rObj of results) {
+          if (!rObj) continue;
+          const { provider, res: r } = rObj;
           if (!r) continue;
           if (kind === 'completion') {
             const items = Array.isArray(r) ? r : r.items || [];
@@ -1341,7 +1410,17 @@ class ExtensionHost extends EventEmitter {
             );
           } else if (kind === 'codeLens') {
             const items = Array.isArray(r) ? r : [];
-            merged = (merged || []).concat(items.map((l) => ({ range: l.range, command: l.command })));
+            merged = (merged || []).concat(
+              items.map((l) => {
+                const mapped = { range: l.range, command: l.command };
+                if (!l.command && typeof provider.resolveCodeLens === 'function') {
+                  const id = String(++this._lensIdCounter);
+                  this._lensCache.set(id, { lens: l, provider });
+                  mapped.__id = id;
+                }
+                return mapped;
+              })
+            );
           } else if (kind === 'formatting' || kind === 'rangeFormatting') {
             const items = Array.isArray(r) ? r : [];
             merged = (merged || []).concat(items.map((e) => ({ range: e.range, newText: e.newText })));
@@ -2400,38 +2479,6 @@ function createVscodeShim() {
     }
   }
 
-  class VscEventEmitter {
-    constructor() {
-      this._listeners = [];
-    }
-    get event() {
-      const self = this;
-      return (listener, thisArg, disposables) => {
-        const bound = thisArg ? listener.bind(thisArg) : listener;
-        self._listeners.push(bound);
-        const d = {
-          dispose() {
-            const i = self._listeners.indexOf(bound);
-            if (i >= 0) self._listeners.splice(i, 1);
-          },
-        };
-        if (disposables) disposables.push(d);
-        return d;
-      };
-    }
-    fire(data) {
-      for (const fn of this._listeners.slice()) {
-        try {
-          fn(data);
-        } catch (e) {
-          log(`event error: ${e.message}`);
-        }
-      }
-    }
-    dispose() {
-      this._listeners.length = 0;
-    }
-  }
 
   host._onDocumentEvent = new VscEventEmitter();
   host._onDocumentChangeEvent = new VscEventEmitter();
@@ -2451,6 +2498,13 @@ function createVscodeShim() {
     constructor(name) {
       this.name = name;
       this._entries = new Map();
+      this.set = this.set.bind(this);
+      this.delete = this.delete.bind(this);
+      this.clear = this.clear.bind(this);
+      this.get = this.get.bind(this);
+      this.has = this.has.bind(this);
+      this.forEach = this.forEach.bind(this);
+      this.dispose = this.dispose.bind(this);
     }
     set(uri, diagnostics) {
       const key = typeof uri === 'string' ? uri : uri.toString();
@@ -2762,6 +2816,7 @@ function createVscodeShim() {
   };
 
   const workspace = {
+    onDidChangeWorkspaceFolders: host._onWorkspaceFoldersChangeEvent.event,
     get workspaceFolders() {
       return host._workspaceFolders.map((f, i) => ({ uri: VscUri.file(f), name: path.basename(f), index: i }));
     },
@@ -2802,35 +2857,57 @@ function createVscodeShim() {
     },
     getConfiguration(section, scope) {
       const getVal = (key) => {
-        if (key === undefined || key === null || key === '') {
-          if (!section) {
-            const all = Object.create(null);
-            for (const [cfgKey, cfgValue] of host._configuration.entries()) {
-              all[cfgKey] = cfgValue;
-            }
-            return all;
-          }
-          if (host._configuration.has(section)) {
-            const sectionVal = host._configuration.get(section);
-            if (sectionVal && typeof sectionVal === 'object') {
-              return sectionVal;
-            }
-          }
-          const sectionPrefix = `${section}.`;
-          const sectionObj = Object.create(null);
+        const full = (key === undefined || key === null || key === '') 
+          ? (section || '') 
+          : (section ? `${section}.${key}` : key);
+          
+        if (!full) {
+          const all = Object.create(null);
           for (const [cfgKey, cfgValue] of host._configuration.entries()) {
-            if (cfgKey.startsWith(sectionPrefix)) {
-              sectionObj[cfgKey.slice(sectionPrefix.length)] = cfgValue;
+            const parts = cfgKey.split('.');
+            let curr = all;
+            for (let i = 0; i < parts.length - 1; i++) {
+              if (!curr[parts[i]] || typeof curr[parts[i]] !== 'object') curr[parts[i]] = Object.create(null);
+              curr = curr[parts[i]];
             }
+            curr[parts[parts.length - 1]] = cfgValue;
+            all[cfgKey] = cfgValue; // Expose flat key for backward compatibility
           }
-          return sectionObj;
+          return all;
         }
-        const full = section ? `${section}.${key}` : key;
-        if (host._configuration.has(full)) return host._configuration.get(full);
+
+        if (host._configuration.has(full)) {
+          return host._configuration.get(full);
+        }
+
+        const prefix = `${full}.`;
+        let foundChildren = false;
+        const nestedObj = Object.create(null);
+        for (const [cfgKey, cfgValue] of host._configuration.entries()) {
+          if (cfgKey.startsWith(prefix)) {
+            foundChildren = true;
+            const rest = cfgKey.slice(prefix.length);
+            const parts = rest.split('.');
+            let curr = nestedObj;
+            for (let i = 0; i < parts.length - 1; i++) {
+              if (!curr[parts[i]] || typeof curr[parts[i]] !== 'object') curr[parts[i]] = Object.create(null);
+              curr = curr[parts[i]];
+            }
+            curr[parts[parts.length - 1]] = cfgValue;
+            nestedObj[rest] = cfgValue; // Expose flat key inside nested scope
+          }
+        }
+        if (foundChildren) {
+          return nestedObj;
+        }
+
         if (section && host._configuration.has(section)) {
           const sectionVal = host._configuration.get(section);
-          if (sectionVal && typeof sectionVal === 'object' && key in sectionVal) return sectionVal[key];
+          if (sectionVal && typeof sectionVal === 'object' && key in sectionVal) {
+            return sectionVal[key];
+          }
         }
+
         return undefined;
       };
       const proxy = {
@@ -3309,10 +3386,12 @@ function createVscodeShim() {
       });
     },
     get activeTextEditor() {
-      return host._activeEditorId ? host._editorValues.get(host._activeEditorId) : undefined;
+      if (!host || !host._editors || !host._activeEditorId) return undefined;
+      return host._editors.get(host._activeEditorId);
     },
     get visibleTextEditors() {
-      return [...host._editorValues.values()];
+      if (!host || !host._editors) return [];
+      return [...host._editors.values()];
     },
     onDidChangeActiveTextEditor: (listener, thisArg, disposables) =>
       host._onActiveEditorChangeEvent.event(listener, thisArg, disposables),
@@ -5061,6 +5140,12 @@ if (process.env.SIDEX_EXTENSION_HOST === 'true' && process.send) {
     log(`failed to parse init data: ${e.message}`);
   }
 
+  // Ensure host exists and is ready for config sync
+  if (!host) {
+    log('critical: host not initialized in main loop');
+    process.exit(1);
+  }
+
   if (initData && initData.extensions) {
     const skipPrefixes = [
       'anysphere.cursor',
@@ -5083,8 +5168,19 @@ if (process.env.SIDEX_EXTENSION_HOST === 'true' && process.send) {
             const props = section.properties;
             if (!props) continue;
             for (const [key, schema] of Object.entries(props)) {
-              if (schema && 'default' in schema && !host._configuration.has(key)) {
+              if (schema && 'default' in schema && host._configuration && !host._configuration.has(key)) {
                 host._configuration.set(key, schema.default);
+              }
+            }
+          }
+        }
+        const configDefaults = manifest.contributes?.configurationDefaults;
+        if (configDefaults) {
+          for (const [section, defaults] of Object.entries(configDefaults)) {
+            for (const [k, v] of Object.entries(defaults)) {
+              const fullKey = `${section}.${k}`;
+              if (host._configuration && !host._configuration.has(fullKey)) {
+                host._configuration.set(fullKey, v);
               }
             }
           }
@@ -5110,6 +5206,18 @@ if (process.env.SIDEX_EXTENSION_HOST === 'true' && process.send) {
         log(`load extension failed ${extPath}: ${e.message}`);
       }
     }
+    // Mark host as ready after initial extension discovery and config sync
+    host._isReady = true;
+    log('host is now ready');
+    if (host._deferredStartupActivations) {
+      for (const extId of host._deferredStartupActivations) {
+        log(`processing deferred activation for ${extId}`);
+        host._activateExtension(extId).catch((e) => log(`deferred activation failed ${extId}: ${e.message}`));
+      }
+      host._deferredStartupActivations.clear();
+    }
+  } else {
+    host._isReady = true; // Still mark as ready even if no extensions
   }
 
   setTimeout(() => {

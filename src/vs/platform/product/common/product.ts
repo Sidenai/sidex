@@ -63,6 +63,7 @@ else {
 	if (Object.keys(product).length === 0) {
 		Object.assign(product, {
 			version: '1.110.0',
+			date: '2026-05-06T00:00:00.000Z',
 			nameShort: 'SideX',
 			nameLong: 'SideX',
 			applicationName: 'sidex',

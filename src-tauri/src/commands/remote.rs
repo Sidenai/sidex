@@ -375,3 +375,12 @@ pub async fn remote_active_connections(
     let mgr = store.inner.lock().await;
     Ok(mgr.active_connections().into_iter().map(to_entry).collect())
 }
+
+#[tauri::command]
+pub async fn remote_internal_set_active_folders(
+    _folders: Vec<String>,
+) -> Result<(), String> {
+    // This is a no-op to satisfy VS Code core's remote agent logic
+    // which is triggered by our spoofed identity.
+    Ok(())
+}

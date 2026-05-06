@@ -307,6 +307,7 @@ export abstract class AbstractExtensionManagementService
 					);
 					installableExtensions.push({ ...compatible, options });
 				} catch (error) {
+					this.logService.error(`[ExtMgmt] checkAndGetCompatibleVersion failed for ${extension.identifier.id}:`, error);
 					results.push({
 						identifier: extension.identifier,
 						operation: InstallOperation.Install,
@@ -1082,6 +1083,7 @@ export abstract class AbstractExtensionManagementService
 			if (!compatibleExtension) {
 				const incompatibleApiProposalsMessages: string[] = [];
 				if (
+					!((globalThis as any).__SIDEX_TAURI__ === true) &&
 					!areApiProposalsCompatible(extension.properties.enabledApiProposals ?? [], incompatibleApiProposalsMessages)
 				) {
 					throw new ExtensionManagementError(
@@ -1132,7 +1134,7 @@ export abstract class AbstractExtensionManagementService
 			);
 		}
 
-		if (manifest.version !== compatibleExtension.version) {
+		if (manifest.version !== compatibleExtension.version && !((globalThis as any).__SIDEX_TAURI__ === true)) {
 			throw new ExtensionManagementError(
 				`Cannot install '${compatibleExtension.identifier.id}' extension because of version mismatch in Marketplace`,
 				ExtensionManagementErrorCode.Invalid
