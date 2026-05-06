@@ -28,8 +28,12 @@ export default defineConfig({
   server: {
     port: 1420,
     strictPort: true,
+    fs: {
+      cachedChecks: true,
+    },
+    preTransformRequests: false, // Reduces memory usage by not pre-transforming all files
     watch: {
-      ignored: ['**/src-tauri/**'],
+      ignored: ['**/src-tauri/**', '**/crates/**'], // Ignore Rust crates from Vite watcher
     },
   },
   envPrefix: ['VITE_', 'TAURI_'],
@@ -40,11 +44,10 @@ export default defineConfig({
   },
   build: {
     target: ['es2022', 'chrome100', 'safari15'],
-    minify: 'esbuild',
     sourcemap: false,
     cssCodeSplit: true,
     chunkSizeWarningLimit: 5000,
-    rollupOptions: {
+    rolldownOptions: {
       input: {
         index: path.resolve(__dirname, 'index.html'),
         textMateWorker: path.resolve(__dirname, 'src/vs/workbench/services/textMate/browser/backgroundTokenization/worker/textMateTokenizationWorker.workerMain.ts'),
@@ -109,12 +112,11 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    include: ['vscode-textmate', 'vscode-oniguruma'],
-    exclude: ['@tauri-apps/api'],
+    include: ['vscode-textmate', 'vscode-oniguruma', '@tauri-apps/api'],
   },
   worker: {
     format: 'es',
-    rollupOptions: {
+    rolldownOptions: {
       output: {
         entryFileNames: 'workers/[name]-[hash].js',
         chunkFileNames: 'workers/[name]-[hash].js',

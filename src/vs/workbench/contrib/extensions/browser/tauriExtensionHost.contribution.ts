@@ -535,6 +535,7 @@ class TauriExtensionHostContribution extends Disposable implements IWorkbenchCon
 				this._send({ id: this._nextId(), type: 'initialize', params: { extensionPaths: [], workspaceFolders } });
 				this._syncOpenDocuments();
 				this._syncActiveEditor();
+				this._syncWorkspaceFolders();
 				this._startEditorTracking();
 			};
 
@@ -564,6 +565,25 @@ class TauriExtensionHostContribution extends Disposable implements IWorkbenchCon
 		} catch {
 			this._scheduleReconnect();
 		}
+	}
+
+	private _syncWorkspaceFolders(): void {
+		this._register(this.workspaceContextService.onDidChangeWorkspaceFolders(() => {
+			if (this._connected && this._ws?.readyState === WebSocket.OPEN) {
+				const workspaceFolders = this.workspaceContextService
+					.getWorkspace()
+					.folders
+					.map(folder => folder.uri)
+					.filter(uri => uri.scheme === 'file')
+					.map(uri => uri.fsPath);
+				this._send({ 
+					id: this._nextId(), 
+					type: 'updateWorkspaceFolders', 
+					params: { workspaceFolders } 
+				});
+				this.logService.info(`[ExtHost] Synced ${workspaceFolders.length} workspace folders`);
+			}
+		}));
 	}
 
 	private _scheduleReconnect(): void {
@@ -1337,6 +1357,8 @@ class TauriExtensionHostContribution extends Disposable implements IWorkbenchCon
 				this.languageFeatures.codeLensProvider.register(selectors(caps.codeLens), {
 					provideCodeLenses: (model, _token) =>
 						this._provideCodeLenses(model),
+					resolveCodeLens: (model, codeLens, _token) =>
+						this._resolveCodeLens(model, codeLens),
 				})
 			);
 		}
@@ -1808,11 +1830,29 @@ class TauriExtensionHostContribution extends Disposable implements IWorkbenchCon
 				lenses: result.map(l => ({
 					range: toVscRange(l.range),
 					command: l.command ? { id: l.command.command || l.command.id, title: l.command.title, arguments: l.command.arguments } : undefined,
-				})),
+					__id: l.__id
+				}) as CodeLens),
 				dispose: () => {},
 			};
 		} catch {
 			return null;
+		}
+	}
+
+	private async _resolveCodeLens(model: ITextModel, codeLens: CodeLens): Promise<CodeLens | null> {
+		if (!(codeLens as any).__id) {
+			return codeLens;
+		}
+		try {
+			const result = await this._request<any>('resolveCodeLens', {
+				id: (codeLens as any).__id
+			});
+			if (result && result.command) {
+				codeLens.command = { id: result.command.command || result.command.id, title: result.command.title, arguments: result.command.arguments };
+			}
+			return codeLens;
+		} catch {
+			return codeLens;
 		}
 	}
 

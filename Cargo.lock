@@ -6166,10 +6166,6 @@ dependencies = [
  "serde",
  "serde_json",
  "sidex-context",
- "tempfile",
- "thiserror 2.0.18",
- "tokio",
- "walkdir",
 ]
 
 [[package]]

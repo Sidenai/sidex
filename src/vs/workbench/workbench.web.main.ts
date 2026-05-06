@@ -94,6 +94,8 @@ import {
 	ISharedWebContentExtractorService,
 	NullSharedWebContentExtractorService
 } from '../platform/webContentExtractor/common/webContentExtractor.js';
+import { IWorkbenchIssueService } from './contrib/issue/common/issue.js';
+import { BrowserIssueService } from './contrib/issue/browser/issueService.js';
 
 registerSingleton(IWorkbenchExtensionManagementService, ExtensionManagementService, InstantiationType.Delayed);
 registerSingleton(IAccessibilityService, AccessibilityService, InstantiationType.Delayed);
@@ -106,6 +108,7 @@ registerSingleton(IDiagnosticsService, NullDiagnosticsService, InstantiationType
 registerSingleton(ILanguagePackService, WebLanguagePacksService, InstantiationType.Delayed);
 registerSingleton(IWebContentExtractorService, NullWebContentExtractorService, InstantiationType.Delayed);
 registerSingleton(ISharedWebContentExtractorService, NullSharedWebContentExtractorService, InstantiationType.Delayed);
+registerSingleton(IWorkbenchIssueService, BrowserIssueService, InstantiationType.Delayed);
 
 //#endregion
 
