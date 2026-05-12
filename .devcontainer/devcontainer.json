@@ -1,0 +1,11 @@
+{
+  "name": "SideX Builder",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+  "forwardPorts": [1420],
+  "postCreateCommand": "npm ci",
+  "remoteUser": "root"
+}
