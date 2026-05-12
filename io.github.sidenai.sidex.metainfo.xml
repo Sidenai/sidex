@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.sidenai.sidex</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <name>SideX</name>
+  <developer id="io.github.sidenai">
+    <name>Sidenai</name>
+  </developer>
+  <url type="homepage">https://github.com/Sidenai/sidex</url>
+  <url type="vcs-browser">https://github.com/Sidenai/sidex</url>
+  <url type="bugtracker">https://github.com/Sidenai/sidex/issues</url>
+  <url type="help">https://github.com/Sidenai/sidex/discussions</url>
+  <summary>VS Code rebuilt on Tauri. Same architecture, 96% smaller.</summary>
+  <description>
+    <p>SideX is a port of Visual Studio Code that replaces Electron with Tauri — a Rust backend
+      and the OS's native webview. The same TypeScript workbench, the same editor, terminal, and
+      Git integration, running without a bundled browser.</p>
+    <p>Built with Tauri 2, Monaco Editor, and Rust.</p>
+  </description>
+  <branding>
+    <color type="primary" scheme_preference="light">#e0ecfb</color>
+    <color type="primary" scheme_preference="dark">#1a1a2e</color>
+  </branding>
+  <screenshots>
+    <screenshot type="default">
+      <image>
+        https://raw.githubusercontent.com/Sidenai/sidex/main/docs/assets/preview.jpg</image>
+      <caption>SideX — VSCode workbench running on Tauri</caption>
+    </screenshot>
+  </screenshots>
+  <launchable type="desktop-id">io.github.sidenai.sidex.desktop</launchable>
+  <content_rating type="oars-1.1" />
+  <releases>
+    <release version="0.1.2" date="2026-04-12" urgency="low">
+      <description>
+        <p>SideX v0.1.2 Beta</p>
+        <ul>
+          <li>Full VS Code editor experience — syntax highlighting, IntelliSense, extensions</li>
+          <li>Native app on macOS (Apple Silicon + Intel), Windows (x64 + ARM64), and Linux</li>
+          <li>Built-in terminal with shell integration (zsh, bash, fish, PowerShell)</li>
+          <li>Media preview, file watching, fuzzy search, and SCM view</li>
+          <li>Signed and notarized on macOS and Windows (working)</li>
+        </ul>
+      </description>
+      <url>https://github.com/Sidenai/sidex/releases/tag/v0.1.2</url>
+    </release>
+    <release version="0.1.0" date="2026-04-07" urgency="low">
+      <description>
+        <p>SideX v0.1.0 Beta</p>
+        <ul>
+          <li>Full VS Code editor experience — syntax highlighting, IntelliSense, extensions</li>
+          <li>Native app on macOS (Apple Silicon + Intel), Windows (x64 + ARM64), and Linux</li>
+          <li>Built-in terminal with shell integration (zsh, bash, fish, PowerShell)</li>
+          <li>Media preview, file watching, fuzzy search, and SCM view</li>
+          <li>Signed and notarized on macOS and Windows</li>
+        </ul>
+      </description>
+      <url>https://github.com/Sidenai/sidex/releases/tag/v0.1.0</url>
+    </release>
+  </releases>
+</component>

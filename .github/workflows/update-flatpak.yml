@@ -1,0 +1,48 @@
+name: Update Flatpak
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to package (e.g. 0.1.3)"
+        required: true
+
+jobs:
+  update-flatpak:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download .deb and compute SHA256
+        id: download
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          DEB_NAME="SideX_${VERSION}_amd64.deb"
+          DEB_URL="https://github.com/${{ github.repository }}/releases/download/v${VERSION}/${DEB_NAME}"
+          echo "Downloading ${DEB_URL}"
+          curl -fSL -o sidex.deb "${DEB_URL}"
+          SHA256=$(sha256sum sidex.deb | cut -d' ' -f1)
+          echo "sha256=${SHA256}" >> "$GITHUB_OUTPUT"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Update manifest
+        run: |
+          VERSION="${{ steps.download.outputs.version }}"
+          SHA256="${{ steps.download.outputs.sha256 }}"
+          DEB_URL="https://github.com/${{ github.repository }}/releases/download/v${VERSION}/SideX_${VERSION}_amd64.deb"
+
+          sed -i \
+            -e "s|url: .*SideX_.*_amd64.deb|url: ${DEB_URL}|" \
+            -e "s|sha256: [a-f0-9]\{64\}|sha256: ${SHA256}|" \
+            io.github.sidenai.sidex.yaml
+
+          cat io.github.sidenai.sidex.yaml
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add io.github.sidenai.sidex.yaml
+          git diff --cached --quiet && echo "No changes to commit" && exit 0
+          git commit -m "flatpak: update to v${{ github.event.inputs.version }}"
+          git push

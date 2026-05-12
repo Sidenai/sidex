@@ -189,9 +189,77 @@ jobs:
           path: dist-artifacts/
           retention-days: 7
 
+  # ── Build Flatpak ──────────────────────────────────────────────────────────────
+  build-flatpak:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Linux build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: linux-x64
+          path: linux-artifacts
+
+      - name: Install flatpak-builder
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y flatpak-builder
+          flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+      - name: Install GNOME SDK
+        run: flatpak install -y flathub org.gnome.Sdk//48
+
+      - name: Update manifest and prepare local build manifest
+        run: |
+          VERSION="${{ github.event.inputs.version || github.ref_name }}"
+          DEB_FILE=$(ls linux-artifacts/*.deb | head -1)
+          DEB_NAME=$(basename "$DEB_FILE")
+          SHA256=$(sha256sum "$DEB_FILE" | cut -d' ' -f1)
+          DEB_URL="https://github.com/${{ github.repository }}/releases/download/v${VERSION}/${DEB_NAME}"
+
+          # Update the canonical manifest with the new release URL + hash
+          sed -i \
+            -e "s|url: .*SideX_.*_amd64.deb|url: ${DEB_URL}|" \
+            -e "s|sha256: [a-f0-9]\{64\}|sha256: ${SHA256}|" \
+            io.github.sidenai.sidex.yaml
+
+          # Commit the updated manifest
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add io.github.sidenai.sidex.yaml
+          git diff --cached --quiet && echo "No changes to commit" && exit 0
+          git commit -m "flatpak: update to v${VERSION}"
+          git push
+
+          # Create a local-only copy that uses the .deb file directly
+          cp io.github.sidenai.sidex.yaml io.github.sidenai.sidex.local.yaml
+          cp "$DEB_FILE" sidex.deb
+          sed -i "s|url: .*SideX.*\.deb|path: sidex.deb|" io.github.sidenai.sidex.local.yaml
+          sed -i '/x-checker-data:/,/url-query:/d' io.github.sidenai.sidex.local.yaml
+
+          echo "--- Local manifest ---"
+          cat io.github.sidenai.sidex.local.yaml
+
+      - name: Build Flatpak bundle
+        run: |
+          flatpak-builder --repo=repo --force-clean build-dir io.github.sidenai.sidex.local.yaml
+          VERSION="${{ github.event.inputs.version || github.ref_name }}"
+          flatpak build-bundle repo "SideX_${VERSION}_amd64.flatpak" io.github.sidenai.sidex
+
+      - name: Upload Flatpak artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-flatpak
+          path: "*.flatpak"
+          retention-days: 7
+
   # ── Deploy to Cloudflare R2 ──────────────────────────────────────────────────
   deploy:
-    needs: build
+    needs: [build, build-flatpak]
     runs-on: ubuntu-latest
 
     steps:
@@ -293,3 +361,4 @@ jobs:
           draft: true
           generate_release_notes: true
           files: all-artifacts/**
+
