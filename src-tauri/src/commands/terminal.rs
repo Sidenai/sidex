@@ -5,10 +5,17 @@ use std::io::{Read, Write};
 use std::sync::{Arc, Mutex};
 use tauri::{AppHandle, Emitter, Manager, State};
 
+// Flow control watermarks matching VS Code's FlowControlConstants.
+const FLOW_HIGH_WATERMARK: usize = 100_000;
+const FLOW_LOW_WATERMARK: usize = 5_000;
+
 pub struct PtyHandle {
-    writer: Box<dyn Write + Send>,
+    writer: Mutex<Box<dyn Write + Send>>,
     master: Box<dyn MasterPty + Send>,
     child: Box<dyn portable_pty::Child + Send>,
+    cwd: Arc<Mutex<String>>,
+    unacknowledged_chars: Arc<std::sync::atomic::AtomicUsize>,
+    flow_condvar: Arc<(Mutex<bool>, std::sync::Condvar)>,
 }
 
 pub struct TerminalStore {
@@ -45,6 +52,102 @@ pub(crate) fn resolve_windows_shell() -> String {
     }
 
     std::env::var("COMSPEC").unwrap_or_else(|_| "powershell.exe".to_string())
+}
+
+#[derive(Debug, Clone, Serialize)]
+struct TerminalTitleEvent {
+    terminal_id: u32,
+    title: String,
+}
+
+/// Payload for shell-integration prompt/command lifecycle events that carry no extra data.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct TerminalShellIntegrationEvent {
+    terminal_id: u32,
+}
+
+/// Payload for the OSC 633;D command-finished event; `exit_code` is `None` when missing or non-numeric.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct TerminalCommandFinishedEvent {
+    terminal_id: u32,
+    exit_code: Option<i32>,
+}
+
+/// Dispatches a single OSC payload: updates state for CWD/title and emits Tauri events for
+/// OSC 0/2 (title) and OSC 633 A/B/C/D shell-integration markers.
+fn process_osc_sequence(
+    app: &AppHandle,
+    state: &Arc<TerminalStore>,
+    terminal_id: u32,
+    payload_bytes: &[u8],
+) {
+    let Ok(payload) = String::from_utf8(payload_bytes.to_vec()) else { return; };
+
+    if payload.starts_with("633;") {
+        // Prompt-end (B) is not surfaced by the shared parser; detect it directly here.
+        if let Some(rest) = payload.strip_prefix("633;") {
+            if rest == "B" || rest.starts_with("B;") {
+                let _ = app.emit(
+                    "terminal-prompt-end",
+                    TerminalShellIntegrationEvent { terminal_id },
+                );
+                return;
+            }
+        }
+
+        if let Some(event) = sidex_terminal::parse_shell_integration_osc(&payload) {
+            match event {
+                sidex_terminal::ShellIntegrationEvent::SetCwd(path) => {
+                    if let Ok(terminals) = state.terminals.lock() {
+                        if let Some(handle) = terminals.get(&terminal_id) {
+                            if let Ok(mut cwd) = handle.cwd.lock() {
+                                *cwd = path.to_string_lossy().to_string();
+                            }
+                        }
+                    }
+                }
+                sidex_terminal::ShellIntegrationEvent::PromptStart => {
+                    let _ = app.emit(
+                        "terminal-prompt-start",
+                        TerminalShellIntegrationEvent { terminal_id },
+                    );
+                }
+                sidex_terminal::ShellIntegrationEvent::CommandStart => {
+                    let _ = app.emit(
+                        "terminal-command-started",
+                        TerminalShellIntegrationEvent { terminal_id },
+                    );
+                }
+                sidex_terminal::ShellIntegrationEvent::CommandFinished(_) => {
+                    // Re-parse the raw suffix so we preserve a missing/non-numeric exit code as `None`
+                    // instead of the parser's `-1` sentinel.
+                    let exit_code: Option<i32> = payload
+                        .strip_prefix("633;D")
+                        .and_then(|rest| rest.strip_prefix(';'))
+                        .and_then(|code_str| code_str.trim().parse::<i32>().ok());
+                    let _ = app.emit(
+                        "terminal-command-finished",
+                        TerminalCommandFinishedEvent {
+                            terminal_id,
+                            exit_code,
+                        },
+                    );
+                }
+                _ => {}
+            }
+        }
+    } else if payload.starts_with("0;") || payload.starts_with("2;") {
+        let title = &payload[2..];
+        let _ = app.emit(
+            "terminal-title-changed",
+            TerminalTitleEvent {
+                terminal_id,
+                title: title.to_string(),
+            },
+        );
+    }
 }
 
 #[cfg(target_os = "windows")]
@@ -260,28 +363,114 @@ pub fn terminal_spawn(
         terminals.insert(
             id,
             PtyHandle {
-                writer,
+                writer: Mutex::new(writer),
                 master: pair.master,
                 child,
+                cwd: Arc::new(Mutex::new(cwd.clone().unwrap_or_default())),
+                unacknowledged_chars: Arc::new(std::sync::atomic::AtomicUsize::new(0)),
+                flow_condvar: Arc::new((Mutex::new(false), std::sync::Condvar::new())),
             },
         );
     }
 
     let terminal_id = id;
     let state_clone = state.inner().clone();
+    let app_clone = app.clone();
     std::thread::spawn(move || {
         let mut buf = [0u8; 8192];
+        let mut osc_buffer = Vec::new();
+        let mut parser_state = 0; // 0: normal, 1: esc_received, 2: osc_received, 3: osc_esc_received
+
+        let (unack, flow) = state_clone.terminals.lock().ok()
+            .and_then(|ts| ts.get(&terminal_id).map(|h| {
+                (h.unacknowledged_chars.clone(), h.flow_condvar.clone())
+            }))
+            .unzip();
+
         loop {
+            // Pause reading when above the high watermark, resume below the low watermark.
+            // Mirrors VS Code's FlowControlConstants (HighWatermarkChars=100000, LowWatermarkChars=5000).
+            if let (Some(ref unack_atomic), Some(ref flow_pair)) = (&unack, &flow) {
+                if unack_atomic.load(std::sync::atomic::Ordering::Relaxed) > FLOW_HIGH_WATERMARK {
+                    let (lock, cvar) = flow_pair.as_ref();
+                    let mut paused = lock.lock().unwrap();
+                    // Re-check the count under the lock so we don't park after an
+                    // acknowledgment already drained the backlog (avoids a lost-wakeup deadlock).
+                    while unack_atomic.load(std::sync::atomic::Ordering::Relaxed) > FLOW_HIGH_WATERMARK {
+                        *paused = true;
+                        paused = cvar.wait(paused).unwrap();
+                    }
+                    *paused = false;
+                }
+            }
+
             match reader.read(&mut buf) {
                 Ok(n) if n > 0 => {
+                    if let Some(ref unack_atomic) = unack {
+                        let char_count = String::from_utf8_lossy(&buf[..n]).chars().count();
+                        unack_atomic.fetch_add(char_count, std::sync::atomic::Ordering::Relaxed);
+                    }
+
                     let text = String::from_utf8_lossy(&buf[..n]).to_string();
-                    let _ = app.emit(
+                    let _ = app_clone.emit(
                         "terminal-data",
                         TerminalDataEvent {
                             terminal_id,
                             data: text,
                         },
                     );
+
+                    for &byte in &buf[..n] {
+                        match parser_state {
+                            0 => {
+                                if byte == 0x1b {
+                                    parser_state = 1;
+                                }
+                            }
+                            1 => {
+                                if byte == b']' {
+                                    parser_state = 2;
+                                    osc_buffer.clear();
+                                } else if byte == 0x1b {
+                                    // A fresh ESC restarts the escape; stay in state 1.
+                                    parser_state = 1;
+                                } else {
+                                    parser_state = 0;
+                                }
+                            }
+                            2 => {
+                                if byte == 0x07 {
+                                    process_osc_sequence(&app_clone, &state_clone, terminal_id, &osc_buffer);
+                                    osc_buffer.clear();
+                                    parser_state = 0;
+                                } else if byte == 0x1b {
+                                    parser_state = 3;
+                                } else if osc_buffer.len() >= 65536 {
+                                    // Abort unterminated OSC to prevent unbounded growth (OOM guard).
+                                    osc_buffer.clear();
+                                    parser_state = 0;
+                                } else {
+                                    osc_buffer.push(byte);
+                                }
+                            }
+                            3 => {
+                                if byte == b'\\' {
+                                    process_osc_sequence(&app_clone, &state_clone, terminal_id, &osc_buffer);
+                                    osc_buffer.clear();
+                                    parser_state = 0;
+                                } else if osc_buffer.len() >= 65536 {
+                                    // Abort unterminated OSC to prevent unbounded growth (OOM guard).
+                                    osc_buffer.clear();
+                                    parser_state = 0;
+                                } else {
+                                    osc_buffer.push(0x1b);
+                                    osc_buffer.push(byte);
+                                    parser_state = 2;
+                                }
+                            }
+                            _ => parser_state = 0,
+                        }
+                    }
                 }
                 Ok(_) | Err(_) => break,
             }
@@ -329,21 +518,17 @@ pub fn terminal_write(
     terminal_id: u32,
     data: String,
 ) -> Result<(), String> {
-    let mut terminals = state.terminals.lock().map_err(|e| e.to_string())?;
+    let terminals = state.terminals.lock().map_err(|e| e.to_string())?;
     let handle = terminals
-        .get_mut(&terminal_id)
+        .get(&terminal_id)
         .ok_or_else(|| format!("Terminal {terminal_id} not found"))?;
-
-    handle
-        .writer
+    let mut writer = handle.writer.lock().map_err(|e| e.to_string())?;
+    writer
         .write_all(data.as_bytes())
         .map_err(|e| format!("Failed to write to terminal {terminal_id}: {e}"))?;
-
-    handle
-        .writer
+    writer
         .flush()
         .map_err(|e| format!("Failed to flush terminal {terminal_id}: {e}"))?;
-
     Ok(())
 }
 
@@ -660,4 +845,74 @@ fi
         .map_err(|e| format!("Failed to write .zlogin: {e}"))?;
 
     Ok(zdotdir.to_string_lossy().to_string())
+}
+
+#[tauri::command]
+pub fn terminal_get_cwd(
+    state: State<'_, Arc<TerminalStore>>,
+    terminal_id: u32,
+) -> Result<String, String> {
+    let terminals = state.terminals.lock().map_err(|e| e.to_string())?;
+    let handle = terminals
+        .get(&terminal_id)
+        .ok_or_else(|| format!("Terminal {terminal_id} not found"))?;
+    let cwd = handle.cwd.lock().map_err(|e| e.to_string())?;
+    Ok(cwd.clone())
+}
+
+#[tauri::command]
+#[allow(clippy::needless_pass_by_value)]
+pub fn terminal_acknowledge_data(
+    state: State<'_, Arc<TerminalStore>>,
+    terminal_id: u32,
+    size: usize,
+) -> Result<(), String> {
+    let terminals = state.terminals.lock().map_err(|e| e.to_string())?;
+    if let Some(handle) = terminals.get(&terminal_id) {
+        let prev = handle.unacknowledged_chars.fetch_update(
+            std::sync::atomic::Ordering::Relaxed,
+            std::sync::atomic::Ordering::Relaxed,
+            |current| Some(current.saturating_sub(size)),
+        ).unwrap_or(0);
+        // Resume the read loop if it was paused and we've drained below the low watermark.
+        if prev.saturating_sub(size) < FLOW_LOW_WATERMARK {
+            let (lock, cvar) = handle.flow_condvar.as_ref();
+            let mut paused = lock.lock().unwrap();
+            if *paused {
+                *paused = false;
+                cvar.notify_one();
+            }
+        }
+    }
+    Ok(())
+}
+
+#[tauri::command]
+#[allow(clippy::needless_pass_by_value)]
+pub fn terminal_send_signal(
+    state: State<'_, Arc<TerminalStore>>,
+    terminal_id: u32,
+    signal: i32,
+) -> Result<(), String> {
+    let terminals = state.terminals.lock().map_err(|e| e.to_string())?;
+    let handle = terminals
+        .get(&terminal_id)
+        .ok_or_else(|| format!("Terminal {terminal_id} not found"))?;
+
+    let pid = handle
+        .child
+        .process_id()
+        .ok_or_else(|| "Process ID not available".to_string())?;
+
+    #[cfg(unix)]
+    {
+        let _ = sidex_terminal::send_signal(pid, signal);
+    }
+    #[cfg(not(unix))]
+    {
+        let _ = pid;
+        let _ = signal;
+    }
+
+    Ok(())
 }
