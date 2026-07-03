@@ -33,10 +33,13 @@ import {
 import type { IProcessDetails } from '../../../../platform/terminal/common/terminalProcess.js';
 import type { IProcessEnvironment } from '../../../../base/common/platform.js';
 import { IWorkbenchContribution } from '../../../common/contributions.js';
-import { ITerminalInstanceService, ITerminalService } from './terminal.js';
+import { ITerminalExternalLinkProvider, ITerminalInstance, ITerminalInstanceService, ITerminalLink, ITerminalService } from './terminal.js';
 import { IInstantiationService } from '../../../../platform/instantiation/common/instantiation.js';
 import { registerWorkbenchContribution2, WorkbenchPhase } from '../../../common/contributions.js';
 import { IConfigurationService } from '../../../../platform/configuration/common/configuration.js';
+import { ITerminalLinkProviderService } from '../../terminalContrib/links/browser/links.js';
+import { ICommandService } from '../../../../platform/commands/common/commands.js';
+import { URI } from '../../../../base/common/uri.js';
 
 let _invoke: ((cmd: string, args?: Record<string, unknown>) => Promise<unknown>) | undefined;
 let _listen: ((event: string, handler: (event: { payload: unknown }) => void) => Promise<() => void>) | undefined;
@@ -87,6 +90,11 @@ class TauriPty extends Disposable implements ITerminalChildProcess {
 	private _backendId: number | undefined;
 	private _unlisten: (() => void) | undefined;
 	private _unlistenExit: (() => void) | undefined;
+	private _unlistenTitle: (() => void) | undefined;
+	private _unlistenPromptStart: (() => void) | undefined;
+	private _unlistenPromptEnd: (() => void) | undefined;
+	private _unlistenCommandStarted: (() => void) | undefined;
+	private _unlistenCommandFinished: (() => void) | undefined;
 
 	constructor(
 		private readonly _shellLaunchConfig: IShellLaunchConfig,
@@ -154,6 +162,52 @@ class TauriPty extends Disposable implements ITerminalChildProcess {
 				}
 			});
 
+			this._unlistenTitle = await _listen('terminal-title-changed', event => {
+				const payload = event.payload as { terminal_id: number; title: string };
+				if (this._backendId !== undefined && payload.terminal_id === this._backendId) {
+					this._onDidChangeProperty.fire({
+						type: ProcessPropertyType.Title,
+						value: payload.title
+					});
+				}
+			});
+
+			// Shell integration lifecycle events (OSC 633 A/B/C/D) are also surfaced as Tauri
+			// events from the Rust side. VS Code's xterm.js shellIntegrationAddon already parses
+			// these same sequences directly from the data stream and feeds the command-detection
+			// capability, so we don't have a clean side-channel sink. Log at info level so
+			// developers can observe the backend signal without double-driving the capability.
+			interface ShellIntegrationEventPayload {
+				readonly terminalId: number;
+			}
+			interface CommandFinishedEventPayload extends ShellIntegrationEventPayload {
+				readonly exitCode: number | null;
+			}
+			this._unlistenPromptStart = await _listen('terminal-prompt-start', event => {
+				const payload = event.payload as ShellIntegrationEventPayload;
+				if (this._backendId !== undefined && payload.terminalId === this._backendId) {
+					console.info('[SideX Terminal] prompt-start', payload);
+				}
+			});
+			this._unlistenPromptEnd = await _listen('terminal-prompt-end', event => {
+				const payload = event.payload as ShellIntegrationEventPayload;
+				if (this._backendId !== undefined && payload.terminalId === this._backendId) {
+					console.info('[SideX Terminal] prompt-end', payload);
+				}
+			});
+			this._unlistenCommandStarted = await _listen('terminal-command-started', event => {
+				const payload = event.payload as ShellIntegrationEventPayload;
+				if (this._backendId !== undefined && payload.terminalId === this._backendId) {
+					console.info('[SideX Terminal] command-started', payload);
+				}
+			});
+			this._unlistenCommandFinished = await _listen('terminal-command-finished', event => {
+				const payload = event.payload as CommandFinishedEventPayload;
+				if (this._backendId !== undefined && payload.terminalId === this._backendId) {
+					console.info('[SideX Terminal] command-finished', payload);
+				}
+			});
+
 			const backendId = (await _invoke('terminal_spawn', {
 				shell: shell ?? null,
 				args: shellArgs ?? null,
@@ -198,11 +252,21 @@ class TauriPty extends Disposable implements ITerminalChildProcess {
 			}
 			this._unlisten?.();
 			this._unlistenExit?.();
+			this._unlistenTitle?.();
+			this._unlistenPromptStart?.();
+			this._unlistenPromptEnd?.();
+			this._unlistenCommandStarted?.();
+			this._unlistenCommandFinished?.();
 		} catch {
 			// IPC channel may already be closed during page unload
 		}
 		this._unlisten = undefined;
 		this._unlistenExit = undefined;
+		this._unlistenTitle = undefined;
+		this._unlistenPromptStart = undefined;
+		this._unlistenPromptEnd = undefined;
+		this._unlistenCommandStarted = undefined;
+		this._unlistenCommandFinished = undefined;
 	}
 
 	input(data: string): void {
@@ -219,20 +283,59 @@ class TauriPty extends Disposable implements ITerminalChildProcess {
 		}
 	}
 
-	acknowledgeDataEvent(_charCount: number): void {}
+	acknowledgeDataEvent(charCount: number): void {
+		if (this._backendId !== undefined && _invoke) {
+			_invoke('terminal_acknowledge_data', { terminalId: this._backendId, size: charCount }).catch(() => {});
+		}
+	}
 	async processBinary(_data: string): Promise<void> {}
 	async getInitialCwd(): Promise<string> {
 		return this._cwd;
 	}
 	async getCwd(): Promise<string> {
+		if (this._backendId !== undefined && _invoke) {
+			try {
+				const cwd = await _invoke('terminal_get_cwd', { terminalId: this._backendId }) as string;
+				if (cwd) {
+					return cwd;
+				}
+			} catch {}
+		}
 		return this._cwd;
 	}
-	sendSignal(_signal: string): void {}
+	sendSignal(signal: string): void {
+		if (this._backendId !== undefined && _invoke) {
+			const signalMap: Record<string, number> = {
+				SIGHUP: 1,
+				SIGINT: 2,
+				SIGQUIT: 3,
+				SIGILL: 4,
+				SIGTRAP: 5,
+				SIGABRT: 6,
+				SIGFPE: 8,
+				SIGKILL: 9,
+				SIGUSR1: 10,
+				SIGSEGV: 11,
+				SIGUSR2: 12,
+				SIGPIPE: 13,
+				SIGALRM: 14,
+				SIGTERM: 15
+			};
+			const sigNum = signalMap[signal.toUpperCase()];
+			if (sigNum !== undefined) {
+				_invoke('terminal_send_signal', { terminalId: this._backendId, signal: sigNum }).catch(() => {});
+			}
+		}
+	}
 	clearBuffer(): void {}
 	async setUnicodeVersion(_version: '6' | '11'): Promise<void> {}
 
 	async refreshProperty<T extends ProcessPropertyType>(property: T): Promise<IProcessPropertyMap[T]> {
-		if (property === ProcessPropertyType.Cwd || property === ProcessPropertyType.InitialCwd) {
+		if (property === ProcessPropertyType.Cwd) {
+			const cwd = await this.getCwd();
+			return cwd as IProcessPropertyMap[T];
+		}
+		if (property === ProcessPropertyType.InitialCwd) {
 			return this._cwd as IProcessPropertyMap[T];
 		}
 		throw new Error(`Unhandled property: ${property}`);
@@ -499,6 +602,86 @@ class TauriTerminalBackend extends Disposable implements ITerminalBackend {
 	}
 }
 
+interface TauriDetectedLink {
+	start_row: number;
+	start_col: number;
+	end_row: number;
+	end_col: number;
+	url: string;
+	kind: 'Url' | 'FilePath' | 'OscHyperlink' | 'Command';
+}
+
+/**
+ * Bridges the Rust `terminal_detect_links` command to xterm.js via VS Code's
+ * external link provider service.
+ */
+class TauriRustLinkProvider implements ITerminalExternalLinkProvider {
+	constructor(private readonly _commandService: ICommandService) {}
+
+	/** Asks Rust to detect URLs/paths in `line` and returns clickable link descriptors. */
+	async provideLinks(_instance: ITerminalInstance, line: string): Promise<ITerminalLink[] | undefined> {
+		if (!line) {
+			return undefined;
+		}
+		const ok = await ensureTauri();
+		if (!ok || !_invoke) {
+			return undefined;
+		}
+		let detected: TauriDetectedLink[];
+		try {
+			detected = (await _invoke('terminal_detect_links', { lineText: line })) as TauriDetectedLink[];
+		} catch (e) {
+			console.error('[SideX Terminal] terminal_detect_links failed:', e);
+			return undefined;
+		}
+		if (!Array.isArray(detected) || detected.length === 0) {
+			return undefined;
+		}
+		const links: ITerminalLink[] = [];
+		for (const link of detected) {
+			const startIndex = link.start_col;
+			const length = Math.max(0, link.end_col - link.start_col);
+			if (length <= 0 || startIndex < 0 || startIndex >= line.length) {
+				continue;
+			}
+			const kind = link.kind;
+			links.push({
+				startIndex,
+				length,
+				label: kind === 'FilePath' ? 'Open file' : 'Open link',
+				activate: (text: string) => {
+					void this._activate(kind, link.url || text);
+				}
+			});
+		}
+		return links.length > 0 ? links : undefined;
+	}
+
+	private async _activate(kind: TauriDetectedLink['kind'], target: string): Promise<void> {
+		if (kind === 'FilePath') {
+			try {
+				await this._commandService.executeCommand('vscode.open', URI.file(target));
+			} catch (e) {
+				console.error('[SideX Terminal] failed to open file link:', e);
+			}
+			return;
+		}
+		if (!_invoke) {
+			return;
+		}
+		try {
+			await _invoke('open_external_url', { url: target });
+		} catch (e) {
+			console.error('[SideX Terminal] open_external_url failed:', e);
+			try {
+				window.open(target, '_blank', 'noopener,noreferrer');
+			} catch {
+				// Last-resort fallback unavailable; nothing else to try.
+			}
+		}
+	}
+}
+
 export class TauriTerminalBackendContribution implements IWorkbenchContribution {
 	static readonly ID = 'workbench.contrib.tauriTerminalBackend';
 
@@ -506,7 +689,9 @@ export class TauriTerminalBackendContribution implements IWorkbenchContribution 
 		@IInstantiationService instantiationService: IInstantiationService,
 		@ITerminalInstanceService terminalInstanceService: ITerminalInstanceService,
 		@ITerminalService terminalService: ITerminalService,
-		@IConfigurationService configurationService: IConfigurationService
+		@IConfigurationService configurationService: IConfigurationService,
+		@ITerminalLinkProviderService terminalLinkProviderService: ITerminalLinkProviderService,
+		@ICommandService commandService: ICommandService
 	) {
 		if (!(globalThis as any).__SIDEX_TAURI__) {
 			return;
@@ -516,6 +701,8 @@ export class TauriTerminalBackendContribution implements IWorkbenchContribution 
 		Registry.as<ITerminalBackendRegistry>(TerminalExtensions.Backend).registerTerminalBackend(backend);
 		terminalInstanceService.didRegisterBackend(backend);
 		terminalService.registerProcessSupport(true);
+
+		terminalLinkProviderService.registerLinkProvider(new TauriRustLinkProvider(commandService));
 
 		this._setDefaultProfile(backend, configurationService);
 	}

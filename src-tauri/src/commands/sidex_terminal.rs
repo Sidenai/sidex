@@ -103,3 +103,47 @@ pub fn terminal_find_in_buffer(
     let matches = sidex_terminal::find_in_terminal(&grid, &query, &opts);
     Ok(matches.into_iter().map(TerminalMatchInfo::from).collect())
 }
+
+#[derive(Debug, Clone, Serialize)]
+pub struct TerminalLinkInfo {
+    pub start_row: u16,
+    pub start_col: u16,
+    pub end_row: u16,
+    pub end_col: u16,
+    pub url: String,
+    pub kind: String,
+}
+
+impl From<sidex_terminal::TerminalLink> for TerminalLinkInfo {
+    fn from(l: sidex_terminal::TerminalLink) -> Self {
+        let kind = match l.kind {
+            sidex_terminal::LinkKind::Url => "Url".to_string(),
+            sidex_terminal::LinkKind::FilePath => "FilePath".to_string(),
+            sidex_terminal::LinkKind::OscHyperlink => "OscHyperlink".to_string(),
+            sidex_terminal::LinkKind::Command => "Command".to_string(),
+        };
+        Self {
+            start_row: l.start.0,
+            start_col: l.start.1,
+            end_row: l.end.0,
+            end_col: l.end.1,
+            url: l.url,
+            kind,
+        }
+    }
+}
+
+#[tauri::command]
+pub fn terminal_detect_links(line_text: String) -> Result<Vec<TerminalLinkInfo>, String> {
+    let cells: Vec<sidex_terminal::Cell> = line_text
+        .chars()
+        .map(|c| {
+            let mut cell = sidex_terminal::Cell::default();
+            cell.c = c;
+            cell
+        })
+        .collect();
+
+    let links = sidex_terminal::detect_links(&cells);
+    Ok(links.into_iter().map(TerminalLinkInfo::from).collect())
+}

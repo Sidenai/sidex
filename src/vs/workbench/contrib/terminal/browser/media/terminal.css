@@ -162,8 +162,8 @@
 
 .monaco-workbench .terminal-editor .terminal-wrapper:not(.fixed-dims) .xterm-viewport,
 .monaco-workbench .pane-body.integrated-terminal .terminal-wrapper:not(.fixed-dims) .xterm-viewport {
-	/* Override xterm.js' position so the area that accepts mouse events extends to the edge of the scroll bar */
-	right: 14px;
+	/* Use native webkit scrollbar (public xterm), so viewport extends to full right edge */
+	right: 0;
 }
 
 .monaco-workbench .pane-body.integrated-terminal .split-view-view {
