@@ -1,8 +1,12 @@
 use serde::Serialize;
 use std::path::Path;
+use std::sync::Arc;
+use tauri::State;
+use tokio::sync::Mutex;
 
 use sidex_workspace::file_ops as ws;
 
+use super::cache::{FileMetadataCache, FileMetadataCacheEntry};
 use super::validation::validate_path;
 
 #[derive(Debug, Serialize)]
@@ -80,11 +84,68 @@ pub fn read_dir(path: String) -> Result<Vec<DirEntry>, String> {
         .collect())
 }
 
+/// Helper to convert metadata to cache entry
+fn metadata_to_cache_entry(metadata: &std::fs::Metadata) -> Option<FileMetadataCacheEntry> {
+    use std::time::UNIX_EPOCH;
+
+    let modified = metadata
+        .modified()
+        .ok()
+        .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
+        .map_or(0, |d| d.as_secs());
+
+    let created = metadata
+        .created()
+        .ok()
+        .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
+        .map_or(0, |d| d.as_secs());
+
+    Some(FileMetadataCacheEntry {
+        size: metadata.len(),
+        is_dir: metadata.is_dir(),
+        is_file: metadata.is_file(),
+        is_symlink: metadata.is_symlink(),
+        modified,
+        created,
+        readonly: metadata.permissions().readonly(),
+    })
+}
+
 #[allow(clippy::needless_pass_by_value)]
 #[tauri::command]
-pub fn stat(path: String) -> Result<FileStat, String> {
+pub async fn stat(
+    path: String,
+    cache: State<'_, Arc<Mutex<FileMetadataCache>>>,
+) -> Result<FileStat, String> {
     validate_path(&path)?;
+
+    // Try to get from cache first
+    {
+        let cache_lock = cache.lock().await;
+        if let Some(entry) = cache_lock.get(&path).await {
+            return Ok(FileStat {
+                size: entry.size,
+                is_dir: entry.is_dir,
+                is_file: entry.is_file,
+                is_symlink: entry.is_symlink,
+                modified: entry.modified,
+                created: entry.created,
+                readonly: entry.readonly,
+            });
+        }
+    }
+
+    // Cache miss - get from filesystem
     let s = ws::stat(Path::new(&path)).map_err(|e| io_err(&path, &e))?;
+
+    // Cache the result
+    if let Some(metadata) = std::fs::metadata(&path).ok() {
+        if let Some(entry) = metadata_to_cache_entry(&metadata) {
+            let mut cache_lock = cache.lock().await;
+            cache_lock.insert(path.clone(), entry).await;
+        }
+    }
+
     Ok(FileStat {
         size: s.size,
         is_dir: s.is_dir,

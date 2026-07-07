@@ -67,6 +67,7 @@ globset = "0.4"
 # Search indexing
 dashmap = "6"
 rayon = "1.10"
+lru = "0.12"
 regex = "1"
 memchr = "2"
 
