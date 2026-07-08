@@ -1,0 +1,64 @@
+id: io.github.sidenai.sidex
+sdk: org.gnome.Sdk
+runtime: org.gnome.Sdk
+runtime-version: '48'
+command: io.github.sidenai.sidex
+finish-args:
+  - --share=ipc
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --socket=pulseaudio
+  - --socket=ssh-auth
+  - --share=network
+  - --device=all
+  - --filesystem=host
+  - --persist=.sidex
+  - --allow=devel
+  - --talk-name=org.freedesktop.secrets
+  - --talk-name=org.kde.kwalletd5
+  - --talk-name=org.freedesktop.Flatpak
+  - --env=XCURSOR_PATH=/run/host/user-share/icons:/run/host/share/icons
+  - --filesystem=xdg-run/gnupg:ro
+  - --filesystem=xdg-config/kdeglobals:ro
+  - --talk-name=com.canonical.AppMenu.Registrar
+  - --system-talk-name=org.freedesktop.login1
+separate-locales: false
+cleanup:
+  - /include
+  - /lib/pkgconfig
+  - /share/gtk-doc
+  - '*.la'
+modules:
+  - name: sidex
+    buildsystem: simple
+    build-commands:
+      - install -Dm644 $FLATPAK_ID.metainfo.xml -t /app/share/metainfo
+      - ar x sidex.deb
+      - tar xzf data.tar.gz
+      - install -Dm755 usr/bin/SideX /app/bin/$FLATPAK_ID
+      - install -Dm644 usr/share/applications/SideX.desktop /app/share/applications/$FLATPAK_ID.desktop
+      - desktop-file-edit --set-icon=$FLATPAK_ID --set-key=Exec --set-value=$FLATPAK_ID /app/share/applications/$FLATPAK_ID.desktop
+      - desktop-file-edit --set-key=StartupWMClass --set-value=SideX /app/share/applications/$FLATPAK_ID.desktop
+      - install -Dm644 usr/share/icons/hicolor/32x32/apps/SideX.png /app/share/icons/hicolor/32x32/apps/$FLATPAK_ID.png
+      - install -Dm644 usr/share/icons/hicolor/128x128/apps/SideX.png /app/share/icons/hicolor/128x128/apps/$FLATPAK_ID.png
+      - install -Dm644 usr/share/icons/hicolor/256x256@2/apps/SideX.png /app/share/icons/hicolor/256x256@2/apps/$FLATPAK_ID.png
+      - mkdir -p /app/lib/sidex
+      - cp -r usr/lib/SideX/shell-integration /app/lib/sidex/
+      - cp -r usr/lib/SideX/extension-host /app/lib/sidex/
+      - rm -r control.tar.gz data.tar.gz debian-binary usr
+    sources:
+      - type: file
+        url: https://github.com/Sidenai/sidex/releases/download/v0.1.2/SideX_0.1.2_amd64.deb
+        sha256: 0000000000000000000000000000000000000000000000000000000000000000
+        dest-filename: sidex.deb
+        only-arches:
+          - x86_64
+        x-checker-data:
+          type: json
+          url: https://api.github.com/repos/Sidenai/sidex/releases/latest
+          tag-query: .tag_name
+          version-query: .tag_name
+          timestamp-query: .published_at
+          url-query: .assets[] | select(.name|test("SideX_.+_amd64.deb$")).browser_download_url
+      - type: file
+        path: io.github.sidenai.sidex.metainfo.xml
