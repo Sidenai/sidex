@@ -107,11 +107,36 @@ async function boot() {
 			workspace,
 			trusted: true,
 			open: async (_workspace: any, _options: any) => {
-				// When VSCode asks to open a new workspace, reload with the folder param
+				const reuseWindow = _options?.reuse === true;
+				
+				let targetUrl = new URL(window.location.href);
 				if (_workspace && 'folderUri' in _workspace) {
-					navigateToFolder(_workspace.folderUri.toString());
+					targetUrl.searchParams.set('folder', _workspace.folderUri.toString());
+				} else if (_workspace && 'workspaceUri' in _workspace) {
+					targetUrl.searchParams.set('folder', _workspace.workspaceUri.toString());
+				} else {
+					targetUrl.searchParams.delete('folder');
 				}
-				return true;
+
+				if (reuseWindow) {
+					window.location.href = targetUrl.toString();
+					return true;
+				} else {
+					try {
+						const { invoke } = await import('@tauri-apps/api/core');
+						const label = `sidex-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+						
+						await invoke('create_window', {
+							label,
+							title: 'SideX',
+							url: targetUrl.toString()
+						});
+						return true;
+					} catch (e) {
+						console.error('[SideX] Failed to open new window:', e);
+						return false;
+					}
+				}
 			}
 		},
 		windowIndicator: {
