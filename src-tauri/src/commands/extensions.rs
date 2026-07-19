@@ -5,7 +5,7 @@ use sidex_extensions::installer::{
     install_from_vsix as crate_install_from_vsix, uninstall as crate_uninstall,
 };
 use sidex_extensions::manifest::sanitize_ext_id;
-use sidex_extensions::marketplace::MarketplaceClient;
+use sidex_extensions::marketplace::{current_target_platform, MarketplaceClient};
 use sidex_extensions::paths::user_extensions_dir;
 use sidex_extensions::vsix::{install_package, unpack_vsix, validate_vsix};
 use std::fs;
@@ -77,8 +77,31 @@ pub async fn install_extension(vsix_path: String) -> Result<InstalledExtension, 
     Ok(to_installed(&installed, &ext_dir))
 }
 
+/// Appends the current platform's `targetPlatform` parameter to a
+/// marketplace download URL if one isn't already present.
+///
+/// The marketplace proxy (`marketplace.siden.ai`) already supports the
+/// `targetPlatform` query parameter (see `worker.ts` lines 481, 496),
+/// but the frontend never includes it because the gallery version objects
+/// returned by the proxy omit the `targetPlatform` field. By adding it
+/// here, we ensure the correct platform-specific VSIX is downloaded
+/// (e.g. `darwin-arm64` on Apple Silicon Macs instead of the default
+/// `linux-arm64` that Open VSX returns).
+fn ensure_target_platform(url: &str) -> String {
+    if url.contains("targetPlatform=") {
+        return url.to_string();
+    }
+    let platform = current_target_platform();
+    if url.contains('?') {
+        format!("{url}&targetPlatform={platform}")
+    } else {
+        format!("{url}?targetPlatform={platform}")
+    }
+}
+
 #[tauri::command]
 pub async fn install_extension_from_url(url: String) -> Result<InstalledExtension, String> {
+    let url = ensure_target_platform(&url);
     log::info!("downloading extension from {url}");
     let resp = reqwest::get(&url)
         .await

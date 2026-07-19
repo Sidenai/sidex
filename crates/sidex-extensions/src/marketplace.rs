@@ -264,6 +264,44 @@ struct CachedQuery {
 }
 
 // ---------------------------------------------------------------------------
+// Platform detection
+// ---------------------------------------------------------------------------
+
+/// Returns the Open VSX `targetPlatform` string for the current build target.
+///
+/// This is used when constructing download URLs so the marketplace returns
+/// a VSIX with native binaries matching the host OS and CPU architecture.
+/// Without this parameter, the marketplace may return a VSIX for a different
+/// platform (e.g. Linux ARM64 on macOS), causing `ENOEXEC` errors when the
+/// extension tries to execute its bundled native binaries.
+///
+/// Reference: https://open-vsx.org/api/-/search?targetPlatform=...
+pub fn current_target_platform() -> &'static str {
+    if cfg!(target_os = "macos") {
+        if cfg!(target_arch = "aarch64") {
+            "darwin-arm64"
+        } else {
+            "darwin-x64"
+        }
+    } else if cfg!(target_os = "windows") {
+        if cfg!(target_arch = "aarch64") {
+            "win32-arm64"
+        } else {
+            "win32-x64"
+        }
+    } else if cfg!(target_os = "linux") {
+        if cfg!(target_arch = "aarch64") {
+            "linux-arm64"
+        } else {
+            "linux-x64"
+        }
+    } else {
+        // Fallback for unknown platforms
+        "linux-x64"
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Client
 // ---------------------------------------------------------------------------
 
@@ -449,8 +487,9 @@ impl MarketplaceClient {
     pub async fn download_vsix_bytes(&self, id: &str, version: &str) -> Result<Vec<u8>> {
         let (namespace, name) = id.split_once('.').unwrap_or(("unknown", id));
 
+        let platform = current_target_platform();
         let url = format!(
-            "{base}/{namespace}/{name}/{version}/file/{namespace}.{name}-{version}.vsix",
+            "{base}/{namespace}/{name}/{version}/file/{namespace}.{name}-{version}.vsix?targetPlatform={platform}",
             base = self.base_url,
         );
 
