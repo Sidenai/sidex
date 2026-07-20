@@ -877,13 +877,22 @@ export class WebExtensionsScannerService extends Disposable implements IWebExten
 		galleryExtension: IGalleryExtension,
 		metadata?: Metadata
 	): Promise<IWebExtension> {
+		let resolvedTargetPlatform: TargetPlatform | undefined;
+		if ((globalThis as any).__SIDEX_TAURI__ === true) {
+			const { getTargetPlatform } = await import('../../../../platform/extensionManagement/common/extensionManagement.js');
+			const { isMacintosh, isWindows, Platform } = await import('../../../../base/common/platform.js');
+			const { arch } = await import('../../../../base/common/process.js');
+			const p = isMacintosh ? Platform.Mac : isWindows ? Platform.Windows : Platform.Linux;
+			resolvedTargetPlatform = getTargetPlatform(p, arch);
+		} else {
+			resolvedTargetPlatform = galleryExtension.properties.targetPlatform === TargetPlatform.WEB ? TargetPlatform.WEB : undefined;
+		}
 		const extensionLocation = await this.extensionResourceLoaderService.getExtensionGalleryResourceURL(
 			{
 				publisher: galleryExtension.publisher,
 				name: galleryExtension.name,
 				version: galleryExtension.version,
-				targetPlatform:
-					galleryExtension.properties.targetPlatform === TargetPlatform.WEB ? TargetPlatform.WEB : undefined
+				targetPlatform: resolvedTargetPlatform
 			},
 			'extension'
 		);

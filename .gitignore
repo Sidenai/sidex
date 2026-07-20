@@ -102,3 +102,8 @@ extensions-rust/css-language-extension/css-builtin.json
 extensions-rust/css-language-extension/src/css_data.rs
 extensions-meta.json
 public/builtin-extensions.js
+public/sidex-env.js
+
+# Bundled Node.js binary (downloaded by scripts/bundle-node.mjs)
+src-tauri/bin/node
+src-tauri/bin/node.exe

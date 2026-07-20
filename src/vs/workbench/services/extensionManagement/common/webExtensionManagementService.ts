@@ -159,6 +159,13 @@ export class WebExtensionManagementService
 	}
 
 	async getTargetPlatform(): Promise<TargetPlatform> {
+		if ((globalThis as any).__SIDEX_TAURI__ === true) {
+			const { getTargetPlatform } = await import('../../../../platform/extensionManagement/common/extensionManagement.js');
+			const { isMacintosh, isWindows, Platform } = await import('../../../../base/common/platform.js');
+			const { arch } = await import('../../../../base/common/process.js');
+			const p = isMacintosh ? Platform.Mac : isWindows ? Platform.Windows : Platform.Linux;
+			return getTargetPlatform(p, arch);
+		}
 		return TargetPlatform.WEB;
 	}
 

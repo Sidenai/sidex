@@ -7,5 +7,12 @@
         "hiddenTitle": true
       }
     ]
+  },
+  "bundle": {
+    "resources": [
+      "extension-host/*",
+      "shell-integration/*",
+      "bin/node"
+    ]
   }
 }

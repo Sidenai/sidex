@@ -87,8 +87,23 @@ import {
 } from './extensionGalleryManifest.js';
 import { TelemetryTrustedValue } from '../../telemetry/common/telemetryUtils.js';
 
-const CURRENT_TARGET_PLATFORM =
-	isWeb && !(globalThis as any).__SIDEX_TAURI__ ? TargetPlatform.WEB : getTargetPlatform(platform, arch);
+// Resolve the host target platform. In Tauri the authoritative value is
+// injected by public/sidex-env.js (generated from Rust cfg! at build time)
+// as `__SIDEX_TARGET_PLATFORM__` (e.g. "darwin-arm64"). Falling back to
+// `getTargetPlatform(platform, arch)` is unreliable in WKWebView: `arch` may
+// be undefined when the WebGL probe in index.html fails, yielding UNKNOWN,
+// which makes the gallery pick a "universal" version whose packaged native
+// binaries are actually for a different OS (see ENOEXEC on kilo-code).
+const SIDEX_INJECTED_TARGET_PLATFORM: TargetPlatform | undefined =
+	(globalThis as any).__SIDEX_TAURI__ === true && (globalThis as any).__SIDEX_TARGET_PLATFORM__
+		? toTargetPlatform((globalThis as any).__SIDEX_TARGET_PLATFORM__)
+		: undefined;
+
+const CURRENT_TARGET_PLATFORM: TargetPlatform =
+	isWeb && !(globalThis as any).__SIDEX_TAURI__
+		? TargetPlatform.WEB
+		: SIDEX_INJECTED_TARGET_PLATFORM ?? getTargetPlatform(platform, arch);
+
 const SEARCH_ACTIVITY_HEADER_NAME = 'X-Market-Search-Activity-Id';
 const ACTIVITY_HEADER_NAME = 'Activityid';
 const SERVER_HEADER_NAME = 'Server';
@@ -873,7 +888,16 @@ export abstract class AbstractExtensionGalleryService implements IExtensionGalle
 		const options = CancellationToken.isCancellationToken(arg1) ? {} : (arg1 as IExtensionQueryOptions);
 		const token = CancellationToken.isCancellationToken(arg1) ? arg1 : (arg2 as CancellationToken);
 
-		const resourceApi = this.getResourceApi(extensionGalleryManifest);
+		// SideX: the proxy's resource API returns a single "latest" version
+		// whose `targetPlatform` field is omitted but whose VSIX asset URI
+		// points at a specific platform (observed: alpine-arm64). That makes
+		// the version look platform-universal, so it gets selected on every OS
+		// and the wrong native binaries are installed (ENOEXEC). The query API
+		// returns all platform versions with `targetPlatform` set, letting the
+		// version-selection logic pick the correct one. Force query API in Tauri.
+		const resourceApi = (globalThis as any).__SIDEX_TAURI__
+			? undefined
+			: this.getResourceApi(extensionGalleryManifest);
 		const result = resourceApi
 			? await this.getExtensionsUsingResourceApi(extensionInfos, options, resourceApi, extensionGalleryManifest, token)
 			: await this.getExtensionsUsingQueryApi(extensionInfos, options, extensionGalleryManifest, token);

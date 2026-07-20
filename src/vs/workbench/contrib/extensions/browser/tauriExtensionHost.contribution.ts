@@ -238,7 +238,7 @@ class TauriExtensionHostContribution extends Disposable implements IWorkbenchCon
 
 			if (source && !URI.isUri(source) && (source as IGalleryExtension).assets?.download?.uri) {
 				const downloadUrl = (source as IGalleryExtension).assets.download.uri;
-				this.logService.info(`[ExtHost] Downloading extension ${extId} from gallery`);
+				this.logService.info(`[ExtHost] Downloading extension ${extId} from gallery: ${downloadUrl}`);
 				installed = await invoke<{ id: string; path: string }>('install_extension_from_url', { url: downloadUrl });
 			} else if (result.local?.location.scheme === 'file') {
 				installed = { id: extId, path: result.local.location.fsPath };
