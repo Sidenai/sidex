@@ -23,9 +23,7 @@
         "shadow": true,
         "visible": false,
         "dragDropEnabled": false,
-        "useHttpsScheme": true,
-        "titleBarStyle": "Overlay",
-        "hiddenTitle": true
+        "useHttpsScheme": true
       }
     ],
     "security": {
