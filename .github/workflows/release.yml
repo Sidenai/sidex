@@ -55,10 +55,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: 24
+          bun-version: latest
 
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
@@ -79,7 +79,7 @@ jobs:
             libfuse2
 
       - name: Install frontend dependencies
-        run: npm ci
+        run: bun install
 
       - name: Import Apple signing certificate
         if: runner.os == 'macOS' && !contains(matrix.platform, 'self-hosted')
@@ -109,9 +109,7 @@ jobs:
         run: bash scripts/setup-extensions.sh
 
       - name: Build frontend
-        env:
-          NODE_OPTIONS: "--max-old-space-size=12288"
-        run: npm run build
+        run: bun run build
 
       - name: Unlock keychain before signing
         if: runner.os == 'macOS'
@@ -127,7 +125,7 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-        run: npx tauri build --target ${{ matrix.target }} --config src-tauri/tauri.release.conf.json
+        run: bunx tauri build --target ${{ matrix.target }} --config src-tauri/tauri.release.conf.json
 
       - name: Collect macOS artifacts
         if: runner.os == 'macOS'

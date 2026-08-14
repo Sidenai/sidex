@@ -1,6 +1,11 @@
 <h1 align="center">SideX</h1>
 
 <p align="center">
+  <img src="assets/cover.png" alt="sidex" width="800"/>
+</p>
+
+
+<p align="center">
   <strong>VSCode's workbench, without Electron.</strong>
 </p>
 
@@ -10,6 +15,8 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="MIT License"></a>
   <img src="https://img.shields.io/badge/Built_with-Tauri_2-FFC131?style=for-the-badge&logo=tauri&logoColor=white" alt="Built with Tauri">
 </p>
+
+![Version](https://img.shields.io/github/v/release/charudatta10/sidex)
 
 <br>
 
@@ -66,23 +73,18 @@ RAM savings are most tested on macOS, WKWebView is shared with Safari. On Window
 ```bash
 git clone https://github.com/Sidenai/sidex.git
 cd sidex
-npm install
-npm run tauri dev
+bun install
+bun run tauri dev
 ```
 
 ### Build from Source
 
 ```bash
-npm install
+bun install
 
-# macOS / Linux
-NODE_OPTIONS="--max-old-space-size=12288" npm run build
+bun run build
 
-# Windows (PowerShell)
-$env:NODE_OPTIONS="--max-old-space-size=12288"
-npm run build
-
-npx tauri build
+bunx tauri build
 ```
 
 First build takes 5–10 minutes (Rust compile time). Pre-built binaries are not distributed yet.

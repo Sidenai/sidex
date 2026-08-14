@@ -9,7 +9,7 @@ on:
       - "tsconfig.json"
       - "eslint.config.*"
       - "package.json"
-      - "package-lock.json"
+      - "bun.lock"
   pull_request:
     branches: [main]
     paths:
@@ -18,7 +18,7 @@ on:
       - "tsconfig.json"
       - "eslint.config.*"
       - "package.json"
-      - "package-lock.json"
+      - "bun.lock"
 
 concurrency:
   group: lint-js-${{ github.ref }}
@@ -32,17 +32,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: "20"
-          cache: "npm"
+          bun-version: latest
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install
 
       - name: Type check
-        run: npx tsc --noEmit
+        run: bun tsc --noEmit
 
   eslint:
     name: ESLint
@@ -51,14 +50,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: "20"
-          cache: "npm"
+          bun-version: latest
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install
 
       - name: Lint
-        run: npm run lint
+        run: bun run lint

@@ -1,8 +1,8 @@
-import fs from 'fs';
-import path from 'path';
+import { existsSync, readdirSync, cpSync, copyFileSync } from 'fs';
+import { join } from 'path';
 
 const DIST_DIR = 'dist';
-const ASSETS_DIR = path.join(DIST_DIR, 'assets');
+const ASSETS_DIR = join(DIST_DIR, 'assets');
 
 function formatSize(bytes) {
   if (bytes < 1024) return `${bytes} B`;
@@ -11,13 +11,13 @@ function formatSize(bytes) {
 }
 
 function getFileSizes(dir, extension) {
-  if (!fs.existsSync(dir)) return { total: 0, files: [] };
+  if (!existsSync(dir)) return { total: 0, files: [] };
 
-  const files = fs.readdirSync(dir)
+  const files = readdirSync(dir)
     .filter(f => f.endsWith(extension))
     .map(f => ({
       name: f,
-      size: fs.statSync(path.join(dir, f)).size
+      size: Bun.file(join(dir, f)).size
     }))
     .sort((a, b) => b.size - a.size);
 
@@ -28,11 +28,11 @@ function getFileSizes(dir, extension) {
 }
 
 // Copy extensions
-if (fs.existsSync('extensions')) {
-  fs.cpSync('extensions', path.join(DIST_DIR, 'extensions'), { recursive: true, force: true });
+if (existsSync('extensions')) {
+  cpSync('extensions', join(DIST_DIR, 'extensions'), { recursive: true, force: true });
 }
-if (fs.existsSync('extensions-meta.json')) {
-  fs.copyFileSync('extensions-meta.json', path.join(DIST_DIR, 'extensions-meta.json'));
+if (existsSync('extensions-meta.json')) {
+  copyFileSync('extensions-meta.json', join(DIST_DIR, 'extensions-meta.json'));
 }
 console.log('Post-build: copied extensions\n');
 

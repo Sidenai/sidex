@@ -6,6 +6,6 @@
   "workspaceFolder": "/workspace",
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
   "forwardPorts": [1420],
-  "postCreateCommand": "npm ci",
+  "postCreateCommand": "bun install",
   "remoteUser": "root"
 }
