@@ -20,7 +20,7 @@
 <br>
 
 <p align="center">
-  <a href="#why">Why</a> · <a href="#whats-working">What's Working</a> · <a href="#getting-started">Getting Started</a> · <a href="#how-its-built">How It's Built</a> · <a href="#contributing">Contributing</a> · <a href="https://discord.gg/8CUCnEAC4J">Discord</a>
+  <a href="#why">Why</a> · <a href="#whats-working">What's Working</a> · <a href="#getting-started">Getting Started</a> · <a href="#nixos">NixOS</a> · <a href="#how-its-built">How It's Built</a> · <a href="#contributing">Contributing</a> · <a href="https://discord.gg/8CUCnEAC4J">Discord</a>
 </p>
 
 ---
@@ -86,6 +86,33 @@ npx tauri build
 ```
 
 First build takes 5–10 minutes (Rust compile time). Pre-built binaries are not distributed yet.
+
+---
+
+## NixOS
+
+The repository includes a Nix flake that packages the Linux application with
+the official `cargo-tauri` hook. With flakes enabled:
+
+```bash
+nix run github:QexleOSS/sidex
+```
+
+To build the package locally instead:
+
+```bash
+nix build github:QexleOSS/sidex
+./result/bin/SideX
+```
+
+For development dependencies, enter the included shell:
+
+```bash
+nix develop github:QexleOSS/sidex
+```
+
+The package currently includes the main application only. Extensions and
+language servers can be installed separately from Open VSX at runtime.
 
 ---
 
