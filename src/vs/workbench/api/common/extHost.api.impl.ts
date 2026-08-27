@@ -1116,6 +1116,17 @@ export function createApiFactoryAndRegisterActors(accessor: ServicesAccessor): I
 			get visibleTextEditors() {
 				return extHostEditors.getVisibleTextEditors();
 			},
+			// SideX: notebook editor APIs are not yet implemented. Return empty
+			// values so extensions that call `.map()` on them (e.g. kilo-code's
+			// gatherEditorContext) don't crash with "Cannot read properties of
+			// undefined (reading 'map')". Returning [] / undefined matches the
+			// VS Code contract when no notebook editors are open.
+			get visibleNotebookEditors() {
+				return [];
+			},
+			get activeNotebookEditor() {
+				return undefined;
+			},
 			get activeTerminal() {
 				return extHostTerminalService.activeTerminal;
 			},

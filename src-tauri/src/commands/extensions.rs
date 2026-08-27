@@ -1,11 +1,13 @@
 use crate::commands::extension_platform::{read_extension_manifest, ExtensionManifest};
+use base64::Engine as _;
+use base64::engine::general_purpose::STANDARD_NO_PAD;
 use serde::Serialize;
 use sidex_extensions::contributions::{parse_contributions, ContributionPoint};
 use sidex_extensions::installer::{
     install_from_vsix as crate_install_from_vsix, uninstall as crate_uninstall,
 };
 use sidex_extensions::manifest::sanitize_ext_id;
-use sidex_extensions::marketplace::MarketplaceClient;
+use sidex_extensions::marketplace::{current_target_platform, MarketplaceClient};
 use sidex_extensions::paths::user_extensions_dir;
 use sidex_extensions::vsix::{install_package, unpack_vsix, validate_vsix};
 use std::fs;
@@ -77,8 +79,139 @@ pub async fn install_extension(vsix_path: String) -> Result<InstalledExtension, 
     Ok(to_installed(&installed, &ext_dir))
 }
 
+/// Ensures a marketplace download URL targets the current platform.
+///
+/// This is the authoritative fallback for platform detection. The frontend
+/// resolves `targetPlatform` at runtime from `navigator.userAgent` and a
+/// WebGL-based architecture probe (see `index.html` / `public/sidex-env.js`),
+/// which can be wrong in WKWebView - e.g. when `WEBGL_debug_renderer_info` is
+/// disabled the architecture is misdetected, and when detection fails the
+/// platform resolves to `UNKNOWN`. A wrong value causes the gallery to
+/// select a version built for a different OS (e.g. `linux-x64` on macOS), and
+/// the download URL it returns then carries `targetPlatform=linux-x64`.
+///
+/// `current_target_platform()` is resolved at *compile time* via `cfg!`, so it
+/// is always correct for the host regardless of what the frontend detected.
+/// This function:
+///
+/// - leaves the URL untouched when it already carries a matching
+///   `targetPlatform`,
+/// - **replaces** a mismatched `targetPlatform` value with the current
+///   platform (instead of trusting the frontend's selection), and
+/// - appends `targetPlatform=<current>` when the URL has none.
+fn ensure_target_platform(url: &str) -> String {
+    let platform = current_target_platform();
+    match extract_target_platform(url) {
+        Some(existing) if existing == platform => url.to_string(),
+        Some(existing) => {
+            log::info!(
+                "replacing mismatched targetPlatform='{existing}' with '{platform}' in download url"
+            );
+            replace_target_platform(url, platform)
+        }
+        None => append_target_platform(url, platform),
+    }
+}
+
+/// Extracts the value of the `targetPlatform` query parameter, if present.
+fn extract_target_platform(url: &str) -> Option<&str> {
+    let key = "targetPlatform=";
+    let idx = url.find(key)?;
+    let start = idx + key.len();
+    let rest = &url[start..];
+    // Value runs until the next query separator (`&`), fragment (`#`), or end.
+    let end = rest
+        .find(|c: char| c == '&' || c == '#')
+        .unwrap_or(rest.len());
+    Some(&rest[..end])
+}
+
+/// Replaces the value of an existing `targetPlatform` parameter.
+fn replace_target_platform(url: &str, new_platform: &str) -> String {
+    let key = "targetPlatform=";
+    let Some(idx) = url.find(key) else {
+        return append_target_platform(url, new_platform);
+    };
+    let start = idx + key.len();
+    let rest = &url[start..];
+    let end = rest
+        .find(|c: char| c == '&' || c == '#')
+        .unwrap_or(rest.len());
+    let mut result = String::with_capacity(url.len() + new_platform.len());
+    result.push_str(&url[..start]);
+    result.push_str(new_platform);
+    result.push_str(&rest[end..]);
+    result
+}
+
+/// Appends a `targetPlatform` parameter to a URL that has none.
+fn append_target_platform(url: &str, platform: &str) -> String {
+    // Keep any fragment after the query string.
+    let (base, fragment) = match url.find('#') {
+        Some(idx) => (&url[..idx], &url[idx..]),
+        None => (url, ""),
+    };
+    let sep = if base.contains('?') { '&' } else { '?' };
+    format!("{base}{sep}targetPlatform={platform}{fragment}")
+}
+
+/// Rewrites the platform baked into a SideX marketplace proxy VSIX URL.
+///
+/// The proxy encodes the upstream Open VSX VSIX URL as base64 in the path
+/// segment `vsix-{base64}`. For platform-specific builds that encoded URL
+/// carries the platform both as a path segment and in the filename, e.g.
+/// `.../{platform}/{version}/file/{ns}.{name}-{version}@{platform}.vsix`.
+///
+/// The proxy serves whatever platform is encoded there and ignores the
+/// `targetPlatform` query parameter, so to download the correct platform we
+/// decode the base64, swap the platform token, and re-encode. No-op when the
+/// URL is not a proxy VSIX URL or when it already targets `new_platform`.
+fn rewrite_proxy_vsix_platform(url: &str, new_platform: &str) -> String {
+    const SEGMENT: &str = "/vsix-";
+    let Some(seg_idx) = url.find(SEGMENT) else {
+        return url.to_string();
+    };
+    let b64_start = seg_idx + SEGMENT.len();
+    let rest = &url[b64_start..];
+    let b64_end = rest.find('/').unwrap_or(rest.len());
+    let b64 = &rest[..b64_end];
+    let Ok(decoded_bytes) = STANDARD_NO_PAD.decode(b64) else {
+        return url.to_string();
+    };
+    let Ok(decoded) = String::from_utf8(decoded_bytes) else {
+        return url.to_string();
+    };
+    // Extract the old platform from the `@{platform}.vsix` filename suffix.
+    let Some(at_idx) = decoded.rfind('@') else {
+        return url.to_string();
+    };
+    let after_at = &decoded[at_idx + 1..];
+    let vsix_idx = after_at.find(".vsix").unwrap_or(after_at.len());
+    let old_platform = &after_at[..vsix_idx];
+    if old_platform.is_empty() || old_platform == new_platform {
+        return url.to_string();
+    }
+    let rewritten = decoded.replace(old_platform, new_platform);
+    log::info!(
+        "rewrote proxy vsix platform: {old_platform} -> {new_platform} (decoded url: {rewritten})"
+    );
+    let new_b64 = STANDARD_NO_PAD.encode(&rewritten);
+    let mut result = String::with_capacity(url.len() + new_b64.len());
+    result.push_str(&url[..b64_start]);
+    result.push_str(&new_b64);
+    result.push_str(&rest[b64_end..]);
+    result
+}
+
 #[tauri::command]
 pub async fn install_extension_from_url(url: String) -> Result<InstalledExtension, String> {
+    // The SideX marketplace proxy encodes the upstream Open VSX VSIX URL as
+    // base64 in the path (`.../vsix-{base64}/...`). The proxy serves the
+    // platform baked into that base64 segment and ignores the
+    // `targetPlatform` query parameter we append elsewhere, so fix the
+    // encoded platform here - this is the authoritative correction point.
+    let url = rewrite_proxy_vsix_platform(&url, current_target_platform());
+    let url = ensure_target_platform(&url);
     log::info!("downloading extension from {url}");
     let resp = reqwest::get(&url)
         .await
@@ -304,4 +437,65 @@ pub async fn extension_get_contributions(
 
     let points = parse_contributions(&value);
     Ok(points.iter().map(summarize_point).collect())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use base64::engine::general_purpose::STANDARD_NO_PAD;
+
+    fn proxy_url(platform: &str) -> String {
+        let inner = format!(
+            "https://open-vsx.org/api/kilocode/kilo-code/{platform}/7.4.11/file/kilocode.kilo-code-7.4.11@{platform}.vsix"
+        );
+        let b64 = STANDARD_NO_PAD.encode(&inner);
+        format!(
+            "https://marketplace.siden.ai/api/asset/openvsx/vsix-{b64}/Microsoft.VisualStudio.Services.VSIXPackage?redirect=true"
+        )
+    }
+
+    fn decoded_inner(url: &str) -> String {
+        const SEGMENT: &str = "/vsix-";
+        let idx = url.find(SEGMENT).expect("vsix segment");
+        let rest = &url[idx + SEGMENT.len()..];
+        let b64 = &rest[..rest.find('/').unwrap_or(rest.len())];
+        let bytes = STANDARD_NO_PAD.decode(b64).expect("base64");
+        String::from_utf8(bytes).expect("utf8")
+    }
+
+    #[test]
+    fn rewrites_mismatched_platform() {
+        let url = proxy_url("alpine-arm64");
+        let rewritten = rewrite_proxy_vsix_platform(&url, "darwin-arm64");
+        assert_ne!(rewritten, url, "URL should change");
+        let decoded = decoded_inner(&rewritten);
+        assert!(decoded.contains("darwin-arm64"), "decoded should contain new platform");
+        assert!(!decoded.contains("alpine-arm64"), "decoded should not contain old platform");
+    }
+
+    #[test]
+    fn no_op_when_already_correct_platform() {
+        let url = proxy_url("darwin-arm64");
+        let rewritten = rewrite_proxy_vsix_platform(&url, "darwin-arm64");
+        assert_eq!(rewritten, url, "should be unchanged");
+    }
+
+    #[test]
+    fn no_op_when_not_proxy_url() {
+        let url = "https://open-vsx.org/api/kilocode/kilo-code/7.4.11/file/kilo-code.vsix";
+        let rewritten = rewrite_proxy_vsix_platform(url, "darwin-arm64");
+        assert_eq!(rewritten, url, "non-proxy URL should be unchanged");
+    }
+
+    #[test]
+    fn no_op_when_no_at_platform_suffix() {
+        // base64 of a URL without the `@{platform}.vsix` filename suffix
+        let inner = "https://open-vsx.org/api/kilocode/kilo-code/7.4.11/file/kilo-code.vsix";
+        let b64 = STANDARD_NO_PAD.encode(inner);
+        let url = format!(
+            "https://marketplace.siden.ai/api/asset/openvsx/vsix-{b64}/Microsoft.VisualStudio.Services.VSIXPackage"
+        );
+        let rewritten = rewrite_proxy_vsix_platform(&url, "darwin-arm64");
+        assert_eq!(rewritten, url, "URL without @platform suffix should be unchanged");
+    }
 }

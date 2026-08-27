@@ -138,23 +138,36 @@ export abstract class AbstractExtensionResourceLoaderService
 	): Promise<URI | undefined> {
 		await this._initPromise;
 		if (this._extensionGalleryResourceUrlTemplate) {
+			const hasPlatform =
+				targetPlatform !== undefined &&
+				targetPlatform !== TargetPlatform.UNDEFINED &&
+				targetPlatform !== TargetPlatform.UNKNOWN &&
+				targetPlatform !== TargetPlatform.UNIVERSAL;
+			// Open VSX (SideX's marketplace) does not support the
+			// `version+targetPlatform` path segment that the Microsoft
+			// Marketplace uses - that route returns 404. Pass the platform as a
+			// query parameter instead
+			// (e.g. `.../7.4.11/extension?targetPlatform=darwin-arm64`). The
+			// Microsoft Marketplace path keeps the `+` form.
+			const isSidexTauri = !!(globalThis as any).__SIDEX_TAURI__;
+			const versionPart = !isSidexTauri && hasPlatform ? `${version}+${targetPlatform}` : version;
 			const uri = URI.parse(
 				format2(this._extensionGalleryResourceUrlTemplate, {
 					publisher,
 					name,
-					version:
-						targetPlatform !== undefined &&
-						targetPlatform !== TargetPlatform.UNDEFINED &&
-						targetPlatform !== TargetPlatform.UNKNOWN &&
-						targetPlatform !== TargetPlatform.UNIVERSAL
-							? `${version}+${targetPlatform}`
-							: version,
+					version: versionPart,
 					path: 'extension'
 				})
 			);
-			return this._isWebExtensionResourceEndPoint(uri)
-				? uri.with({ scheme: RemoteAuthorities.getPreferredWebSchema() })
-				: uri;
+			const finalUri =
+				isSidexTauri && hasPlatform
+					? uri.with({
+							query: uri.query ? `${uri.query}&targetPlatform=${targetPlatform}` : `targetPlatform=${targetPlatform}`
+						})
+					: uri;
+			return this._isWebExtensionResourceEndPoint(finalUri)
+				? finalUri.with({ scheme: RemoteAuthorities.getPreferredWebSchema() })
+				: finalUri;
 		}
 		return undefined;
 	}

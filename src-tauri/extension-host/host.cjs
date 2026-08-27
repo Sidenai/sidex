@@ -3784,6 +3784,26 @@ function createVscodeShim() {
       return { kind: 2 };
     },
     onDidChangeActiveColorTheme: noopEvent,
+    // SideX: editor/notebook APIs not yet wired to the workbench. Return empty
+    // values so extensions that call `.map()` / spread on them (e.g.
+    // kilo-code's gatherEditorContext) don't crash with "Cannot read
+    // properties of undefined" or "is not iterable".
+    get visibleTextEditors() {
+      return [];
+    },
+    get activeTextEditor() {
+      return undefined;
+    },
+    onDidChangeActiveTextEditor: noopEvent,
+    onDidChangeVisibleTextEditors: noopEvent,
+    get visibleNotebookEditors() {
+      return [];
+    },
+    get activeNotebookEditor() {
+      return undefined;
+    },
+    onDidChangeActiveNotebookEditor: noopEvent,
+    onDidChangeVisibleNotebookEditors: noopEvent,
     get tabGroups() {
       return {
         all: [],

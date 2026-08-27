@@ -72,8 +72,8 @@ pub use manifest::{
     ExtensionKind, ExtensionManifest, UriComponents,
 };
 pub use marketplace::{
-    ExtensionCategory, ExtensionVersion, MarketplaceClient, MarketplaceExtension, PublisherInfo,
-    SearchFilters, SearchResult, SortOrder,
+    current_target_platform, ExtensionCategory, ExtensionVersion, MarketplaceClient,
+    MarketplaceExtension, PublisherInfo, SearchFilters, SearchResult, SortOrder,
 };
 pub use paths::{
     global_storage_dir, resolve_node_runtime, sidex_data_dir, user_data_dir, user_extensions_dir,
