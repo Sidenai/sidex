@@ -37,6 +37,92 @@ struct TerminalExitEvent {
     exit_code: i32,
 }
 
+// Environment variables that describe the shell session SideX was launched from.
+// They only exist when the app is started from a terminal, so a terminal opened
+// after a CLI launch behaves differently from one opened after a menu launch,
+// where the app starts from the clean desktop session environment instead.
+//
+// VTE_VERSION is the one confirmed to break a real setup (issue #112): a
+// gnome-terminal launch leaks it into the app, and the spawned login shell then
+// runs /etc/profile.d/vte-2.91.sh. That script appends to PROMPT_COMMAND when it
+// is an array and overwrites it otherwise, and a prompt framework initialised
+// earlier from /etc/profile.d - starship, in the reported setup - leaves it a
+// plain string, so the overwrite wins and the prompt stays at the distro default
+// while the rest of the shell config still applies. It has no business being
+// forwarded regardless - this terminal renders through xterm.js, not VTE, so
+// claiming a VTE version also makes bash emit VTE title sequences every prompt.
+//
+// The rest are the same class of leak rather than reports in their own right.
+// Each was checked against an actual shell to confirm it can break prompt setup,
+// but none of them is the cause of #112.
+const SESSION_SCOPED_ENV_VARS: &[&str] = &[
+    "PS0",
+    "PS1",
+    "PS2",
+    "PS3",
+    "PS4",
+    "PROMPT",
+    "PROMPT_COMMAND",
+    "RPROMPT",
+    "RPS1",
+    "STARSHIP_DURATION",
+    "STARSHIP_JOBS_COUNT",
+    "STARSHIP_PREEXEC_READY",
+    "STARSHIP_SESSION_KEY",
+    "STARSHIP_SHELL",
+    "STARSHIP_START_TIME",
+    // Prompt frameworks detect bash-preexec by name. If one of these arrives in
+    // the environment without bash-preexec actually being loaded, starship's init
+    // takes its bash-preexec branch and registers into precmd_functions instead of
+    // PROMPT_COMMAND - arrays nothing ever runs - so the prompt is never drawn
+    // while the rest of .bashrc still takes effect. Reproduced by presetting any
+    // one of these; not what happens in #112, but the same failure.
+    "__bp_imported",
+    "bash_preexec_imported",
+    "precmd_functions",
+    "preexec_functions",
+    // Same story for ble.sh detection.
+    "BLE_ATTACHED",
+    "BLE_VERSION",
+    "_ble_version",
+    "BASH_ENV",
+    "ENV",
+    "SHLVL",
+    "OLDPWD",
+    "_",
+    "VTE_VERSION",
+    "VSCODE_INJECTION",
+    "VSCODE_NONCE",
+    "VSCODE_SHELL_ENV_REPORTING",
+    "VSCODE_SHELL_INTEGRATION",
+    "VSCODE_SHELL_LOGIN",
+];
+
+// Exported bash functions travel as BASH_FUNC_<name>%% and bring the previous
+// session's prompt hooks along with them.
+const SESSION_SCOPED_ENV_PREFIXES: &[&str] = &["BASH_FUNC_"];
+
+fn is_session_scoped_env(key: &str) -> bool {
+    SESSION_SCOPED_ENV_VARS.contains(&key)
+        || SESSION_SCOPED_ENV_PREFIXES
+            .iter()
+            .any(|prefix| key.starts_with(prefix))
+}
+
+// Config the user opted into (STARSHIP_CONFIG, TERM, PATH, ...) is left alone;
+// only the per-session leftovers listed above are removed.
+fn drop_session_scoped_env(cmd: &mut CommandBuilder) {
+    let stale: Vec<String> = cmd
+        .iter_full_env_as_str()
+        .map(|(key, _)| key.to_string())
+        .filter(|key| is_session_scoped_env(key))
+        .collect();
+
+    for key in stale {
+        cmd.env_remove(key);
+    }
+}
+
 pub(crate) fn resolve_windows_shell() -> String {
     for candidate in ["pwsh.exe", "powershell.exe"] {
         if let Ok(path) = which::which(candidate) {
@@ -239,6 +325,10 @@ pub fn terminal_spawn(
             cmd.env(k, v);
         }
     }
+
+    // Runs last so it also covers the env map the frontend sends, which is built
+    // from this process' own environment.
+    drop_session_scoped_env(&mut cmd);
 
     let child = pair
         .slave
@@ -672,4 +762,55 @@ fi
         .map_err(|e| format!("Failed to write .zlogin: {e}"))?;
 
     Ok(zdotdir.to_string_lossy().to_string())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn drops_leftover_prompt_state() {
+        assert!(is_session_scoped_env("PS1"));
+        assert!(is_session_scoped_env("PROMPT_COMMAND"));
+        assert!(is_session_scoped_env("STARSHIP_SESSION_KEY"));
+        assert!(is_session_scoped_env("STARSHIP_SHELL"));
+        assert!(is_session_scoped_env("VTE_VERSION"));
+        assert!(is_session_scoped_env("BASH_FUNC_starship_precmd%%"));
+        assert!(is_session_scoped_env("__bp_imported"));
+        assert!(is_session_scoped_env("precmd_functions"));
+        assert!(is_session_scoped_env("preexec_functions"));
+        assert!(is_session_scoped_env("BLE_VERSION"));
+    }
+
+    #[test]
+    fn keeps_user_configuration() {
+        assert!(!is_session_scoped_env("STARSHIP_CONFIG"));
+        assert!(!is_session_scoped_env("STARSHIP_CACHE"));
+        assert!(!is_session_scoped_env("PATH"));
+        assert!(!is_session_scoped_env("HOME"));
+        assert!(!is_session_scoped_env("SHELL"));
+        assert!(!is_session_scoped_env("TERM"));
+    }
+
+    #[test]
+    fn removes_only_stale_vars_from_the_command() {
+        let mut cmd = CommandBuilder::new("/bin/bash");
+        cmd.env("PS1", "leftover");
+        cmd.env("PROMPT_COMMAND", "starship_precmd");
+        cmd.env("STARSHIP_CONFIG", "/home/user/.config/starship.toml");
+        cmd.env("TERM", "xterm-256color");
+
+        drop_session_scoped_env(&mut cmd);
+
+        assert!(cmd.get_env("PS1").is_none());
+        assert!(cmd.get_env("PROMPT_COMMAND").is_none());
+        assert_eq!(
+            cmd.get_env("STARSHIP_CONFIG"),
+            Some(std::ffi::OsStr::new("/home/user/.config/starship.toml"))
+        );
+        assert_eq!(
+            cmd.get_env("TERM"),
+            Some(std::ffi::OsStr::new("xterm-256color"))
+        );
+    }
 }
