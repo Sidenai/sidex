@@ -15,7 +15,7 @@ fn main() {
             "shellIntegration-login.zsh",
             "shellIntegration-bash.sh",
             "shellIntegration.fish",
-            "shellIntegration.ps1",
+            "shellIntegration.ps2",
         ];
 
         for file in &shell_files {
