@@ -16,11 +16,14 @@ import { IStorageService, StorageScope, StorageTarget } from '../../../../platfo
 import { ITextFileService } from '../../../services/textfile/common/textfiles.js';
 import { DEFAULT_MARKDOWN_STYLES } from './markdownDocumentRenderer.js';
 import * as marked from '../../../../base/common/marked/marked.js';
+import { ScrollType } from '../../../../editor/common/editorCommon.js';
 
 const MARKDOWN_PREVIEW_VIEW_TYPE = 'sidex.markdown.preview';
 const PREVIEW_OPEN_FILES_KEY = 'markdown.preview.openFiles';
 
 const HAS_SCHEME = /^\w[\w\d+.-]*:/;
+
+type SyncSource = 'editor' | 'preview' | null;
 
 function resolveMarkdownUri(baseDir: URI, href: string): URI {
 	if (HAS_SCHEME.test(href)) {
@@ -43,11 +46,130 @@ function rewriteImageSrcs(html: string, baseDir: URI): string {
 	);
 }
 
+class LineMappingRenderer extends marked.Renderer {
+	private _currentLine = 1;
+
+	reset(startLine: number = 1): void {
+		this._currentLine = startLine;
+	}
+
+	private _advanceLine(raw: string): number {
+		const line = this._currentLine;
+		const newlines = raw.split('\n').length - 1;
+		this._currentLine += newlines || 1;
+		return line;
+	}
+
+	heading(token: marked.Tokens.Heading): string {
+		const line = this._advanceLine(token.raw);
+		const inline = this.parser.parseInline(token.tokens);
+		return `<h${token.depth} data-line="${line}">${inline}</h${token.depth}>\n`;
+	}
+
+	paragraph(token: marked.Tokens.Paragraph): string {
+		const line = this._advanceLine(token.raw);
+		const inline = this.parser.parseInline(token.tokens);
+		return `<p data-line="${line}">${inline}</p>\n`;
+	}
+
+	blockquote(token: marked.Tokens.Blockquote): string {
+		const line = this._advanceLine(token.raw);
+		const body = this.parser.parse(token.tokens);
+		return `<blockquote data-line="${line}">${body}</blockquote>\n`;
+	}
+
+	list(token: marked.Tokens.List): string {
+		const line = this._advanceLine(token.raw);
+		const ordered = token.ordered;
+		const start = token.start;
+		let body = '';
+		for (let j = 0; j < token.items.length; j++) {
+			const item = token.items[j];
+			body += this.listitem(item);
+		}
+		const type = ordered ? 'ol' : 'ul';
+		const startAttr = ordered && start !== 1 ? ' start="' + start + '"' : '';
+		return `<${type} data-line="${line}"${startAttr}>\n${body}</${type}>\n`;
+	}
+
+	listitem(item: marked.Tokens.ListItem): string {
+		let itemBody = '';
+		if (item.task) {
+			const checkbox = '<input ' + (item.checked ? 'checked="" ' : '') + 'disabled="" type="checkbox">';
+			if (item.loose) {
+				if (item.tokens.length > 0 && item.tokens[0].type === 'paragraph') {
+					item.tokens[0].text = checkbox + ' ' + item.tokens[0].text;
+					if (item.tokens[0].tokens && item.tokens[0].tokens.length > 0 && item.tokens[0].tokens[0].type === 'text') {
+						item.tokens[0].tokens[0].text = checkbox + ' ' + item.tokens[0].tokens[0].text;
+					}
+				} else {
+					item.tokens.unshift({
+						type: 'text',
+						raw: checkbox + ' ',
+						text: checkbox + ' '
+					});
+				}
+			} else {
+				itemBody += checkbox + ' ';
+			}
+		}
+		itemBody += this.parser.parse(item.tokens, !!item.loose);
+		return `<li>${itemBody}</li>\n`;
+	}
+
+	table(token: marked.Tokens.Table): string {
+		const line = this._advanceLine(token.raw);
+		let header = '';
+		let cell = '';
+		for (let j = 0; j < token.header.length; j++) {
+			cell += this.tablecell(token.header[j]);
+		}
+		header += `<tr>\n${cell}</tr>\n`;
+		let body = '';
+		for (let j = 0; j < token.rows.length; j++) {
+			const row = token.rows[j];
+			cell = '';
+			for (let k = 0; k < row.length; k++) {
+				cell += this.tablecell(row[k]);
+			}
+			body += `<tr>\n${cell}</tr>\n`;
+		}
+		if (body) {
+			body = `<tbody>${body}</tbody>`;
+		}
+		return `<table data-line="${line}">\n<thead>\n${header}</thead>\n${body}</table>\n`;
+	}
+
+	tablecell(token: marked.Tokens.TableCell): string {
+		const content = this.parser.parseInline(token.tokens);
+		const type = token.header ? 'th' : 'td';
+		const tag = token.align ? `<${type} align="${token.align}">` : `<${type}>`;
+		return tag + content + `</${type}>\n`;
+	}
+
+	code(token: marked.Tokens.Code): string {
+		const line = this._advanceLine(token.raw);
+		const langClass = token.lang ? ` class="language-${token.lang}"` : '';
+		return `<pre data-line="${line}"><code${langClass}>${token.text}</code></pre>\n`;
+	}
+
+	hr(_token: marked.Tokens.Hr): string {
+		return '<hr>\n';
+	}
+
+	html({ text }: marked.Tokens.HTML): string {
+		return text;
+	}
+}
+
 export class MarkdownPreviewManager extends Disposable {
 	private _webviewInput: WebviewInput | undefined;
 	private readonly _previewDisposables = this._register(new DisposableStore());
 	private _debounceTimer: ReturnType<typeof setTimeout> | undefined;
 	private _currentResource: URI | undefined;
+	private _syncSource: SyncSource = null;
+	private _syncDebounceTimer: ReturnType<typeof setTimeout> | undefined;
+	private _lineRenderer: LineMappingRenderer;
 
 	constructor(
 		@IEditorService private readonly _editorService: IEditorService,
@@ -57,6 +179,7 @@ export class MarkdownPreviewManager extends Disposable {
 		@IStorageService private readonly _storageService: IStorageService
 	) {
 		super();
+		this._lineRenderer = new LineMappingRenderer();
 	}
 
 	showPreview(side?: boolean): void {
@@ -107,7 +230,7 @@ export class MarkdownPreviewManager extends Disposable {
 					retainContextWhenHidden: true
 				},
 				contentOptions: {
-					allowScripts: false,
+					allowScripts: true,
 					localResourceRoots: [parentDir]
 				},
 				extension: undefined
@@ -124,6 +247,7 @@ export class MarkdownPreviewManager extends Disposable {
 			this._register(
 				this._webviewInput.onWillDispose(() => {
 					this._clearDebounceTimer();
+					this._clearSyncTimer();
 					this._webviewInput = undefined;
 					this._previewDisposables.clear();
 					this._currentResource = undefined;
@@ -142,12 +266,68 @@ export class MarkdownPreviewManager extends Disposable {
 		}
 
 		this._renderContent();
+		this._setupScrollSync();
+	}
+
+	private _setupScrollSync(): void {
+		this._previewDisposables.clear();
+
 		this._listenToContentChanges();
+
+		if (!this._webviewInput) {
+			return;
+		}
+
+		this._previewDisposables.add(
+			this._webviewInput.webview.onMessage(e => {
+				const msg = e.message;
+				if (msg && typeof msg === 'object' && msg.type === 'scroll-sync') {
+					if (this._syncSource === 'editor') {
+						return;
+					}
+					this._syncSource = 'preview';
+					this._scrollEditorToLine(msg.lineNumber);
+					this._clearSyncDebounce();
+				}
+			})
+		);
+	}
+
+	private _getTopVisibleLine(): number {
+		const editor = this._editorService.activeTextEditorControl;
+		if (!editor || !('getVisibleRanges' in editor)) {
+			return 1;
+		}
+		const ranges = (editor as { getVisibleRanges(): unknown[] }).getVisibleRanges();
+		if (!ranges || ranges.length === 0) {
+			return 1;
+		}
+		const firstRange = ranges[0] as { startLineNumber: number };
+		return firstRange.startLineNumber || 1;
+	}
+
+	private _scrollEditorToLine(lineNumber: number): void {
+		const editor = this._editorService.activeTextEditorControl;
+		if (!editor || !('getModel' in editor) || !('revealLine' in editor)) {
+			return;
+		}
+		const model = (editor as { getModel(): { getLineCount(): number } }).getModel();
+		const maxLine = model ? model.getLineCount() : Infinity;
+		const line = Math.max(1, Math.min(lineNumber, maxLine));
+		(editor as unknown as { revealLine(l: number, s?: ScrollType): void }).revealLine(line, ScrollType.Smooth);
+	}
+
+	private _scrollPreviewToLine(lineNumber: number): void {
+		if (!this._webviewInput) {
+			return;
+		}
+		this._webviewInput.webview.postMessage({
+			type: 'scroll-to-line',
+			lineNumber: lineNumber
+		});
 	}
 
 	private _listenToContentChanges(): void {
-		this._previewDisposables.clear();
-
 		if (!this._currentResource) {
 			return;
 		}
@@ -161,7 +341,7 @@ export class MarkdownPreviewManager extends Disposable {
 			this._previewDisposables.add(
 				this._textFileService.files.onDidResolve(e => {
 					if (this._currentResource && e.model.resource.toString() === this._currentResource.toString()) {
-						this._listenToContentChanges();
+						this._setupScrollSync();
 						this._renderContent();
 					}
 				})
@@ -170,6 +350,7 @@ export class MarkdownPreviewManager extends Disposable {
 		}
 
 		const textModel = fileModel.textEditorModel;
+
 		this._previewDisposables.add(
 			textModel.onDidChangeContent(() => {
 				if (this._debounceTimer) {
@@ -180,6 +361,38 @@ export class MarkdownPreviewManager extends Disposable {
 				}, 300);
 			})
 		);
+
+		const editor = this._editorService.activeTextEditorControl;
+		if (editor && 'onDidScrollChange' in editor) {
+			const disposable = (editor as { onDidScrollChange: (listener: () => void) => Disposable }).onDidScrollChange(
+				() => {
+					if (this._syncSource === 'preview') {
+						return;
+					}
+					this._syncSource = 'editor';
+					const line = this._getTopVisibleLine();
+					this._scrollPreviewToLine(line);
+					this._clearSyncDebounce();
+				}
+			);
+			this._previewDisposables.add(disposable);
+		}
+	}
+
+	private _clearSyncDebounce(): void {
+		if (this._syncDebounceTimer) {
+			clearTimeout(this._syncDebounceTimer);
+		}
+		this._syncDebounceTimer = setTimeout(() => {
+			this._syncSource = null;
+		}, 150);
+	}
+
+	private _clearSyncTimer(): void {
+		if (this._syncDebounceTimer) {
+			clearTimeout(this._syncDebounceTimer);
+			this._syncDebounceTimer = undefined;
+		}
 	}
 
 	private _renderContent(): void {
@@ -195,8 +408,14 @@ export class MarkdownPreviewManager extends Disposable {
 		const baseDir = URI.joinPath(this._currentResource, '..');
 		const textModel = fileModel.textEditorModel;
 		const text = textModel.getValue();
-		const parsedHtml = new marked.Marked().parse(text) as string;
+
+		this._lineRenderer.reset(1);
+		const renderer = this._lineRenderer;
+
+		const parsedHtml = marked.parse(text, { renderer }) as string;
 		const htmlBody = rewriteImageSrcs(parsedHtml, baseDir);
+
+		const topLine = this._getTopVisibleLine();
 
 		const html = `<!DOCTYPE html>
 <html>
@@ -218,14 +437,99 @@ export class MarkdownPreviewManager extends Disposable {
 		}
 		pre {
 			background-color: var(--vscode-textCodeBlock-background);
+			white-space: pre;
+		}
+		pre code {
+			background-color: transparent;
+			padding: 0;
+			border-radius: 0;
+			color: var(--vscode-editor-foreground);
+		}
+		h1, h2, h3, h4, h5, h6 {
+			font-weight: bold;
+			border-bottom: 1px solid;
+			padding-bottom: 0.3em;
 		}
 	</style>
 	<style>${DEFAULT_MARKDOWN_STYLES}</style>
 </head>
 <body>${htmlBody}</body>
+<script>
+(function() {
+	var scrollTimer = null;
+	var ignoreScrollEvents = false;
+
+	function getElementForLine(lineNumber) {
+		return document.querySelector('[data-line="' + lineNumber + '"]');
+	}
+
+	function findClosestLine(targetLine, maxLines) {
+		for (var offset = 0; offset <= maxLines; offset++) {
+			var tryLine = targetLine + offset;
+			if (getElementForLine(tryLine)) { return tryLine; }
+			if (targetLine - offset > 0) {
+				tryLine = targetLine - offset;
+				if (getElementForLine(tryLine)) { return tryLine; }
+			}
+		}
+		return null;
+	}
+
+	function reportScroll() {
+		if (ignoreScrollEvents) { return; }
+		if (scrollTimer) { clearTimeout(scrollTimer); }
+		scrollTimer = setTimeout(function() {
+			var scrollTop = window.scrollY;
+			var maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+			if (maxScroll <= 0) { window.parent.postMessage({ type: 'scroll-sync', lineNumber: 1 }, '*'); return; }
+			var pct = scrollTop / maxScroll;
+			var allLines = document.querySelectorAll('[data-line]');
+			var maxLineNumber = 0;
+			allLines.forEach(function(el) {
+				var n = parseInt(el.getAttribute('data-line'), 10);
+				if (n > maxLineNumber) { maxLineNumber = n; }
+			});
+			if (maxLineNumber === 0) { window.parent.postMessage({ type: 'scroll-sync', lineNumber: 1 }, '*'); return; }
+			var targetLine = Math.round(pct * maxLineNumber) + 1;
+			targetLine = Math.max(1, Math.min(targetLine, maxLineNumber));
+			window.parent.postMessage({ type: 'scroll-sync', lineNumber: targetLine }, '*');
+		}, 50);
+	}
+
+	function scrollToLine(lineNumber) {
+		var el = getElementForLine(lineNumber);
+		if (!el) {
+			var closest = findClosestLine(lineNumber, 20);
+			if (closest) { el = getElementForLine(closest); }
+		}
+		if (el) {
+			ignoreScrollEvents = true;
+			var top = el.getBoundingClientRect().top + window.scrollY - 20;
+			window.scrollTo({ top: top, behavior: 'smooth' });
+			setTimeout(function() { ignoreScrollEvents = false; }, 200);
+		}
+	}
+
+	if (window.addEventListener) {
+		window.addEventListener('scroll', reportScroll, { passive: true });
+	}
+
+	if (window.addEventListener) {
+		window.addEventListener('message', function(event) {
+			var msg = event.data;
+			if (!msg || typeof msg !== 'object') { return; }
+			if (msg.type === 'scroll-to-line' && typeof msg.lineNumber === 'number') {
+				scrollToLine(msg.lineNumber);
+			}
+		});
+	}
+})();
+</script>
 </html>`;
 
 		this._webviewInput.webview.setHtml(html);
+
+		this._scrollPreviewToLine(topLine);
 	}
 
 	private _clearDebounceTimer(): void {
@@ -245,6 +549,7 @@ export class MarkdownPreviewManager extends Disposable {
 				this._storageService.store(PREVIEW_OPEN_FILES_KEY, filtered, StorageScope.WORKSPACE, StorageTarget.MACHINE);
 			}
 			this._clearDebounceTimer();
+			this._clearSyncTimer();
 			this._webviewInput.dispose();
 			this._webviewInput = undefined;
 			this._previewDisposables.clear();
