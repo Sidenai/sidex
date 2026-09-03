@@ -13,8 +13,8 @@ pub struct OsInfo {
 }
 
 #[tauri::command]
-pub fn get_os_info() -> OsInfo {
-    OsInfo {
+pub fn get_os_info() -> Result<OsInfo, String> {
+    Ok(OsInfo {
         platform: env::consts::OS.to_string(),
         arch: env::consts::ARCH.to_string(),
         hostname: hostname::get().map_or_else(
@@ -26,13 +26,13 @@ pub fn get_os_info() -> OsInfo {
             |p| p.to_string_lossy().to_string(),
         ),
         tmpdir: env::temp_dir().to_string_lossy().to_string(),
-    }
+    })
 }
 
 #[allow(clippy::needless_pass_by_value)]
 #[tauri::command]
-pub fn get_env(key: String) -> Option<String> {
-    env::var(&key).ok()
+pub fn get_env(key: String) -> Result<Option<String>, String> {
+    Ok(env::var(&key).ok())
 }
 
 const SENSITIVE_ENV_PATTERNS: &[&str] = &[
@@ -56,24 +56,24 @@ const SENSITIVE_ENV_PATTERNS: &[&str] = &[
 ];
 
 #[tauri::command]
-pub fn get_all_env() -> std::collections::HashMap<String, String> {
-    env::vars()
+pub fn get_all_env() -> Result<std::collections::HashMap<String, String>, String> {
+    Ok(env::vars()
         .filter(|(key, _)| {
             let upper = key.to_uppercase();
             !SENSITIVE_ENV_PATTERNS.iter().any(|p| upper.contains(p))
         })
-        .collect()
+        .collect())
 }
 
 #[tauri::command]
-pub fn get_shell() -> String {
-    env::var("SHELL").unwrap_or_else(|_| {
+pub fn get_shell() -> Result<String, String> {
+    Ok(env::var("SHELL").unwrap_or_else(|_| {
         if cfg!(target_os = "windows") {
             super::terminal::resolve_windows_shell()
         } else {
             "/bin/sh".to_string()
         }
-    })
+    }))
 }
 
 #[allow(clippy::needless_pass_by_value)]

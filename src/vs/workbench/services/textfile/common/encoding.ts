@@ -287,6 +287,10 @@ export async function encodingExists(encoding: string): Promise<boolean> {
 		'lib/iconv-lite-umd.js'
 	);
 
+	if (!iconv) {
+		return true; // iconv-lite-umd unavailable (Tauri), assume encoding exists
+	}
+
 	return iconv.encodingExists(toNodeEncoding(encoding));
 }
 

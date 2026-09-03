@@ -11,8 +11,8 @@ pub struct ExtCommandInfo {
 }
 
 #[tauri::command]
-pub fn ext_api_get_namespaces() -> Vec<String> {
-    [
+pub fn ext_api_get_namespaces() -> Result<Vec<String>, String> {
+    Ok([
         "window",
         "workspace",
         "commands",
@@ -25,17 +25,17 @@ pub fn ext_api_get_namespaces() -> Vec<String> {
     ]
     .into_iter()
     .map(String::from)
-    .collect()
+    .collect())
 }
 
 #[tauri::command]
 #[allow(clippy::needless_pass_by_value)]
-pub fn ext_api_get_commands(registry: State<'_, Arc<CommandRegistry>>) -> Vec<ExtCommandInfo> {
-    registry
+pub fn ext_api_get_commands(registry: State<'_, Arc<CommandRegistry>>) -> Result<Vec<ExtCommandInfo>, String> {
+    Ok(registry
         .get_commands()
         .into_iter()
         .map(|id| ExtCommandInfo { id })
-        .collect()
+        .collect())
 }
 
 /// Dispatch an extension-API call ("namespace/action") to the appropriate
@@ -86,14 +86,14 @@ pub async fn open_external_url(url: String) -> Result<(), String> {
 }
 
 #[tauri::command]
-pub fn env_shell() -> String {
-    env::var("SHELL").unwrap_or_else(|_| {
+pub fn env_shell() -> Result<String, String> {
+    Ok(env::var("SHELL").unwrap_or_else(|_| {
         if cfg!(target_os = "windows") {
             env::var("COMSPEC").unwrap_or_else(|_| "cmd.exe".to_string())
         } else {
             "/bin/sh".to_string()
         }
-    })
+    }))
 }
 
 #[derive(Serialize)]
@@ -103,9 +103,9 @@ pub struct AppHostInfo {
 }
 
 #[tauri::command]
-pub fn env_app_host() -> AppHostInfo {
-    AppHostInfo {
+pub fn env_app_host() -> Result<AppHostInfo, String> {
+    Ok(AppHostInfo {
         os: env::consts::OS.to_string(),
         arch: env::consts::ARCH.to_string(),
-    }
+    })
 }

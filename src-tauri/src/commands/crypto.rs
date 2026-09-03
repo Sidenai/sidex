@@ -7,10 +7,10 @@ const HASH_BUF_SIZE: usize = 64 * 1024;
 
 #[allow(clippy::needless_pass_by_value)]
 #[tauri::command]
-pub fn sha256_hash(data: Vec<u8>) -> String {
+pub fn sha256_hash(data: Vec<u8>) -> Result<String, String> {
     let mut hasher = Sha256::new();
     hasher.update(&data);
-    format!("{:x}", hasher.finalize())
+    Ok(format!("{:x}", hasher.finalize()))
 }
 
 #[allow(clippy::needless_pass_by_value, clippy::large_stack_arrays)]
@@ -36,8 +36,8 @@ pub fn sha256_file(path: String) -> Result<String, String> {
 
 #[allow(clippy::needless_pass_by_value)]
 #[tauri::command]
-pub fn md5_hash(data: Vec<u8>) -> String {
-    format!("{:x}", md5::compute(&data))
+pub fn md5_hash(data: Vec<u8>) -> Result<String, String> {
+    Ok(format!("{:x}", md5::compute(&data)))
 }
 
 #[allow(clippy::needless_pass_by_value, clippy::large_stack_arrays)]
@@ -62,23 +62,23 @@ pub fn md5_file(path: String) -> Result<String, String> {
 }
 
 #[tauri::command]
-pub fn random_bytes(length: usize) -> Vec<u8> {
+pub fn random_bytes(length: usize) -> Result<Vec<u8>, String> {
     use rand::RngCore;
     let mut bytes = vec![0u8; length.min(65536)];
     rand::thread_rng().fill_bytes(&mut bytes);
-    bytes
+    Ok(bytes)
 }
 
 #[tauri::command]
-pub fn uuid_v4() -> String {
-    uuid::Uuid::new_v4().to_string()
+pub fn uuid_v4() -> Result<String, String> {
+    Ok(uuid::Uuid::new_v4().to_string())
 }
 
 #[allow(clippy::needless_pass_by_value)]
 #[tauri::command]
-pub fn base64_encode(data: Vec<u8>) -> String {
+pub fn base64_encode(data: Vec<u8>) -> Result<String, String> {
     use base64::{engine::general_purpose::STANDARD, Engine as _};
-    STANDARD.encode(&data)
+    Ok(STANDARD.encode(&data))
 }
 
 #[allow(clippy::needless_pass_by_value)]
@@ -92,9 +92,9 @@ pub fn base64_decode(text: String) -> Result<Vec<u8>, String> {
 
 #[allow(clippy::needless_pass_by_value)]
 #[tauri::command]
-pub fn base64_encode_urlsafe(data: Vec<u8>) -> String {
+pub fn base64_encode_urlsafe(data: Vec<u8>) -> Result<String, String> {
     use base64::{engine::general_purpose::URL_SAFE, Engine as _};
-    URL_SAFE.encode(&data)
+    Ok(URL_SAFE.encode(&data))
 }
 
 #[allow(clippy::needless_pass_by_value)]

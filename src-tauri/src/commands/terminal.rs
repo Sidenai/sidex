@@ -426,15 +426,15 @@ fn home_dir_string() -> Option<String> {
 }
 
 #[tauri::command]
-pub fn get_default_shell() -> String {
+pub fn get_default_shell() -> Result<String, String> {
     if cfg!(target_os = "windows") {
-        return resolve_windows_shell();
+        return Ok(resolve_windows_shell());
     }
 
     // 1. Check $SHELL (same as VS Code: shell.ts getSystemShellUnixLike)
     if let Ok(shell) = std::env::var("SHELL") {
         if !shell.is_empty() && shell != "/bin/false" {
-            return shell;
+            return Ok(shell);
         }
     }
 
@@ -449,7 +449,7 @@ pub fn get_default_shell() -> String {
                 let shell_cstr = std::ffi::CStr::from_ptr((*pw).pw_shell);
                 if let Ok(s) = shell_cstr.to_str() {
                     if !s.is_empty() && s != "/bin/false" {
-                        return s.to_string();
+                        return Ok(s.to_string());
                     }
                 }
             }
@@ -459,25 +459,25 @@ pub fn get_default_shell() -> String {
     // 3. Fallback: zsh first on macOS, then bash
     for fb in &["/bin/zsh", "/bin/bash", "/bin/sh"] {
         if std::path::Path::new(fb).exists() {
-            return fb.to_string();
+            return Ok(fb.to_string());
         }
     }
-    "/bin/sh".to_string()
+    Ok("/bin/sh".to_string())
 }
 
 #[tauri::command]
 #[allow(clippy::needless_pass_by_value)]
-pub fn check_shell_exists(path: String) -> bool {
+pub fn check_shell_exists(path: String) -> Result<bool, String> {
     if cfg!(target_os = "windows") {
-        return std::path::Path::new(&path).exists() || which::which(&path).is_ok();
+        return Ok(std::path::Path::new(&path).exists() || which::which(&path).is_ok());
     }
 
-    std::path::Path::new(&path).exists()
+    Ok(std::path::Path::new(&path).exists())
 }
 
 #[tauri::command]
 #[allow(clippy::too_many_lines)]
-pub fn get_available_shells() -> Vec<ShellInfo> {
+pub fn get_available_shells() -> Result<Vec<ShellInfo>, String> {
     #[cfg(target_os = "windows")]
     {
         let candidates: &[(&str, &str)] = &[
@@ -513,7 +513,7 @@ pub fn get_available_shells() -> Vec<ShellInfo> {
                 });
             }
         }
-        return shells;
+        return Ok(shells);
     }
 
     #[cfg(not(target_os = "windows"))]
@@ -577,7 +577,7 @@ pub fn get_available_shells() -> Vec<ShellInfo> {
             }
         }
 
-        shells
+        Ok(shells)
     }
 }
 

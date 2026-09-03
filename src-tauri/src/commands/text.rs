@@ -75,19 +75,19 @@ pub fn file_summary(path: String) -> Result<FileSummary, String> {
 
 #[allow(clippy::needless_pass_by_value)]
 #[tauri::command(rename_all = "snake_case")]
-pub fn normalize_line_endings_cmd(text: String) -> String {
-    normalize_line_endings(&text, LineEnding::Lf)
+pub fn normalize_line_endings_cmd(text: String) -> Result<String, String> {
+    Ok(normalize_line_endings(&text, LineEnding::Lf))
 }
 
 #[allow(clippy::needless_pass_by_value)]
 #[tauri::command]
-pub fn to_crlf(text: String) -> String {
-    normalize_line_endings(&text, LineEnding::CrLf)
+pub fn to_crlf(text: String) -> Result<String, String> {
+    Ok(normalize_line_endings(&text, LineEnding::CrLf))
 }
 
 #[allow(clippy::needless_pass_by_value)]
 #[tauri::command]
-pub fn trim_trailing_whitespace(text: String) -> String {
+pub fn trim_trailing_whitespace(text: String) -> Result<String, String> {
     let mut result = String::with_capacity(text.len());
     for (i, line) in text.lines().enumerate() {
         if i > 0 {
@@ -95,17 +95,17 @@ pub fn trim_trailing_whitespace(text: String) -> String {
         }
         result.push_str(line.trim_end());
     }
-    result
+    Ok(result)
 }
 
 #[allow(clippy::needless_pass_by_value)]
 #[tauri::command]
-pub fn ensure_final_newline(mut text: String) -> String {
+pub fn ensure_final_newline(mut text: String) -> Result<String, String> {
     if text.is_empty() || text.ends_with('\n') {
-        return text;
+        return Ok(text);
     }
     text.push('\n');
-    text
+    Ok(text)
 }
 
 #[derive(Debug, Serialize)]
@@ -146,7 +146,7 @@ pub struct DiffLine {
 
 #[allow(clippy::needless_pass_by_value)]
 #[tauri::command]
-pub fn simple_diff(old_text: String, new_text: String) -> Vec<DiffLine> {
+pub fn simple_diff(old_text: String, new_text: String) -> Result<Vec<DiffLine>, String> {
     let old_lines: Vec<&str> = old_text.lines().collect();
     let new_lines: Vec<&str> = new_text.lines().collect();
 
@@ -180,7 +180,7 @@ pub fn simple_diff(old_text: String, new_text: String) -> Vec<DiffLine> {
             }
         }
     }
-    result
+    Ok(result)
 }
 
 #[allow(clippy::needless_pass_by_value)]

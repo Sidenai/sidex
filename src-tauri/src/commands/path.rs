@@ -34,9 +34,9 @@ pub fn parse_path(path: String) -> Result<PathInfo, String> {
 
 #[allow(clippy::needless_pass_by_value)]
 #[tauri::command]
-pub fn join_paths(base: String, segments: Vec<String>) -> String {
+pub fn join_paths(base: String, segments: Vec<String>) -> Result<String, String> {
     let segs: Vec<&str> = segments.iter().map(String::as_str).collect();
-    path_util::join_paths(&base, &segs)
+    Ok(path_util::join_paths(&base, &segs))
 }
 
 #[allow(clippy::needless_pass_by_value)]
@@ -49,14 +49,14 @@ pub fn relative_path(base: String, target: String) -> Result<String, String> {
 
 #[allow(clippy::needless_pass_by_value)]
 #[tauri::command]
-pub fn glob_match(pattern: String, path: String) -> bool {
-    path_util::glob_match(&pattern, &path)
+pub fn glob_match(pattern: String, path: String) -> Result<bool, String> {
+    Ok(path_util::glob_match(&pattern, &path))
 }
 
 #[allow(clippy::needless_pass_by_value)]
 #[tauri::command]
-pub fn ext_category(path: String) -> String {
-    path_util::ext_category(&path).to_string()
+pub fn ext_category(path: String) -> Result<String, String> {
+    Ok(path_util::ext_category(&path).to_string())
 }
 
 #[allow(clippy::needless_pass_by_value)]
