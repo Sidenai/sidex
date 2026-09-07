@@ -7,10 +7,14 @@
 declare global {
 	interface Window {
 		__TAURI__?: {
-			core: {
+			core?: {
 				invoke: (cmd: string, args?: Record<string, unknown>) => Promise<unknown>;
 			};
 		};
+		__TAURI_INTERNALS__?: {
+			invoke: (cmd: string, args?: Record<string, unknown>, options?: unknown) => Promise<unknown>;
+		};
+		__TAURI_INVOKE__?: (cmd: string, args?: Record<string, unknown>) => Promise<unknown>;
 	}
 }
 
@@ -18,6 +22,15 @@ let _invoke: ((cmd: string, args?: Record<string, unknown>) => Promise<unknown>)
 
 function getInvoke(): ((cmd: string, args?: Record<string, unknown>) => Promise<unknown>) | null {
 	if (_invoke) {
+		return _invoke;
+	}
+	const g = (typeof window !== 'undefined' ? window : (globalThis as any)) as Window;
+	if (g.__TAURI_INTERNALS__?.invoke) {
+		_invoke = (cmd, args) => g.__TAURI_INTERNALS__!.invoke(cmd, args);
+		return _invoke;
+	}
+	if (typeof g.__TAURI_INVOKE__ === 'function') {
+		_invoke = g.__TAURI_INVOKE__;
 		return _invoke;
 	}
 	if (window.__TAURI__?.core?.invoke) {

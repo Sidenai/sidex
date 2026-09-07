@@ -18,6 +18,16 @@ pub fn dark_modern() -> Theme {
     }
 }
 
+/// "Quiet Light" — the VS Code Quiet Light theme.
+pub fn quiet_light() -> Theme {
+    Theme {
+        name: "Quiet Light".to_owned(),
+        kind: ThemeKind::Light,
+        token_colors: quiet_light_tokens(),
+        workbench_colors: WorkbenchColors::quiet_light(),
+    }
+}
+
 /// "Default Light Modern" — the VS Code default light theme.
 pub fn light_modern() -> Theme {
     Theme {
@@ -487,6 +497,233 @@ fn light_modern_tokens() -> Vec<TokenColorRule> {
 }
 
 #[allow(clippy::too_many_lines)]
+fn quiet_light_tokens() -> Vec<TokenColorRule> {
+    vec![
+        // Base / comments
+        tok("source", "#333333"),
+        tok_styled("comment", "#AAAAAA", FontStyle::ITALIC),
+        tok_styled("comment.line", "#AAAAAA", FontStyle::ITALIC),
+        tok_styled("comment.block", "#AAAAAA", FontStyle::ITALIC),
+        tok_styled(
+            "comment.block.documentation",
+            "#448C27",
+            FontStyle::ITALIC,
+        ),
+        tok("punctuation.definition.comment", "#AAAAAA"),
+
+        // Strings
+        tok("string", "#448C27"),
+        tok("string.quoted.single", "#448C27"),
+        tok("string.quoted.double", "#448C27"),
+        tok("string.template", "#448C27"),
+        tok("string.quoted.template", "#448C27"),
+        tok("string.interpolated", "#448C27"),
+        tok("string.regexp", "#4B69C6"),
+        tok("constant.character.escape", "#9C5D27"),
+
+        // Numbers & constants
+        tok_multi(
+            &[
+                "constant.numeric",
+                "constant.numeric.integer",
+                "constant.numeric.float",
+                "constant.numeric.hex",
+                "constant.numeric.octal",
+                "constant.numeric.binary",
+            ],
+            "#9C5D27",
+        ),
+        tok("constant.language", "#9C5D27"),
+        tok("constant.language.boolean", "#9C5D27"),
+        tok("constant.language.null", "#9C5D27"),
+        tok("constant.language.undefined", "#9C5D27"),
+        tok("constant.character", "#9C5D27"),
+        tok("constant.other", "#9C5D27"),
+        tok("constant.regexp", "#4B69C6"),
+
+        // Variables
+        tok_multi(
+            &[
+                "variable",
+                "meta.definition.variable.name",
+                "support.variable",
+            ],
+            "#7A3E9D",
+        ),
+        tok("variable.other.readwrite", "#7A3E9D"),
+        tok("variable.other.constant", "#9C5D27"),
+        tok("variable.other.enummember", "#9C5D27"),
+        tok("variable.other.property", "#7A3E9D"),
+        tok("variable.other.object", "#7A3E9D"),
+        tok("variable.parameter", "#7A3E9D"),
+        tok("variable.language", "#4B69C6"),
+        tok("variable.language.this", "#4B69C6"),
+        tok("variable.language.self", "#4B69C6"),
+        tok("variable.language.super", "#4B69C6"),
+        tok("meta.object-literal.key", "#7A3E9D"),
+
+        // Keywords & storage
+        tok("keyword", "#4B69C6"),
+        tok_multi(
+            &[
+                "keyword.control",
+                "keyword.control.flow",
+                "keyword.control.loop",
+                "keyword.control.conditional",
+                "keyword.control.import",
+                "keyword.control.from",
+                "keyword.control.export",
+                "keyword.other.using",
+                "storage",
+                "storage.type",
+                "storage.modifier",
+            ],
+            "#4B69C6",
+        ),
+        tok("keyword.operator", "#777777"),
+        tok("keyword.operator.new", "#4B69C6"),
+        tok("keyword.operator.expression", "#4B69C6"),
+        tok("keyword.operator.logical", "#777777"),
+        tok("keyword.operator.assignment", "#777777"),
+        tok("keyword.operator.comparison", "#777777"),
+        tok("keyword.operator.type", "#4B69C6"),
+
+        // Functions
+        tok_styled(
+            "entity.name.function",
+            "#AA3731",
+            FontStyle::BOLD,
+        ),
+        tok_styled(
+            "entity.name.function.member",
+            "#AA3731",
+            FontStyle::BOLD,
+        ),
+        tok_styled("support.function", "#AA3731", FontStyle::BOLD),
+        tok_styled("meta.function-call", "#AA3731", FontStyle::BOLD),
+        tok_styled(
+            "support.function.builtin",
+            "#AA3731",
+            FontStyle::BOLD,
+        ),
+
+        // Types & classes
+        tok_styled(
+            "entity.name.type",
+            "#7A3E9D",
+            FontStyle::BOLD,
+        ),
+        tok_styled(
+            "entity.name.class",
+            "#7A3E9D",
+            FontStyle::BOLD,
+        ),
+        tok_styled("support.class", "#7A3E9D", FontStyle::BOLD),
+        tok("support.type", "#7A3E9D"),
+        tok("entity.name.type.parameter", "#7A3E9D"),
+        tok("entity.name.type.enum", "#7A3E9D"),
+        tok("entity.name.type.interface", "#7A3E9D"),
+        tok("entity.name.type.alias", "#7A3E9D"),
+        tok("entity.name.namespace", "#7A3E9D"),
+        tok("support.type.primitive", "#7A3E9D"),
+        tok_multi(
+            &["meta.type.cast.expr", "entity.other.inherited-class"],
+            "#7A3E9D",
+        ),
+
+        // HTML/XML/JSX
+        tok("entity.name.tag", "#4B69C6"),
+        tok("entity.name.tag.html", "#4B69C6"),
+        tok("entity.name.tag.css", "#91B3E0"),
+        tok("entity.other.attribute-name", "#8190A0"),
+
+        // CSS
+        tok("support.constant.property-value.css", "#448C27"),
+        tok("support.constant.font-name", "#448C27"),
+        tok("support.constant.color", "#448C27"),
+
+        // Decorators / attributes
+        tok_multi(
+            &[
+                "meta.decorator",
+                "entity.name.function.decorator",
+                "punctuation.decorator",
+            ],
+            "#AA3731",
+        ),
+        tok("meta.attribute", "#8190A0"),
+
+        // Preprocessor / macros
+        tok("meta.preprocessor", "#4B69C6"),
+        tok("meta.preprocessor.string", "#448C27"),
+        tok("meta.preprocessor.numeric", "#9C5D27"),
+        tok("entity.name.function.preprocessor", "#4B69C6"),
+        tok_multi(
+            &[
+                "keyword.control.directive",
+                "punctuation.definition.directive",
+            ],
+            "#4B69C6",
+        ),
+
+        // Operators & punctuation
+        tok("support.constant", "#9C5D27"),
+        tok("punctuation.definition.tag", "#91B3E0"),
+        tok("punctuation.separator", "#777777"),
+        tok("punctuation.terminator", "#777777"),
+        tok("punctuation.section", "#777777"),
+        tok("punctuation.accessor", "#777777"),
+        tok("meta.brace", "#777777"),
+
+        // JSON / YAML / TOML
+        tok("support.type.property-name.json", "#7A3E9D"),
+        tok("string.value.json", "#448C27"),
+        tok("entity.name.tag.yaml", "#4B69C6"),
+        tok("entity.name.tag.toml", "#4B69C6"),
+        tok("support.type.property-name.toml", "#7A3E9D"),
+
+        // Markdown / markup
+        tok_styled("emphasis", "#333333", FontStyle::ITALIC),
+        tok_styled("strong", "#333333", FontStyle::BOLD),
+        tok_styled("markup.heading", "#4B69C6", FontStyle::BOLD),
+        tok("markup.inserted", "#448C27"),
+        tok("markup.deleted", "#AA3731"),
+        tok("markup.changed", "#4B69C6"),
+        tok_styled("markup.italic", "#333333", FontStyle::ITALIC),
+        tok_styled("markup.bold", "#333333", FontStyle::BOLD),
+        tok_styled("markup.underline", "#333333", FontStyle::UNDERLINE),
+        tok_styled(
+            "markup.strikethrough",
+            "#333333",
+            FontStyle::STRIKETHROUGH,
+        ),
+        tok("markup.inline.raw", "#448C27"),
+        tok("markup.fenced_code.block", "#448C27"),
+        tok("markup.quote", "#448C27"),
+        tok("markup.list.numbered", "#4B69C6"),
+        tok("markup.list.unnumbered", "#4B69C6"),
+        tok("meta.link.inline.markdown", "#4B69C6"),
+        tok("string.other.link", "#4B69C6"),
+
+        // Rust
+        tok("entity.name.type.lifetime.rust", "#4B69C6"),
+        tok("keyword.operator.borrow.rust", "#4B69C6"),
+        tok("keyword.operator.sigil.rust", "#4B69C6"),
+        tok("entity.name.function.macro.rust", "#AA3731"),
+        tok("meta.attribute.rust", "#8190A0"),
+
+        // Invalid / deprecated
+        tok("invalid", "#cd3131"),
+        tok("invalid.illegal", "#660000"),
+        tok_styled(
+            "invalid.deprecated",
+            "#AA3731",
+            FontStyle::STRIKETHROUGH,
+        ),
+    ]
+}
+
+#[allow(clippy::too_many_lines)]
 fn hc_black_tokens() -> Vec<TokenColorRule> {
     vec![
         tok_styled("comment", "#7CA668", FontStyle::ITALIC),
@@ -787,5 +1024,13 @@ mod tests {
         let t = hc_light();
         assert_eq!(t.kind, ThemeKind::HighContrastLight);
         assert_eq!(t.workbench_colors.editor_background, c("#FFFFFF"));
+    }
+
+    #[test]
+    fn quiet_light_loads() {
+        let t = quiet_light();
+        assert_eq!(t.kind, ThemeKind::Light);
+        assert_eq!(t.workbench_colors.editor_background, c("#F5F5F5"));
+        assert!(!t.token_colors.is_empty());
     }
 }

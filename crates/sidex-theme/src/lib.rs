@@ -15,7 +15,7 @@ pub mod token_color;
 pub mod workbench_colors;
 
 pub use color::{blend_colors, color_to_hex, darken, hex_to_color, lighten, Color};
-pub use default_themes::{dark_modern, hc_black, hc_light, light_modern};
+pub use default_themes::{dark_modern, hc_black, hc_light, light_modern, quiet_light};
 pub use icon_theme::{FileIconTheme, IconInfo};
 pub use product_icons::{ProductIcon, ProductIconTheme};
 pub use theme::{Theme, ThemeKind};

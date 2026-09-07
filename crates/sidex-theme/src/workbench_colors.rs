@@ -665,6 +665,72 @@ impl WorkbenchColors {
             ..Self::default()
         }
     }
+
+    /// VS Code "Quiet Light" workbench colors.
+    pub fn quiet_light() -> Self {
+        Self {
+            editor_background: c("#F5F5F5"),
+            editor_foreground: c("#333333"),
+            editor_whitespace_foreground: c("#AAAAAA"),
+            editor_line_highlight_background: c("#E4F6D4"),
+            editor_line_number_foreground: c("#6D705B"),
+            editor_line_number_active_foreground: c("#9769dc"),
+            editor_cursor_foreground: c("#54494B"),
+            editor_selection_background: c("#C9D0D9"),
+            minimap_selection_highlight: c("#C9D0D9"),
+
+            side_bar_background: c("#F2F2F2"),
+            side_bar_section_header_background: c("#ede8ef"),
+
+            panel_background: c("#F5F5F5"),
+
+            activity_bar_background: c("#EDEDF5"),
+            activity_bar_foreground: c("#705697"),
+            activity_bar_badge_background: c("#705697"),
+
+            title_bar_active_background: c("#c4b7d7"),
+
+            status_bar_background: c("#705697"),
+            status_bar_no_folder_background: c("#705697"),
+            status_bar_debugging_background: c("#705697"),
+
+            button_background: c("#705697"),
+
+            dropdown_background: c("#F5F5F5"),
+
+            selection_background: c("#C9D0D9"),
+            focus_border: c("#9769dc"),
+
+            list_active_selection_foreground: c("#6c6c6c"),
+            list_active_selection_background: c("#c4d9b1"),
+            list_inactive_selection_background: c("#d3dbcd"),
+            list_hover_background: c("#e0e0e0"),
+            list_highlight_foreground: c("#9769dc"),
+
+            input_option_active_border: c("#adafb7"),
+
+            editor_find_match_background: c("#BF9CAC"),
+            editor_find_match_highlight_background: c("#edc9d899"),
+
+            peek_view_editor_background: c("#F2F8FC"),
+            peek_view_title_background: c("#F2F8FC"),
+            peek_view_result_background: c("#F2F8FC"),
+            peek_view_border: c("#705697"),
+            peek_view_editor_match_highlight_background: c("#C2DFE3"),
+            peek_view_result_match_highlight_background: c("#93C6D6"),
+
+            welcome_page_tile_background: c("#f0f0f7"),
+
+            error_foreground: c("#f1897f"),
+
+            progress_bar_background: c("#705697"),
+
+            editor_indent_guide_background: c("#aaaaaa60"),
+            editor_indent_guide_active_background: c("#777777b0"),
+
+            ..Self::default()
+        }
+    }
 }
 
 fn c(hex: &str) -> Option<Color> {
