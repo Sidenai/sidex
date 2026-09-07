@@ -125,6 +125,7 @@ impl ThemeRegistry {
         let builtin = vec![
             crate::default_themes::dark_modern(),
             crate::default_themes::light_modern(),
+            crate::default_themes::quiet_light(),
             crate::default_themes::hc_black(),
             crate::default_themes::hc_light(),
         ];

@@ -451,6 +451,46 @@ export class ColorThemeData implements IWorkbenchColorTheme {
 		this.setCustomSemanticTokenColors(settings.semanticTokenColorCustomizations);
 	}
 
+	public setSideXThemeData(theme: {
+		workbenchColors?: Record<string, string>;
+		tokenColors?: Array<{
+			scope: string[];
+			settings: {
+				foreground?: string;
+				fontStyle?: string;
+				font_style?: string;
+			};
+		}>;
+		workbench_colors?: Record<string, string>;
+		token_colors?: Array<{
+			scope: string[];
+			settings: {
+				foreground?: string;
+				fontStyle?: string;
+				font_style?: string;
+			};
+		}>;
+	}) {
+		this.colorMap = {};
+
+		const workbenchColors = theme.workbenchColors ?? theme.workbench_colors ?? {};
+		for (const colorId in workbenchColors) {
+			this.colorMap[colorId] = Color.fromHex(workbenchColors[colorId]);
+		}
+
+		const tokenColors = theme.tokenColors ?? theme.token_colors ?? [];
+		this.themeTokenColors = tokenColors.map(rule => ({
+			scope: rule.scope,
+			settings: {
+				foreground: rule.settings.foreground,
+				fontStyle: rule.settings.fontStyle ?? rule.settings.font_style
+			}
+		}));
+
+		this.isLoaded = true;
+		this.clearCaches();
+	}
+
 	public setCustomColors(colors: IColorCustomizations) {
 		this.customColorMap = {};
 		this.overwriteCustomColors(colors);

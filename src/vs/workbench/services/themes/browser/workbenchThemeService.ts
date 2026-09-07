@@ -71,8 +71,10 @@ import { mainWindow } from '../../../../base/browser/window.js';
 import { generateColorThemeCSS } from './colorThemeCss.js';
 import { INotificationService, Severity } from '../../../../platform/notification/common/notification.js';
 import { ICommandService } from '../../../../platform/commands/common/commands.js';
+import { ISideXThemeService } from '../../../../platform/sidex/common/sidexThemeService.js';
 
 // implementation
+const SIDEX_QUIET_LIGHT_THEME_ID = 'Quiet Light';
 
 const defaultThemeExtensionId = 'vscode-theme-defaults';
 
@@ -100,6 +102,13 @@ function createBuiltInColorThemes(): ColorThemeData[] {
 			ThemeSettingDefaults.COLOR_THEME_LIGHT,
 			COLOR_THEME_LIGHT_INITIAL_COLORS,
 			nls.localize('lightModernDescription', 'Default light theme')
+		),
+		ColorThemeData.createLoadedTheme(
+			`${ThemeTypeSelector.VS} sidex-builtin-quiet-light`,
+			'Quiet Light',
+			'Quiet Light',
+			undefined,
+			nls.localize('quietLightDescription', 'Quiet Light theme')
 		),
 		ColorThemeData.createLoadedTheme(
 			`${ThemeTypeSelector.HC_BLACK} sidex-builtin-hc-black`,
@@ -165,6 +174,7 @@ export class WorkbenchThemeService extends Disposable implements IWorkbenchTheme
 
 	constructor(
 		@IExtensionService extensionService: IExtensionService,
+		@ISideXThemeService private readonly sideXThemeService: ISideXThemeService,
 		@IStorageService private readonly storageService: IStorageService,
 		@IConfigurationService private readonly configurationService: IConfigurationService,
 		@ITelemetryService private readonly telemetryService: ITelemetryService,
@@ -641,6 +651,18 @@ export class WorkbenchThemeService extends Disposable implements IWorkbenchTheme
 		});
 	}
 
+	private async loadThemeData(themeData: ColorThemeData): Promise<void> {
+		if (themeData.settingsId === SIDEX_QUIET_LIGHT_THEME_ID) {
+			const sideXTheme = await this.sideXThemeService.getTheme(SIDEX_QUIET_LIGHT_THEME_ID);
+			if (!sideXTheme) {
+				throw new Error(`Unable to load SideX theme: ${SIDEX_QUIET_LIGHT_THEME_ID}`);
+			}
+			themeData.setSideXThemeData(sideXTheme);
+		} else {
+			await themeData.ensureLoaded(this.extensionResourceLoaderService);
+		}
+	}
+
 	private async internalSetColorTheme(
 		themeIdOrTheme: string | undefined | IWorkbenchColorTheme,
 		settingsTarget: ThemeSettingTarget
@@ -665,7 +687,7 @@ export class WorkbenchThemeService extends Disposable implements IWorkbenchTheme
 			}
 		}
 		try {
-			await themeData.ensureLoaded(this.extensionResourceLoaderService);
+			await this.loadThemeData(themeData);
 			themeData.setCustomizations(this.settings);
 			return this.applyTheme(themeData, settingsTarget);
 		} catch (error) {
@@ -678,18 +700,19 @@ export class WorkbenchThemeService extends Disposable implements IWorkbenchTheme
 			) {
 				return null;
 			}
-			throw new Error(
-				nls.localize('error.cannotloadtheme', 'Unable to load {0}: {1}', themeData.location?.toString(), msg)
-			);
+			throw new Error(nls.localize('error.cannotloadtheme', 'Unable to load {0}: {1}', themeData.location?.toString(), msg));
 		}
 	}
 
 	private reloadCurrentColorTheme() {
 		return this.colorThemeSequencer.queue(async () => {
 			try {
-				const theme =
-					this.colorThemeRegistry.findThemeBySettingsId(this.currentColorTheme.settingsId) || this.currentColorTheme;
-				await theme.reload(this.extensionResourceLoaderService);
+				const theme = this.colorThemeRegistry.findThemeBySettingsId(this.currentColorTheme.settingsId) || this.currentColorTheme;
+				if (theme.settingsId === SIDEX_QUIET_LIGHT_THEME_ID) {
+					await this.loadThemeData(theme);
+				} else {
+					await theme.reload(this.extensionResourceLoaderService);
+				}
 				theme.setCustomizations(this.settings);
 				await this.applyTheme(theme, undefined, false);
 			} catch (_error) {
@@ -706,7 +729,7 @@ export class WorkbenchThemeService extends Disposable implements IWorkbenchTheme
 				if (settingId !== this.currentColorTheme.settingsId) {
 					await this.internalSetColorTheme(theme.id, undefined);
 				} else if (theme !== this.currentColorTheme) {
-					await theme.ensureLoaded(this.extensionResourceLoaderService);
+					await this.loadThemeData(theme);
 					theme.setCustomizations(this.settings);
 					await this.applyTheme(theme, undefined, true);
 				}
