@@ -2072,10 +2072,24 @@ ${prompt}`,
 				}
 			}
 
-			// The server list is live from each connected provider (Claude,
-			// Codex, Ollama, …). Do not filter it down to a hardcoded ID
-			// allowlist — that hides new snapshots the moment a provider
-			// ships them. Custom IDs the user typed are already merged above.
+			// `sidex.models.enabled` is the user's own curation from
+			// Settings → Models. Honor it here too: otherwise switching a
+			// model off there leaves it selectable from this picker, which is
+			// exactly what the toggle claims to prevent. Note this is the
+			// user's allowlist, not a hardcoded one — the server list stays
+			// live, so a brand-new provider snapshot still shows up until the
+			// user curates it away.
+			// An unset/empty allowlist means nobody has ever curated one
+			// (fresh install, or a settings.json predating this key), so keep
+			// the full list rather than rendering an empty picker. Same
+			// fallback when curation matches nothing — a stale ID must not be
+			// able to brick model selection.
+			const enabledIds = enabledModelIds(enabledRaw);
+			if (enabledIds.size > 0) {
+				const curated = models.filter(m => enabledIds.has(m.id));
+				if (curated.length > 0) { models = curated; }
+			}
+
 			this._availableModels = models;
 			this._onDidChangeModels.fire(this._availableModels);
 
@@ -2094,6 +2108,23 @@ ${prompt}`,
 		}
 		});
 	}
+}
+
+/**
+ * Normalise the `sidex.models.enabled` setting into a set of model ids.
+ *
+ * Accepts both shapes the Settings panel can write: bare id strings, and
+ * `{ id, name }` objects. Anything else is ignored rather than throwing —
+ * a malformed setting must not take the model picker down with it.
+ */
+function enabledModelIds(raw: unknown): Set<string> {
+	const out = new Set<string>();
+	if (!Array.isArray(raw)) { return out; }
+	for (const entry of raw as Array<string | { id?: string }>) {
+		const id = typeof entry === 'string' ? entry : entry?.id;
+		if (typeof id === 'string' && id.trim()) { out.add(id.trim()); }
+	}
+	return out;
 }
 
 export function contextWindowForModel(modelId: string): number {
