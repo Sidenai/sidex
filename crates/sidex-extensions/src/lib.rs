@@ -40,6 +40,7 @@ pub mod installer;
 pub mod manifest;
 pub mod marketplace;
 pub mod paths;
+pub mod platform;
 pub mod protocol;
 pub mod registry;
 pub mod tree_view;
@@ -78,6 +79,9 @@ pub use marketplace::{
 pub use paths::{
     global_storage_dir, resolve_node_runtime, sidex_data_dir, user_data_dir, user_extensions_dir,
     NodeRuntime,
+};
+pub use platform::{
+    host_target_platform, is_target_platform_compatible, target_platform_from_vsix_manifest,
 };
 pub use protocol::{
     CodeActionContext, CompletionContext, ConfigurationTarget, DecorationData, DecorationRange,

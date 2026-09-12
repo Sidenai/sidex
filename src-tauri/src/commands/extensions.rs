@@ -7,7 +7,13 @@ use sidex_extensions::installer::{
 use sidex_extensions::manifest::sanitize_ext_id;
 use sidex_extensions::marketplace::MarketplaceClient;
 use sidex_extensions::paths::user_extensions_dir;
-use sidex_extensions::vsix::{install_package, unpack_vsix, validate_vsix};
+use sidex_extensions::platform::{
+    host_target_platform, is_target_platform_compatible, target_platform_from_vsix_manifest,
+    vsix_identity_attr,
+};
+use sidex_extensions::vsix::{
+    install_package, read_vsix_target_platform, unpack_vsix, validate_vsix, VsixPackage,
+};
 use std::fs;
 use std::path::Path;
 use std::sync::Arc;
@@ -67,6 +73,25 @@ pub async fn install_extension(vsix_path: String) -> Result<InstalledExtension, 
         return Err(format!("VSIX not found: {vsix_path}"));
     }
 
+    // A locally supplied package cannot be swapped for another build without
+    // second-guessing the user, so a platform mismatch is fatal here rather
+    // than auto-corrected. Reading the manifest is cheap (one zip entry).
+    let host_platform = host_target_platform();
+    match read_vsix_target_platform(vsix) {
+        Ok(declared) if !is_target_platform_compatible(declared.as_deref(), host_platform) => {
+            return Err(format!(
+                "this .vsix is packaged for {} but this machine is {host_platform}; \
+                 install the {host_platform} build instead",
+                declared.as_deref().unwrap_or("an unknown platform")
+            ));
+        }
+        Ok(_) => {}
+        Err(e) => log::warn!(
+            "could not read target platform from {}: {e:#}",
+            vsix.display()
+        ),
+    }
+
     let target_dir = user_extensions_dir();
     let installed =
         crate_install_from_vsix(vsix, &target_dir).map_err(|e| format!("install: {e:#}"))?;
@@ -77,10 +102,14 @@ pub async fn install_extension(vsix_path: String) -> Result<InstalledExtension, 
     Ok(to_installed(&installed, &ext_dir))
 }
 
-#[tauri::command]
-pub async fn install_extension_from_url(url: String) -> Result<InstalledExtension, String> {
-    log::info!("downloading extension from {url}");
-    let resp = reqwest::get(&url)
+// ---------------------------------------------------------------------------
+// Platform-aware installs
+// ---------------------------------------------------------------------------
+
+/// Downloads a `.vsix` and unpacks it in memory. The temp file is deleted as
+/// soon as unpacking finishes — [`VsixPackage`] owns the whole payload.
+async fn download_and_unpack(url: &str) -> Result<VsixPackage, String> {
+    let resp = reqwest::get(url)
         .await
         .map_err(|e| format!("download: {e}"))?;
     if !resp.status().is_success() {
@@ -91,7 +120,7 @@ pub async fn install_extension_from_url(url: String) -> Result<InstalledExtensio
     let tmp_path = std::env::temp_dir().join(format!("sidex-{}.vsix", uuid::Uuid::new_v4()));
     fs::write(&tmp_path, &bytes).map_err(|e| format!("write tempfile: {e}"))?;
 
-    let result = (|| -> Result<InstalledExtension, String> {
+    let unpacked = (|| -> Result<VsixPackage, String> {
         let pkg = unpack_vsix(&tmp_path).map_err(|e| format!("unpack vsix: {e:#}"))?;
         let validation = validate_vsix(&pkg);
         if !validation.valid {
@@ -100,19 +129,133 @@ pub async fn install_extension_from_url(url: String) -> Result<InstalledExtensio
                 validation.errors.join("; ")
             ));
         }
-        let target_dir = user_extensions_dir();
-        let installed =
-            install_package(&pkg, &target_dir).map_err(|e| format!("install: {e:#}"))?;
-        log::info!(
-            "installed extension {} to {}",
-            installed.manifest.canonical_id(),
-            installed.install_dir.display()
-        );
-        Ok(to_installed(&installed.manifest, &installed.install_dir))
+        Ok(pkg)
     })();
 
     let _ = fs::remove_file(&tmp_path);
-    result
+    unpacked
+}
+
+/// Registry path segments are `[A-Za-z0-9._+-]` in practice; anything else
+/// means we are not looking at an Open VSX package and must not build a URL
+/// out of it.
+fn is_registry_segment(value: &str) -> bool {
+    !value.is_empty()
+        && value.len() <= 128
+        && value
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || matches!(c, '-' | '_' | '.' | '+'))
+}
+
+/// Looks up the build of `pkg`'s extension that matches `host_platform`,
+/// using Open VSX's platform-keyed detail endpoint:
+/// `GET /api/{namespace}/{name}/{targetPlatform}/{version}`.
+///
+/// Returns `Ok(None)` when the registry has no such build (or when the
+/// package did not come from Open VSX at all).
+async fn resolve_platform_vsix(
+    pkg: &VsixPackage,
+    host_platform: &str,
+) -> Result<Option<String>, String> {
+    let xml = pkg.vsix_manifest_xml.as_deref().unwrap_or_default();
+    let (Some(namespace), Some(name)) = (
+        vsix_identity_attr(xml, "Publisher"),
+        vsix_identity_attr(xml, "Id"),
+    ) else {
+        return Ok(None);
+    };
+    let version =
+        vsix_identity_attr(xml, "Version").unwrap_or_else(|| pkg.manifest.version.clone());
+
+    if !is_registry_segment(&namespace) || !is_registry_segment(&name) || !is_registry_segment(&version)
+    {
+        return Ok(None);
+    }
+
+    let url = format!("https://open-vsx.org/api/{namespace}/{name}/{host_platform}/{version}");
+    log::info!("resolving platform-specific build: {url}");
+
+    let resp = reqwest::get(&url)
+        .await
+        .map_err(|e| format!("resolve platform build: {e}"))?;
+    if !resp.status().is_success() {
+        return Ok(None);
+    }
+    let json: serde_json::Value = resp
+        .json()
+        .await
+        .map_err(|e| format!("resolve platform build: {e}"))?;
+
+    Ok(json
+        .get("files")
+        .and_then(|files| files.get("download"))
+        .and_then(|download| download.as_str())
+        .filter(|download| download.starts_with("https://"))
+        .map(str::to_string))
+}
+
+#[tauri::command]
+pub async fn install_extension_from_url(url: String) -> Result<InstalledExtension, String> {
+    log::info!("downloading extension from {url}");
+
+    let mut pkg = download_and_unpack(&url).await?;
+    let mut source_url = url.clone();
+
+    // Platform guard.
+    //
+    // Marketplace search is not platform-aware: Open VSX's `/api/-/search`
+    // returns whichever build of a per-platform extension sorts first
+    // (`alpine-arm64` today), and gallery responses that omit
+    // `targetPlatform` leave the client unable to notice. Without this check
+    // a Windows user silently gets an ELF binary that can never launch — and
+    // the install still reports success. Swap in the matching build instead.
+    let host_platform = host_target_platform();
+    let declared = pkg
+        .vsix_manifest_xml
+        .as_deref()
+        .and_then(target_platform_from_vsix_manifest);
+
+    if !is_target_platform_compatible(declared.as_deref(), host_platform) {
+        let declared_platform = declared.as_deref().unwrap_or("an unknown platform");
+        log::warn!(
+            "{source_url} is packaged for {declared_platform} but this machine is {host_platform}; \
+             looking for a matching build"
+        );
+
+        match resolve_platform_vsix(&pkg, host_platform).await? {
+            Some(fixed_url) => {
+                log::info!("re-downloading platform-correct build from {fixed_url}");
+                let fixed_pkg = download_and_unpack(&fixed_url).await?;
+                let fixed_declared = fixed_pkg
+                    .vsix_manifest_xml
+                    .as_deref()
+                    .and_then(target_platform_from_vsix_manifest);
+                if !is_target_platform_compatible(fixed_declared.as_deref(), host_platform) {
+                    return Err(format!(
+                        "registry returned a {} build when {host_platform} was requested",
+                        fixed_declared.as_deref().unwrap_or("unknown")
+                    ));
+                }
+                pkg = fixed_pkg;
+                source_url = fixed_url;
+            }
+            None => {
+                return Err(format!(
+                    "extension is packaged for {declared_platform} and no {host_platform} build is \
+                     published; refusing to install a binary that cannot run on this machine"
+                ));
+            }
+        }
+    }
+
+    let target_dir = user_extensions_dir();
+    let installed = install_package(&pkg, &target_dir).map_err(|e| format!("install: {e:#}"))?;
+    log::info!(
+        "installed extension {} to {}",
+        installed.manifest.canonical_id(),
+        installed.install_dir.display()
+    );
+    Ok(to_installed(&installed.manifest, &installed.install_dir))
 }
 
 #[tauri::command]

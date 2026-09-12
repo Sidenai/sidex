@@ -63,6 +63,26 @@ pub struct ValidationResult {
 // Unpack
 // ---------------------------------------------------------------------------
 
+/// Reads `TargetPlatform` from a `.vsix`'s `extension.vsixmanifest`.
+///
+/// Only the manifest entry is decompressed, so this stays cheap even for
+/// multi-hundred-megabyte packages (platform-specific extension builds ship
+/// their runtime inside the archive). Returns `None` when the package has no
+/// VSIX manifest or does not declare a platform.
+pub fn read_vsix_target_platform(vsix_path: &Path) -> Result<Option<String>> {
+    let file = std::fs::File::open(vsix_path)
+        .with_context(|| format!("failed to open .vsix: {}", vsix_path.display()))?;
+    let mut archive = zip::ZipArchive::new(file).context("failed to read .vsix as ZIP")?;
+    let Ok(mut entry) = archive.by_name("extension.vsixmanifest") else {
+        return Ok(None);
+    };
+    let mut buf = String::new();
+    entry
+        .read_to_string(&mut buf)
+        .context("failed to read extension.vsixmanifest")?;
+    Ok(crate::platform::target_platform_from_vsix_manifest(&buf))
+}
+
 /// Unpacks a `.vsix` file into a `VsixPackage` in memory.
 pub fn unpack_vsix(vsix_path: &Path) -> Result<VsixPackage> {
     let file = std::fs::File::open(vsix_path)
