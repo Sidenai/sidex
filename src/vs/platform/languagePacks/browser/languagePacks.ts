@@ -7,11 +7,15 @@ import { URI } from '../../../base/common/uri.js';
 import { ILanguagePackItem, ILanguagePackService } from '../common/languagePacks.js';
 import { IExtensionGalleryService } from '../../extensionManagement/common/extensionManagement.js';
 import { CancellationToken } from '../../../base/common/cancellation.js';
+import { IExtensionService } from '../../../workbench/services/extensions/common/extensions.js';
 
 export class WebLanguagePacksService implements ILanguagePackService {
 	declare readonly _serviceBrand: undefined;
 
-	constructor(@IExtensionGalleryService private readonly galleryService: IExtensionGalleryService) {}
+	constructor(
+		@IExtensionGalleryService private readonly galleryService: IExtensionGalleryService,
+		@IExtensionService private readonly extensionService: IExtensionService
+	) {}
 
 	async getBuiltInExtensionTranslationsUri(_id: string, _language: string): Promise<URI | undefined> {
 		return undefined;
@@ -45,20 +49,43 @@ export class WebLanguagePacksService implements ILanguagePackService {
 	}
 
 	async getInstalledLanguages(): Promise<ILanguagePackItem[]> {
+		const items: ILanguagePackItem[] = [];
+		const seen = new Set<string>();
+
+		// Check localStorage for explicitly set locale
 		const extensionId = localStorage.getItem('vscode.nls.languagePackExtensionId');
 		const locale = localStorage.getItem('vscode.nls.locale');
 
-		if (!extensionId || !locale) {
-			return [];
-		}
-
-		return [
-			{
+		if (extensionId && locale) {
+			items.push({
 				id: locale,
 				label: this.getLanguageLabel(locale),
 				extensionId
+			});
+			seen.add(locale.toLowerCase());
+		}
+
+		// Also scan installed extensions for language packs
+		try {
+			const extensions = this.extensionService.extensions;
+			for (const ext of extensions) {
+				if (ext.identifier && ext.name.startsWith('vscode-language-pack-')) {
+					const extLocale = this.getLocaleFromExtensionName(ext.name);
+					if (extLocale && !seen.has(extLocale.toLowerCase())) {
+						items.push({
+							id: extLocale,
+							label: this.getLanguageLabel(extLocale),
+							extensionId: ext.identifier.value
+						});
+						seen.add(extLocale.toLowerCase());
+					}
+				}
 			}
-		];
+		} catch {
+			// ignore errors scanning extensions
+		}
+
+		return items;
 	}
 
 	private getLanguageLabel(locale: string): string {
@@ -79,5 +106,17 @@ export class WebLanguagePacksService implements ILanguagePackService {
 			hu: 'Magyar'
 		};
 		return labels[locale.toLowerCase()] ?? locale;
+	}
+
+	// Map extension name suffixes to locale codes
+	// e.g. vscode-language-pack-zh-hans -> zh-cn
+	private getLocaleFromExtensionName(name: string): string | undefined {
+		const nameToLocale: Record<string, string> = {
+			'zh-hans': 'zh-cn',
+			'zh-hant': 'zh-tw',
+			'pt-br': 'pt-br'
+		};
+		const suffix = name.replace('vscode-language-pack-', '');
+		return nameToLocale[suffix] ?? suffix;
 	}
 }

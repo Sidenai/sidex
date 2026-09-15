@@ -877,16 +877,37 @@ export class WebExtensionsScannerService extends Disposable implements IWebExten
 		galleryExtension: IGalleryExtension,
 		metadata?: Metadata
 	): Promise<IWebExtension> {
-		const extensionLocation = await this.extensionResourceLoaderService.getExtensionGalleryResourceURL(
-			{
-				publisher: galleryExtension.publisher,
-				name: galleryExtension.name,
-				version: galleryExtension.version,
-				targetPlatform:
-					galleryExtension.properties.targetPlatform === TargetPlatform.WEB ? TargetPlatform.WEB : undefined
-			},
-			'extension'
-		);
+		// Use the gallery extension's manifest asset URL directly (already proxied
+		// correctly by the marketplace proxy for both Microsoft and Open VSX sources)
+		// instead of constructing a URL from resourceUrlTemplate which may point to
+		// a version that doesn't exist on Open VSX.
+		let manifest: IExtensionManifest | undefined;
+		let extensionLocation: URI | undefined;
+
+		if (galleryExtension.assets.manifest) {
+			try {
+				const manifestUri = URI.parse(galleryExtension.assets.manifest.uri);
+				const content = await this.extensionResourceLoaderService.readExtensionResource(manifestUri);
+				manifest = JSON.parse(content);
+				// Use the manifest URI's directory as the extension location
+				extensionLocation = joinPath(manifestUri, '..');
+			} catch (error) {
+				this.logService.warn(`Failed to fetch manifest from gallery asset, falling back to resourceUrlTemplate`, getErrorMessage(error));
+			}
+		}
+
+		if (!extensionLocation) {
+			extensionLocation = await this.extensionResourceLoaderService.getExtensionGalleryResourceURL(
+				{
+					publisher: galleryExtension.publisher,
+					name: galleryExtension.name,
+					version: galleryExtension.version,
+					targetPlatform:
+						galleryExtension.properties.targetPlatform === TargetPlatform.WEB ? TargetPlatform.WEB : undefined
+				},
+				'extension'
+			);
+		}
 
 		if (!extensionLocation) {
 			throw new Error('No extension gallery service configured.');
@@ -897,7 +918,8 @@ export class WebExtensionsScannerService extends Disposable implements IWebExten
 			galleryExtension.identifier,
 			galleryExtension.assets.readme ? URI.parse(galleryExtension.assets.readme.uri) : undefined,
 			galleryExtension.assets.changelog ? URI.parse(galleryExtension.assets.changelog.uri) : undefined,
-			metadata
+			metadata,
+			manifest
 		);
 	}
 
@@ -906,7 +928,8 @@ export class WebExtensionsScannerService extends Disposable implements IWebExten
 		identifier?: IExtensionIdentifier,
 		readmeUri?: URI,
 		changelogUri?: URI,
-		metadata?: Metadata
+		metadata?: Metadata,
+		manifest?: IExtensionManifest
 	): Promise<IWebExtension> {
 		const extensionResources = await this.listExtensionResources(extensionLocation);
 		const packageNLSResources = this.getPackageNLSResourceMapFromResources(extensionResources);
@@ -916,7 +939,7 @@ export class WebExtensionsScannerService extends Disposable implements IWebExten
 		return this.toWebExtension(
 			extensionLocation,
 			identifier,
-			undefined,
+			manifest,
 			packageNLSResources,
 			fallbackPackageNLSResource ? URI.parse(fallbackPackageNLSResource) : null,
 			readmeUri,
