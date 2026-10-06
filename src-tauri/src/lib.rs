@@ -438,6 +438,13 @@ pub fn run() {
     #[cfg(target_os = "macos")]
     fix_macos_path();
 
+    #[cfg(target_os = "linux")]
+    {
+        if std::env::var_os("WEBKIT_DISABLE_DMABUF_RENDERER").is_none() {
+            std::env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1");
+        }
+    }
+
     // Load .env from project root (parent of src-tauri)
     let manifest_dir = env!("CARGO_MANIFEST_DIR");
     let project_root = std::path::Path::new(manifest_dir)
