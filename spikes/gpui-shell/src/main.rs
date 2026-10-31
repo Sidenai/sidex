@@ -10,6 +10,8 @@ mod files_panel;
 mod highlighter;
 mod icons;
 mod quick_open;
+mod terminal_element;
+mod terminal_keys;
 mod terminal_panel;
 mod theme;
 mod vscode;
@@ -149,7 +151,7 @@ impl Workspace {
     fn new(root: PathBuf, window: &mut Window, cx: &mut Context<Self>) -> Self {
         let files = cx.new(|cx| FilesPanel::new(root.clone(), cx));
         let editor = cx.new(|cx| EditorPanel::new(root.clone(), window, cx));
-        let terminal = cx.new(|cx| TerminalPanel::new(root.clone(), cx));
+        let terminal = cx.new(|cx| TerminalPanel::new(root.clone(), window, cx));
 
         let quick_open = cx.new(|cx| QuickOpen::new(root.clone(), COMMANDS, window, cx));
 

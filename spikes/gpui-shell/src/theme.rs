@@ -87,6 +87,8 @@ pub struct Colors {
     pub terminal: Hsla,
     pub terminal_fg: Hsla,
     pub terminal_cursor: Hsla,
+    /// Text drawn on top of a block cursor (VSCode's `terminalCursor.background`).
+    pub terminal_cursor_text: Hsla,
     pub ansi: [Hsla; 16],
 }
 
@@ -296,6 +298,14 @@ fn build() -> Colors {
         terminal_cursor: pick(
             &["terminalCursor.foreground", "terminal.foreground"],
             "#cccccc",
+        ),
+        terminal_cursor_text: pick(
+            &[
+                "terminalCursor.background",
+                "terminal.background",
+                "panel.background",
+            ],
+            "#181818",
         ),
         ansi,
     }

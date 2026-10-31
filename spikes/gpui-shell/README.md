@@ -25,8 +25,8 @@ selector matching.
 Layout: title bar with command center, activity bar, Explorer
 (`sidex-workspace`), editor group with tabs + breadcrumbs (gpui-kit
 `Editor`, syntect highlighting), bottom panel with a terminal
-(`sidex-terminal` PTY + emulator, drawn by hand because gpui-kit has no
-terminal widget), status bar. Colours come from `sidex-theme`'s Dark Modern.
+(`alacritty_terminal`, the emulator Zed uses, painted by a custom GPUI
+element because gpui-kit has no terminal widget), status bar. Colours come from `sidex-theme`'s Dark Modern.
 
 Lessons so far are in the brainstorm transcript / design doc, not here.
 
@@ -41,6 +41,18 @@ Lessons so far are in the brainstorm transcript / design doc, not here.
 | ⌘B / ⌘J | Toggle side bar / panel (also the title-bar layout buttons) |
 | ⌃` | Focus terminal |
 | ⌘C / ⌘V in terminal | Copy selection / paste (bracketed when the shell asks) |
+| ⌘K / ⌘A in terminal | Clear scrollback / select all |
+| ⌘←/⌘→, ⌥←/⌥→, ⌘⌫/⌥⌫ in terminal | Line and word motions, as VSCode binds them on macOS |
+| ⇧PgUp / ⇧PgDn in terminal | Page through scrollback |
+| ⌘-click in terminal | Open a URL or OSC 8 hyperlink |
 
-Explorer follows the disk via sidex-workspace's `FileWatcher`. Terminal has
-scrollback on the wheel (arrow keys in full-screen apps) and mouse selection.
+Explorer follows the disk via sidex-workspace's `FileWatcher`.
+
+The terminal reflows on resize, keeps 10,000 lines of scrollback, and
+selects by drag, double-click (word) and triple-click (line), ⇧-click to
+extend. Applications that ask for the mouse (vim, htop, tmux) get SGR or
+X10 reports; ⇧ overrides. Without mouse mode, the wheel scrolls history,
+or sends arrow keys in full-screen apps. Text arrives through the platform
+input handler, so dead keys, ⌥-composed characters and IME composition
+work. Focus reporting, OSC 4/10/11 colour queries and OSC 52 copy are
+answered. When the shell exits, any key starts a new one.
