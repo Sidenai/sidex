@@ -83,8 +83,12 @@ pub fn zip_list(path: String) -> Result<Vec<ZipEntry>, String> {
             .by_index(i)
             .map_err(|e| format!("Failed to read zip entry: {e}"))?;
 
+        let name = file
+            .name()
+            .map_err(|e| format!("Invalid zip entry name: {e}"))?
+            .into_owned();
         entries.push(ZipEntry {
-            name: file.name().to_string(),
+            name,
             size: file.size(),
             is_dir: file.is_dir(),
             modified: None, // Simplified - zip datetime handling is complex

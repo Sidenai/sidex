@@ -37,7 +37,10 @@
   },
   "overrides": {
     "@nevware21/ts-utils": "^0.16.0",
-    "sharp": "^0.35.0"
+    "nanoid": "^3.3.20",
+    "postcss": "^8.5.32",
+    "sharp": "^0.35.5",
+    "source-map-js": "^1.2.2"
   },
   "dependencies": {
     "@microsoft/1ds-core-js": "^4.4.3",
@@ -73,6 +76,6 @@
     "jschardet": "^3.1.4",
     "lefthook": "2.1.10",
     "typescript": "6.0.3",
-    "vite": "^7"
+    "vite": "7.3.7"
   }
 }
