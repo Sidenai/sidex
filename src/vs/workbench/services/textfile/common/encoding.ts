@@ -29,6 +29,24 @@ const NO_ENCODING_GUESS_MIN_BYTES = 512; // when not auto guessing the encoding,
 const AUTO_ENCODING_GUESS_MIN_BYTES = 512 * 8; // with auto guessing we want a lot more content to be read for guessing
 const AUTO_ENCODING_GUESS_MAX_BYTES = 512 * 128; // set an upper limit for the number of bytes we pass on to jschardet
 
+const isTauri = !!(globalThis as any).__SIDEX_TAURI__;
+
+// In Tauri there is no node_modules folder to load AMD scripts from,
+// so let Vite bundle these modules instead.
+function loadIconv(): Promise<typeof import('@vscode/iconv-lite-umd')> {
+	if (isTauri) {
+		return import('@vscode/iconv-lite-umd');
+	}
+	return importAMDNodeModule<typeof import('@vscode/iconv-lite-umd')>('@vscode/iconv-lite-umd', 'lib/iconv-lite-umd.js');
+}
+
+function loadJschardet(): Promise<typeof import('jschardet')> {
+	if (isTauri) {
+		return import('jschardet');
+	}
+	return importAMDNodeModule<typeof import('jschardet')>('jschardet', 'dist/jschardet.min.js');
+}
+
 export interface IDecodeStreamOptions {
 	acceptTextOnly: boolean;
 	guessEncoding: boolean;
@@ -79,10 +97,7 @@ class DecoderStream implements IDecoderStream {
 	static async create(encoding: string): Promise<DecoderStream> {
 		let decoder: IDecoderStream | undefined = undefined;
 		if (encoding !== UTF8) {
-			const iconv = await importAMDNodeModule<typeof import('@vscode/iconv-lite-umd')>(
-				'@vscode/iconv-lite-umd',
-				'lib/iconv-lite-umd.js'
-			);
+			const iconv = await loadIconv();
 			decoder = iconv.getDecoder(toNodeEncoding(encoding));
 		} else {
 			const utf8TextDecoder = new TextDecoder();
@@ -230,10 +245,7 @@ export async function toEncodeReadable(
 	encoding: string,
 	options?: { addBOM?: boolean }
 ): Promise<VSBufferReadable> {
-	const iconv = await importAMDNodeModule<typeof import('@vscode/iconv-lite-umd')>(
-		'@vscode/iconv-lite-umd',
-		'lib/iconv-lite-umd.js'
-	);
+	const iconv = await loadIconv();
 	const encoder = iconv.getEncoder(toNodeEncoding(encoding), options);
 
 	let bytesWritten = false;
@@ -282,10 +294,7 @@ export async function toEncodeReadable(
 }
 
 export async function encodingExists(encoding: string): Promise<boolean> {
-	const iconv = await importAMDNodeModule<typeof import('@vscode/iconv-lite-umd')>(
-		'@vscode/iconv-lite-umd',
-		'lib/iconv-lite-umd.js'
-	);
+	const iconv = await loadIconv();
 
 	return iconv.encodingExists(toNodeEncoding(encoding));
 }
@@ -344,7 +353,7 @@ const IGNORE_ENCODINGS = ['ascii', 'utf-16', 'utf-32'];
  * Guesses the encoding from buffer.
  */
 async function guessEncodingByBuffer(buffer: VSBuffer, candidateGuessEncodings?: string[]): Promise<string | null> {
-	const jschardet = await importAMDNodeModule<typeof import('jschardet')>('jschardet', 'dist/jschardet.min.js');
+	const jschardet = await loadJschardet();
 
 	// ensure to limit buffer for guessing due to https://github.com/aadsm/jschardet/issues/53
 	const limitedBuffer = buffer.slice(0, AUTO_ENCODING_GUESS_MAX_BYTES);
