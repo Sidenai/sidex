@@ -54,8 +54,8 @@ jobs:
         #                          upstream; input is our bundled plist/tmLanguage
         #                          (trusted), so real-world risk is low
         #   RUSTSEC-2026-0153/0154 russh <0.60 (crates/remote) — breaking upgrade
-        #   RUSTSEC-2026-0114/0149/0182/0188 wasmtime 43 (apps/desktop extension
-        #                          host) — breaking major upgrade
+        #   RUSTSEC-2026-0387      crypto-bigint 0.5 via russh-keys/p256
+        #                          (crates/remote) — same breaking russh upgrade
         run: >
           cargo audit --file Cargo.lock
           --ignore RUSTSEC-2023-0071
@@ -63,10 +63,7 @@ jobs:
           --ignore RUSTSEC-2026-0195
           --ignore RUSTSEC-2026-0153
           --ignore RUSTSEC-2026-0154
-          --ignore RUSTSEC-2026-0114
-          --ignore RUSTSEC-2026-0149
-          --ignore RUSTSEC-2026-0182
-          --ignore RUSTSEC-2026-0188
+          --ignore RUSTSEC-2026-0387
 
   bun-audit:
     name: bun audit

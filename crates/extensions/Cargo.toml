@@ -16,7 +16,7 @@ thiserror = "2"
 log = "0.4"
 walkdir = { workspace = true }
 reqwest = { workspace = true, features = ["json", "gzip", "brotli"] }
-zip = "2"
+zip = "9.2"
 tempfile = "3"
 toml = "0.8"
 dirs = "6"
