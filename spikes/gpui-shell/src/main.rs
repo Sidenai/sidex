@@ -5,6 +5,7 @@
 //! existing `sidex-*` crates in-process; no Tauri, no webview, no JS.
 
 mod editor_panel;
+mod extensions;
 mod file_icons;
 mod files_panel;
 mod highlighter;
@@ -21,12 +22,15 @@ use std::sync::Arc;
 
 use gpui_kit::component::resizable::{h_resizable, resizable_panel, v_resizable, ResizableState};
 use gpui_kit::component::theme::{Theme, ThemeMode};
+use gpui_kit::prelude::FluentBuilder as _;
 use gpui_kit::*;
 
-use editor_panel::EditorPanel;
+use editor_panel::{EditorEvent, EditorPanel};
+use extensions::Extensions;
 use files_panel::{FilesEvent, FilesPanel};
 use icons::Codicon;
 use quick_open::{PaletteCommand, QuickOpen, QuickOpenEvent};
+use sidex_extension_wasm_host::NotificationLevel;
 use terminal_panel::TerminalPanel;
 use vscode::z;
 
@@ -126,6 +130,7 @@ struct Workspace {
     files: Entity<FilesPanel>,
     editor: Entity<EditorPanel>,
     terminal: Entity<TerminalPanel>,
+    extensions: Entity<Extensions>,
     h_state: Entity<ResizableState>,
     v_state: Entity<ResizableState>,
     branch: SharedString,
@@ -154,6 +159,7 @@ impl Workspace {
         let terminal = cx.new(|cx| TerminalPanel::new(root.clone(), window, cx));
 
         let quick_open = cx.new(|cx| QuickOpen::new(root.clone(), COMMANDS, window, cx));
+        let extensions = cx.new(Extensions::new);
 
         let subscriptions =
             vec![
@@ -172,6 +178,12 @@ impl Workspace {
                         this.quick_open_visible = false;
                         match event {
                             QuickOpenEvent::Open(path) => this.open_file(path.clone(), window, cx),
+                            QuickOpenEvent::RunExtensionCommand { extension, command } => {
+                                this.extensions
+                                    .read(cx)
+                                    .execute(extension.clone(), command.clone());
+                                this.restore_focus(window, cx);
+                            }
                             QuickOpenEvent::Dismiss => this.restore_focus(window, cx),
                         }
                         cx.notify();
@@ -179,6 +191,32 @@ impl Workspace {
                 ),
                 // Status bar shows the editor's live cursor position.
                 cx.observe(&editor, |_, _, cx| cx.notify()),
+                // Extensions follow the active file and its edits.
+                cx.subscribe(
+                    &editor,
+                    |this, editor, event: &EditorEvent, cx| match event {
+                        EditorEvent::ActiveChanged => {
+                            let doc = editor.read(cx).document(None, cx);
+                            this.extensions.update(cx, |x, _| x.set_active(doc));
+                        }
+                        EditorEvent::Edited(path) => {
+                            if let Some(doc) = editor.read(cx).document(Some(path), cx) {
+                                this.extensions.update(cx, |x, cx| x.changed(doc, cx));
+                            }
+                        }
+                    },
+                ),
+                cx.observe(&extensions, |this, extensions, cx| {
+                    let commands = extensions
+                        .read(cx)
+                        .commands
+                        .iter()
+                        .map(|c| (c.extension.clone(), c.id.clone(), c.title.clone()))
+                        .collect();
+                    this.quick_open
+                        .update(cx, |q, _| q.set_extension_commands(commands));
+                    cx.notify();
+                }),
             ];
 
         let focus_handle = cx.focus_handle();
@@ -194,6 +232,7 @@ impl Workspace {
             files,
             editor,
             terminal,
+            extensions,
             h_state: cx.new(|_| ResizableState::default()),
             v_state: cx.new(|_| ResizableState::default()),
             _subscriptions: subscriptions,
@@ -404,8 +443,118 @@ impl Workspace {
             .child(item(Codicon::SETTINGS_GEAR, false))
     }
 
-    fn status_bar(&self, info: editor_panel::StatusInfo) -> impl IntoElement {
+    /// Status-bar entries extensions set, for one side (VSCode's
+    /// `StatusBarAlignment`: 1 left, 2 right), highest priority first.
+    fn extension_status_items(&self, alignment: u32, cx: &mut Context<Self>) -> Vec<AnyElement> {
         let c = theme::colors();
+        self.extensions
+            .read(cx)
+            .status_items
+            .iter()
+            .filter(|s| s.item.alignment == alignment)
+            .enumerate()
+            .map(|(ix, s)| {
+                let command = s.item.command.clone().map(|cmd| (s.extension.clone(), cmd));
+                div()
+                    .id(("ext-status", ix + alignment as usize * 1000))
+                    .h_full()
+                    .px(z(5.))
+                    .flex()
+                    .items_center()
+                    .child(SharedString::from(s.item.text.clone()))
+                    .when_some(command, |d, (extension, command)| {
+                        d.cursor_pointer()
+                            .hover(|d| d.bg(c.list_hover))
+                            .on_click(cx.listener(move |this, _, _, cx| {
+                                this.extensions
+                                    .read(cx)
+                                    .execute(extension.clone(), command.clone());
+                            }))
+                    })
+                    .into_any_element()
+            })
+            .collect()
+    }
+
+    fn toasts(&self, cx: &mut Context<Self>) -> impl IntoElement {
+        let c = theme::colors();
+        let toasts: Vec<AnyElement> = self
+            .extensions
+            .read(cx)
+            .toasts
+            .iter()
+            .map(|t| {
+                let (icon, color) = match t.level {
+                    NotificationLevel::Info => (Codicon::INFO, c.notification_info),
+                    NotificationLevel::Warning => (Codicon::WARNING, c.notification_warning),
+                    NotificationLevel::Error => (Codicon::ERROR, c.notification_error),
+                };
+                let id = t.id;
+                div()
+                    .w(z(450.))
+                    .p(z(10.))
+                    .flex()
+                    .gap(z(8.))
+                    .rounded(z(4.))
+                    .border_1()
+                    .border_color(c.notification_border)
+                    .bg(c.notification)
+                    .text_color(c.notification_fg)
+                    .shadow_lg()
+                    .child(div().flex_none().pt(z(1.)).child(icon.render(16., color)))
+                    .child(
+                        div()
+                            .flex_1()
+                            .min_w_0()
+                            .flex()
+                            .flex_col()
+                            .gap(z(6.))
+                            .child(SharedString::from(t.message.clone()))
+                            .child(
+                                div()
+                                    .text_size(z(12.))
+                                    .text_color(c.description)
+                                    .child(SharedString::from(format!("Source: {}", t.source))),
+                            ),
+                    )
+                    .child(
+                        div()
+                            .id(("toast-close", id as usize))
+                            .flex_none()
+                            .size(z(20.))
+                            .flex()
+                            .items_center()
+                            .justify_center()
+                            .rounded(z(4.))
+                            .cursor_pointer()
+                            .hover(|d| d.bg(c.list_hover))
+                            .child(Codicon::CLOSE.render(14., c.icon))
+                            .on_click(cx.listener(move |this, _, _, cx| {
+                                this.extensions.update(cx, |x, cx| x.dismiss(id, cx));
+                            })),
+                    )
+                    .into_any_element()
+            })
+            .collect();
+        div()
+            .absolute()
+            .right(z(10.))
+            .bottom(z(STATUS_BAR_H + 10.))
+            .flex()
+            .flex_col()
+            .gap(z(6.))
+            .children(toasts)
+    }
+
+    fn status_bar(
+        &self,
+        info: editor_panel::StatusInfo,
+        cx: &mut Context<Self>,
+    ) -> impl IntoElement {
+        let c = theme::colors();
+        let ext_left = self.extension_status_items(1, cx);
+        let ext_right = self.extension_status_items(2, cx);
+        let has_toasts = !self.extensions.read(cx).toasts.is_empty();
         let text = |s: String| div().child(SharedString::from(s)).into_any_element();
         let icon = |i: Codicon| i.render(14., c.status_bar_fg).into_any_element();
         let item = |children: Vec<AnyElement>| {
@@ -417,7 +566,12 @@ impl Workspace {
                 .gap(z(4.))
                 .children(children)
         };
-        let mut right = div().h_full().flex().items_center().pr(z(6.));
+        let mut right = div()
+            .h_full()
+            .flex()
+            .items_center()
+            .pr(z(6.))
+            .children(ext_right);
         if let Some(info) = info.file {
             right = right
                 .child(item(vec![text(format!(
@@ -432,7 +586,11 @@ impl Workspace {
                     text(info.language),
                 ]));
         }
-        right = right.child(item(vec![icon(Codicon::BELL)]));
+        right = right.child(item(vec![icon(if has_toasts {
+            Codicon::BELL_DOT
+        } else {
+            Codicon::BELL
+        })]));
 
         div()
             .h(z(STATUS_BAR_H))
@@ -463,6 +621,7 @@ impl Workspace {
                 icon(Codicon::WARNING),
                 text("0".into()),
             ]))
+            .children(ext_left)
             .child(div().flex_1())
             .child(right)
     }
@@ -554,7 +713,8 @@ impl Render for Workspace {
                     .child(self.activity_bar())
                     .child(div().flex_1().min_w_0().h_full().pr(z(2.)).child(body)),
             )
-            .child(self.status_bar(info))
+            .child(self.status_bar(info, cx))
+            .child(self.toasts(cx))
             .children(overlay)
     }
 }

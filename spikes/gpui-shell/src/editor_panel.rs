@@ -11,6 +11,7 @@ use gpui_kit::prelude::FluentBuilder as _;
 use gpui_kit::*;
 use sidex_workspace::file_ops;
 
+use crate::extensions::Document;
 use crate::icons::Codicon;
 use crate::theme;
 use crate::vscode::{self, z};
@@ -50,7 +51,17 @@ pub struct EditorPanel {
     /// close discards them.
     confirm_discard: Option<PathBuf>,
     message: Option<String>,
+    /// The active file last reported through `EditorEvent::ActiveChanged`.
+    announced: Option<PathBuf>,
 }
+
+pub enum EditorEvent {
+    /// A different file (or none) is now in front.
+    ActiveChanged,
+    Edited(PathBuf),
+}
+
+impl EventEmitter<EditorEvent> for EditorPanel {}
 
 /// Guess indentation the way VSCode's `editor.detectIndentation` reports it.
 fn detect_indent(text: &str) -> String {
@@ -92,11 +103,37 @@ impl EditorPanel {
             active: 0,
             confirm_discard: None,
             message: None,
+            announced: None,
         }
     }
 
     fn active_tab(&self) -> Option<&Tab> {
         self.tabs.get(self.active)
+    }
+
+    /// The active file, or the open file at `path`, as extensions see it.
+    pub fn document(&self, path: Option<&Path>, cx: &App) -> Option<Document> {
+        let tab = match path {
+            Some(p) => self.tabs.iter().find(|t| t.path == p),
+            None => self.active_tab(),
+        }?;
+        let name = file_name(&tab.path);
+        Some(Document {
+            path: tab.path.clone(),
+            language: vscode::get()
+                .language_for(&name)
+                .unwrap_or("plaintext")
+                .to_owned(),
+            text: tab.state.read(cx).text().clone(),
+        })
+    }
+
+    fn announce_active(&mut self, cx: &mut Context<Self>) {
+        let now = self.active_tab().map(|t| t.path.clone());
+        if now != self.announced {
+            self.announced = now;
+            cx.emit(EditorEvent::ActiveChanged);
+        }
     }
 
     pub fn status_info(&self, cx: &App) -> StatusInfo {
@@ -172,6 +209,7 @@ impl EditorPanel {
                             cx.notify();
                         }
                     }
+                    cx.emit(EditorEvent::Edited(change_path.clone()));
                 }
             }),
             // Cursor moves don't emit an event; re-render (and so refresh
@@ -206,6 +244,7 @@ impl EditorPanel {
             tab.state.update(cx, |s, cx| s.focus(window, cx));
             cx.notify();
         }
+        self.announce_active(cx);
     }
 
     pub fn save(&mut self, cx: &mut Context<Self>) {

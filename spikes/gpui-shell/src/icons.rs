@@ -73,6 +73,8 @@ codicons! {
     TRASH = "trash",
     ERROR = "error",
     WARNING = "warning",
+    INFO = "info",
+    BELL_DOT = "bell-dot",
     GIT_BRANCH = "git-branch",
     BELL = "bell",
     SYNC = "sync",

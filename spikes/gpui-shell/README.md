@@ -56,3 +56,22 @@ or sends arrow keys in full-screen apps. Text arrives through the platform
 input handler, so dead keys, ⌥-composed characters and IME composition
 work. Focus reporting, OSC 4/10/11 colour queries and OSC 52 copy are
 answered. When the shell exits, any key starts a new one.
+
+## Native extensions
+
+Extensions run as WASM components in `sidex-extension-wasm-host`, the
+wasmtime host the Tauri app also uses (moved out of `apps/desktop` into
+`crates/extension-wasm-host`). It runs on its own thread. Extensions'
+status-bar items, notifications and palette commands show up in the
+workbench. Each `extensions/*/sidex.toml` here is loaded at startup.
+
+`extensions/word-count` is the demo: a word count of the active file in the
+status bar. Clicking it, or running "Word Count: Show Details" from the
+palette, shows a notification. Build it once before `cargo run` (and before
+`cargo test`, whose round-trip test loads it):
+
+```sh
+(cd extensions/word-count && cargo build --release --target wasm32-wasip2)
+```
+
+`rustup target add wasm32-wasip2` first if the target is missing.

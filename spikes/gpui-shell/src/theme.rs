@@ -84,6 +84,13 @@ pub struct Colors {
     pub widget_border: Hsla,
     pub terminal_selection: Hsla,
 
+    pub notification: Hsla,
+    pub notification_fg: Hsla,
+    pub notification_border: Hsla,
+    pub notification_info: Hsla,
+    pub notification_warning: Hsla,
+    pub notification_error: Hsla,
+
     pub terminal: Hsla,
     pub terminal_fg: Hsla,
     pub terminal_cursor: Hsla,
@@ -292,6 +299,44 @@ fn build() -> Colors {
         terminal_selection: pick(
             &["terminal.selectionBackground", "editor.selectionBackground"],
             "#264f78",
+        ),
+        notification: pick(
+            &["notifications.background", "editorWidget.background"],
+            "#1f1f1f",
+        ),
+        notification_fg: pick(
+            &[
+                "notifications.foreground",
+                "editorWidget.foreground",
+                "foreground",
+            ],
+            "#cccccc",
+        ),
+        notification_border: pick(
+            &[
+                "notificationToast.border",
+                "widget.border",
+                "editorWidget.border",
+            ],
+            "#2b2b2b",
+        ),
+        notification_info: pick(
+            &["notificationsInfoIcon.foreground", "editorInfo.foreground"],
+            "#3794ff",
+        ),
+        notification_warning: pick(
+            &[
+                "notificationsWarningIcon.foreground",
+                "editorWarning.foreground",
+            ],
+            "#cca700",
+        ),
+        notification_error: pick(
+            &[
+                "notificationsErrorIcon.foreground",
+                "editorError.foreground",
+            ],
+            "#f14c4c",
         ),
         terminal: pick(&["terminal.background", "panel.background"], "#181818"),
         terminal_fg: pick(&["terminal.foreground"], "#cccccc"),

@@ -18,8 +18,12 @@ use crate::vscode::{self, z};
 
 pub enum QuickOpenEvent {
     Open(PathBuf),
+    RunExtensionCommand { extension: String, command: String },
     Dismiss,
 }
+
+/// A command an extension contributes: `(extension id, command id, title)`.
+pub type ExtensionCommandEntry = (String, String, String);
 
 /// A palette command: label, keybinding hint, and the action it dispatches.
 pub struct PaletteCommand {
@@ -35,6 +39,7 @@ pub struct QuickOpen {
     query: String,
     files: Vec<PathBuf>,
     commands: &'static [PaletteCommand],
+    extension_commands: Vec<ExtensionCommandEntry>,
     _index_task: Task<()>,
 }
 
@@ -64,6 +69,7 @@ impl QuickOpen {
             query: String::new(),
             files: Vec::new(),
             commands,
+            extension_commands: Vec::new(),
             _index_task: index_task,
         }
     }
@@ -81,6 +87,10 @@ impl QuickOpen {
         window.on_next_frame(move |window, cx| {
             state.update(cx, |s, cx| s.focus(window, cx));
         });
+    }
+
+    pub fn set_extension_commands(&mut self, commands: Vec<ExtensionCommandEntry>) {
+        self.extension_commands = commands;
     }
 
     pub fn mark_recent(&self, path: &Path) {
@@ -120,11 +130,23 @@ impl QuickOpen {
         self.query.starts_with('>')
     }
 
-    fn matching_commands(&self) -> Vec<&'static PaletteCommand> {
+    fn query_matches(&self, label: &str) -> bool {
         let q = self.query.trim_start_matches('>').trim().to_lowercase();
+        q.is_empty() || label.to_lowercase().contains(&q)
+    }
+
+    fn matching_commands(&self) -> Vec<&'static PaletteCommand> {
         self.commands
             .iter()
-            .filter(|c| q.is_empty() || c.label.to_lowercase().contains(&q))
+            .filter(|c| self.query_matches(c.label))
+            .collect()
+    }
+
+    fn matching_extension_commands(&self) -> Vec<ExtensionCommandEntry> {
+        self.extension_commands
+            .iter()
+            .filter(|(_, _, title)| self.query_matches(title))
+            .cloned()
             .collect()
     }
 
@@ -169,6 +191,12 @@ impl QuickOpen {
         })
     }
 
+    fn extension_command_item(title: String) -> CommandItem {
+        CommandItem::new()
+            .label(title.clone())
+            .child(move |_, _| div().w_full().child(title.clone()))
+    }
+
     fn command_item(cmd: &'static PaletteCommand) -> CommandItem {
         let c = theme::colors();
         CommandItem::new()
@@ -197,10 +225,26 @@ impl Render for QuickOpen {
         let c = theme::colors();
         let this = cx.weak_entity();
         let command_mode = self.command_mode();
-        let items: Vec<CommandItem> = if command_mode {
+        let builtin = if command_mode {
             self.matching_commands()
+        } else {
+            Vec::new()
+        };
+        let builtin_count = builtin.len();
+        let ext_commands = if command_mode {
+            self.matching_extension_commands()
+        } else {
+            Vec::new()
+        };
+        let items: Vec<CommandItem> = if command_mode {
+            builtin
                 .into_iter()
                 .map(Self::command_item)
+                .chain(
+                    ext_commands
+                        .iter()
+                        .map(|(_, _, title)| Self::extension_command_item(title.clone())),
+                )
                 .collect()
         } else {
             self.files.iter().map(|p| self.file_item(p)).collect()
@@ -220,7 +264,19 @@ impl Render for QuickOpen {
             move |ix: gpui_kit::component::IndexPath, _: &mut Window, cx: &mut App| {
                 let _ = this.update(cx, |_, cx| {
                     let event = if command_mode {
-                        QuickOpenEvent::Dismiss
+                        // Built-ins dispatch their own action; extension
+                        // commands run in the extension host.
+                        match ix
+                            .row
+                            .checked_sub(builtin_count)
+                            .and_then(|i| ext_commands.get(i))
+                        {
+                            Some((extension, command, _)) => QuickOpenEvent::RunExtensionCommand {
+                                extension: extension.clone(),
+                                command: command.clone(),
+                            },
+                            None => QuickOpenEvent::Dismiss,
+                        }
                     } else {
                         match files.get(ix.row) {
                             Some(p) => QuickOpenEvent::Open(p.clone()),

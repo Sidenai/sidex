@@ -1,0 +1,9 @@
+[extension]
+id = "sidex.word-count"
+name = "word-count"
+version = "0.1.0"
+description = "Word count of the active editor in the status bar"
+wasm = "target/wasm32-wasip2/release/word_count_extension.wasm"
+
+[activation]
+events = ["*"]
