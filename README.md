@@ -126,6 +126,30 @@ First build takes 5–10 minutes (Rust compile time). Pre-built binaries are not
 
 Everything above runs standalone, with no account and no setup. Want the chat panel connected too? See [AI Agent](#ai-agent) above — building the agent server is a separate, optional step.
 
+### Troubleshooting
+
+#### Blank window with `EGL_BAD_PARAMETER` on Linux
+
+On some Linux systems the AppImage opens a blank window and prints this in the terminal:
+
+```
+Could not create default EGL display: EGL_BAD_PARAMETER. Aborting...
+```
+
+This has been reported on Wayland and on X11 (Debian sid) — see [#44](https://github.com/Sidenai/sidex/issues/44). Until there's a proper fix, a workaround reported by users is to preload your system's Wayland client library when launching SideX:
+
+```bash
+LD_PRELOAD=/usr/lib/libwayland-client.so ./SideX.AppImage
+```
+
+Replace `./SideX.AppImage` with the path to the AppImage you downloaded. The library's path depends on your distribution. On Debian, for example, it's `/usr/lib/x86_64-linux-gnu/libwayland-client.so.0`. You can find it with:
+
+```bash
+ldconfig -p | grep libwayland-client
+```
+
+This is a temporary workaround, not a guaranteed fix. On X11, one user found the window didn't redraw until they switched to windowed mode and maximized it.
+
 ---
 
 ## How It's Built
