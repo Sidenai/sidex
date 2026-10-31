@@ -36,7 +36,9 @@ SideX is a port of Visual Studio Code that replaces Electron with [Tauri](https:
 VSCode's memory useage is almost entirely from its bundled Chromium, not the editor itself. Tauri replaces that with the webview already on your system — WKWebView on macOS, WebView2 on Windows — shared across apps and costing almost nothing extra.
 
 <p align="center">
-  <img src="./docs/assets/compare.jpg" alt="SideX 16.4 MB vs Visual Studio Code 797.8 MB" width="760">
+  <img src="./docs/assets/compare.jpg" alt="macOS Get Info: SideX.app is 16.4 MB vs Visual Studio Code.app at 797.8 MB" width="760">
+  <br>
+  <sub>Installed app size (macOS Get Info), not memory usage. Runtime RAM is covered below.</sub>
 </p>
 
 RAM savings are most tested on macOS, WKWebView is shared with Safari. On Windows the picture is more nuanced — WebView2 memory can look higher depending on how it's measured, and [it's an active area in the Tauri ecosystem](https://github.com/tauri-apps/tauri/issues/5889). The target is **under 200 MB at idle** on macOS. We'll publish real benchmarks once the app is stable enough for them to be meaningful.
