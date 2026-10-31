@@ -1,7 +1,7 @@
 [workspace]
 resolver = "2"
 members = ["crates/*", "apps/desktop"]
-exclude = ["extensions-wasm", "wasm"]
+exclude = ["extensions-wasm", "wasm", "spikes"]
 
 [workspace.package]
 version = "0.2.0"
