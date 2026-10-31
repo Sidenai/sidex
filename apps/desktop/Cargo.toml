@@ -81,13 +81,7 @@ open = "5"
 url = "2"
 
 # WASM extension runtime
-wasmtime = { version = "50.0.1", default-features = false, features = [
-  "runtime",
-  "component-model",
-  "cranelift",
-  "async",
-] }
-wasmtime-wasi = "50.0.1"
+sidex-extension-wasm-host = { path = "../../crates/extension-wasm-host" }
 toml = "0.8"
 anyhow = "1"
 sidex-db = { path = "../../crates/db" }

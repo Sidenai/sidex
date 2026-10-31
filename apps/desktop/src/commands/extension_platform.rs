@@ -777,7 +777,9 @@ pub async fn extension_platform_bootstrap(
         std::thread::spawn(move || {
             use tauri::Emitter;
             for manifest in &wasm_manifests {
-                if let Err(e) = runtime.load_extension(manifest) {
+                if let Err(e) =
+                    crate::commands::extension_wasm::load_wasm_manifest(&runtime, manifest)
+                {
                     log::warn!("[platform] failed to load WASM ext {}: {e}", manifest.id);
                 }
             }

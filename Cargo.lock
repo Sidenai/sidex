@@ -6026,6 +6026,7 @@ dependencies = [
  "sidex-dap",
  "sidex-db",
  "sidex-extension-api",
+ "sidex-extension-wasm-host",
  "sidex-extensions",
  "sidex-git",
  "sidex-keymap",
@@ -6054,8 +6055,6 @@ dependencies = [
  "urlencoding",
  "uuid",
  "walkdir",
- "wasmtime",
- "wasmtime-wasi",
  "which 6.0.3",
  "zip",
 ]
@@ -6119,6 +6118,23 @@ name = "sidex-extension-sdk"
 version = "0.1.0"
 dependencies = [
  "wit-bindgen 0.41.0",
+]
+
+[[package]]
+name = "sidex-extension-wasm-host"
+version = "0.2.0"
+dependencies = [
+ "anyhow",
+ "dirs 5.0.1",
+ "flate2",
+ "hostname",
+ "log",
+ "reqwest 0.12.28",
+ "serde_json",
+ "uuid",
+ "walkdir",
+ "wasmtime",
+ "wasmtime-wasi",
 ]
 
 [[package]]
