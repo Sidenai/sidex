@@ -377,10 +377,7 @@ export abstract class Pane extends Disposable implements IView {
 
 		this.header.style.color = this.collapsible ? (this.styles.headerForeground ?? '') : '';
 		this.header.style.backgroundColor = (this.collapsible ? this.styles.headerBackground : 'transparent') ?? '';
-		this.header.style.borderTop =
-			this.styles.headerBorder && this.orientation === Orientation.VERTICAL
-				? `1px solid ${this.styles.headerBorder}`
-				: '';
+		this.header.style.borderTop = '';
 		this.element.style.borderLeft =
 			this.styles.leftBorder && this.orientation === Orientation.HORIZONTAL
 				? `1px solid ${this.styles.leftBorder}`

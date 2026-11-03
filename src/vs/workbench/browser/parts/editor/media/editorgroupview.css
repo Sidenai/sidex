@@ -78,16 +78,17 @@
 	outline: none; /* never show outline for empty group if it is the last */
 }
 
-/* Watermark & shortcuts */
+/* Watermark & shortcuts — SideX minimal */
 
 .monaco-workbench .part.editor > .content .editor-group-container > .editor-group-watermark  {
 	display: flex;
 	height: 100%;
-	max-width: 272px;
+	max-width: 400px;
 	margin: auto;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
+	gap: 16px;
 }
 
 .monaco-workbench .part.editor > .content .editor-group-container > .editor-group-watermark > .watermark-container {
@@ -96,7 +97,7 @@
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	gap: 24px;
+	gap: 16px;
 }
 
 .monaco-workbench .part.editor > .content .editor-group-container:not(.empty) > .editor-group-watermark {
@@ -105,31 +106,13 @@
 
 .monaco-workbench .part.editor > .content:not(.empty) .editor-group-container.empty > .editor-group-watermark,
 .monaco-workbench .part.editor > .content.auxiliary .editor-group-container.empty > .editor-group-watermark {
-	max-width: 200px;
+	max-width: 300px;
 	height: calc(100% - 70px);
 }
 
+/* Hide the VS Code letterpress logo entirely */
 .monaco-workbench .part.editor > .content .editor-group-container > .editor-group-watermark .letterpress {
-	width: 100%;
-	max-height: 100%;
-	aspect-ratio: 1/1;
-	background-image: url('./letterpress-light.svg');
-	background-size: contain;
-	background-position-x: center;
-	background-repeat: no-repeat;
-	max-width: 256px;
-}
-
-.monaco-workbench.vs-dark .part.editor > .content .editor-group-container .editor-group-watermark .letterpress {
-	background-image: url('./letterpress-dark.svg');
-}
-
-.monaco-workbench.hc-light .part.editor > .content .editor-group-container .editor-group-watermark .letterpress {
-	background-image: url('./letterpress-hcLight.svg');
-}
-
-.monaco-workbench.hc-black .part.editor > .content .editor-group-container .editor-group-watermark .letterpress {
-	background-image: url('./letterpress-hcDark.svg');
+	display: none;
 }
 
 .monaco-workbench .part.editor > .content .editor-group-container > .editor-group-watermark .shortcuts {
@@ -145,14 +128,16 @@
 .monaco-workbench .part.editor > .content .editor-group-container > .editor-group-watermark .shortcuts > .watermark-box {
 	display: flex;
 	flex-direction: column;
+	align-items: center;
 }
 
 .monaco-workbench .part.editor > .content .editor-group-container > .editor-group-watermark .shortcuts dl {
 	display: flex;
 	justify-content: space-between;
-	margin: 4px 0;
+	margin: 3px 0;
 	cursor: default;
-	color: var(--vscode-descriptionForeground);
+	color: #303030;
+	font-size: 12px;
 }
 
 .monaco-workbench .part.editor > .content .editor-group-container > .editor-group-watermark .shortcuts dl:first-of-type {
@@ -165,11 +150,13 @@
 
 .monaco-workbench .part.editor > .content .editor-group-container > .editor-group-watermark .shortcuts dt {
 	letter-spacing: 0.04em;
+	color: #303030;
 }
 
 .monaco-workbench .part.editor > .content .editor-group-container > .editor-group-watermark .shortcuts dd {
 	text-align: left;
 	margin-inline-start: 24px;
+	color: #404040;
 }
 
 /* Title */
@@ -205,7 +192,7 @@
 
 .monaco-workbench .part.editor > .content .editor-group-container > .editor-group-container-toolbar {
 	display: none;
-	height: 35px;
+	height: 32px;
 }
 
 .monaco-workbench .part.editor > .content .editor-group-container.empty.locked > .editor-group-container-toolbar,
@@ -219,7 +206,7 @@
 }
 
 .monaco-workbench .part.editor > .content .editor-group-container > .editor-group-container-toolbar .action-item {
-	margin-right: 4px;
+	margin-right: 2px;
 }
 
 /* Editor */

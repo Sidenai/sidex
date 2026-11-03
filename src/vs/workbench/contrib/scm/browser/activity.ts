@@ -177,9 +177,7 @@ export class SCMActiveRepositoryController extends Disposable implements IWorkbe
 		commands: readonly Command[],
 		store: DisposableStore
 	): void {
-		if (!activeRepository) {
-			return;
-		}
+		return;
 
 		const label = activeRepository.repository.provider.rootUri
 			? `${basename(activeRepository.repository.provider.rootUri)} (${activeRepository.repository.provider.label})`

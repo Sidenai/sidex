@@ -19,6 +19,7 @@
 //! - [`validation`] — security-critical input validation (path traversal,
 //!   NUL byte detection).
 
+pub mod chat_sessions;
 pub mod db;
 pub mod history;
 pub mod recent;
@@ -27,6 +28,11 @@ pub mod storage_kv;
 pub mod validation;
 pub mod window_state;
 
+pub use chat_sessions::{
+    create_session, delete_session, list_sessions, load_messages, save_message, save_session,
+    search_sessions, update_session_title, update_session_pin, update_session_archive,
+    ChatMessage, ChatSession,
+};
 pub use db::{Database, CURRENT_SCHEMA_VERSION};
 pub use history::{
     add_clipboard_entry, add_search_history, add_terminal_session, all_breakpoints,

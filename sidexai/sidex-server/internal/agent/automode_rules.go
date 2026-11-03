@@ -1,0 +1,196 @@
+package agent
+
+// Built-in safety rules organized by tool type.
+// These are static classification tables used by AutoMode Layer 1.
+
+// readOnlyToolSet lists tools that never modify state and are always safe.
+var readOnlyToolSet = map[string]bool{
+	"read_file":       true,
+	"list_dir":        true,
+	"grep":            true,
+	"search_files":    true,
+	"glob":            true,
+	"tree":            true,
+	"file_info":       true,
+	"batch_read":      true,
+	"git_status":      true,
+	"git_log":         true,
+	"git_diff_file":   true,
+	"cwd":             true,
+	"diff":            true,
+	"plan_get":        true,
+	"memory_search":   true,
+	"shell_output":    true,
+	"list_shells":     true,
+	"web_fetch":       true,
+	"lsp_hover":       true,
+	"lsp_definition":  true,
+	"lsp_references":  true,
+	"lsp_diagnostics": true,
+	"context_search":  true,
+	"context_status":  true,
+	"list_worktrees":  true,
+	"tool_search":     true,
+}
+
+// safeMetaToolSet lists tools that affect only agent-internal state,
+// never the user's filesystem or external systems.
+var safeMetaToolSet = map[string]bool{
+	"todo_write":            true,
+	"memory_store":          true,
+	"ask_user":              true,
+	"enter_plan_mode":       true,
+	"exit_plan_mode":        true,
+	"brief":                 true,
+	"sleep":                 true,
+	"config":                true,
+	"skill":                 true,
+	"web_search":            true,
+	"plan_create":           true,
+	"plan_update":           true,
+	"plan_complete":         true,
+	"task_create":           true,
+	"task_get":              true,
+	"task_list":             true,
+	"task_update":           true,
+	"task_stop":             true,
+	"task_output":           true,
+	"spawn_agents":          true,
+	"send_message":          true,
+	"agent_status":          true,
+	"parallel_plan_execute": true,
+}
+
+// safeShellPatterns are command prefixes/patterns that are always safe to execute.
+var safeShellPatterns = []string{
+	// Test runners
+	"^python -m pytest",
+	"^python3 -m pytest",
+	"^go test",
+	"^npm test",
+	"^npm run test",
+	"^npx jest",
+	"^npx vitest",
+	"^cargo test",
+	"^make test",
+	"^rake test",
+	"^bundle exec rspec",
+	// Read-only commands
+	"^cat ",
+	"^ls ",
+	"^ls$",
+	"^pwd$",
+	"^echo ",
+	"^head ",
+	"^tail ",
+	"^wc ",
+	"^find ",
+	"^which ",
+	"^whereis ",
+	"^type ",
+	"^file ",
+	"^stat ",
+	"^du ",
+	"^df ",
+	// Git read-only
+	"^git status",
+	"^git log",
+	"^git diff",
+	"^git branch",
+	"^git show",
+	"^git remote -v",
+	"^git tag",
+	"^git stash list",
+	// Language/runtime info
+	"^python -c",
+	"^python3 -c",
+	"^node -e",
+	"^go version",
+	"^rustc --version",
+	"^python --version",
+	"^node --version",
+	"^npm --version",
+	// Build commands
+	"^go build",
+	"^cargo build",
+	"^cargo check",
+	"^npm run build",
+	"^npm run lint",
+	"^npx tsc",
+	"^make ",
+	"^cmake ",
+	"^go mod download",
+	// Linting / static checks
+	"^eslint ",
+	"^flake8",
+	"^mypy ",
+	"^pylint ",
+	// Other common read-only operations
+	"^grep ",
+	"^rg ",
+	"^ag ",
+	"^sort ",
+	"^uniq ",
+	"^diff ",
+	"^tree",
+	"^env$",
+	"^printenv",
+}
+
+// dangerousShellPatterns are commands that should NEVER be auto-approved.
+var dangerousShellPatterns = []string{
+	// Destructive filesystem operations
+	"rm -rf /",
+	"rm -rf /*",
+	"rm -rf ~",
+	"rm -rf $home",
+	// Fork bombs and system destruction
+	":(){ :|:& };:",
+	"> /dev/sd",
+	"> /dev/nvme",
+	// Force push / destructive git
+	"git push.*--force",
+	"git push.*-f ",
+	"git reset --hard origin",
+	"git clean -fdx",
+	// Database destruction
+	"drop table",
+	"drop database",
+	"truncate ",
+	"delete from.*where 1",
+	"delete from.*without",
+	// Remote code execution
+	"curl.*| ?sh",
+	"curl.*| ?bash",
+	"wget.*| ?sh",
+	"wget.*| ?bash",
+	// Permission escalation
+	"chmod 777",
+	"chmod -r 777",
+	"chown root",
+	// Disk destruction
+	"mkfs",
+	"dd if=/dev/zero",
+	"dd if=/dev/random",
+	"dd if=/dev/urandom",
+	// System commands
+	"shutdown",
+	"reboot",
+	"init 0",
+	"init 6",
+	"halt",
+	"poweroff",
+	"kill -9 1",
+	"killall",
+	// Credential/key exposure
+	"cat ~/.ssh/id_",
+	"cat /etc/shadow",
+	"cat /etc/passwd",
+	// Network exposure
+	"nc -l",
+	"ncat -l",
+	// Format/wipe
+	"format c:",
+	"del /f /s /q c:",
+	"rd /s /q c:",
+}

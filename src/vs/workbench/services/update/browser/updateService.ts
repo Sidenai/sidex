@@ -16,7 +16,8 @@ export interface IUpdateProvider {
 
 import { Emitter, Event } from '../../../../base/common/event.js';
 import { InstantiationType, registerSingleton } from '../../../../platform/instantiation/common/extensions.js';
-import { IUpdateService, State, UpdateType } from '../../../../platform/update/common/update.js';
+import { INotificationService } from '../../../../platform/notification/common/notification.js';
+import { IUpdateService, State, StateType, UpdateType } from '../../../../platform/update/common/update.js';
 
 const STATE_EVENT = 'sidex://update/state-change';
 
@@ -46,7 +47,9 @@ export class SidexUpdateService implements IUpdateService {
 	private _state: State = State.Uninitialized;
 	private _tauriReady: Promise<{ core: TauriCore; event: TauriEvent } | undefined>;
 
-	constructor() {
+	constructor(
+		@INotificationService private readonly notificationService: INotificationService,
+	) {
 		this._tauriReady = loadTauri();
 		this._bootstrap();
 	}
@@ -103,9 +106,28 @@ export class SidexUpdateService implements IUpdateService {
 			return;
 		}
 		try {
-			await tauri.core.invoke('update_check', { explicit });
+			const result = await tauri.core.invoke<unknown>('update_check', { explicit });
+			// A from-source build with no update feed configured (no env var,
+			// no `endpoints` in tauri.conf.json — see updater.rs) resolves
+			// here with `Disabled` instead of throwing, so this is the normal
+			// success path, not an error handler. A silent background poll
+			// finding nothing configured isn't news; only tell the user when
+			// they asked for the check themselves via the menu.
+			if (isState(result)) {
+				this.setState(result);
+				if (explicit && result.type === StateType.Disabled) {
+					this.notificationService.info('SideX updates are not configured for this build.');
+				}
+			}
 		} catch (err) {
-			console.error('[sidex-update] check failed:', err);
+			// A background check failing is routine — offline, or a release
+			// feed that's temporarily unreachable. Only surface it as an
+			// error when the user asked for the check themselves.
+			if (explicit) {
+				console.error('[sidex-update] check failed:', err);
+			} else {
+				console.info('[sidex-update] background check skipped:', err);
+			}
 		}
 	}
 

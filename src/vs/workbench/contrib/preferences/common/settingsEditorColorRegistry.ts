@@ -8,14 +8,11 @@ import { localize } from '../../../../nls.js';
 import {
 	editorWidgetBorder,
 	focusBorder,
-	inputBackground,
-	inputBorder,
-	inputForeground,
+	foreground,
 	listHoverBackground,
+	menuBackground,
 	registerColor,
-	selectBackground,
-	selectBorder,
-	selectForeground,
+	widgetBorder,
 	checkboxBackground,
 	checkboxBorder,
 	checkboxForeground,
@@ -58,17 +55,17 @@ export const settingsSashBorder = registerColor(
 // Enum control colors
 export const settingsSelectBackground = registerColor(
 	`settings.dropdownBackground`,
-	selectBackground,
+	menuBackground,
 	localize('settingsDropdownBackground', 'Settings editor dropdown background.')
 );
 export const settingsSelectForeground = registerColor(
 	'settings.dropdownForeground',
-	selectForeground,
+	foreground,
 	localize('settingsDropdownForeground', 'Settings editor dropdown foreground.')
 );
 export const settingsSelectBorder = registerColor(
 	'settings.dropdownBorder',
-	selectBorder,
+	widgetBorder,
 	localize('settingsDropdownBorder', 'Settings editor dropdown border.')
 );
 export const settingsSelectListBorder = registerColor(
@@ -100,34 +97,34 @@ export const settingsCheckboxBorder = registerColor(
 // Text control colors
 export const settingsTextInputBackground = registerColor(
 	'settings.textInputBackground',
-	inputBackground,
+	menuBackground,
 	localize('textInputBoxBackground', 'Settings editor text input box background.')
 );
 export const settingsTextInputForeground = registerColor(
 	'settings.textInputForeground',
-	inputForeground,
+	foreground,
 	localize('textInputBoxForeground', 'Settings editor text input box foreground.')
 );
 export const settingsTextInputBorder = registerColor(
 	'settings.textInputBorder',
-	inputBorder,
+	widgetBorder,
 	localize('textInputBoxBorder', 'Settings editor text input box border.')
 );
 
 // Number control colors
 export const settingsNumberInputBackground = registerColor(
 	'settings.numberInputBackground',
-	inputBackground,
+	menuBackground,
 	localize('numberInputBoxBackground', 'Settings editor number input box background.')
 );
 export const settingsNumberInputForeground = registerColor(
 	'settings.numberInputForeground',
-	inputForeground,
+	foreground,
 	localize('numberInputBoxForeground', 'Settings editor number input box foreground.')
 );
 export const settingsNumberInputBorder = registerColor(
 	'settings.numberInputBorder',
-	inputBorder,
+	widgetBorder,
 	localize('numberInputBoxBorder', 'Settings editor number input box border.')
 );
 

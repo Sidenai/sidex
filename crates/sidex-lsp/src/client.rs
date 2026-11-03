@@ -49,15 +49,20 @@ impl LspClient {
     /// * `args` — command-line arguments.
     /// * `root_uri` — workspace root URI (e.g. `"file:///home/user/project"`).
     pub async fn start(command: &str, args: &[&str], root_uri: &str) -> Result<Self> {
-        let mut cmd = Command::new(command);
-        cmd.args(args)
+        let mut server_cmd = Command::new(command);
+        server_cmd
+            .args(args)
             .stdin(std::process::Stdio::piped())
             .stdout(std::process::Stdio::piped())
             .stderr(std::process::Stdio::null())
             .kill_on_drop(true);
+
         #[cfg(windows)]
-        cmd.creation_flags(0x0800_0000);
-        let mut child = cmd
+        {
+            server_cmd.creation_flags(0x0800_0000);
+        }
+
+        let mut child = server_cmd
             .spawn()
             .with_context(|| format!("failed to spawn language server: {command}"))?;
 

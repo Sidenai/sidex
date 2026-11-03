@@ -1,0 +1,45 @@
+[package]
+name = "sidex-context"
+description = "AST-based code chunking and context engine for SideX"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+tree-sitter = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+regex = { workspace = true }
+tokio = { workspace = true }
+ignore = { workspace = true }
+reqwest = { workspace = true, features = ["blocking", "json"] }
+rusqlite = { workspace = true }
+sha2 = "0.10"
+notify = "6"
+
+tree-sitter-rust = "0.23"
+tree-sitter-python = "0.23"
+tree-sitter-javascript = "0.23"
+tree-sitter-typescript = "0.23"
+tree-sitter-go = "0.23"
+tree-sitter-c = "0.23"
+tree-sitter-cpp = "0.23"
+tree-sitter-java = "0.23"
+tree-sitter-ruby = "0.23"
+tree-sitter-bash = "0.23"
+tree-sitter-json = "0.24"
+tree-sitter-toml-ng = "0.7"
+tree-sitter-html = "0.23"
+tree-sitter-css = "0.23"
+
+[lints]
+workspace = true
+
+[[bin]]
+name = "format_bench"
+path = "src/bin/format_bench.rs"
+
+[dev-dependencies]
+tempfile = "3"

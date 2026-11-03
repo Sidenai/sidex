@@ -2181,6 +2181,7 @@ class SettingEnumRenderer
 
 		common.toDispose.add(selectBox);
 		selectBox.render(common.controlElement);
+		DOM.append(common.controlElement, $('span.codicon.codicon-chevron-down'));
 
 		const selectElement = common.controlElement.querySelector('select');
 		if (selectElement) {
@@ -2277,6 +2278,11 @@ class SettingEnumRenderer
 
 		template.onChange = undefined;
 		template.selectBox.select(idx);
+		if (template.selectElement) {
+			const selectedLabel = displayOptions[idx]?.text ?? '';
+			const measuredWidth = this.measureSelectTriggerWidth(selectedLabel);
+			template.selectElement.style.width = `${measuredWidth}px`;
+		}
 		template.onChange = idx => {
 			if (createdDefault && idx === 0) {
 				onChange(dataElement.defaultValue);
@@ -2287,6 +2293,21 @@ class SettingEnumRenderer
 
 		template.enumDescriptionElement.innerText = '';
 	}
+
+	private measureSelectTriggerWidth(label: string): number {
+		const measureElement = DOM.$('span');
+		measureElement.style.position = 'absolute';
+		measureElement.style.visibility = 'hidden';
+		measureElement.style.whiteSpace = 'nowrap';
+		measureElement.style.fontSize = '12px';
+		measureElement.style.fontFamily = 'var(--vscode-font-family, -apple-system, BlinkMacSystemFont, sans-serif)';
+		measureElement.textContent = label;
+		document.body.appendChild(measureElement);
+		const textWidth = Math.ceil(measureElement.getBoundingClientRect().width);
+		measureElement.remove();
+		const horizontalPaddingAndChevron = 48;
+		return Math.min(320, Math.max(110, textWidth + horizontalPaddingAndChevron));
+	}
 }
 
 const settingsNumberInputBoxStyles = getInputBoxStyle({
@@ -2294,6 +2315,13 @@ const settingsNumberInputBoxStyles = getInputBoxStyle({
 	inputForeground: settingsNumberInputForeground,
 	inputBorder: settingsNumberInputBorder
 });
+
+const settingsToggleStyles = {
+	...unthemedToggleStyles,
+	inputActiveOptionBackground: 'var(--vscode-button-background, #0078d4)',
+	inputActiveOptionBorder: 'var(--vscode-button-background, #0078d4)',
+	inputActiveOptionForeground: '#fff'
+};
 
 class SettingNumberRenderer
 	extends AbstractSettingRenderer
@@ -2406,7 +2434,7 @@ class SettingBoolRenderer
 			actionClassName: 'setting-value-checkbox',
 			isChecked: true,
 			title: '',
-			...unthemedToggleStyles
+			...settingsToggleStyles
 		});
 		controlElement.appendChild(checkbox.domNode);
 		toDispose.add(checkbox);
@@ -3130,20 +3158,20 @@ export class SettingsTree extends WorkbenchObjectTree<SettingsTreeElement> {
 		this.style(
 			getListStyles({
 				listBackground: editorBackground,
-				listActiveSelectionBackground: editorBackground,
+				listActiveSelectionBackground: undefined,
 				listActiveSelectionForeground: foreground,
-				listFocusAndSelectionBackground: editorBackground,
+				listFocusAndSelectionBackground: undefined,
 				listFocusAndSelectionForeground: foreground,
-				listFocusBackground: editorBackground,
+				listFocusBackground: undefined,
 				listFocusForeground: foreground,
 				listHoverForeground: foreground,
-				listHoverBackground: editorBackground,
-				listHoverOutline: editorBackground,
-				listFocusOutline: editorBackground,
-				listInactiveSelectionBackground: editorBackground,
+				listHoverBackground: undefined,
+				listHoverOutline: undefined,
+				listFocusOutline: undefined,
+				listInactiveSelectionBackground: undefined,
 				listInactiveSelectionForeground: foreground,
-				listInactiveFocusBackground: editorBackground,
-				listInactiveFocusOutline: editorBackground,
+				listInactiveFocusBackground: undefined,
+				listInactiveFocusOutline: undefined,
 				treeIndentGuidesStroke: undefined,
 				treeInactiveIndentGuidesStroke: undefined
 			})

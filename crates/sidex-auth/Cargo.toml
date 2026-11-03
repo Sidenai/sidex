@@ -1,6 +1,6 @@
 [package]
 name = "sidex-auth"
-description = "Authentication primitives for SideX: OS keyring secret storage, OAuth flows."
+description = "Generic OS keyring-backed secret storage for SideX."
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true

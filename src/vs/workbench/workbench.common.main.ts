@@ -211,6 +211,12 @@ import './contrib/bulkEdit/browser/bulkEditService.js';
 import './contrib/search/browser/search.contribution.js';
 import './contrib/search/browser/searchView.js';
 
+// Sidex Chat
+import './contrib/sidexChat/browser/sidexChat.contribution.js';
+
+// Sidex Complete
+import './contrib/sidexComplete/browser/sidexComplete.contribution.js';
+
 // Search Editor
 import './contrib/searchEditor/browser/searchEditor.contribution.js';
 
@@ -245,6 +251,9 @@ import './contrib/url/browser/url.contribution.js';
 import './contrib/webview/browser/webview.contribution.js';
 import './contrib/webviewPanel/browser/webviewPanel.contribution.js';
 import './contrib/webviewView/browser/webviewView.contribution.js';
+
+// Image Preview
+import './contrib/imagePreview/browser/imagePreview.contribution.js';
 
 // Extensions Management
 import './contrib/extensions/browser/extensions.contribution.js';

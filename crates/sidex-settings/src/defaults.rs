@@ -270,7 +270,7 @@ fn add_workbench_defaults(m: &mut Map<String, Value>) {
     ins(m, "workbench.startupEditor", json!("welcomePage"));
     ins(m, "workbench.sideBar.location", json!("left"));
     ins(m, "workbench.activityBar.visible", json!(true));
-    ins(m, "workbench.activityBar.location", json!("side"));
+    ins(m, "workbench.activityBar.location", json!("top"));
     ins(m, "workbench.statusBar.visible", json!(true));
     ins(m, "workbench.editor.showTabs", json!("multiple"));
     ins(m, "workbench.editor.tabSizing", json!("fit"));

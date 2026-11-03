@@ -3,21 +3,24 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+/* Sidex: Debug toolbar — floating, rounded, semi-transparent */
 .monaco-workbench .debug-toolbar {
 	position: absolute;
-	z-index: 2520; /* Below quick input at 2550, above custom titlebar toolbar at 2500 */
+	z-index: 2520;
 	height: 28px;
 	display: flex;
 	padding-left: 2px;
-	border-radius: var(--vscode-cornerRadius-large);
+	border-radius: 8px;
 	left: 0;
 	top: 0;
 	-webkit-app-region: no-drag;
-	box-shadow: var(--vscode-shadow-lg);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
 }
 
 .monaco-workbench .debug-toolbar .monaco-action-bar .action-item {
-	margin-right: 4px;
+	margin-right: 2px;
 }
 
 .monaco-workbench .debug-toolbar .monaco-action-bar .action-item.select-container {
@@ -29,22 +32,27 @@
 	padding: 0 24px 0 8px;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+	border-radius: 4px;
 }
 
 .monaco-workbench .debug-toolbar .drag-area {
 	cursor: grab;
-	width: 20px;
-	opacity: 0.5;
+	width: 16px;
+	opacity: 0.35;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+}
+
+.monaco-workbench .debug-toolbar .drag-area:hover {
+	opacity: 0.6;
 }
 
 .monaco-workbench .debug-toolbar .drag-area.dragged {
 	cursor: grabbing;
 }
 
-.monaco-workbench  .debug-toolbar .monaco-action-bar .action-item .action-label {
+.monaco-workbench .debug-toolbar .monaco-action-bar .action-item .action-label {
 	margin-right: 0;
 	background-size: 16px;
 	background-position: center center;
@@ -52,4 +60,9 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	border-radius: 4px;
+}
+
+.monaco-workbench .debug-toolbar .monaco-action-bar .action-item .action-label:hover {
+	background-color: var(--vscode-toolbar-hoverBackground);
 }

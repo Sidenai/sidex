@@ -27,10 +27,7 @@ impl ProfilesStore {
 }
 
 pub fn initialize(app: &AppHandle) -> Result<(), String> {
-    let data_dir = app
-        .path()
-        .app_data_dir()
-        .map_err(|e| format!("app_data_dir: {e}"))?;
+    let data_dir = crate::app_dirs::app_data_dir();
     let profile_root = data_dir.join("UserData");
     std::fs::create_dir_all(&profile_root).map_err(|e| format!("create UserData: {e}"))?;
     app.manage(Arc::new(ProfilesStore::new(profile_root)));

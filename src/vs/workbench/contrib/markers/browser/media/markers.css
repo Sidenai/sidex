@@ -3,6 +3,8 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+/* Sidex: Markers/Problems — monochrome, clean tree, muted severity icons */
+
 .markers-panel .markers-panel-container {
 	height: 100%;
 }
@@ -22,16 +24,19 @@
 	text-decoration: underline;
 }
 
-.markers-panel  .markers-panel-container .hidden {
+.markers-panel .markers-panel-container .hidden {
 	display: none;
 }
 
-.markers-panel  .markers-panel-container .codicon.codicon-light-bulb {
-	color:  var(--vscode-editorLightBulb-foreground);
+/* Light bulb icons — monochrome */
+.markers-panel .markers-panel-container .codicon.codicon-light-bulb {
+	color: var(--vscode-foreground);
+	opacity: 0.6;
 }
 
-.markers-panel  .markers-panel-container .codicon.codicon-lightbulb-autofix {
-	color:  var(--vscode-editorLightBulbAutoFix-foreground);
+.markers-panel .markers-panel-container .codicon.codicon-lightbulb-autofix {
+	color: var(--vscode-foreground);
+	opacity: 0.6;
 }
 
 .markers-panel .markers-panel-container .tree-container.hidden {
@@ -39,9 +44,10 @@
 	visibility: hidden;
 }
 
+/* Tree contents — 24px row height */
 .markers-panel .markers-panel-container .tree-container .monaco-tl-contents {
 	display: flex;
-	line-height: 22px;
+	line-height: 24px;
 	padding-right: 10px;
 }
 
@@ -53,6 +59,7 @@
 .markers-panel .markers-panel-container .tree-container .monaco-tl-contents .marker-stats {
 	display: inline-block;
 	margin-left: 10px;
+	opacity: 0.7;
 }
 
 .markers-panel:not(.wide) .markers-panel-container .tree-container .monaco-tl-contents .resource-label-container {
@@ -105,24 +112,29 @@
 	margin-left: 6px;
 }
 
+/* Source label — muted */
 .markers-panel .markers-panel-container .tree-container .monaco-tl-contents .marker-source,
 .markers-panel .markers-panel-container .tree-container .monaco-tl-contents .related-info-resource,
 .markers-panel .markers-panel-container .tree-container .monaco-tl-contents .related-info-resource-separator,
 .markers-panel .markers-panel-container .tree-container .monaco-tl-contents .marker-line,
 .markers-panel .markers-panel-container .tree-container .monaco-tl-contents .marker-code {
-	opacity: 0.7;
+	opacity: 0.6;
 }
 
+/* Highlight matches — bold */
 .markers-panel .markers-panel-container .tree-container .monaco-tl-contents .highlight {
-	font-weight: bold;
+	font-weight: 600;
 }
 
+/* Error/warning icons */
+/* Marker severity icon — 24px height */
 .markers-panel .monaco-tl-contents .marker-icon {
-	height: 22px;
+	height: 24px;
 	margin: 0 6px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	opacity: 0.7;
 }
 
 .markers-panel .monaco-tl-contents .actions .monaco-action-bar {
@@ -143,12 +155,19 @@
 
 .markers-panel .monaco-tl-contents .actions,
 .markers-panel .monaco-tl-contents .multiline-actions .monaco-action-bar {
-	height: 22px;
+	height: 24px;
 }
 
 .markers-panel .monaco-tl-contents .actions .action-label,
 .markers-panel .monaco-tl-contents .multiline-actions .monaco-action-bar .action-label {
 	padding: 2px;
+	border-radius: 3px;
+	transition: background-color 120ms ease;
+}
+
+.markers-panel .monaco-tl-contents .actions .action-label:hover,
+.markers-panel .monaco-tl-contents .multiline-actions .monaco-action-bar .action-label:hover {
+	background-color: rgba(255, 255, 255, 0.03);
 }
 
 .markers-panel .monaco-tl-contents .actions .action-item {
@@ -160,13 +179,18 @@
 	display: none;
 }
 
-/* Table */
+/* Table view */
 
+/* Table header — bold, monochrome */
 .markers-panel .markers-table-container .monaco-table .monaco-table-th {
 	display: flex;
 	font-weight: 600;
+	font-size: 10px;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
 	align-items: center;
 	padding-left: 10px;
+	opacity: 0.7;
 }
 
 .markers-panel .markers-table-container .monaco-table .monaco-list-row .monaco-table-tr > .monaco-table-td {
@@ -176,7 +200,7 @@
 }
 
 .markers-panel .markers-table-container .monaco-table .monaco-list-row .monaco-table-tr > .monaco-table-td .highlight {
-	font-weight: bold;
+	font-weight: 600;
 }
 
 .markers-panel .markers-table-container .monaco-table .monaco-list-row .monaco-table-tr > .monaco-table-td > .code,
@@ -237,5 +261,5 @@
 
 .markers-panel .markers-table-container .monaco-table .monaco-list-row .monaco-table-tr > .monaco-table-td > .file > .file-position {
 	margin-left: 6px;
-	opacity: 0.7;
+	opacity: 0.6;
 }

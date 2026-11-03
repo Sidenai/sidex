@@ -48,13 +48,13 @@
 }
 
 .monaco-workbench .part > .title > .title-label {
-	padding-left: 12px;
 }
 
 .monaco-workbench .part > .title > .title-label h2 {
 	font-size: 11px;
 	cursor: default;
-	font-weight: normal;
+	font-weight: 500;
+	letter-spacing: 0.03em;
 	margin: 0;
 	overflow: hidden;
 	white-space: nowrap;
@@ -92,6 +92,11 @@
 .monaco-workbench .part.editor > .content .editor-group-container > .monaco-progress-container {
 	position: absolute;
 	left: 0;
-	top: 33px; /* at the bottom of the 35px height title container */
-	z-index: 5; /* on top of things */
+	top: 30px;
+	z-index: 5;
+}
+
+/* Sidex: panel titles are shorter at 30px */
+.monaco-workbench .part.panel > .content > .monaco-progress-container {
+	top: 28px;
 }

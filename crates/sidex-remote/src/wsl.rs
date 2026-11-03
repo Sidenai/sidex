@@ -12,6 +12,9 @@ use serde::{Deserialize, Serialize};
 
 use crate::transport::{DirEntry, ExecOutput, FileStat, RemotePty, RemoteTransport};
 
+#[cfg(windows)]
+use std::os::windows::process::CommandExt;
+
 #[cfg(target_os = "windows")]
 use std::time::SystemTime;
 
@@ -81,12 +84,15 @@ pub fn translate_path_to_windows(wsl_path: &str, distro: &str) -> PathBuf {
 /// Execute a single command inside a WSL distro (standalone helper).
 #[cfg(target_os = "windows")]
 pub fn exec_in_wsl(distro: &str, command: &str) -> Result<ExecOutput> {
-    use std::os::windows::process::CommandExt;
-    let output = std::process::Command::new("wsl")
-        .args(["-d", distro, "--", "sh", "-c", command])
-        .creation_flags(0x0800_0000)
-        .output()
-        .context("wsl exec")?;
+    let mut cmd = std::process::Command::new("wsl");
+    cmd.args(["-d", distro, "--", "sh", "-c", command]);
+
+    #[cfg(windows)]
+    {
+        cmd.creation_flags(0x0800_0000);
+    }
+
+    let output = cmd.output().context("wsl exec")?;
     Ok(ExecOutput {
         stdout: String::from_utf8_lossy(&output.stdout).into_owned(),
         stderr: String::from_utf8_lossy(&output.stderr).into_owned(),
@@ -168,12 +174,15 @@ fn wsl_unavailable<T>() -> Result<T> {
 /// List installed WSL distributions by parsing `wsl --list --verbose`.
 #[cfg(target_os = "windows")]
 pub fn list_distributions() -> Result<Vec<WslDistro>> {
-    use std::os::windows::process::CommandExt;
-    let output = std::process::Command::new("wsl")
-        .args(["--list", "--verbose"])
-        .creation_flags(0x0800_0000)
-        .output()
-        .context("running wsl --list --verbose")?;
+    let mut cmd = std::process::Command::new("wsl");
+    cmd.args(["--list", "--verbose"]);
+
+    #[cfg(windows)]
+    {
+        cmd.creation_flags(0x0800_0000);
+    }
+
+    let output = cmd.output().context("running wsl --list --verbose")?;
 
     let text = String::from_utf8_lossy(&output.stdout);
     parse_wsl_list(&text)
@@ -223,11 +232,15 @@ pub(crate) fn parse_wsl_list(text: &str) -> Result<Vec<WslDistro>> {
 impl WslTransport {
     /// Connect to a named WSL distribution.
     pub async fn connect(distro: &str) -> Result<Self> {
-        use std::os::windows::process::CommandExt;
-        let output = std::process::Command::new("wsl")
-            .args(["-d", distro, "--", "echo", "ok"])
-            .creation_flags(0x0800_0000)
-            .output()?;
+        let mut cmd = std::process::Command::new("wsl");
+        cmd.args(["-d", distro, "--", "echo", "ok"]);
+
+        #[cfg(windows)]
+        {
+            cmd.creation_flags(0x0800_0000);
+        }
+
+        let output = cmd.output()?;
 
         if !output.status.success() {
             bail!(
@@ -242,11 +255,15 @@ impl WslTransport {
     }
 
     fn wsl_exec(&self, command: &str) -> Result<ExecOutput> {
-        use std::os::windows::process::CommandExt;
-        let output = std::process::Command::new("wsl")
-            .args(["-d", &self.distro, "--", "sh", "-c", command])
-            .creation_flags(0x0800_0000)
-            .output()?;
+        let mut cmd = std::process::Command::new("wsl");
+        cmd.args(["-d", &self.distro, "--", "sh", "-c", command]);
+
+        #[cfg(windows)]
+        {
+            cmd.creation_flags(0x0800_0000);
+        }
+
+        let output = cmd.output()?;
 
         Ok(ExecOutput {
             stdout: String::from_utf8_lossy(&output.stdout).into_owned(),

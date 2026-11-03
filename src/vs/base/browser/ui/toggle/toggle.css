@@ -16,6 +16,7 @@
 	box-sizing:	border-box;
 	user-select: none;
 	-webkit-user-select: none;
+	transition: background-color 120ms ease, border-color 120ms ease;
 }
 
 .monaco-custom-toggle:hover {
@@ -38,15 +39,22 @@
 }
 
 .monaco-custom-toggle.monaco-checkbox {
-	height: 18px;
-	width: 18px;
-	border: 1px solid transparent;
-	border-radius: 3px;
+	height: 14px;
+	width: 14px;
+	border: 1px solid var(--vscode-checkbox-border, #252525);
+	border-radius: 2px;
 	margin-right: 9px;
 	margin-left: 0px;
 	padding: 0px;
 	opacity: 1;
-	background-size: 16px !important;
+	background-size: 12px !important;
+	background-position: center !important;
+	transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.monaco-custom-toggle.monaco-checkbox.checked {
+	background-color: var(--vscode-checkbox-background, var(--vscode-foreground));
+	border-color: var(--vscode-checkbox-background, var(--vscode-foreground));
 }
 
 .monaco-action-bar .checkbox-action-item {

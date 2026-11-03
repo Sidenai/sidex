@@ -2,7 +2,7 @@
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "SideX",
   "version": "0.1.3",
-  "identifier": "com.siden.sidex",
+  "identifier": "dev.sidex.app",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:1420",
@@ -22,26 +22,26 @@
         "decorations": false,
         "shadow": true,
         "visible": false,
-        "dragDropEnabled": false,
-        "useHttpsScheme": true,
-        "titleBarStyle": "Overlay",
-        "hiddenTitle": true
+        "dragDropEnabled": true,
+        "useHttpsScheme": true
       }
     ],
     "security": {
       "csp": null,
       "assetProtocol": {
         "enable": true,
-        "scope": ["$HOME/**", "/tmp/**"]
+        "scope": [
+          "$HOME/**",
+          "$TEMP/**",
+          "$TMP/**",
+          "/tmp/**"
+        ]
       }
     }
   },
   "plugins": {
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEVENkM0QkJDNjlBRjQ0OTcKUldTWFJLOXB2RXRzN1UrM3V3WFlNSFpBb0xRQ25yRjdydHIxc2YyZWZPU0o1MHpUU0lIY0FOVUYK",
-      "endpoints": [
-        "https://cdn.siden.ai/releases/sidex/latest/latest.json"
-      ]
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEVENkM0QkJDNjlBRjQ0OTcKUldTWFJLOXB2RXRzN1UrM3V3WFlNSFpBb0xRQ25yRjdydHIxc2YyZWZPU0o1MHpUU0lIY0FOVUYK"
     }
   },
   "bundle": {
@@ -63,9 +63,9 @@
       "icons/icon.ico"
     ],
     "macOS": {
-      "signingIdentity": "Developer ID Application: kima Booker (D983H3RN86)",
       "entitlements": "entitlements.plist",
-      "minimumSystemVersion": "10.15"
+      "minimumSystemVersion": "10.15",
+      "infoPlist": "Info.plist"
     },
     "windows": {
       "webviewInstallMode": {
@@ -77,12 +77,6 @@
         "depends": [
           "libwebkit2gtk-4.1-0",
           "libgtk-3-0"
-        ]
-      },
-      "rpm": {
-        "depends": [
-          "webkit2gtk4.1",
-          "gtk3"
         ]
       }
     }

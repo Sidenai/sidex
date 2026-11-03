@@ -100,6 +100,31 @@
 	left: 0;
 	top: 0;
 	bottom: 0;
+	/* Show a native scrollbar for terminal scrollback (SideX has no
+	   DomScrollableElement overlay on the terminal). */
+	overflow-y: scroll;
+	scrollbar-width: thin;
+	scrollbar-color: var(--vscode-scrollbarSlider-background, rgba(121, 121, 121, 0.4)) transparent;
+}
+
+.xterm .xterm-viewport::-webkit-scrollbar {
+	width: 10px;
+}
+
+.xterm .xterm-viewport::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+.xterm .xterm-viewport::-webkit-scrollbar-thumb {
+	background: var(--vscode-scrollbarSlider-background, rgba(121, 121, 121, 0.4));
+}
+
+.xterm .xterm-viewport::-webkit-scrollbar-thumb:hover {
+	background: var(--vscode-scrollbarSlider-hoverBackground, rgba(100, 100, 100, 0.7));
+}
+
+.xterm .xterm-viewport::-webkit-scrollbar-thumb:active {
+	background: var(--vscode-scrollbarSlider-activeBackground, rgba(191, 191, 191, 0.4));
 }
 
 .xterm .xterm-screen {

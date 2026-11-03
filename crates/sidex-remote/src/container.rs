@@ -543,8 +543,12 @@ impl ContainerTransport {
             .args(["compose", "-f"])
             .arg(&compose_path)
             .args(["up", "-d", service]);
+
         #[cfg(windows)]
-        up_cmd.creation_flags(0x0800_0000);
+        {
+            up_cmd.creation_flags(0x0800_0000);
+        }
+
         let output = up_cmd.output().await.context("running docker compose up")?;
 
         if !output.status.success() {
@@ -559,8 +563,12 @@ impl ContainerTransport {
             .args(["compose", "-f"])
             .arg(&compose_path)
             .args(["ps", "-q", service]);
+
         #[cfg(windows)]
-        ps_cmd.creation_flags(0x0800_0000);
+        {
+            ps_cmd.creation_flags(0x0800_0000);
+        }
+
         let ps_output = ps_cmd.output().await?;
 
         let container_id = String::from_utf8_lossy(&ps_output.stdout)

@@ -101,7 +101,7 @@
 	display: flex;
 	flex: initial;
 	opacity: 0.5;
-	padding-right: 8px;
+	padding-right: 6px;
 	height: var(--editor-group-tab-height);
 }
 
@@ -111,7 +111,11 @@
 
 
 .monaco-workbench .part.editor > .content .editor-group-container > .title > .title-actions .action-item {
-	margin-right: 4px;
+	margin-right: 2px;
+}
+
+.monaco-workbench .part.editor > .content .editor-group-container > .title > .title-actions .action-label.codicon {
+	font-size: 14px;
 }
 
 .monaco-workbench .part.editor > .content .editor-group-container.active > .title > .title-actions {

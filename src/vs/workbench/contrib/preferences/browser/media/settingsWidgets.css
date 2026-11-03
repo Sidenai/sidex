@@ -23,14 +23,9 @@
 	overflow: hidden;
 }
 
-.settings-editor > .settings-body .settings-tree-container .setting-item-bool .setting-value-checkbox {
-	background-color: var(--vscode-settings-checkboxBackground) !important;
-	color: var(--vscode-settings-checkboxForeground) !important;
-	border-color: var(--vscode-settings-checkboxBorder) !important;
-}
 .settings-editor > .settings-body .settings-tree-container .setting-item-bool .setting-list-object-input-key-checkbox {
 	margin-left: 4px;
-	height: 24px;
+	height: 26px;
 }
 .settings-editor > .settings-body .settings-tree-container .setting-item-bool .setting-list-object-input-key-checkbox .setting-value-checkbox {
 	margin-top: 3px;
@@ -81,8 +76,8 @@
 .settings-editor > .settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-object-widget .setting-list-object-key,
 .settings-editor > .settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-object-widget .setting-list-object-value {
 	display: inline-block;
-	line-height: 24px;
-	min-height: 24px;
+	line-height: 26px;
+	min-height: 26px;
 	flex: none;
 }
 
@@ -139,7 +134,7 @@
 .settings-editor > .settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-row,
 .settings-editor > .settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-row-header {
 	position: relative;
-	max-height: 24px;
+	max-height: 26px;
 }
 
 .settings-editor > .settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-row-header {
@@ -179,8 +174,21 @@
 }
 
 .settings-editor > .settings-body .settings-tree-container .setting-item.setting-item-list .monaco-text-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 	width: initial;
 	white-space: nowrap;
+	min-height: 26px;
+	padding: 4px 12px;
+	border-radius: 6px;
+	border: 1px solid var(--vscode-widget-border, rgba(255,255,255,0.09));
+	background: var(--vscode-menu-background, var(--vscode-dropdown-background, #1e1e1e));
+	color: var(--vscode-foreground, #ccc);
+	font-family: inherit;
+	font-size: 12px;
+	font-weight: 500;
+	box-sizing: border-box;
 }
 
 .settings-editor > .settings-body .settings-tree-container .setting-item.setting-item-list .setting-item-control.setting-list-hide-add-button .setting-list-new-row {
@@ -188,7 +196,7 @@
 }
 
 .settings-editor > .settings-body .settings-tree-container .setting-item.setting-item-list .monaco-text-button.setting-list-addButton {
-	display: inline-block;
+	display: inline-flex;
 	margin-top: 4px;
 	margin-right: 4px;
 }
@@ -201,7 +209,7 @@
 .settings-editor > .settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-valueInput,
 .settings-editor > .settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-siblingInput,
 .settings-editor > .settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-object-widget .setting-list-object-input {
-	height: 24px;
+	height: 26px;
 	max-width: 320px;
 	margin-right: 4px;
 }
@@ -232,7 +240,7 @@
 .settings-editor > .settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-object-widget .setting-list-object-value-container,
 .settings-editor > .settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-object-widget .setting-list-object-input select {
 	width: 100%;
-	height: 24px;
+	height: 26px;
 }
 
 .settings-editor > .settings-body .settings-tree-container .setting-list-widget .setting-list-object-list-row.select-container {

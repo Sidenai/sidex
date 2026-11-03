@@ -131,6 +131,10 @@ function getExtensionSearchPaths() {
   }
 
   const builtinExt = process.env.SIDEX_BUILTIN_EXTENSIONS_DIR;
+  // NOTE: do NOT scan ~/.vscode or ~/.cursor extension dirs — loading foreign
+  // user extensions pulls in incompatible/platform-specific extensions and
+  // can mutate the user's other-editor runtimes (e.g. redhat.java touching a
+  // VS Code-managed JDK). SideX only loads its own extension dirs.
   const candidates = [
     EXTENSIONS_DIR,
     builtinExt,

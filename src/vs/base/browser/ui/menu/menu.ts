@@ -354,12 +354,11 @@ export class Menu extends ActionBar {
 
 	private styleScrollElement(scrollElement: HTMLElement, style: IMenuStyles): void {
 		const fgColor = style.foregroundColor ?? '';
-		const bgColor = style.backgroundColor ?? '';
-		const border = style.borderColor ? `1px solid ${style.borderColor}` : '';
-		const borderRadius = 'var(--vscode-cornerRadius-large)';
+		const bgColor = style.backgroundColor ?? '#141414';
+		const border = style.borderColor ? `1px solid ${style.borderColor}` : '1px solid #252525';
 
 		scrollElement.style.outline = border;
-		scrollElement.style.borderRadius = borderRadius;
+		scrollElement.style.borderRadius = '8px';
 		scrollElement.style.color = fgColor;
 		scrollElement.style.backgroundColor = bgColor;
 	}
@@ -1127,11 +1126,11 @@ export function formatRule(c: ThemeIcon) {
 }
 
 export function getMenuWidgetCSS(style: IMenuStyles, isForShadowDom: boolean): string {
-	const borderColor = style.borderColor ?? 'var(--vscode-menu-border)';
+	const borderColor = style.borderColor ?? '#252525';
 	let result = /* css */ `
 .monaco-menu {
 	font-size: 13px;
-	border-radius: var(--vscode-cornerRadius-large);
+	border-radius: 8px;
 	border: 1px solid ${borderColor};
 	min-width: 160px;
 }
@@ -1170,6 +1169,7 @@ ${formatRule(Codicon.menuSubmenu)}
 
 .monaco-menu .monaco-action-bar .action-item.disabled {
 	cursor: default;
+	opacity: 0.4;
 }
 
 .monaco-menu .monaco-action-bar .action-item .icon,
@@ -1204,9 +1204,13 @@ ${formatRule(Codicon.menuSubmenu)}
 
 .monaco-menu .monaco-action-bar.vertical .action-label.separator {
 	display: block;
-	border-bottom: 1px solid var(--vscode-menu-separatorBackground);
-	padding-top: 1px;
-	padding: 30px;
+	border-bottom: 1px solid var(--vscode-menu-separatorBackground, #252525);
+	padding: 0;
+	margin: 3px 12px !important;
+	height: 0 !important;
+	line-height: 0 !important;
+	font-size: 0 !important;
+}
 }
 
 .monaco-menu .secondary-actions .monaco-action-bar .action-label {
@@ -1215,7 +1219,7 @@ ${formatRule(Codicon.menuSubmenu)}
 
 /* Action Items */
 .monaco-menu .monaco-action-bar .action-item.select-container {
-	overflow: hidden; /* somehow the dropdown overflows its container, we prevent it here to not push */
+	overflow: hidden;
 	flex: 1;
 	max-width: 170px;
 	min-width: 60px;
@@ -1244,14 +1248,23 @@ ${formatRule(Codicon.menuSubmenu)}
 	transform: none;
 }
 
+/* Menu items: 28px height, rounded 3px, padding 0 12px */
 .monaco-menu .monaco-action-bar.vertical .action-menu-item {
 	flex: 1 1 auto;
 	display: flex;
-	height: 24px;
+	height: 28px;
 	align-items: center;
 	position: relative;
 	margin: 0 4px;
-	border-radius: var(--vscode-cornerRadius-medium);
+	padding: 0 12px;
+	border-radius: 3px;
+	transition: background-color 60ms ease;
+}
+
+/* Hover: handled by JS inline selectionBackgroundColor — no CSS background to avoid double layer */
+.monaco-menu .monaco-action-bar.vertical .action-item.focused .action-menu-item,
+.monaco-menu .monaco-action-bar.vertical .action-menu-item:hover {
+	background-color: transparent;
 }
 
 .monaco-menu .monaco-action-bar.vertical .action-menu-item:hover .keybinding,
@@ -1259,32 +1272,35 @@ ${formatRule(Codicon.menuSubmenu)}
 	opacity: unset;
 }
 
+/* Label: 13px */
 .monaco-menu .monaco-action-bar.vertical .action-label {
 	flex: 1 1 auto;
 	text-decoration: none;
 	padding: 0 1em;
 	background: none;
-	font-size: 12px;
+	font-size: 13px;
 	line-height: 1;
 }
 
+/* Keyboard shortcuts: right-aligned, 11px, muted */
 .monaco-menu .monaco-action-bar.vertical .keybinding,
 .monaco-menu .monaco-action-bar.vertical .submenu-indicator {
 	display: inline-block;
 	flex: 2 1 auto;
 	padding: 0 1em;
 	text-align: right;
-	font-size: 12px;
+	font-size: 11px;
 	line-height: 1;
-	opacity: 0.7;
+	opacity: 0.5;
 }
 
+/* Submenu indicator: small chevron */
 .monaco-menu .monaco-action-bar.vertical .submenu-indicator {
 	height: 100%;
 }
 
 .monaco-menu .monaco-action-bar.vertical .submenu-indicator.codicon {
-	font-size: 16px !important;
+	font-size: 14px !important;
 	display: flex;
 	align-items: center;
 }
@@ -1294,6 +1310,7 @@ ${formatRule(Codicon.menuSubmenu)}
 	margin-right: -20px;
 }
 
+/* Disabled items: 40% opacity */
 .monaco-menu .monaco-action-bar.vertical .action-item.disabled .keybinding,
 .monaco-menu .monaco-action-bar.vertical .action-item.disabled .submenu-indicator {
 	opacity: 0.4;
@@ -1314,15 +1331,17 @@ ${formatRule(Codicon.menuSubmenu)}
 	position: absolute;
 }
 
+/* Separator: thin 1px line */
 .monaco-menu .monaco-action-bar.vertical .action-label.separator {
-	width: 100%;
+	width: calc(100% - 24px);
 	height: 0px !important;
 	opacity: 1;
+	margin: 3px 12px !important;
 }
 
 .monaco-menu .monaco-action-bar.vertical .action-label.separator.text {
 	padding: 0.7em 1em 0.1em 1em;
-	font-weight: bold;
+	font-weight: 500;
 	opacity: 1;
 }
 
@@ -1330,11 +1349,13 @@ ${formatRule(Codicon.menuSubmenu)}
 	color: inherit;
 }
 
+/* Icons: 16px, left of text, 8px gap */
 .monaco-menu .monaco-action-bar.vertical .menu-item-check {
 	position: absolute;
 	visibility: hidden;
 	width: 1em;
 	height: 100%;
+	font-size: 16px;
 }
 
 .monaco-menu .monaco-action-bar.vertical .action-menu-item.checked .menu-item-check {
@@ -1344,15 +1365,15 @@ ${formatRule(Codicon.menuSubmenu)}
 	justify-content: center;
 }
 
-/* Context Menu */
+/* Context Menu Container */
 
 .context-view.monaco-menu-container {
 	outline: 0;
 	border: none;
 	animation: fadeIn 0.083s linear;
 	-webkit-app-region: no-drag;
-	box-shadow: var(--vscode-shadow-lg${style.shadowColor ? `, 0 0 12px ${style.shadowColor}` : ''});
-	border-radius: var(--vscode-cornerRadius-large);
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3)${style.shadowColor ? `, 0 0 12px ${style.shadowColor}` : ''};
+	border-radius: 8px;
 	overflow: hidden;
 }
 
@@ -1376,14 +1397,14 @@ ${formatRule(Codicon.menuSubmenu)}
 	background: none;
 }
 
-/* Vertical Action Bar Styles */
+/* Vertical Action Bar: 4px padding inside container */
 
 .monaco-menu .monaco-action-bar.vertical {
 	padding: 4px 0;
 }
 
 .monaco-menu .monaco-action-bar.vertical .action-menu-item {
-	height: 24px;
+	height: 28px;
 }
 
 .monaco-menu .monaco-action-bar.vertical .action-label:not(.separator),
@@ -1400,15 +1421,15 @@ ${formatRule(Codicon.menuSubmenu)}
 
 .monaco-menu .monaco-action-bar.vertical .action-label.separator {
 	font-size: inherit;
-	margin: 5px 0 !important;
+	margin: 3px 12px !important;
 	padding: 0;
 	border-radius: 0;
 }
 
 .linux .monaco-menu .monaco-action-bar.vertical .action-label.separator,
 :host-context(.linux) .monaco-menu .monaco-action-bar.vertical .action-label.separator {
-	margin-left: 0;
-	margin-right: 0;
+	margin-left: 8px;
+	margin-right: 8px;
 }
 
 .monaco-menu .monaco-action-bar.vertical .submenu-indicator {

@@ -105,3 +105,9 @@
 .monaco-workbench .auxiliarybar.pane-composite-part > .title.has-composite-bar > .title-actions .monaco-action-bar .action-item {
 	max-width: 150px;
 }
+
+/* Sidex: remove focus highlight border from auxiliary bar */
+.monaco-workbench .part.auxiliarybar:focus,
+.monaco-workbench .part.auxiliarybar *:focus {
+	outline: none !important;
+}

@@ -33,6 +33,16 @@ impl TaskProcessStore {
             next_id: Mutex::new(1),
         }
     }
+
+    /// Kill every running task process. Called on app exit so spawned build
+    /// tasks don't outlive the editor.
+    pub fn kill_all(&self) {
+        let mut tasks = self.tasks.lock().unwrap_or_else(|e| e.into_inner());
+        for (_, mut handle) in tasks.drain() {
+            let _ = handle.child.kill();
+            let _ = handle.child.wait();
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -174,7 +184,11 @@ pub fn task_spawn(
                 }
             }
 
-            let exit_code = {
+            // Remove the handle from the map FIRST, then wait() WITHOUT the
+            // lock held: a child that closes stdout but keeps running (e.g. a
+            // daemonizing build script) would otherwise block wait() forever
+            // while holding the tasks mutex, hanging task_spawn/kill/list.
+            let handle = {
                 let Ok(mut tasks) = state_clone.tasks.lock() else {
                     let _ = app_out.emit(
                         "task-exit",
@@ -185,14 +199,15 @@ pub fn task_spawn(
                     );
                     return;
                 };
-                if let Some(handle) = tasks.get_mut(&task_id) {
-                    match handle.child.wait() {
-                        Ok(status) => status.code(),
-                        Err(_) => None,
-                    }
-                } else {
-                    None
-                }
+                tasks.remove(&task_id)
+            };
+
+            let exit_code = match handle {
+                Some(mut handle) => match handle.child.wait() {
+                    Ok(status) => status.code(),
+                    Err(_) => None,
+                },
+                None => None,
             };
 
             let _ = app_out.emit("task-exit", TaskExitEvent { task_id, exit_code });

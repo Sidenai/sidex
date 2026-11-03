@@ -122,6 +122,7 @@ import { DeferredPromise, Promises } from '../../base/common/async.js';
 import { IBannerService } from '../services/banner/browser/bannerService.js';
 import { IPaneCompositePartService } from '../services/panecomposite/browser/panecomposite.js';
 import { AuxiliaryBarPart } from './parts/auxiliarybar/auxiliaryBarPart.js';
+import { SidexPart } from './parts/sidex/sidexPart.js';
 import { ITelemetryService } from '../../platform/telemetry/common/telemetry.js';
 import { IAuxiliaryWindowService } from '../services/auxiliaryWindow/browser/auxiliaryWindowService.js';
 import { CodeWindow, mainWindow } from '../../base/browser/window.js';
@@ -154,6 +155,7 @@ interface ILayoutInitializationState {
 			sideBar?: string;
 			panel?: string;
 			auxiliaryBar?: string;
+			sidex?: string;
 		};
 	};
 	readonly editor: {
@@ -175,6 +177,7 @@ enum LayoutClasses {
 	MAIN_EDITOR_AREA_HIDDEN = 'nomaineditorarea',
 	PANEL_HIDDEN = 'nopanel',
 	AUXILIARYBAR_HIDDEN = 'noauxiliarybar',
+	SIDEX_HIDDEN = 'nosidex',
 	STATUSBAR_HIDDEN = 'nostatusbar',
 	FULLSCREEN = 'fullscreen',
 	MAXIMIZED = 'maximized',
@@ -365,6 +368,7 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 	private sideBarPartView!: ISerializableView;
 	private panelPartView!: ISerializableView;
 	private auxiliaryBarPartView!: ISerializableView;
+	private sidexPartView!: ISerializableView;
 	private editorPartView!: ISerializableView;
 	private statusBarPartView!: ISerializableView;
 
@@ -771,6 +775,7 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 		const activityBar = this.getPart(Parts.ACTIVITYBAR_PART);
 		const sideBar = this.getPart(Parts.SIDEBAR_PART);
 		const auxiliaryBar = this.getPart(Parts.AUXILIARYBAR_PART);
+		const sidexBar = this.getPart(Parts.SIDEX_PART);
 		const newPositionValue = position === Position.LEFT ? 'left' : 'right';
 		const oldPositionValue = position === Position.RIGHT ? 'left' : 'right';
 		const panelAlignment = this.getPanelAlignment();
@@ -795,6 +800,7 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 		activityBar.updateStyles();
 		sideBar.updateStyles();
 		auxiliaryBar.updateStyles();
+		sidexBar.updateStyles();
 
 		// Move activity bar and side bars
 		this.adjustPartPositions(position, panelAlignment, panelPosition);
@@ -983,6 +989,20 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 				this.state.initialization.views.containerToRestore.auxiliaryBar = viewContainerToRestore;
 			} else {
 				this.stateModel.setRuntimeValue(LayoutStateKeys.AUXILIARYBAR_HIDDEN, true);
+			}
+		}
+
+		// Sidex View to restore
+		if (this.isVisible(Parts.SIDEX_PART)) {
+			const viewContainerToRestore = this.storageService.get(
+				SidexPart.activeViewSettingsKey,
+				StorageScope.WORKSPACE,
+				this.viewDescriptorService.getDefaultViewContainer(ViewContainerLocation.Sidex)?.id
+			);
+			if (viewContainerToRestore) {
+				this.state.initialization.views.containerToRestore.sidex = viewContainerToRestore;
+			} else {
+				this.stateModel.setRuntimeValue(LayoutStateKeys.SIDEX_HIDDEN, true);
 			}
 		}
 
@@ -1316,6 +1336,12 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 						locationsRestored[ViewContainerLocation.AuxiliaryBar].id;
 				}
 
+				// If we opened a view in the sidex, stop any restore there
+				if (locationsRestored[ViewContainerLocation.Sidex]) {
+					this.state.initialization.views.containerToRestore.sidex =
+						locationsRestored[ViewContainerLocation.Sidex].id;
+				}
+
 				mark('code/didOpenDefaultViews');
 			}
 		})();
@@ -1381,6 +1407,25 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 				);
 
 				mark('code/didRestoreAuxiliaryBar');
+			})()
+		);
+
+		// Restore Sidex
+		layoutReadyPromises.push(
+			(async () => {
+				await restoreDefaultViewsPromise;
+				if (!this.state.initialization.views.containerToRestore.sidex) {
+					return;
+				}
+
+				mark('code/willRestoreSidex');
+
+				await this.openViewContainer(
+					ViewContainerLocation.Sidex,
+					this.state.initialization.views.containerToRestore.sidex
+				);
+
+				mark('code/didRestoreSidex');
 			})()
 		);
 
@@ -1520,6 +1565,10 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 				this.paneCompositeService.getActivePaneComposite(ViewContainerLocation.AuxiliaryBar)?.focus();
 				break;
 			}
+			case Parts.SIDEX_PART: {
+				this.paneCompositeService.getActivePaneComposite(ViewContainerLocation.Sidex)?.focus();
+				break;
+			}
 			case Parts.ACTIVITYBAR_PART:
 				(this.getPart(Parts.SIDEBAR_PART) as SidebarPart).focusActivityBar();
 				break;
@@ -1579,6 +1628,8 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 				return !this.stateModel.getRuntimeValue(LayoutStateKeys.PANEL_HIDDEN);
 			case Parts.AUXILIARYBAR_PART:
 				return !this.stateModel.getRuntimeValue(LayoutStateKeys.AUXILIARYBAR_HIDDEN);
+			case Parts.SIDEX_PART:
+				return !this.stateModel.getRuntimeValue(LayoutStateKeys.SIDEX_HIDDEN);
 			case Parts.STATUSBAR_PART:
 				return !this.stateModel.getRuntimeValue(LayoutStateKeys.STATUSBAR_HIDDEN);
 			case Parts.ACTIVITYBAR_PART:
@@ -1625,6 +1676,7 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 				(this.isVisible(Parts.ACTIVITYBAR_PART) ? this.activityBarPartView.minimumWidth : 0) +
 				(this.isVisible(Parts.SIDEBAR_PART) ? this.sideBarPartView.minimumWidth : 0) +
 				(this.isVisible(Parts.PANEL_PART) && !isPanelHorizontal ? this.panelPartView.minimumWidth : 0) +
+				(this.isVisible(Parts.SIDEX_PART) ? this.sidexPartView.minimumWidth : 0) +
 				(this.isVisible(Parts.AUXILIARYBAR_PART) ? this.auxiliaryBarPartView.minimumWidth : 0);
 
 			const takenHeight =
@@ -1695,11 +1747,13 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 				zenModeExitInfo.wasVisible.sideBar = this.isVisible(Parts.SIDEBAR_PART);
 				zenModeExitInfo.wasVisible.panel = this.isVisible(Parts.PANEL_PART);
 				zenModeExitInfo.wasVisible.auxiliaryBar = this.isVisible(Parts.AUXILIARYBAR_PART);
+				zenModeExitInfo.wasVisible.sidex = this.isVisible(Parts.SIDEX_PART);
 				this.stateModel.setRuntimeValue(LayoutStateKeys.ZEN_MODE_EXIT_INFO, zenModeExitInfo);
 			}
 
 			this.setPanelHidden(true, true);
 			this.setAuxiliaryBarHidden(true, true);
+			this.setSidexHidden(true, true);
 			this.setSideBarHidden(true);
 
 			if (config.hideActivityBar) {
@@ -1814,6 +1868,10 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 				this.setAuxiliaryBarHidden(false, true);
 			}
 
+			if (zenModeExitInfo.wasVisible.sidex) {
+				this.setSidexHidden(false, true);
+			}
+
 			if (zenModeExitInfo.wasVisible.sideBar) {
 				this.setSideBarHidden(false);
 			}
@@ -1883,6 +1941,7 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 		const activityBar = this.getPart(Parts.ACTIVITYBAR_PART);
 		const panelPart = this.getPart(Parts.PANEL_PART);
 		const auxiliaryBarPart = this.getPart(Parts.AUXILIARYBAR_PART);
+		const sidexPart = this.getPart(Parts.SIDEX_PART);
 		const sideBar = this.getPart(Parts.SIDEBAR_PART);
 		const statusBar = this.getPart(Parts.STATUSBAR_PART);
 
@@ -1894,6 +1953,7 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 		this.editorPartView = editorPart;
 		this.panelPartView = panelPart;
 		this.auxiliaryBarPartView = auxiliaryBarPart;
+		this.sidexPartView = sidexPart;
 		this.statusBarPartView = statusBar;
 
 		const viewMap: Record<string, ISerializableView> = {
@@ -1904,7 +1964,8 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 			[Parts.PANEL_PART]: this.panelPartView,
 			[Parts.SIDEBAR_PART]: this.sideBarPartView,
 			[Parts.STATUSBAR_PART]: this.statusBarPartView,
-			[Parts.AUXILIARYBAR_PART]: this.auxiliaryBarPartView
+			[Parts.AUXILIARYBAR_PART]: this.auxiliaryBarPartView,
+			[Parts.SIDEX_PART]: this.sidexPartView
 		};
 
 		const fromJSON = ({ type }: { type: Parts }) => viewMap[type];
@@ -1927,6 +1988,7 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 			sideBar,
 			statusBar,
 			auxiliaryBarPart,
+			sidexPart,
 			bannerPart
 		]) {
 			this._register(
@@ -1947,6 +2009,8 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 							this.setPanelHidden(!visible, true);
 						} else if (part === auxiliaryBarPart) {
 							this.setAuxiliaryBarHidden(!visible, true);
+						} else if (part === sidexPart) {
+							this.setSidexHidden(!visible, true);
 						} else if (part === editorPart) {
 							this.setEditorHidden(!visible);
 						}
@@ -1979,6 +2043,12 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 					? this.workbenchGrid.getViewCachedVisibleSize(this.auxiliaryBarPartView)
 					: this.workbenchGrid.getViewSize(this.auxiliaryBarPartView).width;
 				this.stateModel.setInitializationValue(LayoutStateKeys.AUXILIARYBAR_SIZE, auxiliaryBarSize as number);
+
+				// Sidex Size
+				const sidexSize = this.stateModel.getRuntimeValue(LayoutStateKeys.SIDEX_HIDDEN)
+					? this.workbenchGrid.getViewCachedVisibleSize(this.sidexPartView)
+					: this.workbenchGrid.getViewSize(this.sidexPartView).width;
+				this.stateModel.setInitializationValue(LayoutStateKeys.SIDEX_SIZE, sidexSize as number);
 
 				this.stateModel.save(true, true);
 			})
@@ -2115,6 +2185,13 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 					height: viewSize.height
 				});
 				break;
+			case Parts.SIDEX_PART:
+				viewSize = this.workbenchGrid.getViewSize(this.sidexPartView);
+				this.workbenchGrid.resizeView(this.sidexPartView, {
+					width: viewSize.width + sizeChangePxWidth,
+					height: viewSize.height
+				});
+				break;
 			case Parts.EDITOR_PART:
 				viewSize = this.workbenchGrid.getViewSize(this.editorPartView);
 
@@ -2190,6 +2267,7 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 			!this.isVisible(Parts.EDITOR_PART, mainWindow) ? LayoutClasses.MAIN_EDITOR_AREA_HIDDEN : undefined,
 			!this.isVisible(Parts.PANEL_PART) ? LayoutClasses.PANEL_HIDDEN : undefined,
 			!this.isVisible(Parts.AUXILIARYBAR_PART) ? LayoutClasses.AUXILIARYBAR_HIDDEN : undefined,
+			!this.isVisible(Parts.SIDEX_PART) ? LayoutClasses.SIDEX_HIDDEN : undefined,
 			!this.isVisible(Parts.STATUSBAR_PART) ? LayoutClasses.STATUSBAR_HIDDEN : undefined,
 			this.state.runtime.mainWindowFullscreen ? LayoutClasses.FULLSCREEN : undefined,
 			this.isShadowsDisabled() ? LayoutClasses.NO_SHADOWS : undefined
@@ -2287,8 +2365,14 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 						this.auxiliaryBarPartView.minimumWidth
 				)
 			: this.workbenchGrid.getViewSize(this.auxiliaryBarPartView).width;
+		const preMoveSidexSize = !this.isVisible(Parts.SIDEX_PART)
+			? Sizing.Invisible(
+					this.workbenchGrid.getViewCachedVisibleSize(this.sidexPartView) ??
+						this.sidexPartView.minimumWidth
+				)
+			: this.workbenchGrid.getViewSize(this.sidexPartView).width;
 
-		const focusedPart = [Parts.PANEL_PART, Parts.SIDEBAR_PART, Parts.AUXILIARYBAR_PART].find(part =>
+		const focusedPart = [Parts.PANEL_PART, Parts.SIDEBAR_PART, Parts.AUXILIARYBAR_PART, Parts.SIDEX_PART].find(part =>
 			this.hasFocus(part)
 		) as SINGLE_WINDOW_PARTS | undefined;
 
@@ -2300,11 +2384,18 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 				sideBarSiblingToEditor ? this.editorPartView : this.activityBarPartView,
 				sideBarSiblingToEditor ? Direction.Left : Direction.Right
 			);
+			// Sidex between editor and auxiliary bar
+			this.workbenchGrid.moveView(
+				this.sidexPartView,
+				preMoveSidexSize,
+				this.editorPartView,
+				Direction.Right
+			);
 			if (auxiliaryBarSiblingToEditor) {
 				this.workbenchGrid.moveView(
 					this.auxiliaryBarPartView,
 					preMoveAuxiliaryBarSize,
-					this.editorPartView,
+					this.sidexPartView,
 					Direction.Right
 				);
 			} else {
@@ -2318,11 +2409,18 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 				sideBarSiblingToEditor ? this.editorPartView : this.activityBarPartView,
 				sideBarSiblingToEditor ? Direction.Right : Direction.Left
 			);
+			// Sidex between editor and auxiliary bar
+			this.workbenchGrid.moveView(
+				this.sidexPartView,
+				preMoveSidexSize,
+				this.editorPartView,
+				Direction.Left
+			);
 			if (auxiliaryBarSiblingToEditor) {
 				this.workbenchGrid.moveView(
 					this.auxiliaryBarPartView,
 					preMoveAuxiliaryBarSize,
-					this.editorPartView,
+					this.sidexPartView,
 					Direction.Left
 				);
 			} else {
@@ -2363,6 +2461,13 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 			this.workbenchGrid.resizeView(this.auxiliaryBarPartView, {
 				height: this.workbenchGrid.getViewSize(this.auxiliaryBarPartView).height,
 				width: preMoveAuxiliaryBarSize as number
+			});
+		}
+
+		if (this.isVisible(Parts.SIDEX_PART)) {
+			this.workbenchGrid.resizeView(this.sidexPartView, {
+				height: this.workbenchGrid.getViewSize(this.sidexPartView).height,
+				width: preMoveSidexSize as number
 			});
 		}
 	}
@@ -2518,6 +2623,9 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 				if (state.editorVisible) {
 					this.setEditorHidden(true);
 				}
+				if (this.isVisible(Parts.SIDEX_PART)) {
+					this.setSidexHidden(true);
+				}
 
 				this.stateModel.setRuntimeValue(LayoutStateKeys.AUXILIARYBAR_LAST_NON_MAXIMIZED_VISIBILITY, state);
 			} finally {
@@ -2650,6 +2758,43 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 		}
 	}
 
+	private setSidexHidden(hidden: boolean, skipLayout?: boolean): void {
+		this.stateModel.setRuntimeValue(LayoutStateKeys.SIDEX_HIDDEN, hidden);
+
+		// Adjust CSS
+		if (hidden) {
+			this.mainContainer.classList.add(LayoutClasses.SIDEX_HIDDEN);
+		} else {
+			this.mainContainer.classList.remove(LayoutClasses.SIDEX_HIDDEN);
+		}
+
+		// Propagate to grid
+		this.workbenchGrid.setViewVisible(this.sidexPartView, !hidden);
+
+		// If sidex becomes hidden, also hide the current active pane composite if any
+		if (hidden && this.paneCompositeService.getActivePaneComposite(ViewContainerLocation.Sidex)) {
+			this.paneCompositeService.hideActivePaneComposite(ViewContainerLocation.Sidex);
+			this.focusPanelOrEditor();
+		}
+
+		// If sidex becomes visible, show last active pane composite or default pane composite
+		else if (!hidden && !this.paneCompositeService.getActivePaneComposite(ViewContainerLocation.Sidex)) {
+			let viewletToOpen: string | undefined = this.paneCompositeService.getLastActivePaneCompositeId(
+				ViewContainerLocation.Sidex
+			);
+
+			if (!viewletToOpen || !this.hasViews(viewletToOpen)) {
+				viewletToOpen = this.viewDescriptorService
+					.getViewContainersByLocation(ViewContainerLocation.Sidex)
+					.find(viewContainer => this.hasViews(viewContainer.id))?.id;
+			}
+
+			if (viewletToOpen) {
+				this.openViewContainer(ViewContainerLocation.Sidex, viewletToOpen, !skipLayout);
+			}
+		}
+	}
+
 	setPartHidden(hidden: boolean, part: Parts): void {
 		switch (part) {
 			case Parts.ACTIVITYBAR_PART:
@@ -2662,6 +2807,8 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 				return this.setBannerHidden(hidden);
 			case Parts.AUXILIARYBAR_PART:
 				return this.setAuxiliaryBarHidden(hidden);
+			case Parts.SIDEX_PART:
+				return this.setSidexHidden(hidden);
 			case Parts.PANEL_PART:
 				return this.setPanelHidden(hidden);
 		}
@@ -2747,6 +2894,7 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 		const size = this.workbenchGrid.getViewSize(this.panelPartView);
 		const sideBarSize = this.workbenchGrid.getViewSize(this.sideBarPartView);
 		const auxiliaryBarSize = this.workbenchGrid.getViewSize(this.auxiliaryBarPartView);
+		const sidexSize = this.workbenchGrid.getViewSize(this.sidexPartView);
 
 		let editorHidden = !this.isVisible(Parts.EDITOR_PART, mainWindow);
 
@@ -2771,6 +2919,7 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 
 		const sideBarVisible = this.isVisible(Parts.SIDEBAR_PART);
 		const auxiliaryBarVisible = this.isVisible(Parts.AUXILIARYBAR_PART);
+		const sidexVisible = this.isVisible(Parts.SIDEX_PART);
 
 		const hadFocus = this.hasFocus(Parts.PANEL_PART);
 
@@ -2817,6 +2966,11 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 		this.workbenchGrid.resizeView(this.auxiliaryBarPartView, auxiliaryBarSize);
 		if (!auxiliaryBarVisible) {
 			this.setAuxiliaryBarHidden(true);
+		}
+
+		this.workbenchGrid.resizeView(this.sidexPartView, sidexSize);
+		if (!sidexVisible) {
+			this.setSidexHidden(true);
 		}
 
 		if (isHorizontal(position)) {
@@ -2869,6 +3023,7 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 				Parts.EDITOR_PART,
 				Parts.PANEL_PART,
 				Parts.AUXILIARYBAR_PART,
+				Parts.SIDEX_PART,
 				Parts.SIDEBAR_PART,
 				Parts.STATUSBAR_PART,
 				Parts.TITLEBAR_PART
@@ -2902,11 +3057,11 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 	}
 
 	private arrangeEditorNodes(
-		nodes: { editor: ISerializedNode; sideBar?: ISerializedNode; auxiliaryBar?: ISerializedNode },
+		nodes: { editor: ISerializedNode; sideBar?: ISerializedNode; auxiliaryBar?: ISerializedNode; sidex?: ISerializedNode },
 		availableHeight: number,
 		availableWidth: number
 	): ISerializedNode {
-		if (!nodes.sideBar && !nodes.auxiliaryBar) {
+		if (!nodes.sideBar && !nodes.auxiliaryBar && !nodes.sidex) {
 			nodes.editor.size = availableHeight;
 			return nodes.editor;
 		}
@@ -2921,6 +3076,17 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 			}
 
 			nodes.editor.size -= this.stateModel.getRuntimeValue(LayoutStateKeys.SIDEBAR_HIDDEN) ? 0 : nodes.sideBar.size;
+		}
+
+		// Sidex goes between editor and auxiliary bar
+		if (nodes.sidex) {
+			if (this.stateModel.getRuntimeValue(LayoutStateKeys.SIDEBAR_POSITON) === Position.LEFT) {
+				result.push(nodes.sidex);
+			} else {
+				result.splice(0, 0, nodes.sidex);
+			}
+
+			nodes.editor.size -= this.stateModel.getRuntimeValue(LayoutStateKeys.SIDEX_HIDDEN) ? 0 : nodes.sidex.size;
 		}
 
 		if (nodes.auxiliaryBar) {
@@ -2950,6 +3116,7 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 			activityBar: ISerializedNode;
 			sideBar: ISerializedNode;
 			auxiliaryBar: ISerializedNode;
+			sidex: ISerializedNode;
 		},
 		availableWidth: number,
 		availableHeight: number
@@ -2961,6 +3128,7 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 		const auxiliaryBarSize = this.stateModel.getRuntimeValue(LayoutStateKeys.AUXILIARYBAR_HIDDEN)
 			? 0
 			: nodes.auxiliaryBar.size;
+		const sidexSize = this.stateModel.getRuntimeValue(LayoutStateKeys.SIDEX_HIDDEN) ? 0 : nodes.sidex.size;
 		const panelSize = this.stateModel.getInitializationValue(LayoutStateKeys.PANEL_SIZE) ? 0 : nodes.panel.size;
 
 		const panelPostion = this.stateModel.getRuntimeValue(LayoutStateKeys.PANEL_POSITION);
@@ -2969,7 +3137,7 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 		const result = [] as ISerializedNode[];
 		if (!isHorizontal(panelPostion)) {
 			result.push(nodes.editor);
-			nodes.editor.size = availableWidth - activityBarSize - sideBarSize - panelSize - auxiliaryBarSize;
+			nodes.editor.size = availableWidth - activityBarSize - sideBarSize - panelSize - auxiliaryBarSize - sidexSize;
 			if (panelPostion === Position.RIGHT) {
 				result.push(nodes.panel);
 			} else {
@@ -2977,10 +3145,14 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 			}
 
 			if (sideBarPosition === Position.LEFT) {
+				// [ActivityBar] [SideBar] [Editor] [Sidex] [AuxiliaryBar]
+				result.push(nodes.sidex);
 				result.push(nodes.auxiliaryBar);
 				result.splice(0, 0, nodes.sideBar);
 				result.splice(0, 0, nodes.activityBar);
 			} else {
+				// [AuxiliaryBar] [Sidex] [Editor] [SideBar] [ActivityBar]
+				result.splice(0, 0, nodes.sidex);
 				result.splice(0, 0, nodes.auxiliaryBar);
 				result.push(nodes.sideBar);
 				result.push(nodes.activityBar);
@@ -3002,13 +3174,15 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 				availableWidth -
 				activityBarSize -
 				(sideBarNextToEditor ? 0 : sideBarSize) -
-				(auxiliaryBarNextToEditor ? 0 : auxiliaryBarSize);
+				(auxiliaryBarNextToEditor ? 0 : auxiliaryBarSize) -
+				sidexSize;
 
 			const editorNodes = this.arrangeEditorNodes(
 				{
 					editor: nodes.editor,
 					sideBar: sideBarNextToEditor ? nodes.sideBar : undefined,
-					auxiliaryBar: auxiliaryBarNextToEditor ? nodes.auxiliaryBar : undefined
+					auxiliaryBar: auxiliaryBarNextToEditor ? nodes.auxiliaryBar : undefined,
+					sidex: nodes.sidex
 				},
 				availableHeight - panelSize,
 				editorSectionWidth
@@ -3052,6 +3226,7 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 		const { width, height } = this._mainContainerDimension;
 		const sideBarSize = this.stateModel.getInitializationValue(LayoutStateKeys.SIDEBAR_SIZE);
 		const auxiliaryBarSize = this.stateModel.getInitializationValue(LayoutStateKeys.AUXILIARYBAR_SIZE);
+		const sidexSize = this.stateModel.getInitializationValue(LayoutStateKeys.SIDEX_SIZE);
 		const panelSize = this.stateModel.getInitializationValue(LayoutStateKeys.PANEL_SIZE);
 
 		const titleBarHeight = this.titleBarPartView.minimumHeight;
@@ -3096,6 +3271,13 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 			visible: this.isVisible(Parts.AUXILIARYBAR_PART)
 		};
 
+		const sidexNode: ISerializedLeafNode = {
+			type: 'leaf',
+			data: { type: Parts.SIDEX_PART },
+			size: sidexSize,
+			visible: this.isVisible(Parts.SIDEX_PART)
+		};
+
 		const editorNode: ISerializedLeafNode = {
 			type: 'leaf',
 			data: { type: Parts.EDITOR_PART },
@@ -3114,6 +3296,7 @@ export abstract class Layout extends Disposable implements IWorkbenchLayoutServi
 			{
 				activityBar: activityBarNode,
 				auxiliaryBar: auxiliaryBarNode,
+				sidex: sidexNode,
 				editor: editorNode,
 				panel: panelNode,
 				sideBar: sideBarNode
@@ -3300,7 +3483,8 @@ const LayoutStateKeys = {
 		wasVisible: {
 			auxiliaryBar: false,
 			panel: false,
-			sideBar: false
+			sideBar: false,
+			sidex: false
 		}
 	}),
 
@@ -3313,6 +3497,7 @@ const LayoutStateKeys = {
 		300
 	),
 	PANEL_SIZE: new InitializationStateKey<number>('panel.size', StorageScope.PROFILE, StorageTarget.MACHINE, 300),
+	SIDEX_SIZE: new InitializationStateKey<number>('sidex.size', StorageScope.PROFILE, StorageTarget.MACHINE, 350),
 
 	// Part State
 	PANEL_LAST_NON_MAXIMIZED_HEIGHT: new RuntimeStateKey<number>(
@@ -3400,6 +3585,12 @@ const LayoutStateKeys = {
 		StorageScope.WORKSPACE,
 		StorageTarget.MACHINE,
 		true
+	),
+	SIDEX_HIDDEN: new RuntimeStateKey<boolean>(
+		'sidex.hidden',
+		StorageScope.WORKSPACE,
+		StorageTarget.MACHINE,
+		false
 	),
 	STATUSBAR_HIDDEN: new RuntimeStateKey<boolean>(
 		'statusBar.hidden',
@@ -3590,7 +3781,7 @@ class LayoutStateModel extends Disposable {
 		LayoutStateKeys.PANEL_SIZE.defaultValue =
 			(this.stateCache.get(LayoutStateKeys.PANEL_POSITION.name) ??
 			isHorizontal(LayoutStateKeys.PANEL_POSITION.defaultValue))
-				? mainContainerDimension.height / 3
+				? mainContainerDimension.height * 0.3
 				: mainContainerDimension.width / 4;
 		LayoutStateKeys.PANEL_POSITION.defaultValue = positionFromString(
 			this.configurationService.getValue(WorkbenchLayoutSettings.PANEL_POSITION) ?? 'bottom'
@@ -3675,6 +3866,10 @@ class LayoutStateModel extends Disposable {
 				LayoutStateKeys.AUXILIARYBAR_SIZE,
 				Math.min(300, configuration.mainContainerDimension.width / 4)
 			);
+			this.setInitializationValue(
+				LayoutStateKeys.SIDEX_SIZE,
+				Math.min(350, configuration.mainContainerDimension.width / 4)
+			);
 		}
 	}
 
@@ -3690,6 +3885,7 @@ class LayoutStateModel extends Disposable {
 		this.setRuntimeValue(LayoutStateKeys.PANEL_HIDDEN, true);
 		this.setRuntimeValue(LayoutStateKeys.EDITOR_HIDDEN, true);
 		this.setRuntimeValue(LayoutStateKeys.AUXILIARYBAR_HIDDEN, false);
+		this.setRuntimeValue(LayoutStateKeys.SIDEX_HIDDEN, true);
 
 		this.setRuntimeValue(
 			LayoutStateKeys.AUXILIARYBAR_LAST_NON_MAXIMIZED_SIZE,

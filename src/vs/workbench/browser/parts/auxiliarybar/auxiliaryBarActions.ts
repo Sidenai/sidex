@@ -62,7 +62,7 @@ const auxiliaryBarLeftOffIcon = registerIcon(
 
 export class ToggleAuxiliaryBarAction extends Action2 {
 	static readonly ID = 'workbench.action.toggleAuxiliaryBar';
-	static readonly LABEL = localize2('toggleAuxiliaryBar', 'Toggle Secondary Side Bar Visibility');
+	static readonly LABEL = localize2('toggleAuxiliaryBar', 'Toggle Secondary Side Bar');
 
 	constructor() {
 		super({
@@ -74,13 +74,13 @@ export class ToggleAuxiliaryBarAction extends Action2 {
 				icon: closeIcon,
 				mnemonicTitle: localize(
 					{ key: 'miCloseSecondarySideBar', comment: ['&& denotes a mnemonic'] },
-					'&&Secondary Side Bar'
+					'&&Sidex'
 				)
 			},
 			icon: closeIcon,
 			category: Categories.View,
 			metadata: {
-				description: localize('openAndCloseAuxiliaryBar', 'Open/Show and Close/Hide Secondary Side Bar')
+				description: localize('openAndCloseAuxiliaryBar', 'Show/Hide Secondary Side Bar')
 			},
 			f1: true,
 			keybinding: {

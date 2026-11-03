@@ -22,7 +22,10 @@ const INPUT_STYLES = [
 	'outline:none',
 	'padding:0 2px',
 	'font-family:var(--vscode-font-family,inherit)',
-	'font-size:var(--vscode-font-size,13px)'
+	'font-size:var(--vscode-font-size,13px)',
+	'text-overflow:ellipsis',
+	'white-space:nowrap',
+	'overflow:hidden'
 ].join(';');
 
 const WRAPPER_STYLES = [

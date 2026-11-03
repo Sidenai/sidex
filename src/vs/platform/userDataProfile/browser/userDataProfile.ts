@@ -40,6 +40,8 @@ async function loadTauri(): Promise<TauriBindings | undefined> {
 export class BrowserUserDataProfilesService extends UserDataProfilesService implements IUserDataProfilesService {
 	private readonly changesBroadcastChannel: BroadcastDataChannel<BroadcastedProfileChanges>;
 	private readonly _tauri: Promise<TauriBindings | undefined>;
+	/** True while hydrateFromDisk is writing to localStorage — prevents re-entrant saves. */
+	private _isHydrating = false;
 
 	constructor(
 		@IEnvironmentService environmentService: IEnvironmentService,
@@ -109,6 +111,14 @@ export class BrowserUserDataProfilesService extends UserDataProfilesService impl
 			return;
 		}
 
+		// Guard against re-entrant saves triggered by localStorage writes below.
+		// Without this flag, writing to localStorage causes the UserDataProfilesService
+		// base class to call saveStoredProfiles/saveStoredProfileAssociations → mirrorToDisk
+		// → Rust emits PROFILES_CHANGED_EVENT → hydrateFromDisk fires again → infinite loop.
+		if (this._isHydrating) {
+			return;
+		}
+		this._isHydrating = true;
 		try {
 			const [profiles, associations] = await Promise.all([
 				tauri.invoke<StoredUserDataProfile[]>('profiles_load'),
@@ -126,6 +136,8 @@ export class BrowserUserDataProfilesService extends UserDataProfilesService impl
 			}
 		} catch (error) {
 			this.logService.warn('[sidex-profiles] hydrate failed', error);
+		} finally {
+			this._isHydrating = false;
 		}
 	}
 
@@ -179,7 +191,9 @@ export class BrowserUserDataProfilesService extends UserDataProfilesService impl
 
 	protected override saveStoredProfiles(storedProfiles: StoredUserDataProfile[]): void {
 		localStorage.setItem(UserDataProfilesService.PROFILES_KEY, JSON.stringify(storedProfiles));
-		void this.mirrorToDisk('profiles_save', { profiles: storedProfiles });
+		if (!this._isHydrating) {
+			void this.mirrorToDisk('profiles_save', { profiles: storedProfiles });
+		}
 	}
 
 	protected override getStoredProfileAssociations(): StoredProfileAssociations {
@@ -196,6 +210,8 @@ export class BrowserUserDataProfilesService extends UserDataProfilesService impl
 
 	protected override saveStoredProfileAssociations(storedProfileAssociations: StoredProfileAssociations): void {
 		localStorage.setItem(UserDataProfilesService.PROFILE_ASSOCIATIONS_KEY, JSON.stringify(storedProfileAssociations));
-		void this.mirrorToDisk('profiles_save_associations', { value: storedProfileAssociations });
+		if (!this._isHydrating) {
+			void this.mirrorToDisk('profiles_save_associations', { value: storedProfileAssociations });
+		}
 	}
 }

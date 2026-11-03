@@ -365,6 +365,8 @@ export abstract class AbstractPaneCompositePart extends CompositePart<PaneCompos
 			return undefined;
 		}
 
+		titleArea.classList.add('sidex-header');
+
 		this._register(
 			addDisposableListener(titleArea, EventType.CONTEXT_MENU, e => {
 				this.onTitleAreaContextMenu(new StandardMouseEvent(getWindow(titleArea), e));

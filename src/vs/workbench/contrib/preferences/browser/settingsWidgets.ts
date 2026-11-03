@@ -50,6 +50,13 @@ import { settingsDiscardIcon, settingsEditIcon, settingsRemoveIcon } from './pre
 
 const $ = DOM.$;
 
+const settingsToggleStyles = {
+	...unthemedToggleStyles,
+	inputActiveOptionBackground: 'var(--vscode-button-background, #0078d4)',
+	inputActiveOptionBorder: 'var(--vscode-button-background, #0078d4)',
+	inputActiveOptionForeground: '#fff'
+};
+
 type EditKey = 'none' | 'create' | number;
 
 type RowElementGroup = {
@@ -1495,7 +1502,7 @@ export class ObjectSettingCheckboxWidget extends AbstractListSettingWidget<IBool
 			actionClassName: 'setting-value-checkbox',
 			isChecked: value,
 			title: checkboxDescription,
-			...unthemedToggleStyles
+			...settingsToggleStyles
 		});
 
 		this.listDisposables.add(checkbox);

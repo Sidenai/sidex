@@ -1,8 +1,9 @@
-//! OS-keyring-backed secret storage commands.
+//! Secret storage commands — thin wrapper around `SecretStorage`.
 //!
-//! Feeds the TypeScript `ISecretStorageService`. Keys are namespaced
-//! automatically (the crate stores them under the `SideX` service id) so
-//! collisions with other apps on the same keyring are impossible.
+//! Values live in `state.vscdb` → `ItemTable`, the same `SQLite` database the
+//! VS Code platform uses for all user state. There's no fixed key namespace
+//! here; callers pick their own keys (see `commands::providers` for the
+//! provider API key, base-URL and CLI-auth-opt-in keys actually written).
 
 use std::sync::Arc;
 
@@ -10,7 +11,7 @@ use sidex_auth::SecretStorage;
 use tauri::{AppHandle, Manager};
 
 pub struct SecretsStore {
-    inner: SecretStorage,
+    pub(crate) inner: SecretStorage,
 }
 
 impl SecretsStore {
@@ -20,11 +21,13 @@ impl SecretsStore {
 }
 
 pub fn initialize(app: &AppHandle) -> Result<(), String> {
-    let data_dir = app
-        .path()
-        .app_data_dir()
-        .map_err(|e| format!("app_data_dir: {e}"))?;
-    let db_path = data_dir.join("UserData").join("secrets-index.db");
+    let data_dir = crate::app_dirs::app_data_dir();
+    // state.vscdb -> ItemTable, matching how the VS Code platform (and
+    // Cursor, which this layout is modeled on) persist user-scoped state.
+    let db_path = data_dir
+        .join("User")
+        .join("globalStorage")
+        .join("state.vscdb");
     let storage = SecretStorage::open(db_path).map_err(|e| e.to_string())?;
     app.manage(Arc::new(SecretsStore::new(storage)));
     Ok(())

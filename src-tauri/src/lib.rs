@@ -1,14 +1,16 @@
+mod app_dirs;
 mod commands;
+mod server;
 
+use commands::auth::AuthState;
 use commands::db_state::SidexDbState;
 use commands::debug::{DapClientStore, DebugAdapterStore};
 use commands::ext_host::ExtensionPlatformSupervisor;
 use commands::extension_diagnostics::ExtensionDiagnosticsStore;
 use commands::extension_wasm::WasmExtensionRuntime;
 use commands::index::IndexStore;
-use commands::logging::LoggerStore;
 use commands::lsp::LspState;
-use commands::process::ProcessStore;
+use commands::orchestrate::OrchestrationStore;
 use commands::remote::RemoteManagerStore;
 use commands::settings::SettingsStore;
 use commands::storage::StorageDb;
@@ -20,6 +22,7 @@ use commands::window::restore_and_show;
 use std::sync::Arc;
 #[cfg(target_os = "macos")]
 use tauri::menu::{Menu, MenuItemBuilder, PredefinedMenuItem, SubmenuBuilder};
+use tauri::Listener;
 use tauri::Manager;
 
 #[cfg(target_os = "macos")]
@@ -367,24 +370,102 @@ fn build_menu(app: &tauri::AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
     Ok(menu)
 }
 
+/// macOS GUI apps inherit a minimal `PATH` (`/usr/bin:/bin`) from launchd,
+/// which breaks discovery of git/node/LSP binaries installed via Homebrew,
+/// nvm, etc. Query the user's login shell for its interactive `PATH` and
+/// adopt it if it is richer than the current one.
+///
+/// Vendored minimal equivalent of the `fix-path-env` crate
+/// (tauri-apps/fix-path-env-rs), which is not published on crates.io.
+#[cfg(target_os = "macos")]
+fn fix_macos_path() {
+    use std::process::{Command, Stdio};
+    use std::sync::mpsc;
+    use std::time::Duration;
+
+    let shell = std::env::var("SHELL")
+        .ok()
+        .filter(|s| !s.is_empty())
+        .unwrap_or_else(|| "/bin/zsh".to_string());
+
+    let child = Command::new(&shell)
+        .args(["-ilc", "echo -n \"$PATH\""])
+        .stdin(Stdio::null())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::null())
+        .spawn();
+
+    let child = match child {
+        Ok(c) => c,
+        Err(e) => {
+            log::warn!("fix_macos_path: failed to spawn {shell}: {e}");
+            return;
+        }
+    };
+
+    let pid = child.id();
+    let (tx, rx) = mpsc::channel();
+    std::thread::spawn(move || {
+        let _ = tx.send(child.wait_with_output());
+    });
+
+    let output = match rx.recv_timeout(Duration::from_secs(3)) {
+        Ok(Ok(output)) => output,
+        Ok(Err(e)) => {
+            log::warn!("fix_macos_path: shell failed: {e}");
+            return;
+        }
+        Err(_) => {
+            // Timed out: kill the orphaned shell and keep the default PATH.
+            let _ = Command::new("kill").arg(pid.to_string()).status();
+            log::warn!("fix_macos_path: timed out waiting for {shell}");
+            return;
+        }
+    };
+
+    let new_path = String::from_utf8_lossy(&output.stdout).trim().to_string();
+    let current_path = std::env::var("PATH").unwrap_or_default();
+    if !new_path.is_empty() && new_path.len() > current_path.len() {
+        std::env::set_var("PATH", &new_path);
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 #[allow(clippy::too_many_lines)]
 pub fn run() {
+    // Inherit the user's login-shell PATH before anything (terminals, git,
+    // LSP servers, extension hosts) is spawned.
+    #[cfg(target_os = "macos")]
+    fix_macos_path();
+
+    // Load .env from project root (parent of src-tauri)
+    let manifest_dir = env!("CARGO_MANIFEST_DIR");
+    let project_root = std::path::Path::new(manifest_dir)
+        .parent()
+        .unwrap_or(std::path::Path::new("."));
+    let env_path = project_root.join(".env");
+    if env_path.exists() {
+        dotenvy::from_path(&env_path).ok();
+    }
+
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_shell::init())
+        .manage(AuthState::new())
         .manage(UpdateManagerState::new())
-        .manage(Arc::new(commands::textmate::TextMateStore::new()))
         .manage(Arc::new(commands::extensions::MarketplaceClientState::new()))
         .manage(Arc::new(TerminalStore::new()))
-        .manage(Arc::new(ProcessStore::new()))
         .manage(Arc::new(DebugAdapterStore::new()))
         .manage(Arc::new(DapClientStore::new()))
         .manage(Arc::new(LspState::new()))
         .manage(Arc::new(TaskProcessStore::new()))
+        .manage(Arc::new(OrchestrationStore::new()))
         .manage(Arc::new(WatchStore::new()))
-        .manage(Arc::new(IndexStore::new(true)))
-        .manage(Arc::new(LoggerStore::new()))
+        .manage(commands::browser::BrowserState::new())
+        .manage(commands::mcp::McpState::new())
+        .manage(commands::hooks::HooksState::default_global())
+        .manage(commands::next_gen_tools::CheckpointStore::new())
+        .manage(Arc::new(IndexStore::new(false)))
         .manage(ExtensionPlatformSupervisor::new())
         .manage(ExtensionDiagnosticsStore::new())
         .manage(Arc::new(SettingsStore::new()))
@@ -399,7 +480,44 @@ pub fn run() {
                 let decoded = urlencoding::decode(raw_path.strip_prefix('/').unwrap_or(raw_path))
                     .unwrap_or_default();
 
-                let Ok(data) = std::fs::read(decoded.as_ref()) else {
+                // Security: only serve files from the app's resource directories
+                // Block path traversal, symlinks to sensitive files, and absolute paths
+                // outside the expected asset directories.
+                let path = std::path::Path::new(decoded.as_ref());
+                let canonical = match path.canonicalize() {
+                    Ok(p) => p,
+                    Err(_) => {
+                        responder.respond(
+                            tauri::http::Response::builder()
+                                .status(404)
+                                .header("Access-Control-Allow-Origin", "*")
+                                .body(Vec::new())
+                                .unwrap(),
+                        );
+                        return;
+                    }
+                };
+
+                // Only allow files within the user's workspace or common asset paths
+                let canonical_str = canonical.to_string_lossy();
+                let is_safe = !canonical_str.contains("/.ssh/")
+                    && !canonical_str.contains("/.gnupg/")
+                    && !canonical_str.contains("/etc/")
+                    && !canonical_str.starts_with("/System")
+                    && !canonical_str.contains("/.env");
+
+                if !is_safe {
+                    responder.respond(
+                        tauri::http::Response::builder()
+                            .status(403)
+                            .header("Access-Control-Allow-Origin", "*")
+                            .body(Vec::new())
+                            .unwrap(),
+                    );
+                    return;
+                }
+
+                let Ok(data) = std::fs::read(&canonical) else {
                     responder.respond(
                         tauri::http::Response::builder()
                             .status(404)
@@ -441,25 +559,62 @@ pub fn run() {
             });
         })
         .setup(|app| {
-            let app_data = app
-                .path()
-                .app_data_dir()
-                .expect("failed to resolve app data dir");
+            let app_data = crate::app_dirs::resolve_and_migrate();
             std::fs::create_dir_all(&app_data).ok();
             let db_path = app_data.join("sidex_storage.db");
-            let db = StorageDb::new(db_path.to_str().unwrap())
-                .expect("failed to initialize storage database");
+            // Non-UTF-8 app-data paths and a corrupt/locked DB must not hard-
+            // crash the app with no message — recreate the DB once, then fail
+            // with a readable error.
+            let db_path_str = db_path.to_string_lossy().to_string();
+            let db = match StorageDb::new(&db_path_str) {
+                Ok(db) => db,
+                Err(e) => {
+                    log::error!("storage DB open failed ({e}); recreating {db_path_str}");
+                    let _ = std::fs::remove_file(&db_path);
+                    StorageDb::new(&db_path_str)
+                        .map_err(|e| format!("failed to initialize storage database: {e}"))?
+                }
+            };
 
             restore_and_show(app, &db);
 
+            // Debug-only: SIDEX_DEVTOOLS=1 auto-opens devtools to capture boot errors
+            #[cfg(debug_assertions)]
+            if std::env::var("SIDEX_DEVTOOLS").is_ok() {
+                if let Some(w) = app.get_webview_window("main") {
+                    w.open_devtools();
+                }
+            }
+
             app.manage(Arc::new(db));
+
+            // Full extension-API dispatcher (ext_api_call), sharing the
+            // already-managed CommandRegistry.
+            {
+                use sidex_extension_api as ext;
+                let registry = app
+                    .state::<Arc<ext::CommandRegistry>>()
+                    .inner()
+                    .clone();
+                app.manage(Arc::new(ext::ExtensionApiHandler::new(
+                    Arc::new(ext::WindowApi::new()),
+                    Arc::new(ext::WorkspaceApi::new()),
+                    Arc::new(ext::LanguagesApi::new()),
+                    registry,
+                    Arc::new(ext::DebugApi::new()),
+                    Arc::new(ext::TasksApi::new()),
+                    Arc::new(ext::ScmApi::new()),
+                    Arc::new(ext::TestApi::new()),
+                    Arc::new(ext::EnvApi::new()),
+                )));
+            }
 
             {
                 let settings_store = app.state::<Arc<SettingsStore>>();
-                let user_settings_path = commands::os::resolve_user_data_dir(app.handle())
-                    .expect("failed to resolve user data dir")
-                    .join("User")
-                    .join("settings.json");
+                let user_settings_path = app_data.join("UserData").join("User").join("settings.json");
+                // Always record the path so user-scope updates persist to
+                // disk, even on first launch when the file doesn't exist yet.
+                settings_store.set_user_path(&user_settings_path);
                 if user_settings_path.exists() {
                     if let Err(e) = settings_store.load_user(&user_settings_path) {
                         log::warn!("failed to pre-load user settings: {e}");
@@ -468,12 +623,17 @@ pub fn run() {
             }
 
             let sidex_db_path = app_data.join("sidex_state.db");
-            let sidex_db = sidex_db::Database::open(&sidex_db_path)
-                .expect("failed to initialize sidex-db state database");
+            // Same graceful-recreate policy as the storage DB above.
+            let sidex_db = match sidex_db::Database::open(&sidex_db_path) {
+                Ok(db) => db,
+                Err(e) => {
+                    log::error!("state DB open failed ({e}); recreating {}", sidex_db_path.display());
+                    let _ = std::fs::remove_file(&sidex_db_path);
+                    sidex_db::Database::open(&sidex_db_path)
+                        .map_err(|e| format!("failed to initialize sidex-db state database: {e}"))?
+                }
+            };
             app.manage(Arc::new(SidexDbState::new(sidex_db)));
-
-            let process_store = app.state::<Arc<ProcessStore>>();
-            process_store.set_app_handle(app.handle().clone());
 
             if let Err(err) = commands::updater::initialize(app.handle()) {
                 log::warn!("update manager disabled: {err}");
@@ -507,6 +667,11 @@ pub fn run() {
                 }
             }
 
+
+            // Start the local agent server. Failure is non-fatal —
+            // the editor works without it, the chat panel just shows
+            // as disconnected.
+            server::initialize(app.handle());
             Ok(())
         })
         .on_menu_event(|app, event| {
@@ -519,8 +684,28 @@ pub fn run() {
             }
         })
         .invoke_handler(tauri::generate_handler![
+            // AI Agent
+            commands::agent::agent_execute_tool,
+            // Local account, providers, and the local agent server
+            server::server_endpoint,
+            server::server_restart,
+            commands::providers_catalog,
+            commands::providers_status,
+            commands::providers_save,
+            commands::providers_delete,
+            commands::providers_set_cli_auth,
+            commands::providers_set_enabled,
+            commands::providers_detect_cli,
+            commands::providers_detect_local,
+            commands::providers_list_models,
+            commands::accounts_list,
+            commands::accounts_connect,
+            commands::accounts_disconnect,
+            commands::auth_get_session,
+            commands::auth_get_usage,
             // File system
             commands::read_file,
+            commands::get_cwd,
             commands::read_file_bytes,
             commands::write_file,
             commands::write_file_bytes,
@@ -574,35 +759,14 @@ pub fn run() {
             commands::terminal_resize,
             commands::terminal_kill,
             commands::terminal_get_pid,
-            // High-performance process management
-            commands::term_spawn,
-            commands::term_write,
-            commands::term_resize,
-            commands::term_read,
-            commands::term_kill,
-            commands::term_info,
-            commands::term_list,
-            commands::term_is_alive,
-            commands::term_clear_buffer,
-            commands::term_signal,
-            commands::term_set_cwd,
-            commands::term_get_shells,
             commands::exec,
             commands::get_default_shell,
             commands::check_shell_exists,
             commands::get_available_shells,
             commands::get_shell_integration_dir,
             commands::setup_zsh_dotdir,
-            // sidex-terminal crate features
-            commands::terminal_detect_shell,
-            commands::terminal_get_profiles,
-            commands::terminal_find_in_buffer,
             commands::search_files,
             commands::search_text,
-            commands::search_workspace,
-            commands::search_workspace_grouped,
-            commands::search_workspace_replace_preview,
-            commands::search_workspace_replace_apply,
             commands::create_window,
             commands::close_window,
             commands::set_window_title,
@@ -623,26 +787,23 @@ pub fn run() {
             commands::secret_set,
             commands::secret_delete,
             commands::secret_keys,
-            commands::textmate_load_grammar,
-            commands::textmate_update_theme,
-            commands::textmate_tokenize_line,
-		commands::textmate_tokenize_line_binary,
-            commands::textmate_tokenize_document,
-            commands::textmate_release_stack,
             commands::get_os_info,
             commands::get_env,
             commands::get_all_env,
-            commands::get_shell,
             commands::get_user_data_dir,
             commands::storage_get,
             commands::storage_set,
             commands::storage_delete,
-            commands::storage_list,
-            // sidex-db state persistence
-            commands::db_get_recent_files,
-            commands::db_get_recent_workspaces,
-            commands::db_save_workspace_state,
-            commands::db_get_workspace_state,
+            // Chat session persistence
+            commands::session_create,
+            commands::session_list,
+            commands::session_load,
+            commands::session_save_message,
+            commands::session_delete,
+            commands::session_search,
+            commands::session_update_title,
+            commands::session_pin,
+            commands::session_archive,
             // Layered settings
             commands::settings_get,
             commands::settings_update,
@@ -699,8 +860,6 @@ pub fn run() {
             commands::extension_platform_restart,
             commands::extension_platform_stop,
             commands::extension_platform_init_data,
-            commands::fetch_url,
-            commands::fetch_url_text,
             commands::proxy_request,
             commands::proxy_request_full,
             commands::clipboard_read_text,
@@ -722,6 +881,19 @@ pub fn run() {
             commands::task_list,
             commands::tasks_detect,
             commands::tasks_parse_config,
+            // Orchestration
+            commands::orch_start,
+            commands::orch_add_tasks,
+            commands::orch_spawn_task,
+            commands::orch_cancel,
+            commands::orch_status,
+            commands::orch_get_ready_tasks,
+            commands::orch_get_handoffs,
+            commands::orch_list,
+            // Context formatting
+            commands::context_format::context_search_toon,
+            commands::context_format::format_diagnostics_toon,
+            commands::context_format::format_file_tree_toon,
             // File watching
             commands::watch_start,
             commands::watch_stop,
@@ -755,30 +927,6 @@ pub fn run() {
             commands::wasm_provide_definition_all,
             commands::wasm_provide_document_symbols_all,
             commands::wasm_provide_formatting_all,
-            commands::wasm_provide_type_definition_all,
-            commands::wasm_provide_implementation_all,
-            commands::wasm_provide_declaration_all,
-            commands::wasm_provide_code_actions_all,
-            commands::wasm_provide_code_lenses_all,
-            commands::wasm_provide_signature_help_all,
-            commands::wasm_provide_document_highlights_all,
-            commands::wasm_provide_rename_all,
-            commands::wasm_provide_folding_ranges_all,
-            commands::wasm_provide_inlay_hints_all,
-            commands::wasm_provide_document_links_all,
-            commands::wasm_provide_selection_ranges_all,
-            commands::wasm_provide_semantic_tokens_all,
-            commands::wasm_provide_document_colors_all,
-            commands::wasm_provide_workspace_symbols_all,
-            commands::wasm_provide_range_formatting_all,
-            commands::wasm_execute_command_all,
-            commands::wasm_get_extension_metadata,
-            commands::wasm_on_document_opened,
-            commands::wasm_on_document_closed,
-            commands::wasm_on_document_saved,
-            commands::wasm_on_document_changed,
-            commands::wasm_on_configuration_changed,
-            commands::wasm_on_active_editor_changed,
             // Extension diagnostics
             commands::extension_report_activated,
             commands::extension_report_provider_call,
@@ -796,16 +944,8 @@ pub fn run() {
             commands::extension_bisect_bad,
             commands::extension_bisect_reset,
             commands::extension_bisect_state,
-            // Logging
-            commands::log_create_logger,
-            commands::log_write,
-            commands::log_set_level,
-            commands::log_flush,
-            commands::log_drop,
             // Index search
             commands::index_build,
-            commands::index_search,
-            commands::index_update,
             commands::index_stats,
             commands::index_clear,
             // LSP management
@@ -821,7 +961,6 @@ pub fn run() {
             commands::syntax_detect_from_content,
             commands::syntax_get_language_config,
             commands::syntax_tokenize,
-            commands::textmate_tokenize_lines,
             // Theme management
             commands::theme_list,
             commands::theme_get,
@@ -851,9 +990,71 @@ pub fn run() {
             // Extension API introspection
             commands::ext_api_get_namespaces,
             commands::ext_api_get_commands,
+            commands::ext_api_call,
             // Menu i18n
             commands::update_menu_labels,
+            // Browser automation (native webview — zero extra memory)
+            commands::__browser_console_log,
+            commands::browser_navigate,
+            commands::browser_screenshot,
+            commands::browser_click,
+            commands::browser_type,
+            commands::browser_read,
+            commands::browser_scroll,
+            commands::browser_console,
+            commands::browser_eval,
+            commands::browser_close,
+            // MCP (Model Context Protocol) client
+            commands::mcp_list_servers,
+            commands::mcp_connect,
+            commands::mcp_disconnect,
+            commands::mcp_list_tools,
+            commands::mcp_call_tool,
+            commands::mcp_add_server,
+            commands::mcp_remove_server,
+            commands::mcp_reload_config,
+            // Hooks (lifecycle automation)
+            commands::hooks_list,
+            commands::hooks_trigger,
+            commands::hooks_reload,
+            commands::hooks_add,
+            commands::hooks_remove,
+            commands::hooks_toggle,
+            commands::hooks_test,
+            // Next-gen editing tools
+            commands::next_gen_tools::semantic_edit,
+            commands::next_gen_tools::multi_edit_file,
+            commands::next_gen_tools::understand_symbol,
+            commands::next_gen_tools::diff_preview,
+            commands::next_gen_tools::batch_read_files,
+            commands::next_gen_tools::context_search,
+            commands::next_gen_tools::checkpoint_create,
+            commands::next_gen_tools::checkpoint_rollback,
+            commands::next_gen_tools::analyze_error,
         ])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .build(tauri::generate_context!())
+        .expect("error while running tauri application")
+        .run(|app_handle, event| {
+            // Kill every child process we spawned when the app exits —
+            // PTY shells, build tasks, debug adapters, and the extension
+            // host would otherwise outlive the editor as orphans.
+            if let tauri::RunEvent::Exit = event {
+                if let Some(store) = app_handle.try_state::<Arc<TaskProcessStore>>() {
+                    store.kill_all();
+                }
+                if let Some(store) = app_handle.try_state::<Arc<DebugAdapterStore>>() {
+                    store.kill_all();
+                }
+                if let Some(supervisor) = app_handle.try_state::<ExtensionPlatformSupervisor>() {
+                    let _ = supervisor.stop();
+                }
+                // Every other child-process owner is stopped explicitly here
+                // rather than left to Drop; the agent server needs the same
+                // treatment or it outlives the app and holds the state
+                // database locked against the next launch.
+                if let Some(server) = app_handle.try_state::<Arc<server::LocalServer>>() {
+                    server.shutdown();
+                }
+            }
+        });
 }

@@ -20,6 +20,8 @@ members = [
   "crates/sidex-profiles",
   "crates/sidex-auth",
   "crates/sidex-textmate",
+  "crates/sidex-agent",
+  "crates/sidex-context",
   "src-tauri",
   "sidex-extension-sdk",
 ]
@@ -35,30 +37,13 @@ repository = "https://github.com/sidenai/sidex"
 [workspace.dependencies]
 # Internal crates
 sidex-text = { path = "crates/sidex-text" }
-sidex-syntax = { path = "crates/sidex-syntax" }
-sidex-lsp = { path = "crates/sidex-lsp" }
-sidex-workspace = { path = "crates/sidex-workspace" }
-sidex-terminal = { path = "crates/sidex-terminal" }
-sidex-git = { path = "crates/sidex-git" }
-sidex-extensions = { path = "crates/sidex-extensions" }
-sidex-extension-api = { path = "crates/sidex-extension-api" }
 sidex-theme = { path = "crates/sidex-theme" }
-sidex-keymap = { path = "crates/sidex-keymap" }
-sidex-settings = { path = "crates/sidex-settings" }
-sidex-db = { path = "crates/sidex-db" }
-sidex-remote = { path = "crates/sidex-remote" }
-sidex-extension-sdk = { path = "sidex-extension-sdk" }
-sidex-tasks = { path = "crates/sidex-tasks" }
-sidex-dap = { path = "crates/sidex-dap" }
-sidex-update = { path = "crates/sidex-update" }
-sidex-profiles = { path = "crates/sidex-profiles" }
-sidex-auth = { path = "crates/sidex-auth" }
-sidex-textmate = { path = "crates/sidex-textmate" }
+sidex-context = { path = "crates/sidex-context" }
 
 # Core
 tokio = { version = "1", features = ["full"] }
 serde = { version = "1", features = ["derive"] }
-serde_json = "1"
+serde_json = { version = "1", features = ["preserve_order"] }
 anyhow = "1"
 thiserror = "2"
 
@@ -81,9 +66,6 @@ ignore = "0.4"
 # Terminal
 portable-pty = "0.8"
 vte = "0.13"
-
-# Git
-gix = { version = "0.68", default-features = false }
 
 # Database
 rusqlite = { version = "0.31", features = ["bundled", "backup"] }

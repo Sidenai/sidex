@@ -229,7 +229,28 @@ pub async fn fetch_manifest(
 
 async fn fetch_one(client: &reqwest::Client, endpoint: &str) -> UpdateResult<ReleaseManifest> {
     let response = client.get(endpoint).send().await?.error_for_status()?;
+
+    // 204 No Content (or an empty body) is the server's way of saying "no
+    // release published yet" — that's a normal no-update condition, not a
+    // malformed manifest.
+    if response.status() == reqwest::StatusCode::NO_CONTENT {
+        return Ok(ReleaseManifest {
+            version: "0.0.0".to_string(),
+            pub_date: None,
+            notes: None,
+            platforms: std::collections::HashMap::new(),
+        });
+    }
+
     let bytes = response.bytes().await?;
+    if bytes.is_empty() {
+        return Ok(ReleaseManifest {
+            version: "0.0.0".to_string(),
+            pub_date: None,
+            notes: None,
+            platforms: std::collections::HashMap::new(),
+        });
+    }
     serde_json::from_slice::<ReleaseManifest>(&bytes)
         .map_err(|e| UpdateError::MalformedManifest(e.to_string()))
 }

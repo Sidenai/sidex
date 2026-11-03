@@ -50,6 +50,10 @@ export default defineConfig({
         textMateWorker: path.resolve(__dirname, 'src/vs/workbench/services/textMate/browser/backgroundTokenization/worker/textMateTokenizationWorker.workerMain.ts'),
         editorWorker: path.resolve(__dirname, 'src/vs/editor/common/services/editorWebWorkerMain.ts'),
         extensionHostWorker: path.resolve(__dirname, 'src/vs/workbench/api/worker/extensionHostWorkerMain.ts'),
+        // Force the NLS runtime (localize/localize2) into its own chunk so it
+        // loads first and has its global translation tables in place before any
+        // module evaluates `localize()` at top-level module scope.
+        nls: path.resolve(__dirname, 'src/vs/nls.ts'),
       },
       output: {
         entryFileNames: (chunkInfo) => {
@@ -61,6 +65,9 @@ export default defineConfig({
           }
           if (chunkInfo.name === 'extensionHostWorker') {
             return 'assets/extensionHostWorker.js';
+          }
+          if (chunkInfo.name === 'nls') {
+            return 'assets/nls.js';
           }
           return 'assets/[name]-[hash].js';
         },
@@ -92,6 +99,9 @@ export default defineConfig({
           }
 
           if (id.endsWith('/vs/nls.ts') || id.endsWith('/vs/nls.js')) {
+            return 'nls';
+          }
+          if (id.endsWith('/vs/nls.mock.js')) {
             return 'nls';
           }
           if (

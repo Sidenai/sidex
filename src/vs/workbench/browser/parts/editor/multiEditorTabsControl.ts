@@ -59,8 +59,6 @@ import {
 	TAB_UNFOCUSED_HOVER_BORDER,
 	EDITOR_GROUP_HEADER_TABS_BACKGROUND,
 	WORKBENCH_BACKGROUND,
-	TAB_ACTIVE_BORDER_TOP,
-	TAB_UNFOCUSED_ACTIVE_BORDER_TOP,
 	TAB_ACTIVE_MODIFIED_BORDER,
 	TAB_INACTIVE_MODIFIED_BORDER,
 	TAB_UNFOCUSED_ACTIVE_MODIFIED_BORDER,
@@ -69,8 +67,7 @@ import {
 	TAB_HOVER_FOREGROUND,
 	TAB_UNFOCUSED_HOVER_FOREGROUND,
 	EDITOR_GROUP_HEADER_TABS_BORDER,
-	TAB_LAST_PINNED_BORDER,
-	TAB_SELECTED_BORDER_TOP
+	TAB_LAST_PINNED_BORDER
 } from '../../../common/theme.js';
 import {
 	activeContrastBorder,
@@ -1951,14 +1948,13 @@ export class MultiEditorTabsControl extends EditorTabsControl {
 		tabActionBar: ActionBar
 	): void {
 		const isTabActive = this.tabsModel.isActive(editor);
-		const hasModifiedBorderTop = this.doRedrawTabDirty(isGroupActive, isTabActive, editor, tabContainer);
+		this.doRedrawTabDirty(isGroupActive, isTabActive, editor, tabContainer);
 
-		this.doRedrawTabActive(isGroupActive, !hasModifiedBorderTop, editor, tabContainer, tabActionBar);
+		this.doRedrawTabActive(isGroupActive, editor, tabContainer, tabActionBar);
 	}
 
 	private doRedrawTabActive(
 		isGroupActive: boolean,
-		allowBorderTop: boolean,
 		editor: EditorInput,
 		tabContainer: HTMLElement,
 		tabActionBar: ActionBar
@@ -1978,21 +1974,6 @@ export class MultiEditorTabsControl extends EditorTabsControl {
 			tabContainer.classList.toggle('tab-border-bottom', !!activeTabBorderColorBottom);
 			tabContainer.style.setProperty('--tab-border-bottom-color', activeTabBorderColorBottom ?? '');
 		}
-
-		// Set border TOP if theme defined color
-		let tabBorderColorTop: string | null = null;
-		if (allowBorderTop) {
-			if (isActive) {
-				tabBorderColorTop = this.getColor(isGroupActive ? TAB_ACTIVE_BORDER_TOP : TAB_UNFOCUSED_ACTIVE_BORDER_TOP);
-			}
-
-			if (tabBorderColorTop === null && isSelected) {
-				tabBorderColorTop = this.getColor(TAB_SELECTED_BORDER_TOP);
-			}
-		}
-
-		tabContainer.classList.toggle('tab-border-top', !!tabBorderColorTop);
-		tabContainer.style.setProperty('--tab-border-top-color', tabBorderColorTop ?? '');
 	}
 
 	private doRedrawTabDirty(

@@ -32,6 +32,13 @@ fn io_err(path: &str, e: &sidex_workspace::WorkspaceError) -> String {
     format!("{path}: {e}")
 }
 
+#[tauri::command]
+pub fn get_cwd() -> Result<String, String> {
+    std::env::current_dir()
+        .map(|p| p.to_string_lossy().to_string())
+        .map_err(|e| e.to_string())
+}
+
 #[allow(clippy::needless_pass_by_value)]
 #[tauri::command]
 pub fn read_file(path: String) -> Result<String, String> {

@@ -1,5 +1,6 @@
 use serde::Serialize;
 use sidex_extension_api::CommandRegistry;
+use sidex_extension_api::ExtensionApiHandler;
 use std::env;
 use std::sync::Arc;
 use tauri::State;
@@ -35,6 +36,25 @@ pub fn ext_api_get_commands(registry: State<'_, Arc<CommandRegistry>>) -> Vec<Ex
         .into_iter()
         .map(|id| ExtCommandInfo { id })
         .collect()
+}
+
+/// Dispatch an extension-API call ("namespace/action") to the appropriate
+/// subsystem handler. This is the command the workbench-side
+/// SidexExtensionApiService invokes — without it the entire extension API
+/// surface was unreachable.
+#[tauri::command]
+#[allow(clippy::needless_pass_by_value)]
+pub fn ext_api_call(
+    handler: State<'_, Arc<ExtensionApiHandler>>,
+    namespace: String,
+    action: String,
+    params: Option<serde_json::Value>,
+) -> Result<serde_json::Value, String> {
+    let method = format!("{namespace}/{action}");
+    let params = params.unwrap_or(serde_json::Value::Null);
+    handler
+        .dispatch(&method, &params)
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]

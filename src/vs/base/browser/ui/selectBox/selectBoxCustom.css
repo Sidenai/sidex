@@ -6,8 +6,9 @@
 .monaco-select-box-dropdown-container {
 	display: none;
 	box-sizing: border-box;
-	border-radius: var(--vscode-cornerRadius-large);
-	box-shadow: var(--vscode-shadow-lg);
+	border-radius: 6px;
+	border: 1px solid var(--vscode-widget-border, #252525);
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
 }
 
 .monaco-select-box-dropdown-container > .select-box-details-pane > .select-box-description-markdown * {
@@ -20,7 +21,7 @@
 }
 
 .monaco-select-box-dropdown-container > .select-box-details-pane > .select-box-description-markdown code {
-	line-height: 15px; /** For some reason, this is needed, otherwise <code> will take up 20px height */
+	line-height: 15px;
 	font-family: var(--monaco-monospace-font);
 }
 
@@ -45,7 +46,7 @@
 	padding: 5px 6px;
 }
 
-/* Remove list-level focus ring — individual rows show their own focus indicators */
+/* Remove list-level focus ring */
 .monaco-select-box-dropdown-container > .select-box-dropdown-list-container .monaco-list:focus::before {
 	outline: 0 !important;
 }
@@ -53,6 +54,8 @@
 .monaco-select-box-dropdown-container > .select-box-dropdown-list-container .monaco-list .monaco-list-row {
 	cursor: pointer;
 	padding-left: 2px;
+	border-radius: 3px;
+	transition: background-color 120ms ease;
 }
 
 .monaco-select-box-dropdown-container > .select-box-dropdown-list-container .monaco-list .monaco-list-row > .option-text {
@@ -113,8 +116,7 @@
 	background-color: var(--vscode-menu-separatorBackground);
 }
 
-/* Accepted CSS hiding technique for accessibility reader text  */
-/* https://webaim.org/techniques/css/invisiblecontent/ */
+/* Accessibility reader text */
 
 .monaco-select-box-dropdown-container > .select-box-dropdown-list-container .monaco-list .monaco-list-row > .visually-hidden {
 	position: absolute;

@@ -3,6 +3,8 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+/* Sidex: Extension editor — clean sections, good spacing */
+
 .extension-editor {
 	height: 100%;
 	overflow: hidden;
@@ -29,9 +31,11 @@
 	position: relative;
 }
 
+/* Extension icon — rounded 6px */
 .extension-editor > .header > .icon-container .extension-icon .icon {
 	height: 128px;
 	width: 128px;
+	border-radius: 6px;
 }
 
 .extension-editor > .header > .icon-container > .extension-icon .codicon {
@@ -75,6 +79,7 @@
 	line-height: 30px;
 	font-weight: 600;
 	white-space: nowrap;
+	letter-spacing: -0.01em;
 }
 
 .extension-editor > .header > .details > .title > .name.deprecated {
@@ -94,19 +99,21 @@
 	margin-left: 10px;
 }
 
+/* Pre-release badge — monochrome */
 .extension-editor > .header > .details > .title > .pre-release {
 	margin-left: 10px;
 	padding: 0px 4px;
-	border-radius: 4px;
-	background-color: var(--vscode-extensionIcon-preReleaseForeground);
-	color: #ffffff;
+	border-radius: 3px;
+	background-color: rgba(255, 255, 255, 0.08);
+	color: var(--vscode-foreground);
 	display: flex;
 	align-items: center;
 }
 
 .extension-editor > .header > .details > .title > .pre-release > .codicon.codicon-extensions-pre-release {
-	color: #ffffff;
+	color: var(--vscode-foreground);
 	font-size: 14px;
+	opacity: 0.7;
 }
 
 .extension-editor > .header > .details > .title > .pre-release > .pre-release-text {
@@ -118,13 +125,15 @@
 	color: white;
 }
 
+/* Preview badge — monochrome, muted */
 .extension-editor > .header > .details > .title > .preview {
-	background: rgb(214, 63, 38);
+	background: rgba(255, 255, 255, 0.08);
+	color: var(--vscode-foreground);
 	font-size: 10px;
 	font-style: italic;
 	margin-left: 10px;
 	padding: 0px 4px;
-	border-radius: 4px;
+	border-radius: 3px;
 	user-select: none;
 	-webkit-user-select: none;
 }
@@ -170,8 +179,9 @@
 	margin-right: 6px;
 }
 
+/* Subtitle dividers — monochrome */
 .extension-editor > .header > .details > .subtitle > .subtitle-entry:not(:empty):not(.last-non-empty) {
-	border-right: 1px solid rgba(128, 128, 128, 0.7);
+	border-right: 1px solid rgba(255, 255, 255, 0.1);
 	margin-right: 14px;
 	padding-right: 14px;
 }
@@ -265,20 +275,20 @@
 	display: none;
 }
 
-/* single install */
+/* single install — rounded 3px */
 .extension-editor > .header > .details > .actions-status-container > .monaco-action-bar > .actions-container > .action-item > .extension-action.label,
 .extension-editor > .header > .details > .actions-status-container > .monaco-action-bar > .actions-container > .action-item.action-dropdown-item.empty > .extension-action.label {
-	border-radius: 4px;
+	border-radius: 3px;
 }
 
-/* split install */
+/* split install — rounded 3px */
 .extension-editor > .header > .details > .actions-status-container > .monaco-action-bar > .actions-container > .action-item.action-dropdown-item:not(.empty) > .extension-action.label {
-	border-radius: 4px 0 0 4px;
+	border-radius: 3px 0 0 3px;
 }
 
 .extension-editor > .header > .details > .actions-status-container > .monaco-action-bar > .actions-container > .action-item.action-dropdown-item:not(.empty) > .monaco-dropdown .extension-action.label {
 	border-left-width: 0;
-	border-radius: 0 4px 4px 0;
+	border-radius: 0 3px 3px 0;
 	padding: 0 2px;
 }
 
@@ -370,13 +380,14 @@
 	overflow: hidden;
 }
 
+/* Tab bar — monochrome, clean */
 .extension-editor > .body > .navbar {
 	height: 36px;
 	font-weight: bold;
 	font-size: 14px;
 	line-height: 36px;
 	padding-left: 20px;
-	border-bottom: 1px solid var(--vscode-panelSection-border);
+	border-bottom: 1px solid #1e1e1e;
 }
 
 .extension-editor > .body > .navbar > .monaco-action-bar > .actions-container {
@@ -387,18 +398,21 @@
 	height: 100%;
 }
 
+/* Tab labels — 10px uppercase, monochrome */
 .extension-editor > .body > .navbar > .monaco-action-bar > .actions-container > .action-item > .action-label {
 	padding: 0 10px;
-	font-size: 11px;
-	font-weight: normal;
+	font-size: 10px;
+	font-weight: 600;
 	color: var(--vscode-panelTitle-inactiveForeground);
 	text-transform: uppercase;
+	letter-spacing: 0.06em;
 	background: none !important;
 	border-radius: 0px !important;
+	transition: color 120ms ease;
 }
 
 .extension-editor > .body > .navbar > .monaco-action-bar > .actions-container > .action-item > .action-label.checked {
-	border-bottom: 1px solid var(--vscode-panelTitle-activeBorder);
+	border-bottom: 1px solid var(--vscode-foreground);
 	color: var(--vscode-panelTitle-activeForeground);
 }
 
@@ -474,8 +488,9 @@
 	padding-bottom: 16px;
 }
 
+/* Section dividers — monochrome #1e1e1e */
 .extension-editor > .body > .content > .details > .additional-details-container .additional-details-element:not(:last-child) {
-	border-bottom: 1px solid rgba(128, 128, 128, 0.22);
+	border-bottom: 1px solid #1e1e1e;
 }
 
 .extension-editor > .body > .content > .details > .additional-details-container .additional-details-element > .additional-details-title {
@@ -485,12 +500,13 @@
 	opacity: 0.9;
 }
 
+/* Category pills — monochrome, rounded 3px */
 .extension-editor > .body > .content > .details > .additional-details-container .categories-container > .categories > .category {
 	display: inline-block;
-	border: 1px solid rgba(136, 136, 136, 0.45);
+	border: 1px solid rgba(255, 255, 255, 0.1);
 	padding: 2px 4px;
-	border-radius: 2px;
-	font-size: 90%;
+	border-radius: 3px;
+	font-size: 12px;
 	margin: 0px 6px 3px 0px;
 }
 
@@ -506,8 +522,8 @@
 	white-space: nowrap;
 	text-overflow: ellipsis;
 	text-decoration: none;
-	font-size: 13px;
-	opacity: 0.9;
+	font-size: 12px;
+	opacity: 0.8;
 }
 
 .extension-editor > .body > .content > .details > .additional-details-container .resources-container > .resources > .resource:hover a {
@@ -598,8 +614,8 @@
 
 .extension-editor > .body > .content > .details > .content-container > .extension-pack-readme > .extension-pack > .extension-pack-content {
 	height: calc(100% - 34px);
-	border-top: 1px solid rgba(128, 128, 128, 0.22);
-	border-bottom: 1px solid rgba(128, 128, 128, 0.22);
+	border-top: 1px solid #1e1e1e;
+	border-bottom: 1px solid #1e1e1e;
 }
 
 .extension-editor > .body > .content > .details > .content-container > .extension-pack-readme > .extension-pack > .extension-pack-content > .monaco-scrollable-element {
@@ -635,17 +651,18 @@
 	margin-bottom: 10px;
 	font-weight: bold;
 	font-size: 120%;
-	border-bottom: 1px solid rgba(128, 128, 128, 0.22);
+	border-bottom: 1px solid #1e1e1e;
 	padding: 3px 6px;
 	line-height: 22px;
 }
 
+/* Content tables — monochrome rows */
 .extension-editor > .body > .content table tr:nth-child(odd) {
-	background-color: rgba(130, 130, 130, 0.04);
+	background-color: rgba(255, 255, 255, 0.02);
 }
 
 .extension-editor > .body > .content table tr:not(:first-child):hover {
-	background-color: rgba(128, 128, 128, 0.15);
+	background-color: rgba(255, 255, 255, 0.04);
 }
 
 .extension-editor > .body > .content table th,
@@ -673,11 +690,12 @@
 	margin: 0px;
 }
 
+/* Inline code — monochrome background, rounded 3px */
 .extension-editor code:not(:empty) {
 	font-family: var(--monaco-monospace-font);
 	font-size: 90%;
-	background-color: rgba(128, 128, 128, 0.17);
-	border-radius: 4px;
+	background-color: rgba(255, 255, 255, 0.06);
+	border-radius: 3px;
 	padding: 1px 4px;
 }
 
@@ -702,12 +720,14 @@
 	line-height: 62px;
 }
 
+/* Error marker — monochrome */
 .extension-editor .subcontent .monaco-list-row .content .unknown-extension > .error-marker {
-	background-color: #BE1100;
+	background-color: rgba(255, 255, 255, 0.08);
 	padding: 2px 4px;
 	font-weight: bold;
 	font-size: 11px;
-	color: #CCC;
+	color: var(--vscode-foreground);
+	border-radius: 3px;
 }
 
 .extension-editor .subcontent .monaco-list-row .unknown-extension > .message {
@@ -750,12 +770,12 @@
 }
 
 .extension-editor .subcontent .monaco-list-row .extension > .details > .header > .identifier {
-	font-size: 90%;
-	opacity: 0.6;
+	font-size: 12px;
+	opacity: 0.5;
 	margin-left: 10px;
-	background: rgba(173, 173, 173, 0.31);
+	background: rgba(255, 255, 255, 0.06);
 	padding: 0px 4px;
-	border-radius: 4px;
+	border-radius: 3px;
 }
 
 .extension-editor .subcontent .monaco-list-row .extension > .details > .footer {
@@ -821,8 +841,10 @@
 	padding-right: 2px;
 }
 
+/* Recommendation icon — monochrome */
 .monaco-workbench .extension-editor > .header > .details > .recommendation .codicon {
-	color: var(--vscode-extensionButton-prominentBackground);
+	color: var(--vscode-foreground);
+	opacity: 0.6;
 }
 
 /* Features Tab */

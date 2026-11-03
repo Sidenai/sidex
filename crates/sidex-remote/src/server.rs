@@ -446,6 +446,11 @@ impl SideXServer {
             cmd.env(k, v);
         }
 
+        #[cfg(windows)]
+        {
+            cmd.creation_flags(0x0800_0000);
+        }
+
         match cmd.output().await {
             Ok(out) => Response::ok(
                 id,
@@ -474,12 +479,18 @@ impl SideXServer {
             .unwrap_or(24) as u16;
         let shell = params.get("shell").and_then(|v| v.as_str()).unwrap_or("sh");
 
-        let child = match Command::new(shell)
+        let mut shell_cmd = Command::new(shell);
+        shell_cmd
             .stdin(std::process::Stdio::piped())
             .stdout(std::process::Stdio::piped())
-            .stderr(std::process::Stdio::piped())
-            .spawn()
+            .stderr(std::process::Stdio::piped());
+
+        #[cfg(windows)]
         {
+            shell_cmd.creation_flags(0x0800_0000);
+        }
+
+        let child = match shell_cmd.spawn() {
             Ok(c) => c,
             Err(e) => return Response::err(id, 1, e.to_string()),
         };
@@ -554,13 +565,19 @@ impl SideXServer {
             .and_then(|v| serde_json::from_value(v.clone()).ok())
             .unwrap_or_default();
 
-        let child = match Command::new(command)
+        let mut lsp_cmd = Command::new(command);
+        lsp_cmd
             .args(&args)
             .stdin(std::process::Stdio::piped())
             .stdout(std::process::Stdio::piped())
-            .stderr(std::process::Stdio::piped())
-            .spawn()
+            .stderr(std::process::Stdio::piped());
+
+        #[cfg(windows)]
         {
+            lsp_cmd.creation_flags(0x0800_0000);
+        }
+
+        let child = match lsp_cmd.spawn() {
             Ok(c) => c,
             Err(e) => return Response::err(id, 1, format!("failed to start LSP server: {e}")),
         };

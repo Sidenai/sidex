@@ -3,10 +3,18 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-/* --- Explorer viewlet --- */
+/* Sidex: Explorer viewlet — 22px rows, Inter font, tighter spacing, muted chrome */
+
 .explorer-folders-view,
 .explorer-folders-view {
 	height: 100%;
+}
+
+.explorer-folders-view .monaco-list .monaco-list-row {
+	font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+	font-size: 12.5px;
+	font-weight: 400;
+	letter-spacing: 0.01em;
 }
 
 .explorer-folders-view .explorer-folders-view.highlight .monaco-list .explorer-item:not(.explorer-item-edited),
@@ -14,6 +22,7 @@
 	opacity: 0.3;
 }
 
+/* 22px row height — tighter than VS Code's 22px default */
 .explorer-folders-view .explorer-item,
 .explorer-folders-view .editor-group {
 	height: 22px;
@@ -21,7 +30,7 @@
 }
 
 .explorer-folders-view .explorer-item {
-	display: flex; /* this helps showing the overflow ellipsis (...) even though we use display:inline-block for the labels */
+	display: flex;
 	flex-wrap: nowrap;
 }
 
@@ -41,7 +50,7 @@
 }
 
 .explorer-folders-view .explorer-item.explorer-item-edited .label-name {
-	flex: 0; /* do not steal space when label is hidden because we are in edit mode */
+	flex: 0;
 }
 
 .explorer-folders-view .explorer-item.nonexistent-root {
@@ -53,15 +62,20 @@
 	line-height: normal;
 }
 
+/* Git status count badges — small, rounded pill, muted */
 .explorer-folders-view .monaco-list-row .explorer-item .monaco-count-badge {
 	margin-left: 5px;
 	display: none;
+	border-radius: 8px;
+	font-size: 11px;
+	opacity: 0.7;
 }
 
 .explorer-folders-view .monaco-list-row[aria-expanded="false"] .explorer-item.highlight-badge .monaco-count-badge {
 	display: inline-block;
 }
 
+/* Rounded 3px hover/selection for multi-label items */
 .explorer-folders-view .explorer-item .monaco-icon-name-container.multiple > .label-name > .monaco-highlighted-label {
 	border-radius: 3px;
 }
@@ -87,9 +101,10 @@
 .monaco-workbench .explorer-folders-view .explorer-item .monaco-inputbox > .ibwrapper > .input {
 	padding: 0;
 	height: 20px;
+	border-radius: 3px;
 }
 
-/* High Contrast Theming */
+/* High Contrast */
 .monaco-workbench.hc-black .explorer-folders-view .explorer-item,
 .monaco-workbench.hc-light .explorer-folders-view .explorer-item {
 	line-height: 20px;

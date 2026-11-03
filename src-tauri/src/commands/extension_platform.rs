@@ -148,10 +148,12 @@ pub fn read_wasm_extension_manifest(
     ext_dir: &Path,
 ) -> Result<ExtensionManifest, String> {
     let toml_path = ext_dir.join("sidex.toml");
-    let raw =
-        fs::read_to_string(&toml_path).map_err(|e| format!("read {}: {e}", toml_path.display()))?;
+    let raw_bytes =
+        fs::read(&toml_path).map_err(|e| format!("read {}: {e}", toml_path.display()))?;
+    let raw = crate::commands::encoding::decode_utf8_strict(&raw_bytes)
+        .map_err(|e| format!("decode {}: {e}", toml_path.display()))?;
     let manifest: SidexTomlManifest =
-        toml::from_str(&raw).map_err(|e| format!("parse {}: {e}", toml_path.display()))?;
+        toml::from_str(raw).map_err(|e| format!("parse {}: {e}", toml_path.display()))?;
 
     let wasm_path = ext_dir.join(&manifest.extension.wasm);
     if !wasm_path.exists() {
@@ -421,10 +423,7 @@ pub fn read_extension_manifest(
     ext_dir: &Path,
 ) -> Result<ExtensionManifest, String> {
     let pkg_path = ext_dir.join("package.json");
-    let raw = sidex_extensions::encoding::read_manifest_file(&pkg_path)
-        .map_err(|e| format!("read {}: {e}", pkg_path.display()))?;
-    let val: serde_json::Value =
-        serde_json::from_str(&raw).map_err(|e| format!("parse {}: {e}", pkg_path.display()))?;
+    let val: serde_json::Value = crate::commands::encoding::read_json_file(&pkg_path)?;
 
     let publisher = val
         .get("publisher")
@@ -499,20 +498,10 @@ pub fn read_extension_manifest(
 
 pub fn extension_search_paths(app: &AppHandle) -> Vec<PathBuf> {
     let builtin_ext = resolve_builtin_extensions_dir(app);
-    let cursor_app_ext = if cfg!(target_os = "macos") {
-        Some(PathBuf::from(
-            "/Applications/Cursor.app/Contents/Resources/app/extensions",
-        ))
-    } else {
-        None
-    };
-    let vscode_app_ext = if cfg!(target_os = "macos") {
-        Some(PathBuf::from(
-            "/Applications/Visual Studio Code.app/Contents/Resources/app/extensions",
-        ))
-    } else {
-        None
-    };
+    // NOTE: we intentionally do NOT scan other editors' extension dirs
+    // (~/.vscode/extensions, ~/.cursor/extensions, or their app bundles).
+    // Loading foreign user extensions pulls in incompatible/platform-native
+    // extensions and can mutate the user's other-editor runtimes.
     let dist_ext = std::env::current_dir()
         .unwrap_or_else(|_| PathBuf::from("."))
         .join("dist")
@@ -527,8 +516,6 @@ pub fn extension_search_paths(app: &AppHandle) -> Vec<PathBuf> {
         user_extensions_dir(),
         builtin_ext,
         rust_ext,
-        cursor_app_ext.unwrap_or_default(),
-        vscode_app_ext.unwrap_or_default(),
         dist_ext,
         cwd.join("extensions"),
         PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -542,9 +529,15 @@ pub fn extension_search_paths(app: &AppHandle) -> Vec<PathBuf> {
         if candidate.as_os_str().is_empty() {
             continue;
         }
-        let normalized = candidate
-            .canonicalize()
-            .unwrap_or_else(|_| candidate.clone());
+        // canonicalize yields `\\?\C:\...` extended-length paths on Windows,
+        // which Node's CJS resolver cannot handle; dunce strips the prefix
+        // when safe and is a pass-through elsewhere.
+        let normalized = dunce::simplified(
+            &candidate
+                .canonicalize()
+                .unwrap_or_else(|_| candidate.clone()),
+        )
+        .to_path_buf();
         if seen.insert(normalized.clone()) {
             out.push(normalized);
         }
@@ -631,10 +624,9 @@ pub fn build_extension_descriptions(manifests: &[ExtensionManifest]) -> Vec<Exte
         .filter(|m| m.kind == ExtensionKind::Node && (m.main.is_some() || m.browser.is_some()))
         .map(|m| {
             let pkg_path = Path::new(&m.path).join("package.json");
-            let package_json = sidex_extensions::encoding::read_manifest_file(&pkg_path)
-                .ok()
-                .and_then(|raw| serde_json::from_str::<serde_json::Value>(&raw).ok())
-                .unwrap_or(serde_json::Value::Null);
+            let package_json =
+                crate::commands::encoding::read_json_file::<serde_json::Value>(&pkg_path)
+                    .unwrap_or(serde_json::Value::Null);
 
             ExtensionDescription {
                 identifier: ExtensionIdentifier {
@@ -805,10 +797,10 @@ pub async fn extension_platform_bootstrap(
         "transport": { "kind": "websocket", "endpoint": format!("ws://127.0.0.1:{port}/") },
         "runtime": { "path": node.path, "version": node.version, "source": "system", "bundled": false },
         "paths": {
-            "serverScript": resolve_server_script(&app).to_string_lossy(),
-            "builtinExtensionsDir": resolve_builtin_extensions_dir(&app).to_string_lossy(),
-            "userExtensionsDir": user_extensions_dir().to_string_lossy(),
-            "globalStorageDir": global_storage_dir().to_string_lossy(),
+            "serverScript": dunce::simplified(&resolve_server_script(&app)).to_string_lossy(),
+            "builtinExtensionsDir": dunce::simplified(&resolve_builtin_extensions_dir(&app)).to_string_lossy(),
+            "userExtensionsDir": dunce::simplified(&user_extensions_dir()).to_string_lossy(),
+            "globalStorageDir": dunce::simplified(&global_storage_dir()).to_string_lossy(),
         },
         "sessionKind": "local",
         "extensions": summaries,

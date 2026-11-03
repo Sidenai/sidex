@@ -1,16 +1,14 @@
-//! Authentication primitives for `SideX`.
+//! Generic secret storage for SideX.
 //!
-//! Provides OS-keyring-backed secret storage with a `SQLite` fallback for
-//! environments where the keyring is unavailable (headless CI, containers).
-//! Built on `keyring` so each platform uses the best backend:
+//! Despite the crate name, this has nothing to do with authentication —
+//! SideX has no sign-in, so there are no tokens to manage. It's a plain
+//! key-value secret store used for things like provider API keys and
+//! base-URL overrides (see `commands::providers` and `commands::secrets`
+//! in the `sidex` crate); callers pick their own keys, there's no fixed
+//! namespace.
 //!
-//! * macOS     — Keychain
-//! * Windows   — Credential Manager
-//! * Linux/BSD — Secret Service (libsecret) / `KWallet`
-//!
-//! All values are opaque blobs; structured interpretation happens in the
-//! TypeScript authentication service. We index an "all known keys" list in
-//! `SQLite` so the `keys()` listing contract stays cheap.
+//! See `storage` for the keyring-backed implementation and its `SQLite`
+//! fallback.
 
 pub mod storage;
 

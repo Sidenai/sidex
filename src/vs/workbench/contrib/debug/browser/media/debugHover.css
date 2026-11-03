@@ -3,6 +3,8 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+/* Sidex: Debug hover — rounded, subtle shadow */
+
 .monaco-editor .debug-hover-widget {
 	position: absolute;
 	z-index: 50;
@@ -12,8 +14,8 @@
 	-webkit-user-select: text;
 	word-break: break-all;
 	white-space: pre;
-	border-radius: var(--vscode-cornerRadius-large);
-	box-shadow: var(--vscode-shadow-lg);
+	border-radius: 8px;
+	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
 }
 
 .monaco-editor .debug-hover-widget .complex-value {
@@ -34,11 +36,11 @@
 }
 
 .monaco-editor .debug-hover-widget .complex-value .title {
-	border-bottom: 1px solid rgba(128, 128, 128, 0.35);
+	border-bottom: 1px solid rgba(128, 128, 128, 0.2);
 }
 
 .monaco-editor .debug-hover-widget .complex-value .tip {
-	border-top: 1px solid rgba(128, 128, 128, 0.35);
+	border-top: 1px solid rgba(128, 128, 128, 0.2);
 	opacity: 0.5;
 }
 
@@ -53,8 +55,7 @@
 	white-space: pre;
 }
 
-/* Disable tree highlight in debug hover tree. */
-.monaco-editor .debug-hover-widget .debug-hover-tree .monaco-list-rows .monaco-list-row:hover:not(.highlighted):not(.selected):not(.focused)  {
+.monaco-editor .debug-hover-widget .debug-hover-tree .monaco-list-rows .monaco-list-row:hover:not(.highlighted):not(.selected):not(.focused) {
 	background-color: inherit;
 }
 
@@ -72,7 +73,7 @@
 	overflow: auto;
 	font-family: var(--monaco-monospace-font);
 	max-height: 500px;
-	padding: 4px 5px;
+	padding: 6px 8px;
 	white-space: pre-wrap;
 }
 

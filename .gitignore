@@ -33,6 +33,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+logs/
 
 # ── OS files ─────────────────────────────────────────────────────────────────
 .DS_Store
@@ -50,15 +51,14 @@ ehthumbs.db
 *.sublime-project
 *.sublime-workspace
 
-# ── Local dev tooling (Cargo overrides, Claude Code state) ───────────────────
-.cargo/
-.claude/
-
 # ── Environment / Secrets ────────────────────────────────────────────────────
 .env
 .env.*
+.env.local
 !.env.example
-/docs
+*.pem
+aws-credentials.json
+sidexai/aws-credentials.json
 
 # ── Tauri generated ──────────────────────────────────────────────────────────
 src-tauri/gen/
@@ -67,6 +67,18 @@ src-tauri/gen/
 coverage/
 .nyc_output/
 *.lcov
+
+# ── Local scratch / source reconstruction (never ship) ───────────────────────
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+/scratchtmp/
+/recover_sources.py
+/recovered/
+/reconstruct/
+/reconstruct_sources.py
+/recover_*.py
 
 # ── Misc ─────────────────────────────────────────────────────────────────────
 *.tgz
@@ -91,14 +103,30 @@ extensions-rust/npm-extension/
 extensions-rust/php-language-extension/
 extensions-rust/references-view-extension/
 extensions-rust/terminal-suggest-extension/
-
-# ── Cloudflare Wrangler (marketplace-proxy dev state) ────────────────────────
-infrastructure/marketplace-proxy/.wrangler/
-infrastructure/marketplace-proxy/node_modules/
-
-
 extensions-rust/css-language-extension/css-data.json
 extensions-rust/css-language-extension/css-builtin.json
 extensions-rust/css-language-extension/src/css_data.rs
 extensions-meta.json
 public/builtin-extensions.js
+
+# ── Cloudflare Wrangler (marketplace-proxy dev state) ────────────────────────
+infrastructure/marketplace-proxy/.wrangler/
+infrastructure/marketplace-proxy/node_modules/
+
+# ── Sidex ephemeral state (never commit) ─────────────────────────────────────
+# Memory, bench results, and other generated state live in ~/.sidex/.
+# Only .sidex/rules/ and .sidex/skills/ are meant to be committed.
+.sidex/*
+!.sidex/rules/
+!.sidex/skills/
+MEMORY.md
+.kilo/
+
+# Private — not part of the public app repo.
+# /sidex-web = marketing site + dashboard (Next.js)
+# /deploy    = maintainer deploy scripts and prod env
+/sidex-web/
+/website/
+/marketing/
+/sidex-site/
+/deploy/

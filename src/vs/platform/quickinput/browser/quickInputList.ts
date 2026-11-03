@@ -296,7 +296,7 @@ class QuickInputItemDelegate implements IListVirtualDelegate<IQuickPickElement> 
 		if (element instanceof QuickPickSeparatorElement) {
 			return 30;
 		}
-		return element.saneDetail ? 44 : 22;
+		return element.saneDetail ? 44 : 28;
 	}
 
 	getTemplateId(element: IQuickPickElement): string {
@@ -1493,9 +1493,7 @@ export class QuickInputList extends Disposable {
 	layout(maxHeight?: number): void {
 		this._tree.getHTMLElement().style.maxHeight = maxHeight
 			? `${
-					// Make sure height aligns with list item heights
-					Math.floor(maxHeight / 44) * 44 +
-					// Add some extra height so that it's clear there's more to scroll
+					Math.floor(maxHeight / 28) * 28 +
 					6
 				}px`
 			: '';

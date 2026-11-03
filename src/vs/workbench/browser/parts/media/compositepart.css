@@ -16,3 +16,16 @@
 	flex: 1;
 	padding-left: 8px;
 }
+
+/* Sidex: tighter title-actions in panel for compact header */
+.monaco-workbench .part.panel > .composite.title > .title-actions {
+	padding-left: 4px;
+}
+
+.monaco-workbench .part.panel > .composite.title > .title-actions .action-item {
+	margin-right: 2px;
+}
+
+.monaco-workbench .part.panel > .composite.title > .title-actions .action-label {
+	padding: 2px;
+}

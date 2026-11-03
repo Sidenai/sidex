@@ -67,14 +67,14 @@ import { IViewsService } from '../../../services/views/common/viewsService.js';
 import { SwitchCompositeViewAction } from '../compositeBarActions.js';
 
 export class ActivitybarPart extends Part {
-	static readonly ACTION_HEIGHT = 48;
-	static readonly COMPACT_ACTION_HEIGHT = 32;
+	static readonly ACTION_HEIGHT = 40;
+	static readonly COMPACT_ACTION_HEIGHT = 28;
 
-	static readonly ACTIVITYBAR_WIDTH = 48;
-	static readonly COMPACT_ACTIVITYBAR_WIDTH = 36;
+	static readonly ACTIVITYBAR_WIDTH = 40;
+	static readonly COMPACT_ACTIVITYBAR_WIDTH = 32;
 
-	static readonly ICON_SIZE = 24;
-	static readonly COMPACT_ICON_SIZE = 16;
+	static readonly ICON_SIZE = 18;
+	static readonly COMPACT_ICON_SIZE = 14;
 
 	static readonly pinnedViewContainersKey = 'workbench.activity.pinnedViewlets2';
 	static readonly placeholderViewContainersKey = 'workbench.activity.placeholderViewlets';
@@ -191,7 +191,7 @@ export class ActivitybarPart extends Part {
 			},
 			Parts.ACTIVITYBAR_PART,
 			this.paneCompositePart,
-			true
+			false
 		);
 	}
 
@@ -274,11 +274,10 @@ export class ActivitybarPart extends Part {
 			return;
 		}
 
-		// Layout contents
 		const contentAreaSize = super.layoutContents(width, height).contentSize;
 
-		// Layout composite bar
-		this.compositeBar.value.layout(width, contentAreaSize.height);
+		const logoHeight = 40;
+		this.compositeBar.value.layout(width, contentAreaSize.height - logoHeight);
 	}
 
 	toJSON(): object {
@@ -781,7 +780,7 @@ registerThemingParticipant((theme, collector) => {
 	if (activityBarActiveBorderColor) {
 		collector.addRule(`
 			.monaco-workbench .activitybar > .content :not(.monaco-menu) > .monaco-action-bar .action-item.checked .active-item-indicator:before {
-				border-left-color: ${activityBarActiveBorderColor};
+				border-left-color: transparent;
 			}
 		`);
 	}
@@ -795,7 +794,7 @@ registerThemingParticipant((theme, collector) => {
 
 			.monaco-workbench .activitybar > .content :not(.monaco-menu) > .monaco-action-bar .action-item.checked:focus .active-item-indicator:before {
 				visibility: visible;
-				border-left-color: ${activityBarActiveFocusBorderColor};
+				border-left-color: transparent;
 			}
 		`);
 	}

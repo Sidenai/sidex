@@ -55,6 +55,7 @@ import {
 import { InMemoryFileSystemProvider } from '../../platform/files/common/inMemoryFilesystemProvider.js';
 import { ICommandService } from '../../platform/commands/common/commands.js';
 import { IEditorService } from '../services/editor/common/editorService.js';
+import { IEditorGroupsService } from '../services/editor/common/editorGroupsService.js';
 import { BrowserRequestService } from '../services/request/browser/requestService.js';
 import { IRequestService } from '../../platform/request/common/request.js';
 import {
@@ -177,6 +178,9 @@ export class BrowserMain extends Disposable {
 			const editorService = accessor.get(IEditorService);
 			(globalThis as any).__sidex_editorService = editorService;
 
+			const editorGroupsService = accessor.get(IEditorGroupsService);
+			(globalThis as any).__sidex_editorGroupsService = editorGroupsService;
+
 			const lifecycleService = accessor.get(ILifecycleService);
 			const timerService = accessor.get(ITimerService);
 			const openerService = accessor.get(IOpenerService);
@@ -189,6 +193,40 @@ export class BrowserMain extends Disposable {
 			const embedderTerminalService = accessor.get(IEmbedderTerminalService);
 			const remoteAuthorityResolverService = accessor.get(IRemoteAuthorityResolverService);
 			const notificationService = accessor.get(INotificationService);
+
+			// SideX: open OS-dropped paths forwarded from main.ts (Tauri drag-drop).
+			// Files open as editors; a dropped directory opens as the workspace folder.
+			const fileService = accessor.get(IFileService);
+			const hostService = accessor.get(IHostService);
+			mainWindow.addEventListener('sidex-open-paths', ((e: CustomEvent) => {
+				const paths = e.detail?.paths;
+				if (!Array.isArray(paths) || paths.length === 0) {
+					return;
+				}
+				(async () => {
+					const files: URI[] = [];
+					const folders: URI[] = [];
+					for (const path of paths) {
+						if (typeof path !== 'string' || path.length === 0) {
+							continue;
+						}
+						const resource = URI.file(path);
+						try {
+							const stat = await fileService.stat(resource);
+							(stat.isDirectory ? folders : files).push(resource);
+						} catch {
+							// Ignore paths that cannot be resolved
+						}
+					}
+					if (files.length > 0) {
+						await editorService.openEditors(files.map(resource => ({ resource, options: { pinned: true } })));
+					}
+					if (folders.length > 0) {
+						// Opens via the workspace provider (same path as the Open Folder menu action)
+						await hostService.openWindow([{ folderUri: folders[0] }]);
+					}
+				})().catch(err => services.logService.error('[SideX] Failed to open dropped paths:', err));
+			}) as EventListener);
 
 			async function showMessage<T extends string>(
 				severity: Severity,

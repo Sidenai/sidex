@@ -429,11 +429,7 @@ export class ViewDescriptorService extends Disposable implements IViewDescriptor
 	}
 
 	private getEffectiveViewContainerLocation(location: ViewContainerLocation): ViewContainerLocation {
-		// When not in agent sessions workspace, view containers contributed to ChatBar
-		// should be registered at the AuxiliaryBar location instead
-		if (!this.isSessionsWindow && location === ViewContainerLocation.ChatBar) {
-			return ViewContainerLocation.AuxiliaryBar;
-		}
+		// Sidex always stays in its own panel — never redirected
 		return location;
 	}
 

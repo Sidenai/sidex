@@ -113,6 +113,14 @@
 	/* margin for outline */
 }
 
+.monaco-action-bar .action-item .action-label.extension-action.icon.manage {
+	opacity: 0.45;
+}
+
+.monaco-action-bar .action-item .action-label.extension-action.icon.manage:hover {
+	opacity: 1;
+}
+
 .monaco-action-bar .action-item.disabled .action-label.extension-action.hide,
 .monaco-action-bar .action-item.disabled .action-label.extension-action.ignore,
 .monaco-action-bar .action-item.disabled .action-label.extension-action.undo-ignore,

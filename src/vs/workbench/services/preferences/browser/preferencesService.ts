@@ -472,6 +472,9 @@ export class PreferencesService extends Disposable implements IPreferencesServic
 	}
 
 	private getEditorGroupFromOptions(options: { groupId?: number; openToSide?: boolean }): PreferredGroup {
+		if (options?.groupId !== undefined) {
+			return this.editorGroupService.getGroup(options.groupId) ?? this.editorGroupService.activeGroup;
+		}
 		if (
 			this.configurationService.getValue<string>('workbench.editor.useModal') !== 'off' && // modal editors enabled in settings
 			!this.environmentService.enableSmokeTestDriver &&
@@ -481,9 +484,6 @@ export class PreferencesService extends Disposable implements IPreferencesServic
 		}
 		if (options.openToSide) {
 			return SIDE_GROUP;
-		}
-		if (options?.groupId !== undefined) {
-			return this.editorGroupService.getGroup(options.groupId) ?? this.editorGroupService.activeGroup;
 		}
 		return ACTIVE_GROUP;
 	}

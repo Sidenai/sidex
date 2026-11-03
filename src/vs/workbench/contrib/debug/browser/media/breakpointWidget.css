@@ -3,10 +3,13 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
+/* Sidex: Breakpoint widget — clean, rounded inputs */
+
 .monaco-editor .zone-widget .zone-widget-container.breakpoint-widget {
 	display: flex;
-	border-color: #007ACC;
+	border-color: var(--vscode-focusBorder, #007ACC);
 	background: var(--vscode-editor-background);
+	border-radius: 4px;
 
 	.breakpoint-select-container {
 		display: flex;
@@ -20,6 +23,7 @@
 		min-width: 100px;
 		min-height: 18px;
 		padding: 2px 20px 2px 8px;
+		border-radius: 4px;
 	}
 
 	.breakpoint-select-container:after {
@@ -44,6 +48,7 @@
 		line-height: 14px;
 		flex-grow: 0;
 		width: initial;
+		border-radius: 4px;
 	}
 
 	.select-breakpoint-container .select-box-container,
@@ -66,5 +71,4 @@
 	.select-breakpoint-container:after {
 		right: 14px;
 	}
-
 }

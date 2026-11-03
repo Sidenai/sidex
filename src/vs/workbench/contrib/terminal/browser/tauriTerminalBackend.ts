@@ -66,6 +66,21 @@ function getShellBasename(shellPath: string): string {
 	);
 }
 
+// Flow control: the Rust PTY reader counts emitted UTF-8 bytes
+// (String::len) and blocks above a high watermark until the frontend
+// acknowledges consumption, so we must ack with the same unit —
+// TextEncoder gives the UTF-8 byte length of the received string.
+const flowControlEncoder = new TextEncoder();
+
+function ackTerminalData(terminalId: number, data: string): void {
+	_invoke?.('terminal_ack_data', {
+		handle: terminalId,
+		bytes: flowControlEncoder.encode(data).length
+	})?.catch(() => {
+		// Best-effort: acks may race terminal teardown.
+	});
+}
+
 let nextPtyId = 1;
 
 class TauriPty extends Disposable implements ITerminalChildProcess {
@@ -144,6 +159,9 @@ class TauriPty extends Disposable implements ITerminalChildProcess {
 					} else {
 						dataBuffer.push(payload.data);
 					}
+					// Acknowledge every received chunk (buffered or not) so the
+					// backend's unacked-bytes counter mirrors what was emitted.
+					ackTerminalData(payload.terminal_id, payload.data);
 				}
 			});
 

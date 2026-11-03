@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>SideX needs access to read and edit your code files.</string>
+	<key>NSDesktopFolderUsageDescription</key>
+	<string>SideX needs access to read and edit code files on your Desktop.</string>
+	<key>NSDownloadsFolderUsageDescription</key>
+	<string>SideX needs access to read and edit code files in your Downloads folder.</string>
+	<key>NSFileProviderPresenceUsageDescription</key>
+	<string>SideX uses file presence to track code changes.</string>
+	<key>NSAppleEventsUsageDescription</key>
+	<string>SideX uses Apple Events to automate editor workflows.</string>
+	<key>NSRemovableVolumesUsageDescription</key>
+	<string>SideX needs access to read and edit code on removable volumes.</string>
+	<key>NSNetworkVolumesUsageDescription</key>
+	<string>SideX needs access to read and edit code on network volumes.</string>
+</dict>
+</plist>

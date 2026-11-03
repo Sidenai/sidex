@@ -37,6 +37,9 @@ const entries = readdirSync(extensionsDir);
 const descriptors = [];
 
 for (const dirName of entries) {
+  // Skip the Node.js Git extension — SideX uses its own Rust-native Git provider
+  if (dirName === 'git') continue;
+
   const dirPath = join(extensionsDir, dirName);
   if (!statSync(dirPath).isDirectory()) continue;
 

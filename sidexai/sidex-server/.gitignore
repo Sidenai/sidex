@@ -1,0 +1,17 @@
+# Build artifacts — never commit compiled binaries
+sidex-server
+sidex-server-new
+/server
+*.exe
+
+# Local databases and state
+*.db
+*.db-shm
+*.db-wal
+
+# Secrets
+.env
+!.env.example
+
+# Stray tilde dir created by unexpanded SIDEX_DATA_DIR (bug fixed in paths.ExpandUser)
+~/

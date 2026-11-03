@@ -1990,8 +1990,9 @@ CommandsRegistry.registerCommand('git.showOutput', async () => {
 });
 
 // ─── SCM Source Control ("...") menu items ──────────────────────────────────
+// All menu registrations below are provided solely by the Rust-native
+// TauriGit implementation — the Node.js extensions/git is disabled.
 
-// Define submenus matching VS Code's Git extension
 const SCMGitCommitMenu = new MenuId('SCMGitCommit');
 const SCMGitChangesMenu = new MenuId('SCMGitChanges');
 const SCMGitPullPushMenu = new MenuId('SCMGitPullPush');
@@ -2001,7 +2002,6 @@ const SCMGitStashMenu = new MenuId('SCMGitStash');
 const SCMGitTagsMenu = new MenuId('SCMGitTags');
 const SCMRepoViewSortMenu = new MenuId('SCMRepoViewSort');
 
-// Repository row "..." in REPOSITORIES view (SCMSourceControlInline)
 // View & Sort submenu
 MenuRegistry.appendMenuItem(MenuId.SCMSourceControlInline, {
 	title: 'View & Sort',
@@ -2009,7 +2009,6 @@ MenuRegistry.appendMenuItem(MenuId.SCMSourceControlInline, {
 	group: '0_view&sort',
 	order: 1
 });
-
 MenuRegistry.appendMenuItem(SCMRepoViewSortMenu, {
 	command: { id: 'workbench.scm.action.setListViewMode', title: 'View as List' },
 	group: '1_viewmode',
@@ -2099,13 +2098,12 @@ MenuRegistry.appendMenuItem(MenuId.SCMSourceControlInline, {
 	order: 1
 });
 
-// Navigation toolbar buttons
+// Navigation toolbar buttons (SCM title bar)
 MenuRegistry.appendMenuItem(MenuId.SCMTitle, {
 	command: { id: 'git.commit', title: 'Commit', icon: ThemeIcon.fromId('check') },
 	group: 'navigation',
 	order: 1
 });
-
 MenuRegistry.appendMenuItem(MenuId.SCMTitle, {
 	command: { id: 'git.refresh', title: 'Refresh', icon: ThemeIcon.fromId('refresh') },
 	group: 'navigation',
@@ -2118,13 +2116,11 @@ MenuRegistry.appendMenuItem(MenuId.SCMHistoryTitle, {
 	group: 'navigation',
 	order: 3
 });
-
 MenuRegistry.appendMenuItem(MenuId.SCMHistoryTitle, {
 	command: { id: 'git.pull', title: 'Pull', icon: ThemeIcon.fromId('repo-pull') },
 	group: 'navigation',
 	order: 4
 });
-
 MenuRegistry.appendMenuItem(MenuId.SCMHistoryTitle, {
 	command: { id: 'git.push', title: 'Push', icon: ThemeIcon.fromId('repo-push') },
 	group: 'navigation',
@@ -2132,39 +2128,43 @@ MenuRegistry.appendMenuItem(MenuId.SCMHistoryTitle, {
 });
 
 // ─── Commit submenu items ───────────────────────────────────────────────────
-
 MenuRegistry.appendMenuItem(SCMGitCommitMenu, {
 	command: { id: 'git.commit', title: 'Commit' },
 	group: '1_commit',
 	order: 1
 });
-
 MenuRegistry.appendMenuItem(SCMGitCommitMenu, {
 	command: { id: 'git.commitAll', title: 'Commit All' },
 	group: '1_commit',
 	order: 2
 });
-
 MenuRegistry.appendMenuItem(SCMGitCommitMenu, {
 	command: { id: 'git.commitAmend', title: 'Commit (Amend)' },
 	group: '2_amend',
 	order: 1
 });
+MenuRegistry.appendMenuItem(SCMGitCommitMenu, {
+	command: { id: 'git.commitAndPush', title: 'Commit & Push' },
+	group: '3_commitpush',
+	order: 1
+});
+MenuRegistry.appendMenuItem(SCMGitCommitMenu, {
+	command: { id: 'git.commitAndSync', title: 'Commit & Sync' },
+	group: '3_commitpush',
+	order: 2
+});
 
 // ─── Changes submenu items ──────────────────────────────────────────────────
-
 MenuRegistry.appendMenuItem(SCMGitChangesMenu, {
 	command: { id: 'git.stageAll', title: 'Stage All Changes' },
 	group: 'changes',
 	order: 1
 });
-
 MenuRegistry.appendMenuItem(SCMGitChangesMenu, {
 	command: { id: 'git.unstageAll', title: 'Unstage All Changes' },
 	group: 'changes',
 	order: 2
 });
-
 MenuRegistry.appendMenuItem(SCMGitChangesMenu, {
 	command: { id: 'git.discardAll', title: 'Discard All Changes' },
 	group: 'changes',
@@ -2172,25 +2172,21 @@ MenuRegistry.appendMenuItem(SCMGitChangesMenu, {
 });
 
 // ─── Pull, Push submenu items ───────────────────────────────────────────────
-
 MenuRegistry.appendMenuItem(SCMGitPullPushMenu, {
 	command: { id: 'git.sync', title: 'Sync' },
 	group: '1_sync',
 	order: 1
 });
-
 MenuRegistry.appendMenuItem(SCMGitPullPushMenu, {
 	command: { id: 'git.pull', title: 'Pull' },
 	group: '2_pull',
 	order: 1
 });
-
 MenuRegistry.appendMenuItem(SCMGitPullPushMenu, {
 	command: { id: 'git.push', title: 'Push' },
 	group: '3_push',
 	order: 1
 });
-
 MenuRegistry.appendMenuItem(SCMGitPullPushMenu, {
 	command: { id: 'git.fetch', title: 'Fetch' },
 	group: '4_fetch',
@@ -2198,13 +2194,11 @@ MenuRegistry.appendMenuItem(SCMGitPullPushMenu, {
 });
 
 // ─── Branch submenu items ───────────────────────────────────────────────────
-
 MenuRegistry.appendMenuItem(SCMGitBranchMenu, {
 	command: { id: 'git.createBranch', title: 'Create Branch...' },
 	group: '1_branch',
 	order: 1
 });
-
 MenuRegistry.appendMenuItem(SCMGitBranchMenu, {
 	command: { id: 'git.checkoutTo', title: 'Checkout to...' },
 	group: '1_branch',
@@ -2212,19 +2206,16 @@ MenuRegistry.appendMenuItem(SCMGitBranchMenu, {
 });
 
 // ─── Stash submenu items ────────────────────────────────────────────────────
-
 MenuRegistry.appendMenuItem(SCMGitStashMenu, {
 	command: { id: 'git.stash', title: 'Stash' },
 	group: '1_stash',
 	order: 1
 });
-
 MenuRegistry.appendMenuItem(SCMGitStashMenu, {
 	command: { id: 'git.stashPopLatest', title: 'Pop Latest Stash' },
 	group: '2_pop',
 	order: 1
 });
-
 MenuRegistry.appendMenuItem(SCMGitStashMenu, {
 	command: { id: 'git.stashPop', title: 'Pop Stash...' },
 	group: '2_pop',
@@ -2232,13 +2223,11 @@ MenuRegistry.appendMenuItem(SCMGitStashMenu, {
 });
 
 // ─── Remote submenu items ───────────────────────────────────────────────────
-
 MenuRegistry.appendMenuItem(SCMGitRemoteMenu, {
 	command: { id: 'git.addRemote', title: 'Add Remote...' },
 	group: 'remote',
 	order: 1
 });
-
 MenuRegistry.appendMenuItem(SCMGitRemoteMenu, {
 	command: { id: 'git.removeRemote', title: 'Remove Remote...' },
 	group: 'remote',
@@ -2246,13 +2235,11 @@ MenuRegistry.appendMenuItem(SCMGitRemoteMenu, {
 });
 
 // ─── Tags submenu items ─────────────────────────────────────────────────────
-
 MenuRegistry.appendMenuItem(SCMGitTagsMenu, {
 	command: { id: 'git.createTag', title: 'Create Tag...' },
 	group: 'tags',
 	order: 1
 });
-
 MenuRegistry.appendMenuItem(SCMGitTagsMenu, {
 	command: { id: 'git.deleteTag', title: 'Delete Tag...' },
 	group: 'tags',

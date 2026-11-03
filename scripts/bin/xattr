@@ -1,0 +1,29 @@
+#!/bin/bash
+# xattr shim — handles -rc and -cr flags that Tauri passes on macOS.
+# The real /usr/bin/xattr on newer macOS doesn't support -r before -c.
+# We convert: xattr -rc <path> → find <path> -exec /usr/bin/xattr -c {} \;
+
+ARGS=("$@")
+PATHS=()
+FLAGS=""
+IS_RECURSIVE=false
+
+for arg in "${ARGS[@]}"; do
+    if [[ "$arg" == -* ]]; then
+        if [[ "$arg" == *r* ]]; then IS_RECURSIVE=true; fi
+        FLAGS="$FLAGS${arg//-/}"
+    else
+        PATHS+=("$arg")
+    fi
+done
+
+# Strip 'r' from flags since we handle recursion via find
+CLEAN_FLAGS="${FLAGS//r/}"
+
+if $IS_RECURSIVE; then
+    for path in "${PATHS[@]}"; do
+        find "$path" -exec /usr/bin/xattr -${CLEAN_FLAGS:-c} {} \; 2>/dev/null
+    done
+else
+    exec /usr/bin/xattr "$@"
+fi

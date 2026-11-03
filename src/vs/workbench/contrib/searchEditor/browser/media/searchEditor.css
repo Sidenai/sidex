@@ -24,12 +24,31 @@
 	width: 16px;
 	height: 100%;
 	box-sizing: border-box;
-	background-position: center center;
-	background-repeat: no-repeat;
 	cursor: pointer;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	background-color: transparent;
+	border: none;
+	border-radius: 4px;
+	color: var(--vscode-sideBarSectionHeader-foreground, inherit);
+	opacity: 0.45;
+	padding-right: 2px;
+}
+
+.search-editor .search-widget .toggle-replace-button::before {
+	font-size: 12.5px;
+	font-weight: 700;
+	border-radius: 20px;
+	transition: transform 0.1s ease;
+}
+
+.search-editor .search-widget .toggle-replace-button[aria-expanded="false"]::before {
+	transform: rotate(-90deg);
+}
+
+.search-editor .search-widget .toggle-replace-button:hover {
+	opacity: 1;
 }
 
 .search-editor .search-widget .search-container,

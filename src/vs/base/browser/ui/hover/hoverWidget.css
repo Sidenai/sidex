@@ -12,6 +12,9 @@
 	box-sizing: border-box;
 	line-height: 1.5em;
 	white-space: var(--vscode-hover-whiteSpace, normal);
+	border-radius: 6px;
+	border: 1px solid var(--vscode-widget-border, #252525);
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 .monaco-hover.fade-in {
@@ -27,7 +30,7 @@
 }
 
 .monaco-hover .hover-contents:not(.html-hover-contents) {
-	padding: 4px 8px;
+	padding: 8px 12px;
 }
 
 .monaco-hover .markdown-hover > .hover-contents:not(.code-hover-contents) {
@@ -70,8 +73,8 @@
 	border-right: 0px;
 	margin-top: 4px;
 	margin-bottom: -4px;
-	margin-left: -8px;
-	margin-right: -8px;
+	margin-left: -12px;
+	margin-right: -12px;
 	height: 1px;
 }
 
@@ -172,7 +175,6 @@
 
 .monaco-hover .hover-contents a.code-link > span {
 	text-decoration: underline;
-	/** Hack to force underline to show **/
 	border-bottom: 1px solid transparent;
 	text-underline-position: under;
 	color: var(--vscode-textLink-foreground);
@@ -182,10 +184,6 @@
 	color: var(--vscode-textLink-activeForeground);
 }
 
-/**
- * Add a slight margin to try vertically align codicons with any text
- * https://github.com/microsoft/vscode/issues/221359
- */
 .monaco-hover .markdown-hover .hover-contents:not(.code-hover-contents):not(.html-hover-contents) span.codicon {
 	margin-bottom: 2px;
 }

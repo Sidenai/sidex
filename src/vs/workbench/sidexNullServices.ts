@@ -6,7 +6,6 @@
 import { InstantiationType, registerSingleton } from '../platform/instantiation/common/extensions.js';
 import { createDecorator } from '../platform/instantiation/common/instantiation.js';
 import { Emitter, Event } from '../base/common/event.js';
-import { IWorkbenchIssueService } from './contrib/issue/common/issue.js';
 
 // --- IAccessibleViewService ---
 const IAccessibleViewService = createDecorator<IAccessibleViewService>('accessibleViewService');
@@ -19,13 +18,6 @@ class NullAccessibleViewService implements IAccessibleViewService {
 	show() {}
 }
 registerSingleton(IAccessibleViewService, NullAccessibleViewService, InstantiationType.Delayed);
-
-// --- workbenchIssueService ---
-class NullWorkbenchIssueService implements IWorkbenchIssueService {
-	declare readonly _serviceBrand: undefined;
-	async openReporter(): Promise<void> {}
-}
-registerSingleton(IWorkbenchIssueService, NullWorkbenchIssueService, InstantiationType.Delayed);
 
 // --- notebookEditorModelResolverService ---
 const INotebookEditorModelResolverService = createDecorator<INotebookEditorModelResolverService>(
@@ -117,3 +109,18 @@ class NullNotebookCellStatusBarService implements INotebookCellStatusBarService 
 	declare readonly _serviceBrand: undefined;
 }
 registerSingleton(INotebookCellStatusBarService, NullNotebookCellStatusBarService, InstantiationType.Delayed);
+
+// --- IWorkbenchIssueService ---
+// Without this registration, any code path that injects the issue reporter
+// (e.g. PromptExtensionInstallFailureAction after a failed extension install)
+// crashes with "UNKNOWN service workbenchIssueService". SideX has no issue
+// reporter window; reporting is a no-op.
+import { IWorkbenchIssueService } from './contrib/issue/common/issue.js';
+
+class NullWorkbenchIssueService implements IWorkbenchIssueService {
+	declare readonly _serviceBrand: undefined;
+	async openReporter(): Promise<void> {
+		// no-op: SideX does not bundle the issue reporter
+	}
+}
+registerSingleton(IWorkbenchIssueService, NullWorkbenchIssueService, InstantiationType.Delayed);

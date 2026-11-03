@@ -4,8 +4,8 @@
  *--------------------------------------------------------------------------------------------*/
 
 :root {
-	--vscode-sash-size: 4px;
-	--vscode-sash-hover-size: 4px;
+	--vscode-sash-size: 3px;
+	--vscode-sash-hover-size: 2px;
 }
 
 .monaco-sash {
@@ -112,7 +112,7 @@
 }
 
 .monaco-enable-motion .monaco-sash:before {
-	transition: background-color 0.1s ease-out;
+	transition: background-color 120ms ease;
 }
 
 .monaco-sash.hover:before,

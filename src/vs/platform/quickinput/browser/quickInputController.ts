@@ -82,7 +82,7 @@ type QuickInputViewState = {
 };
 
 export class QuickInputController extends Disposable {
-	private static readonly MAX_WIDTH = 600; // Max total width of quick input widget
+	private static readonly MAX_WIDTH = 560; // Max total width of quick input widget
 
 	private idPrefix: string;
 	private ui: QuickInputUI | undefined;
@@ -175,6 +175,8 @@ export class QuickInputController extends Disposable {
 		}
 	}
 
+	private backdrop: HTMLElement | undefined;
+
 	private getUI(showInActiveContainer?: boolean): QuickInputUI {
 		if (this.ui) {
 			// In order to support aux windows, re-parent the controller
@@ -191,6 +193,10 @@ export class QuickInputController extends Disposable {
 
 			return this.ui;
 		}
+
+		// Backdrop
+		this.backdrop = dom.append(this._container, $('.quick-input-backdrop'));
+		this.backdrop.style.display = 'none';
 
 		const container = dom.append(this._container, $('.quick-input-widget.show-file-icons'));
 		container.tabIndex = -1;
@@ -602,6 +608,9 @@ export class QuickInputController extends Disposable {
 	private reparentUI(container: HTMLElement): void {
 		if (this.ui) {
 			this._container = container;
+			if (this.backdrop) {
+				dom.append(this._container, this.backdrop);
+			}
 			dom.append(this._container, this.ui.container);
 			this.dndController?.reparentUI(this._container);
 		}
@@ -890,17 +899,29 @@ export class QuickInputController extends Disposable {
 			: localize('quickInput.back', 'Back');
 
 		ui.container.style.display = '';
+		ui.container.classList.remove('sidex-visible');
+		if (this.backdrop) {
+			this.backdrop.style.display = '';
+			this.backdrop.classList.remove('visible');
+		}
+
 		this.updateLayout();
 		this.dndController?.setEnabled(!controller.anchor);
 		this.dndController?.layoutContainer();
 		if (controller.anchor) {
-			// Anchored quick inputs are positioned near a specific element, not
-			// at the default top location, so report them as custom-positioned.
 			this._alignment.set('custom', undefined);
 		} else {
-			// Re-sync from DnD in case a previous anchored input left us stale.
 			this._alignment.set(this.dndController?.alignment.get() ?? 'top', undefined);
 		}
+
+		// Trigger fade-in on next frame so the transition plays
+		requestAnimationFrame(() => {
+			ui.container.classList.add('sidex-visible');
+			if (this.backdrop) {
+				this.backdrop.classList.add('visible');
+			}
+		});
+
 		this.onShowEmitter.fire();
 		ui.inputBox.setFocus();
 		this.quickInputTypeContext.set(controller.type);
@@ -972,8 +993,20 @@ export class QuickInputController extends Disposable {
 		this.controller = null;
 		this.onHideEmitter.fire();
 		if (container) {
-			container.style.display = 'none';
+			container.classList.remove('sidex-visible');
 		}
+		if (this.backdrop) {
+			this.backdrop.classList.remove('visible');
+		}
+		// Wait for fade-out to finish, then fully hide
+		setTimeout(() => {
+			if (container && !this.controller) {
+				container.style.display = 'none';
+			}
+			if (this.backdrop && !this.controller) {
+				this.backdrop.style.display = 'none';
+			}
+		}, 150);
 		if (!focusChanged) {
 			let currentElement = this.previousFocusElement;
 			while (currentElement && !currentElement.offsetParent) {
@@ -1067,8 +1100,6 @@ export class QuickInputController extends Disposable {
 				width = 380;
 				listHeight = this.dimension ? Math.min(this.dimension.height * 0.2, 200) : 200;
 
-				// Beware:
-				// We need to add some extra pixels to the height to account for the input and padding.
 				const containerHeight = Math.floor(listHeight) + 6 + 26 + 16;
 				const { top, left, right, bottom, anchorAlignment, anchorPosition } = layout2d(
 					container,
@@ -1080,9 +1111,11 @@ export class QuickInputController extends Disposable {
 				if (anchorAlignment === AnchorAlignment.RIGHT) {
 					style.right = `${right}px`;
 					style.left = 'initial';
+					style.transform = 'none';
 				} else {
 					style.left = `${left}px`;
 					style.right = 'initial';
+					style.transform = 'none';
 				}
 
 				if (anchorPosition === AnchorPosition.ABOVE) {
@@ -1095,9 +1128,17 @@ export class QuickInputController extends Disposable {
 
 				style.width = `${width}px`;
 				style.height = '';
-			} else {
+			} else if (this.viewState?.top !== undefined || this.viewState?.left !== undefined) {
 				style.top = `${this.viewState?.top !== undefined ? Math.round(this.dimension!.height * this.viewState.top) : this.titleBarOffset}px`;
-				style.left = `${Math.round(this.dimension!.width * (this.viewState?.left ?? 0.5) /* center */ - width / 2)}px`;
+				style.left = `${Math.round(this.dimension!.width * (this.viewState?.left ?? 0.5) - width / 2)}px`;
+				style.transform = 'none';
+				style.right = '';
+				style.bottom = '';
+				style.height = '';
+			} else {
+				style.top = `${this.titleBarOffset ?? 0}px`;
+				style.left = '50%';
+				style.transform = 'translateX(-50%)';
 				style.right = '';
 				style.bottom = '';
 				style.height = '';

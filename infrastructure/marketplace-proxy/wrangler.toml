@@ -10,11 +10,12 @@ MS_UPSTREAM = "https://marketplace.visualstudio.com"
 OPENVSX_UPSTREAM = "https://open-vsx.org"
 
 # KV namespace used as a second-tier cache (edge cache -> KV -> upstream).
-# Create with: wrangler kv:namespace create MARKETPLACE_CACHE
+# Create with: wrangler kv namespace create MARKETPLACE_CACHE
+# Then paste the ids here. Do not commit a personal Cloudflare account's ids.
 [[kv_namespaces]]
 binding = "MARKETPLACE_CACHE"
-id = "f3c1bd969a374f0c91dd0ea7c6b01e6d"
-preview_id = "683912397fd5416ea35fa436e40c21c8"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+preview_id = "REPLACE_WITH_KV_PREVIEW_ID"
 
 [observability]
 enabled = true

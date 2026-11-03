@@ -300,9 +300,7 @@ pub async fn extension_get_contributions(
     extension_dir: String,
 ) -> Result<Vec<ContributionInfo>, String> {
     let pkg_path = Path::new(&extension_dir).join("package.json");
-    let raw = fs::read_to_string(&pkg_path).map_err(|e| format!("read package.json: {e}"))?;
-    let value: serde_json::Value =
-        serde_json::from_str(&raw).map_err(|e| format!("parse package.json: {e}"))?;
+    let value: serde_json::Value = crate::commands::encoding::read_json_file(&pkg_path)?;
 
     let points = parse_contributions(&value);
     Ok(points.iter().map(summarize_point).collect())

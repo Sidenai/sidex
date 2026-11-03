@@ -1,3 +1,4 @@
+use std::path::PathBuf;
 use std::sync::{Arc, RwLock};
 
 use serde_json::Value;
@@ -5,22 +6,67 @@ use sidex_settings::{modify_jsonc, parse_jsonc, Settings};
 use tauri::State;
 
 pub struct SettingsStore {
-    inner: RwLock<Settings>,
+    pub(crate) inner: RwLock<Settings>,
+    /// Path of the user settings.json — set during app startup so user-scope
+    /// updates can be persisted to disk (otherwise toggles vanish on restart).
+    user_path: RwLock<Option<PathBuf>>,
 }
 
 impl SettingsStore {
     pub fn new() -> Self {
         Self {
             inner: RwLock::new(Settings::new()),
+            user_path: RwLock::new(None),
         }
     }
 
     pub fn load_user(&self, path: &std::path::Path) -> Result<(), String> {
+        self.set_user_path(path);
         self.inner
             .write()
             .map_err(|e| e.to_string())?
             .load_user(path)
             .map_err(|e| e.to_string())
+    }
+
+    /// Record where the user settings file lives so later updates persist.
+    pub fn set_user_path(&self, path: &std::path::Path) {
+        if let Ok(mut p) = self.user_path.write() {
+            *p = Some(path.to_path_buf());
+        }
+    }
+
+    /// Serialize the current user layer to the user settings file.
+    fn persist_user_layer(&self) -> Result<(), String> {
+        let path = match self.user_path.read().map_err(|e| e.to_string())?.clone() {
+            Some(p) => p,
+            None => return Ok(()), // path unknown (tests/headless) — skip silently
+        };
+        let layer = {
+            let settings = self.inner.read().map_err(|e| e.to_string())?;
+            settings.user_layer().clone()
+        };
+        if let Some(parent) = path.parent() {
+            std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+        }
+        let json = serde_json::to_string_pretty(&layer).map_err(|e| e.to_string())?;
+        // Write atomically: unique temp file + rename, so a crash mid-write
+        // can't corrupt settings.json and two concurrent persists can't
+        // interleave on a shared tmp path.
+        let tmp = path.with_extension(format!(
+            "json.tmp.{}.{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .map(|d| d.as_nanos())
+                .unwrap_or(0)
+        ));
+        std::fs::write(&tmp, json).map_err(|e| e.to_string())?;
+        std::fs::rename(&tmp, &path).map_err(|e| {
+            let _ = std::fs::remove_file(&tmp);
+            e.to_string()
+        })?;
+        Ok(())
     }
 
     pub fn load_workspace(&self, path: &std::path::Path) -> Result<(), String> {
@@ -84,15 +130,24 @@ pub fn settings_update(
     value: Value,
     scope: String,
 ) -> Result<(), String> {
-    let mut settings = state.inner.write().map_err(|e| e.to_string())?;
+    {
+        let mut settings = state.inner.write().map_err(|e| e.to_string())?;
 
-    match scope.as_str() {
-        "user" => settings.set(&key, value),
-        "workspace" => settings.set_workspace(&key, value),
-        _ => {
-            return Err(format!(
-                "invalid scope '{scope}': expected \"user\" or \"workspace\""
-            ))
+        match scope.as_str() {
+            "user" => settings.set(&key, value),
+            "workspace" => settings.set_workspace(&key, value),
+            _ => {
+                return Err(format!(
+                    "invalid scope '{scope}': expected \"user\" or \"workspace\""
+                ))
+            }
+        }
+    }
+
+    // Persist user-scope changes so they survive app restarts.
+    if scope == "user" {
+        if let Err(e) = state.persist_user_layer() {
+            log::warn!("failed to persist user settings: {e}");
         }
     }
     Ok(())

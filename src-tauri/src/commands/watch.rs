@@ -111,7 +111,27 @@ struct WatchSession {
     event_sender: UnboundedSender<PendingEvent>,
     /// Handle to the debounce task (for cleanup)
     #[allow(dead_code)]
-    debounce_task: AbortHandle,
+    debounce_task: DebounceStopper,
+}
+
+/// Stops a debounce worker regardless of which execution mode it runs in:
+/// a tokio task (abortable) or a dedicated fallback thread (signaled via
+/// channel). The previous fallback leaked an entire tokio runtime per
+/// watch_start (`std::mem::forget`) just to fake an AbortHandle.
+pub enum DebounceStopper {
+    Task(AbortHandle),
+    Channel(UnboundedSender<()>),
+}
+
+impl DebounceStopper {
+    pub fn stop(&self) {
+        match self {
+            DebounceStopper::Task(handle) => handle.abort(),
+            DebounceStopper::Channel(tx) => {
+                let _ = tx.send(());
+            }
+        }
+    }
 }
 
 /// Thread-safe store for all active watch sessions
@@ -251,7 +271,7 @@ fn spawn_debounce_task(
     app: AppHandle,
     debounce_duration: Duration,
     emit_content: bool,
-) -> (UnboundedSender<PendingEvent>, AbortHandle) {
+) -> (UnboundedSender<PendingEvent>, DebounceStopper) {
     let (tx, mut rx) = mpsc::unbounded_channel::<PendingEvent>();
 
     let handle = if let Ok(h) = tokio::runtime::Handle::try_current() {
@@ -329,10 +349,16 @@ fn spawn_debounce_task(
         log::warn!("[watch] no Tokio runtime for debounce task, creating background thread");
         let (stop_tx, mut stop_rx) = mpsc::unbounded_channel::<()>();
         std::thread::spawn(move || {
-            let rt = tokio::runtime::Builder::new_current_thread()
+            let rt = match tokio::runtime::Builder::new_current_thread()
                 .enable_all()
                 .build()
-                .unwrap();
+            {
+                Ok(rt) => rt,
+                Err(e) => {
+                    log::error!("[watch] failed to build fallback runtime: {e}");
+                    return;
+                }
+            };
             rt.block_on(async move {
                 let mut pending_events: Vec<PendingEvent> = Vec::new();
                 let mut last_event_time: Option<tokio::time::Instant> = None;
@@ -382,22 +408,10 @@ fn spawn_debounce_task(
                 }
             });
         });
-        let sentinel_rt = tokio::runtime::Builder::new_current_thread()
-            .enable_all()
-            .build()
-            .unwrap();
-        let abort_handle = sentinel_rt
-            .spawn(async move {
-                // Keep stop_tx alive until this task is aborted
-                let _keep = stop_tx;
-                std::future::pending::<()>().await;
-            })
-            .abort_handle();
-        std::mem::forget(sentinel_rt);
-        return (tx, abort_handle);
+        return (tx, DebounceStopper::Channel(stop_tx));
     };
 
-    (tx, handle.abort_handle())
+    (tx, DebounceStopper::Task(handle.abort_handle()))
 }
 
 /// Start watching multiple paths with advanced options
@@ -518,7 +532,7 @@ pub fn watch_stop(state: State<'_, Arc<WatchStore>>, id: u32) -> Result<(), Stri
 
     if let Some(session) = sessions.remove(&id) {
         // Abort the debounce task
-        session.debounce_task.abort();
+        session.debounce_task.stop();
         // The watcher and other resources are dropped automatically
         Ok(())
     } else {

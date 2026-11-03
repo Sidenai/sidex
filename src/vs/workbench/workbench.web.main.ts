@@ -44,6 +44,7 @@ import './services/extensionManagement/browser/extensionGalleryManifestService.j
 import './services/telemetry/browser/telemetryService.js';
 import './services/url/browser/urlService.js';
 import './services/update/browser/updateService.js';
+import './contrib/sidexUpdate/browser/sidexUpdate.contribution.js';
 import './services/workspaces/browser/workspacesService.js';
 import './services/workspaces/browser/workspaceEditingService.js';
 import './services/dialogs/browser/fileDialogService.js';

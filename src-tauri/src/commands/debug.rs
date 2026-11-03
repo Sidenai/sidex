@@ -24,6 +24,15 @@ impl DebugAdapterStore {
             next_id: Mutex::new(1),
         }
     }
+
+    /// Kill every running debug adapter. Called on app exit.
+    pub fn kill_all(&self) {
+        let mut adapters = self.adapters.lock().unwrap_or_else(|e| e.into_inner());
+        for (_, mut handle) in adapters.drain() {
+            let _ = handle.child.kill();
+            let _ = handle.child.wait();
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -139,8 +148,11 @@ pub fn debug_spawn_adapter(
             }
         }
 
-        // Process exited — retrieve exit code
-        let exit_code = {
+        // Process exited (stdout EOF) — remove the handle from the map FIRST,
+        // then reap with a real wait() OUTSIDE the lock. try_wait() under the
+        // lock left zombies (Ok(None) when the process hadn't fully exited)
+        // and leaked the map entry forever.
+        let handle = {
             let Ok(mut adapters) = state_clone.adapters.lock() else {
                 let _ = app_stdout.emit(
                     "debug-exit",
@@ -151,14 +163,15 @@ pub fn debug_spawn_adapter(
                 );
                 return;
             };
-            if let Some(handle) = adapters.get_mut(&adapter_id) {
-                match handle.child.try_wait() {
-                    Ok(Some(status)) => status.code(),
-                    _ => None,
-                }
-            } else {
-                None
-            }
+            adapters.remove(&adapter_id)
+        };
+
+        let exit_code = match handle {
+            Some(mut handle) => match handle.child.wait() {
+                Ok(status) => status.code(),
+                Err(_) => None,
+            },
+            None => None,
         };
 
         let _ = app_stdout.emit(

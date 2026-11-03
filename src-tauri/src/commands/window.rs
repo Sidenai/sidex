@@ -94,11 +94,6 @@ pub fn get_monitors(app: AppHandle) -> Result<Vec<MonitorInfo>, String> {
         .collect())
 }
 
-/// OS window frame geometry persisted in `sidex_storage.db` (`kv_store`).
-///
-/// Workbench layout (sidebar, panel, editor grid) is owned by VS Code storage
-/// (`workbench.*` / `editorpart.state` keys via `TauriStorageDatabase`). This
-/// command only touches native frame position/size/maximized state.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct WindowState {
     pub x: i32,
@@ -110,11 +105,6 @@ pub struct WindowState {
 
 const WINDOW_STATE_KEY: &str = "sidex.windowState";
 
-/// Restores native frame geometry before the workbench is shown.
-///
-/// Runs during Tauri `setup`, before the webview loads `LayoutStateModel`, so only
-/// OS-level size/position/maximize are applied. Inner workbench splits load from
-/// profile storage independently.
 #[allow(clippy::cast_possible_wrap)]
 pub fn restore_and_show(app: &tauri::App, db: &StorageDb) {
     let Some(window) = app.get_webview_window("main") else {
@@ -123,7 +113,7 @@ pub fn restore_and_show(app: &tauri::App, db: &StorageDb) {
 
     if let Ok(Some(json)) = db.get(WINDOW_STATE_KEY) {
         if let Ok(state) = serde_json::from_str::<WindowState>(&json) {
-            // Only restore if the frame lands on an available monitor.
+            // Only restores position if it lands on an available monitor.
             let on_screen = app.available_monitors().ok().is_some_and(|monitors| {
                 monitors.iter().any(|m| {
                     let pos = m.position();
@@ -139,13 +129,10 @@ pub fn restore_and_show(app: &tauri::App, db: &StorageDb) {
             });
 
             if on_screen {
+                let _ = window.set_size(tauri::PhysicalSize::new(state.width, state.height));
                 let _ = window.set_position(tauri::PhysicalPosition::new(state.x, state.y));
                 if state.maximized {
-                    // Skip set_size: maximize uses the restored frame; avoids a resize
-                    // that could run before workbench layout storage has loaded.
                     let _ = window.maximize();
-                } else {
-                    let _ = window.set_size(tauri::PhysicalSize::new(state.width, state.height));
                 }
             }
         }

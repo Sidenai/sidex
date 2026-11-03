@@ -11,6 +11,7 @@
 	flex-wrap: nowrap;
 	justify-content: flex-start;
 	outline-style: none;
+	height: 20px;
 }
 
 .monaco-breadcrumbs .monaco-breadcrumb-item {
@@ -22,13 +23,24 @@
 	align-self: center;
 	height: 100%;
 	outline: none;
+	transition: color 120ms ease;
 }
+
+.monaco-breadcrumbs .monaco-breadcrumb-item:hover {
+	text-decoration: underline;
+}
+
 .monaco-breadcrumbs.disabled .monaco-breadcrumb-item {
 	cursor: default;
 }
 
+.monaco-breadcrumbs.disabled .monaco-breadcrumb-item:hover {
+	text-decoration: none;
+}
+
 .monaco-breadcrumbs .monaco-breadcrumb-item .codicon-breadcrumb-separator {
-	color: inherit;
+	color: var(--vscode-breadcrumb-foreground, inherit);
+	opacity: 0.5;
 }
 
 .monaco-breadcrumbs .monaco-breadcrumb-item:first-of-type::before {
