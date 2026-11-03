@@ -128,6 +128,33 @@ Everything above runs standalone, with no account and no setup. Want the chat pa
 
 ---
 
+## NixOS
+
+The repository includes a Nix flake that packages the Linux application with
+the official `cargo-tauri` hook. With flakes enabled:
+
+```bash
+nix run github:QexleOSS/sidex
+```
+
+To build the package locally instead:
+
+```bash
+nix build github:QexleOSS/sidex
+./result/bin/SideX
+```
+
+For development dependencies, enter the included shell:
+
+```bash
+nix develop github:QexleOSS/sidex
+```
+
+The package currently includes the main application only. Extensions and
+language servers can be installed separately from Open VSX at runtime.
+
+---
+
 ## How It's Built
 
 SideX maps VSCode's Electron architecture onto Tauri layer by layer:
