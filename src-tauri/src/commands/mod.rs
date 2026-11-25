@@ -25,6 +25,7 @@ pub mod mcp;
 pub mod menu;
 pub mod models;
 pub mod next_gen_tools;
+pub mod open_paths;
 pub mod orchestrate;
 pub mod os;
 pub mod path;
