@@ -21,6 +21,7 @@ async function sidexOpenFolder() {
 
 function navigateToFolder(folderUri: string) {
 	const url = new URL(window.location.href);
+	url.searchParams.delete('workspace');
 	url.searchParams.set('folder', folderUri);
 	window.location.href = url.toString();
 }
@@ -86,12 +87,20 @@ async function boot() {
 
 	const urlParams = new URLSearchParams(window.location.search);
 	const folderParam = urlParams.get('folder');
+	const workspaceParam = urlParams.get('workspace');
 
 	let workspace: any = undefined;
 	if (folderParam) {
 		const parsed = URI.parse(folderParam);
 		if (parsed.scheme === 'file' || parsed.scheme === 'vscode-remote' || parsed.scheme === 'vscode-vfs') {
 			workspace = { folderUri: parsed };
+		}
+	}
+
+	if (workspaceParam) {
+		const parsed = URI.parse(workspaceParam);
+		if (parsed.scheme === 'file') {
+			workspace = { workspaceUri: parsed };
 		}
 	}
 
@@ -212,6 +221,7 @@ async function boot() {
 		create(document.body, options);
 	}
 
+	setupOpenPaths().catch(error => console.error('[SideX] Failed to initialize launch paths:', error));
 	setupTauriExternalOpener();
 	setupMenuActions();
 	setupWindowStateSave();
@@ -224,6 +234,72 @@ async function boot() {
 		'workspace:',
 		workspace
 	);
+}
+
+async function setupOpenPaths() {
+	if (!(globalThis as any).__SIDEX_TAURI__) {
+		return;
+	}
+	const [
+		{ invoke },
+		{ listen },
+		{ URI },
+		{ commands },
+		{ createOpenPathsHandler },
+		{ getCurrentWindow },
+		{ CommandsRegistry },
+		{ ILifecycleService, LifecyclePhase },
+		{ API_OPEN_EDITOR_COMMAND_ID }
+	] = await Promise.all([
+		import('@tauri-apps/api/core'),
+		import('@tauri-apps/api/event'),
+		import('./vs/base/common/uri.js'),
+		import('./vs/workbench/browser/web.factory.js'),
+		import('./open-paths.js'),
+		import('@tauri-apps/api/window'),
+		import('./vs/platform/commands/common/commands.js'),
+		import('./vs/workbench/services/lifecycle/common/lifecycle.js'),
+		import('./vs/workbench/browser/parts/editor/editorCommands.js')
+	]);
+	if (getCurrentWindow().label !== 'main') {
+		return;
+	}
+	const key = 'sidex.pendingOpenPaths';
+	const drain = createOpenPathsHandler({
+		take: () => invoke<import('./open-paths.js').OpenPath[] | null>('take_pending_open_paths'),
+		load: () => JSON.parse(sessionStorage.getItem(key) || 'null'),
+		save: paths => sessionStorage.setItem(key, JSON.stringify(paths)),
+		clear: () => sessionStorage.removeItem(key),
+		openWorkspace: path => {
+			const url = new URL(window.location.href);
+			const param = path.kind === 'folder' ? 'folder' : 'workspace';
+			const uri = URI.file(path.path).toString();
+			if (url.searchParams.get(param) === uri) {
+				return false;
+			}
+			url.searchParams.delete('folder');
+			url.searchParams.delete('workspace');
+			url.searchParams.set(param, uri);
+			window.location.href = url.toString();
+			return true;
+		},
+		openFile: async path => {
+			await commands.executeCommand(API_OPEN_EDITOR_COMMAND_ID, URI.file(path), [undefined, { pinned: true }]);
+		},
+		onError: error => console.error('[SideX] Failed to open launch path:', error)
+	});
+	// Register before draining, and wait for session restoration before opening files.
+	const registration = CommandsRegistry.registerCommand('_sidex.waitForSessionRestore', accessor =>
+		accessor.get(ILifecycleService).when(LifecyclePhase.Restored)
+	);
+	const ready = commands.executeCommand('_sidex.waitForSessionRestore').finally(() => registration.dispose());
+	const wake = () => {
+		void ready.then(() => drain());
+	};
+	const unlisten = await listen('sidex-open-paths', wake);
+	window.addEventListener('beforeunload', unlisten, { once: true });
+	await ready;
+	await drain();
 }
 
 function setupTauriExternalOpener() {

@@ -448,7 +448,33 @@ pub fn run() {
         dotenvy::from_path(&env_path).ok();
     }
 
-    tauri::Builder::default()
+    let pending = commands::open_paths::PendingOpenPaths::default();
+    if let Ok(cwd) = std::env::current_dir() {
+        pending.push(commands::open_paths::parse_paths(
+            std::env::args_os().skip(1),
+            &cwd,
+        ));
+    }
+    let builder = tauri::Builder::default().manage(pending);
+    #[cfg(desktop)]
+    let builder = builder.plugin(tauri_plugin_single_instance::init(|app, args, cwd| {
+        use tauri::Emitter;
+        let paths = commands::open_paths::parse_paths(
+            args.into_iter().skip(1).map(std::ffi::OsString::from),
+            std::path::Path::new(&cwd),
+        );
+        app.state::<commands::open_paths::PendingOpenPaths>()
+            .push(paths);
+        // The event is only a wake-up signal. Requests survive startup and reloads.
+        let _ = app.emit_to("main", "sidex-open-paths", ());
+        if let Some(window) = app.get_webview_window("main") {
+            let _ = window.unminimize();
+            let _ = window.show();
+            let _ = window.set_focus();
+        }
+    }));
+
+    builder
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_shell::init())
         .manage(AuthState::new())
@@ -684,6 +710,7 @@ pub fn run() {
             }
         })
         .invoke_handler(tauri::generate_handler![
+            commands::open_paths::take_pending_open_paths,
             // AI Agent
             commands::agent::agent_execute_tool,
             // Local account, providers, and the local agent server

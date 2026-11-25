@@ -10,6 +10,8 @@ on:
       - "sidex-extension-sdk/**"
       - "Cargo.toml"
       - "Cargo.lock"
+      - "src/open-paths.ts"
+      - "scripts/open-paths.test.mjs"
   pull_request:
     branches: [main]
     paths:
@@ -19,6 +21,8 @@ on:
       - "sidex-extension-sdk/**"
       - "Cargo.toml"
       - "Cargo.lock"
+      - "src/open-paths.ts"
+      - "scripts/open-paths.test.mjs"
 
 env:
   RUST_BACKTRACE: 1
@@ -29,6 +33,16 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  open-paths:
+    name: Launch path regression tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: node --experimental-strip-types --test scripts/open-paths.test.mjs
+
   rust-test:
     name: cargo test (${{ matrix.os }})
     strategy:
